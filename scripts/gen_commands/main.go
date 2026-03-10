@@ -23,6 +23,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// camelUpperBoundary matches the transition from lowercase to uppercase (e.g. 'l' before 'P' in "listPullRequests").
+var camelUpperBoundary = regexp.MustCompile(`([a-z])([A-Z])`)
+
 // ─── Schema types ─────────────────────────────────────────────────────────────
 
 type Schema struct {
@@ -65,6 +68,7 @@ type CommandData struct {
 	HandlerCall string
 	Flags       []FlagData
 	HasBody     bool
+	HasIntFlag  bool // true when any flag requires strconv
 }
 
 type FlagData struct {
@@ -148,7 +152,9 @@ package commands
 import (
 	"context"
 	"fmt"
+{{- if .NeedsStrconv}}
 	"strconv"
+{{- end}}
 
 	"github.com/spf13/cobra"
 
@@ -202,7 +208,6 @@ func new{{toCamel .OperationID}}Cmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			_ = strconv.Itoa // ensure strconv import is used
 			return {{.HandlerCall}}
 		},
 	}
@@ -230,8 +235,9 @@ func AddOutputFlag(cmd *cobra.Command) {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 type FileData struct {
-	SchemaPath string
-	Commands   []CommandData
+	SchemaPath    string
+	Commands      []CommandData
+	NeedsStrconv  bool // true if any command has an integer flag (requires strconv import)
 }
 
 func main() {
@@ -267,8 +273,12 @@ func main() {
 			}
 
 			var flags []FlagData
+			hasIntFlag := false
 			for _, p := range op.Parameters {
 				gt := goType(p.Schema.Type)
+				if gt == "int" {
+					hasIntFlag = true
+				}
 				flags = append(flags, FlagData{
 					Name:     flagName(p.Name),
 					GoName:   toGoName(p.Name),
@@ -283,17 +293,14 @@ func main() {
 			handlerCall := fmt.Sprintf("handlers.Dispatch(context.Background(), c, %q, map[string]any{})",
 				op.OperationID)
 
-			use := strings.ToLower(strings.ReplaceAll(op.OperationID, "_", "-"))
-			// Strip leading verb + "pull-request" prefix for brevity
-			for _, prefix := range []string{"listPullRequests", "createPullRequest", "getPullRequest", "mergePullRequest"} {
-				if op.OperationID == prefix {
-					parts := nonAlpha.Split(op.OperationID, -1)
-					// camelCase to kebab: "listPullRequests" → "list"
-					if len(parts) > 0 {
-						use = strings.ToLower(parts[0])
-					}
-					break
-				}
+			// Derive the CLI subcommand name: extract the leading verb from camelCase operationId.
+			// e.g. "listPullRequests" → "list", "getPullRequest" → "get"
+			// Strategy: insert a hyphen at every lowercase→uppercase transition, then take the first word.
+			kebab := strings.ToLower(camelUpperBoundary.ReplaceAllString(op.OperationID, "${1}-${2}"))
+			use := strings.SplitN(kebab, "-", 2)[0]
+
+			if hasIntFlag {
+				data.NeedsStrconv = true
 			}
 
 			data.Commands = append(data.Commands, CommandData{
@@ -304,6 +311,7 @@ func main() {
 				HandlerCall: handlerCall,
 				Flags:       flags,
 				HasBody:     op.RequestBody != nil,
+				HasIntFlag:  hasIntFlag,
 			})
 		}
 	}
