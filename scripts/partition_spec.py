@@ -135,9 +135,11 @@ def post_process_schema(out: dict) -> None:
     """Normalize extracted schema for stable Go code generation.
 
     Two transformations are applied after extraction:
-    1. Ensure ``pullrequest`` always exposes ``description`` as a direct
-       property so that the generated Go struct always has the field and
-       ``pr_create.go`` can set it without further changes.
+    1. Ensure ``pullrequest`` always exposes ``description`` inside an allOf
+       inline subschema so that oapi-codegen generates it as a Go struct field.
+       When the live Bitbucket API schema places ``description`` as a top-level
+       property alongside ``allOf``, oapi-codegen silently ignores it; moving
+       it into the inline allOf subschema makes it visible to the generator.
     2. Lift the inline ``pullrequest_endpoint.branch`` object into a named
        schema (``pullrequest_endpoint_branch``) so that Go code can reference
        the type by name instead of using an anonymous struct literal that
@@ -145,17 +147,49 @@ def post_process_schema(out: dict) -> None:
     """
     schemas = out.get("components", {}).get("schemas", {})
 
-    # 1. Ensure pullrequest.description is a direct property.
-    # We check only direct properties (not inherited via allOf) because
-    # oapi-codegen may not promote embedded allOf fields to the top-level
-    # struct, making the field inaccessible as pr.Description.
+    # 1. Ensure pullrequest.description ends up in the allOf inline subschema.
+    # oapi-codegen ignores top-level `properties` when `allOf` is also present.
+    # Strategy:
+    #   a. If `description` exists as a top-level property alongside `allOf`,
+    #      move it into the allOf inline object subschema (type: object).
+    #   b. If `description` is missing entirely from both top-level properties
+    #      and all allOf subschemas, inject it into the inline allOf subschema
+    #      (or as a direct property if no allOf exists).
     pr = schemas.get("pullrequest")
     if pr is not None:
-        if "description" not in pr.get("properties", {}):
-            pr.setdefault("properties", {})["description"] = {
-                "type": "string",
-                "description": "Explains what the pull request does.",
-            }
+        all_of = pr.get("allOf", [])
+        if all_of:
+            # Find the inline subschema (type: object) to inject into
+            inline_sub = next(
+                (s for s in all_of if s.get("type") == "object"), None
+            )
+            # Collect all properties already visible inside allOf subschemas
+            allof_props: set = set()
+            for sub in all_of:
+                allof_props.update(sub.get("properties", {}).keys())
+
+            # Move top-level description (ignored by oapi-codegen) into allOf
+            top_level_desc = pr.get("properties", {}).pop("description", None)
+            if top_level_desc and "description" not in allof_props:
+                if inline_sub is not None:
+                    inline_sub.setdefault("properties", {})["description"] = top_level_desc
+                # Clean up the now-empty top-level properties dict
+                if not pr.get("properties"):
+                    pr.pop("properties", None)
+            elif "description" not in allof_props:
+                # description is missing entirely — inject it
+                target = inline_sub if inline_sub is not None else pr
+                target.setdefault("properties", {})["description"] = {
+                    "type": "string",
+                    "description": "Explains what the pull request does.",
+                }
+        else:
+            # No allOf — just ensure description exists as a direct property
+            if "description" not in pr.get("properties", {}):
+                pr.setdefault("properties", {})["description"] = {
+                    "type": "string",
+                    "description": "Explains what the pull request does.",
+                }
 
     # 2. Lift pullrequest_endpoint.branch to a named schema
     ep = schemas.get("pullrequest_endpoint")

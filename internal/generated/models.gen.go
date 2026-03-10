@@ -4,12 +4,136 @@
 package generated
 
 import (
+	"encoding/json"
+	"fmt"
 	"time"
 )
 
+const (
+	Api_keyScopes = "api_key.Scopes"
+	BasicScopes   = "basic.Scopes"
+	Oauth2Scopes  = "oauth2.Scopes"
+)
+
+// Defines values for BaseCommitSummaryMarkup.
+const (
+	BaseCommitSummaryMarkupCreole    BaseCommitSummaryMarkup = "creole"
+	BaseCommitSummaryMarkupMarkdown  BaseCommitSummaryMarkup = "markdown"
+	BaseCommitSummaryMarkupPlaintext BaseCommitSummaryMarkup = "plaintext"
+)
+
+// Valid indicates whether the value is a known member of the BaseCommitSummaryMarkup enum.
+func (e BaseCommitSummaryMarkup) Valid() bool {
+	switch e {
+	case BaseCommitSummaryMarkupCreole:
+		return true
+	case BaseCommitSummaryMarkupMarkdown:
+		return true
+	case BaseCommitSummaryMarkupPlaintext:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for BranchMergeStrategies.
+const (
+	BranchMergeStrategiesFastForward       BranchMergeStrategies = "fast_forward"
+	BranchMergeStrategiesMergeCommit       BranchMergeStrategies = "merge_commit"
+	BranchMergeStrategiesRebaseFastForward BranchMergeStrategies = "rebase_fast_forward"
+	BranchMergeStrategiesRebaseMerge       BranchMergeStrategies = "rebase_merge"
+	BranchMergeStrategiesSquash            BranchMergeStrategies = "squash"
+	BranchMergeStrategiesSquashFastForward BranchMergeStrategies = "squash_fast_forward"
+)
+
+// Valid indicates whether the value is a known member of the BranchMergeStrategies enum.
+func (e BranchMergeStrategies) Valid() bool {
+	switch e {
+	case BranchMergeStrategiesFastForward:
+		return true
+	case BranchMergeStrategiesMergeCommit:
+		return true
+	case BranchMergeStrategiesRebaseFastForward:
+		return true
+	case BranchMergeStrategiesRebaseMerge:
+		return true
+	case BranchMergeStrategiesSquash:
+		return true
+	case BranchMergeStrategiesSquashFastForward:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for CommentContentMarkup.
+const (
+	CommentContentMarkupCreole    CommentContentMarkup = "creole"
+	CommentContentMarkupMarkdown  CommentContentMarkup = "markdown"
+	CommentContentMarkupPlaintext CommentContentMarkup = "plaintext"
+)
+
+// Valid indicates whether the value is a known member of the CommentContentMarkup enum.
+func (e CommentContentMarkup) Valid() bool {
+	switch e {
+	case CommentContentMarkupCreole:
+		return true
+	case CommentContentMarkupMarkdown:
+		return true
+	case CommentContentMarkupPlaintext:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for CommitSummaryMarkup.
+const (
+	CommitSummaryMarkupCreole    CommitSummaryMarkup = "creole"
+	CommitSummaryMarkupMarkdown  CommitSummaryMarkup = "markdown"
+	CommitSummaryMarkupPlaintext CommitSummaryMarkup = "plaintext"
+)
+
+// Valid indicates whether the value is a known member of the CommitSummaryMarkup enum.
+func (e CommitSummaryMarkup) Valid() bool {
+	switch e {
+	case CommitSummaryMarkupCreole:
+		return true
+	case CommitSummaryMarkupMarkdown:
+		return true
+	case CommitSummaryMarkupPlaintext:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for CommitstatusState.
+const (
+	FAILED     CommitstatusState = "FAILED"
+	INPROGRESS CommitstatusState = "INPROGRESS"
+	STOPPED    CommitstatusState = "STOPPED"
+	SUCCESSFUL CommitstatusState = "SUCCESSFUL"
+)
+
+// Valid indicates whether the value is a known member of the CommitstatusState enum.
+func (e CommitstatusState) Valid() bool {
+	switch e {
+	case FAILED:
+		return true
+	case INPROGRESS:
+		return true
+	case STOPPED:
+		return true
+	case SUCCESSFUL:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ParticipantRole.
 const (
-	AUTHOR      ParticipantRole = "AUTHOR"
 	PARTICIPANT ParticipantRole = "PARTICIPANT"
 	REVIEWER    ParticipantRole = "REVIEWER"
 )
@@ -17,8 +141,6 @@ const (
 // Valid indicates whether the value is a known member of the ParticipantRole enum.
 func (e ParticipantRole) Valid() bool {
 	switch e {
-	case AUTHOR:
-		return true
 	case PARTICIPANT:
 		return true
 	case REVIEWER:
@@ -32,7 +154,7 @@ func (e ParticipantRole) Valid() bool {
 const (
 	Approved         ParticipantState = "approved"
 	ChangesRequested ParticipantState = "changes_requested"
-	Null             ParticipantState = "null"
+	LessThannil      ParticipantState = "<nil>"
 )
 
 // Valid indicates whether the value is a known member of the ParticipantState enum.
@@ -42,7 +164,70 @@ func (e ParticipantState) Valid() bool {
 		return true
 	case ChangesRequested:
 		return true
-	case Null:
+	case LessThannil:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PullrequestRenderedDescriptionMarkup.
+const (
+	PullrequestRenderedDescriptionMarkupCreole    PullrequestRenderedDescriptionMarkup = "creole"
+	PullrequestRenderedDescriptionMarkupMarkdown  PullrequestRenderedDescriptionMarkup = "markdown"
+	PullrequestRenderedDescriptionMarkupPlaintext PullrequestRenderedDescriptionMarkup = "plaintext"
+)
+
+// Valid indicates whether the value is a known member of the PullrequestRenderedDescriptionMarkup enum.
+func (e PullrequestRenderedDescriptionMarkup) Valid() bool {
+	switch e {
+	case PullrequestRenderedDescriptionMarkupCreole:
+		return true
+	case PullrequestRenderedDescriptionMarkupMarkdown:
+		return true
+	case PullrequestRenderedDescriptionMarkupPlaintext:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PullrequestRenderedReasonMarkup.
+const (
+	PullrequestRenderedReasonMarkupCreole    PullrequestRenderedReasonMarkup = "creole"
+	PullrequestRenderedReasonMarkupMarkdown  PullrequestRenderedReasonMarkup = "markdown"
+	PullrequestRenderedReasonMarkupPlaintext PullrequestRenderedReasonMarkup = "plaintext"
+)
+
+// Valid indicates whether the value is a known member of the PullrequestRenderedReasonMarkup enum.
+func (e PullrequestRenderedReasonMarkup) Valid() bool {
+	switch e {
+	case PullrequestRenderedReasonMarkupCreole:
+		return true
+	case PullrequestRenderedReasonMarkupMarkdown:
+		return true
+	case PullrequestRenderedReasonMarkupPlaintext:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PullrequestRenderedTitleMarkup.
+const (
+	PullrequestRenderedTitleMarkupCreole    PullrequestRenderedTitleMarkup = "creole"
+	PullrequestRenderedTitleMarkupMarkdown  PullrequestRenderedTitleMarkup = "markdown"
+	PullrequestRenderedTitleMarkupPlaintext PullrequestRenderedTitleMarkup = "plaintext"
+)
+
+// Valid indicates whether the value is a known member of the PullrequestRenderedTitleMarkup enum.
+func (e PullrequestRenderedTitleMarkup) Valid() bool {
+	switch e {
+	case PullrequestRenderedTitleMarkupCreole:
+		return true
+	case PullrequestRenderedTitleMarkupMarkdown:
+		return true
+	case PullrequestRenderedTitleMarkupPlaintext:
 		return true
 	default:
 		return false
@@ -52,8 +237,10 @@ func (e ParticipantState) Valid() bool {
 // Defines values for PullrequestState.
 const (
 	PullrequestStateDECLINED   PullrequestState = "DECLINED"
+	PullrequestStateDRAFT      PullrequestState = "DRAFT"
 	PullrequestStateMERGED     PullrequestState = "MERGED"
 	PullrequestStateOPEN       PullrequestState = "OPEN"
+	PullrequestStateQUEUED     PullrequestState = "QUEUED"
 	PullrequestStateSUPERSEDED PullrequestState = "SUPERSEDED"
 )
 
@@ -62,9 +249,13 @@ func (e PullrequestState) Valid() bool {
 	switch e {
 	case PullrequestStateDECLINED:
 		return true
+	case PullrequestStateDRAFT:
+		return true
 	case PullrequestStateMERGED:
 		return true
 	case PullrequestStateOPEN:
+		return true
+	case PullrequestStateQUEUED:
 		return true
 	case PullrequestStateSUPERSEDED:
 		return true
@@ -73,11 +264,95 @@ func (e PullrequestState) Valid() bool {
 	}
 }
 
+// Defines values for PullrequestSummaryMarkup.
+const (
+	PullrequestSummaryMarkupCreole    PullrequestSummaryMarkup = "creole"
+	PullrequestSummaryMarkupMarkdown  PullrequestSummaryMarkup = "markdown"
+	PullrequestSummaryMarkupPlaintext PullrequestSummaryMarkup = "plaintext"
+)
+
+// Valid indicates whether the value is a known member of the PullrequestSummaryMarkup enum.
+func (e PullrequestSummaryMarkup) Valid() bool {
+	switch e {
+	case PullrequestSummaryMarkupCreole:
+		return true
+	case PullrequestSummaryMarkupMarkdown:
+		return true
+	case PullrequestSummaryMarkupPlaintext:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PullrequestCommentContentMarkup.
+const (
+	PullrequestCommentContentMarkupCreole    PullrequestCommentContentMarkup = "creole"
+	PullrequestCommentContentMarkupMarkdown  PullrequestCommentContentMarkup = "markdown"
+	PullrequestCommentContentMarkupPlaintext PullrequestCommentContentMarkup = "plaintext"
+)
+
+// Valid indicates whether the value is a known member of the PullrequestCommentContentMarkup enum.
+func (e PullrequestCommentContentMarkup) Valid() bool {
+	switch e {
+	case PullrequestCommentContentMarkupCreole:
+		return true
+	case PullrequestCommentContentMarkupMarkdown:
+		return true
+	case PullrequestCommentContentMarkupPlaintext:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PullrequestCommentTaskContentMarkup.
+const (
+	PullrequestCommentTaskContentMarkupCreole    PullrequestCommentTaskContentMarkup = "creole"
+	PullrequestCommentTaskContentMarkupMarkdown  PullrequestCommentTaskContentMarkup = "markdown"
+	PullrequestCommentTaskContentMarkupPlaintext PullrequestCommentTaskContentMarkup = "plaintext"
+)
+
+// Valid indicates whether the value is a known member of the PullrequestCommentTaskContentMarkup enum.
+func (e PullrequestCommentTaskContentMarkup) Valid() bool {
+	switch e {
+	case PullrequestCommentTaskContentMarkupCreole:
+		return true
+	case PullrequestCommentTaskContentMarkupMarkdown:
+		return true
+	case PullrequestCommentTaskContentMarkupPlaintext:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PullrequestCommentTaskState.
+const (
+	PullrequestCommentTaskStateRESOLVED   PullrequestCommentTaskState = "RESOLVED"
+	PullrequestCommentTaskStateUNRESOLVED PullrequestCommentTaskState = "UNRESOLVED"
+)
+
+// Valid indicates whether the value is a known member of the PullrequestCommentTaskState enum.
+func (e PullrequestCommentTaskState) Valid() bool {
+	switch e {
+	case PullrequestCommentTaskStateRESOLVED:
+		return true
+	case PullrequestCommentTaskStateUNRESOLVED:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for PullrequestEndpointBranchMergeStrategies.
 const (
-	PullrequestEndpointBranchMergeStrategiesFastForward PullrequestEndpointBranchMergeStrategies = "fast_forward"
-	PullrequestEndpointBranchMergeStrategiesMergeCommit PullrequestEndpointBranchMergeStrategies = "merge_commit"
-	PullrequestEndpointBranchMergeStrategiesSquash      PullrequestEndpointBranchMergeStrategies = "squash"
+	PullrequestEndpointBranchMergeStrategiesFastForward       PullrequestEndpointBranchMergeStrategies = "fast_forward"
+	PullrequestEndpointBranchMergeStrategiesMergeCommit       PullrequestEndpointBranchMergeStrategies = "merge_commit"
+	PullrequestEndpointBranchMergeStrategiesRebaseFastForward PullrequestEndpointBranchMergeStrategies = "rebase_fast_forward"
+	PullrequestEndpointBranchMergeStrategiesRebaseMerge       PullrequestEndpointBranchMergeStrategies = "rebase_merge"
+	PullrequestEndpointBranchMergeStrategiesSquash            PullrequestEndpointBranchMergeStrategies = "squash"
+	PullrequestEndpointBranchMergeStrategiesSquashFastForward PullrequestEndpointBranchMergeStrategies = "squash_fast_forward"
 )
 
 // Valid indicates whether the value is a known member of the PullrequestEndpointBranchMergeStrategies enum.
@@ -87,7 +362,13 @@ func (e PullrequestEndpointBranchMergeStrategies) Valid() bool {
 		return true
 	case PullrequestEndpointBranchMergeStrategiesMergeCommit:
 		return true
+	case PullrequestEndpointBranchMergeStrategiesRebaseFastForward:
+		return true
+	case PullrequestEndpointBranchMergeStrategiesRebaseMerge:
+		return true
 	case PullrequestEndpointBranchMergeStrategiesSquash:
+		return true
+	case PullrequestEndpointBranchMergeStrategiesSquashFastForward:
 		return true
 	default:
 		return false
@@ -96,19 +377,160 @@ func (e PullrequestEndpointBranchMergeStrategies) Valid() bool {
 
 // Defines values for PullrequestMergeParametersMergeStrategy.
 const (
-	PullrequestMergeParametersMergeStrategyFastForward PullrequestMergeParametersMergeStrategy = "fast_forward"
-	PullrequestMergeParametersMergeStrategyMergeCommit PullrequestMergeParametersMergeStrategy = "merge_commit"
-	PullrequestMergeParametersMergeStrategySquash      PullrequestMergeParametersMergeStrategy = "squash"
+	FastForward       PullrequestMergeParametersMergeStrategy = "fast_forward"
+	MergeCommit       PullrequestMergeParametersMergeStrategy = "merge_commit"
+	RebaseFastForward PullrequestMergeParametersMergeStrategy = "rebase_fast_forward"
+	RebaseMerge       PullrequestMergeParametersMergeStrategy = "rebase_merge"
+	Squash            PullrequestMergeParametersMergeStrategy = "squash"
+	SquashFastForward PullrequestMergeParametersMergeStrategy = "squash_fast_forward"
 )
 
 // Valid indicates whether the value is a known member of the PullrequestMergeParametersMergeStrategy enum.
 func (e PullrequestMergeParametersMergeStrategy) Valid() bool {
 	switch e {
-	case PullrequestMergeParametersMergeStrategyFastForward:
+	case FastForward:
 		return true
-	case PullrequestMergeParametersMergeStrategyMergeCommit:
+	case MergeCommit:
 		return true
-	case PullrequestMergeParametersMergeStrategySquash:
+	case RebaseFastForward:
+		return true
+	case RebaseMerge:
+		return true
+	case Squash:
+		return true
+	case SquashFastForward:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PullrequestTaskContentMarkup.
+const (
+	PullrequestTaskContentMarkupCreole    PullrequestTaskContentMarkup = "creole"
+	PullrequestTaskContentMarkupMarkdown  PullrequestTaskContentMarkup = "markdown"
+	PullrequestTaskContentMarkupPlaintext PullrequestTaskContentMarkup = "plaintext"
+)
+
+// Valid indicates whether the value is a known member of the PullrequestTaskContentMarkup enum.
+func (e PullrequestTaskContentMarkup) Valid() bool {
+	switch e {
+	case PullrequestTaskContentMarkupCreole:
+		return true
+	case PullrequestTaskContentMarkupMarkdown:
+		return true
+	case PullrequestTaskContentMarkupPlaintext:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PullrequestTaskState.
+const (
+	PullrequestTaskStateRESOLVED   PullrequestTaskState = "RESOLVED"
+	PullrequestTaskStateUNRESOLVED PullrequestTaskState = "UNRESOLVED"
+)
+
+// Valid indicates whether the value is a known member of the PullrequestTaskState enum.
+func (e PullrequestTaskState) Valid() bool {
+	switch e {
+	case PullrequestTaskStateRESOLVED:
+		return true
+	case PullrequestTaskStateUNRESOLVED:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PullrequestTaskUpdateState.
+const (
+	PullrequestTaskUpdateStateRESOLVED   PullrequestTaskUpdateState = "RESOLVED"
+	PullrequestTaskUpdateStateUNRESOLVED PullrequestTaskUpdateState = "UNRESOLVED"
+)
+
+// Valid indicates whether the value is a known member of the PullrequestTaskUpdateState enum.
+func (e PullrequestTaskUpdateState) Valid() bool {
+	switch e {
+	case PullrequestTaskUpdateStateRESOLVED:
+		return true
+	case PullrequestTaskUpdateStateUNRESOLVED:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RepositoryForkPolicy.
+const (
+	AllowForks    RepositoryForkPolicy = "allow_forks"
+	NoForks       RepositoryForkPolicy = "no_forks"
+	NoPublicForks RepositoryForkPolicy = "no_public_forks"
+)
+
+// Valid indicates whether the value is a known member of the RepositoryForkPolicy enum.
+func (e RepositoryForkPolicy) Valid() bool {
+	switch e {
+	case AllowForks:
+		return true
+	case NoForks:
+		return true
+	case NoPublicForks:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RepositoryScm.
+const (
+	Git RepositoryScm = "git"
+)
+
+// Valid indicates whether the value is a known member of the RepositoryScm enum.
+func (e RepositoryScm) Valid() bool {
+	switch e {
+	case Git:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for TaskContentMarkup.
+const (
+	Creole    TaskContentMarkup = "creole"
+	Markdown  TaskContentMarkup = "markdown"
+	Plaintext TaskContentMarkup = "plaintext"
+)
+
+// Valid indicates whether the value is a known member of the TaskContentMarkup enum.
+func (e TaskContentMarkup) Valid() bool {
+	switch e {
+	case Creole:
+		return true
+	case Markdown:
+		return true
+	case Plaintext:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for TaskState.
+const (
+	TaskStateRESOLVED   TaskState = "RESOLVED"
+	TaskStateUNRESOLVED TaskState = "UNRESOLVED"
+)
+
+// Valid indicates whether the value is a known member of the TaskState enum.
+func (e TaskState) Valid() bool {
+	switch e {
+	case TaskStateRESOLVED:
+		return true
+	case TaskStateUNRESOLVED:
 		return true
 	default:
 		return false
@@ -139,49 +561,433 @@ func (e ListPullRequestsParamsState) Valid() bool {
 	}
 }
 
-// Account defines model for account.
-type Account struct {
-	DisplayName *string `json:"display_name,omitempty"`
-	Links       *struct {
-		Html *Link `json:"html,omitempty"`
-		Self *Link `json:"self,omitempty"`
-	} `json:"links,omitempty"`
-	Nickname *string `json:"nickname,omitempty"`
-	Username *string `json:"username,omitempty"`
-	Uuid     *string `json:"uuid,omitempty"`
+// Defines values for ListWorkspacePullRequestsForAUserParamsState.
+const (
+	DECLINED   ListWorkspacePullRequestsForAUserParamsState = "DECLINED"
+	MERGED     ListWorkspacePullRequestsForAUserParamsState = "MERGED"
+	OPEN       ListWorkspacePullRequestsForAUserParamsState = "OPEN"
+	SUPERSEDED ListWorkspacePullRequestsForAUserParamsState = "SUPERSEDED"
+)
+
+// Valid indicates whether the value is a known member of the ListWorkspacePullRequestsForAUserParamsState enum.
+func (e ListWorkspacePullRequestsForAUserParamsState) Valid() bool {
+	switch e {
+	case DECLINED:
+		return true
+	case MERGED:
+		return true
+	case OPEN:
+		return true
+	case SUPERSEDED:
+		return true
+	default:
+		return false
+	}
 }
 
-// Link defines model for link.
+// Account defines model for account.
+type Account struct {
+	CreatedOn   *time.Time `json:"created_on,omitempty"`
+	DisplayName *string    `json:"display_name,omitempty"`
+
+	// Links Links related to an Account.
+	Links                *AccountLinks          `json:"links,omitempty"`
+	Type                 string                 `json:"type"`
+	Uuid                 *string                `json:"uuid,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// AccountLinks Links related to an Account.
+type AccountLinks struct {
+	// Avatar A link to a resource related to this object.
+	Avatar               *Link                  `json:"avatar,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// Author defines model for author.
+type Author struct {
+	// Raw The raw author value from the repository. This may be the only value available if the author does not match a user in Bitbucket.
+	Raw                  *string                `json:"raw,omitempty"`
+	Type                 string                 `json:"type"`
+	User                 *Account               `json:"user,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// BaseCommit defines model for base_commit.
+type BaseCommit struct {
+	Author    *Author       `json:"author,omitempty"`
+	Committer *Committer    `json:"committer,omitempty"`
+	Date      *time.Time    `json:"date,omitempty"`
+	Hash      *string       `json:"hash,omitempty"`
+	Message   *string       `json:"message,omitempty"`
+	Parents   *[]BaseCommit `json:"parents,omitempty"`
+	Summary   *struct {
+		// Html The user's content rendered as HTML.
+		Html *string `json:"html,omitempty"`
+
+		// Markup The type of markup language the raw content is to be interpreted in.
+		Markup *BaseCommitSummaryMarkup `json:"markup,omitempty"`
+
+		// Raw The text as it was typed by a user.
+		Raw *string `json:"raw,omitempty"`
+	} `json:"summary,omitempty"`
+	Type                 string                 `json:"type"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// BaseCommitSummaryMarkup The type of markup language the raw content is to be interpreted in.
+type BaseCommitSummaryMarkup string
+
+// Branch defines model for branch.
+type Branch struct {
+	// DefaultMergeStrategy The default merge strategy for pull requests targeting this branch.
+	DefaultMergeStrategy *string `json:"default_merge_strategy,omitempty"`
+	Links                *struct {
+		// Commits A link to a resource related to this object.
+		Commits *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"commits,omitempty"`
+
+		// Html A link to a resource related to this object.
+		Html *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"html,omitempty"`
+
+		// Self A link to a resource related to this object.
+		Self *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"self,omitempty"`
+	} `json:"links,omitempty"`
+
+	// MergeStrategies Available merge strategies for pull requests targeting this branch.
+	MergeStrategies *[]BranchMergeStrategies `json:"merge_strategies,omitempty"`
+
+	// Name The name of the ref.
+	Name                 *string                `json:"name,omitempty"`
+	Target               *Commit                `json:"target,omitempty"`
+	Type                 string                 `json:"type"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// BranchMergeStrategies defines model for Branch.MergeStrategies.
+type BranchMergeStrategies string
+
+// Comment defines model for comment.
+type Comment struct {
+	Content *struct {
+		// Html The user's content rendered as HTML.
+		Html *string `json:"html,omitempty"`
+
+		// Markup The type of markup language the raw content is to be interpreted in.
+		Markup *CommentContentMarkup `json:"markup,omitempty"`
+
+		// Raw The text as it was typed by a user.
+		Raw *string `json:"raw,omitempty"`
+	} `json:"content,omitempty"`
+	CreatedOn *time.Time `json:"created_on,omitempty"`
+	Deleted   *bool      `json:"deleted,omitempty"`
+	Id        *int64     `json:"id,omitempty"`
+	Inline    *struct {
+		// From The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.
+		From *int `json:"from,omitempty"`
+
+		// Path The path of the file this comment is anchored to.
+		Path string `json:"path"`
+
+		// StartFrom The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.
+		StartFrom *int `json:"start_from,omitempty"`
+
+		// StartTo The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.
+		StartTo *int `json:"start_to,omitempty"`
+
+		// To The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.
+		To *int `json:"to,omitempty"`
+	} `json:"inline,omitempty"`
+	Links *struct {
+		// Code A link to a resource related to this object.
+		Code *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"code,omitempty"`
+
+		// Html A link to a resource related to this object.
+		Html *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"html,omitempty"`
+
+		// Self A link to a resource related to this object.
+		Self *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"self,omitempty"`
+	} `json:"links,omitempty"`
+	Parent               *Comment               `json:"parent,omitempty"`
+	Type                 string                 `json:"type"`
+	UpdatedOn            *time.Time             `json:"updated_on,omitempty"`
+	User                 *Account               `json:"user,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// CommentContentMarkup The type of markup language the raw content is to be interpreted in.
+type CommentContentMarkup string
+
+// CommentResolution The resolution object for a Comment.
+type CommentResolution struct {
+	// CreatedOn The ISO8601 timestamp the resolution was created.
+	CreatedOn            *time.Time             `json:"created_on,omitempty"`
+	Type                 string                 `json:"type"`
+	User                 *Account               `json:"user,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// Commit defines model for commit.
+type Commit struct {
+	Author       *Author        `json:"author,omitempty"`
+	Committer    *Committer     `json:"committer,omitempty"`
+	Date         *time.Time     `json:"date,omitempty"`
+	Hash         *string        `json:"hash,omitempty"`
+	Message      *string        `json:"message,omitempty"`
+	Parents      *[]BaseCommit  `json:"parents,omitempty"`
+	Participants *[]Participant `json:"participants,omitempty"`
+	Repository   *Repository    `json:"repository,omitempty"`
+	Summary      *struct {
+		// Html The user's content rendered as HTML.
+		Html *string `json:"html,omitempty"`
+
+		// Markup The type of markup language the raw content is to be interpreted in.
+		Markup *CommitSummaryMarkup `json:"markup,omitempty"`
+
+		// Raw The text as it was typed by a user.
+		Raw *string `json:"raw,omitempty"`
+	} `json:"summary,omitempty"`
+	Type                 string                 `json:"type"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// CommitSummaryMarkup The type of markup language the raw content is to be interpreted in.
+type CommitSummaryMarkup string
+
+// Commitstatus defines model for commitstatus.
+type Commitstatus struct {
+	CreatedOn *time.Time `json:"created_on,omitempty"`
+
+	// Description A description of the build (e.g. "Unit tests in Bamboo")
+	Description *string `json:"description,omitempty"`
+
+	// Key An identifier for the status that's unique to
+	//         its type (current "build" is the only supported type) and the vendor,
+	//         e.g. BB-DEPLOY
+	Key   string `json:"key"`
+	Links *struct {
+		// Commit A link to a resource related to this object.
+		Commit *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"commit,omitempty"`
+
+		// Self A link to a resource related to this object.
+		Self *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"self,omitempty"`
+	} `json:"links,omitempty"`
+
+	// Name An identifier for the build itself, e.g. BB-DEPLOY-1
+	Name *string `json:"name,omitempty"`
+
+	// Refname
+	// The name of the ref that pointed to this commit at the time the status
+	// object was created. Note that this the ref may since have moved off of
+	// the commit. This optional field can be useful for build systems whose
+	// build triggers and configuration are branch-dependent (e.g. a Pipeline
+	// build).
+	// It is legitimate for this field to not be set, or even apply (e.g. a
+	// static linting job).
+	Refname *string `json:"refname,omitempty"`
+
+	// State Provides some indication of the status of this commit
+	State     CommitstatusState `json:"state"`
+	Type      string            `json:"type"`
+	UpdatedOn *time.Time        `json:"updated_on,omitempty"`
+
+	// Url A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time.
+	Url                  *string                `json:"url,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// CommitstatusState Provides some indication of the status of this commit
+type CommitstatusState string
+
+// Committer defines model for committer.
+type Committer struct {
+	// Raw The raw committer value from the repository. This may be the only value available if the committer does not match a user in Bitbucket.
+	Raw                  *string                `json:"raw,omitempty"`
+	Type                 string                 `json:"type"`
+	User                 *Account               `json:"user,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// DefaultReviewerAndType Object containing a user that is a default reviewer and the type of reviewer
+type DefaultReviewerAndType struct {
+	ReviewerType         *string                `json:"reviewer_type,omitempty"`
+	Type                 string                 `json:"type"`
+	User                 *User                  `json:"user,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// Error Base type for most resource objects. It defines the common `type` element that identifies an object's type. It also identifies the element as Swagger's `discriminator`.
+type Error struct {
+	Error *struct {
+		// Data Optional structured data that is endpoint-specific.
+		Data    *map[string]interface{} `json:"data,omitempty"`
+		Detail  *string                 `json:"detail,omitempty"`
+		Message string                  `json:"message"`
+	} `json:"error,omitempty"`
+	Type                 string                 `json:"type"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// Link A link to a resource related to this object.
 type Link struct {
 	Href *string `json:"href,omitempty"`
 	Name *string `json:"name,omitempty"`
 }
 
-// PaginatedPullrequests defines model for paginated_pullrequests.
-type PaginatedPullrequests struct {
-	// Next Link to the next page.
+// Object Base type for most resource objects. It defines the common `type` element that identifies an object's type. It also identifies the element as Swagger's `discriminator`.
+type Object struct {
+	Type                 string                 `json:"type"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// PaginatedAccounts A paginated list of accounts.
+type PaginatedAccounts struct {
+	// Next Link to the next page if it exists. The last page of a collection does not have this value. Use this link to navigate the result set and refrain from constructing your own URLs.
 	Next *string `json:"next,omitempty"`
 
-	// Page Current page number.
+	// Page Page number of the current results. This is an optional element that is not provided in all responses.
 	Page *int `json:"page,omitempty"`
 
-	// Pagelen Maximum number of objects in a single response.
+	// Pagelen Current number of objects on the existing page. The default value is 10 with 100 being the maximum allowed value. Individual APIs may enforce different values.
 	Pagelen *int `json:"pagelen,omitempty"`
 
-	// Previous Link to the previous page.
+	// Previous Link to previous page if it exists. A collections first page does not have this value. This is an optional element that is not provided in all responses. Some result sets strictly support forward navigation and never provide previous links. Clients must anticipate that backwards navigation is not always available. Use this link to navigate the result set and refrain from constructing your own URLs.
 	Previous *string `json:"previous,omitempty"`
 
-	// Size Total number of objects.
+	// Size Total number of objects in the response. This is an optional element that is not provided in all responses, as it can be expensive to compute.
+	Size   *int       `json:"size,omitempty"`
+	Values *[]Account `json:"values,omitempty"`
+}
+
+// PaginatedCommitstatuses A paginated list of commit status objects.
+type PaginatedCommitstatuses struct {
+	// Next Link to the next page if it exists. The last page of a collection does not have this value. Use this link to navigate the result set and refrain from constructing your own URLs.
+	Next *string `json:"next,omitempty"`
+
+	// Page Page number of the current results. This is an optional element that is not provided in all responses.
+	Page *int `json:"page,omitempty"`
+
+	// Pagelen Current number of objects on the existing page. The default value is 10 with 100 being the maximum allowed value. Individual APIs may enforce different values.
+	Pagelen *int `json:"pagelen,omitempty"`
+
+	// Previous Link to previous page if it exists. A collections first page does not have this value. This is an optional element that is not provided in all responses. Some result sets strictly support forward navigation and never provide previous links. Clients must anticipate that backwards navigation is not always available. Use this link to navigate the result set and refrain from constructing your own URLs.
+	Previous *string `json:"previous,omitempty"`
+
+	// Size Total number of objects in the response. This is an optional element that is not provided in all responses, as it can be expensive to compute.
+	Size   *int            `json:"size,omitempty"`
+	Values *[]Commitstatus `json:"values,omitempty"`
+}
+
+// PaginatedDefaultReviewerAndType A paginated list of default reviewers with reviewer type.
+type PaginatedDefaultReviewerAndType struct {
+	// Next Link to the next page if it exists. The last page of a collection does not have this value. Use this link to navigate the result set and refrain from constructing your own URLs.
+	Next *string `json:"next,omitempty"`
+
+	// Page Page number of the current results. This is an optional element that is not provided in all responses.
+	Page *int `json:"page,omitempty"`
+
+	// Pagelen Current number of objects on the existing page. The default value is 10 with 100 being the maximum allowed value. Individual APIs may enforce different values.
+	Pagelen *int `json:"pagelen,omitempty"`
+
+	// Previous Link to previous page if it exists. A collections first page does not have this value. This is an optional element that is not provided in all responses. Some result sets strictly support forward navigation and never provide previous links. Clients must anticipate that backwards navigation is not always available. Use this link to navigate the result set and refrain from constructing your own URLs.
+	Previous *string `json:"previous,omitempty"`
+
+	// Size Total number of objects in the response. This is an optional element that is not provided in all responses, as it can be expensive to compute.
+	Size   *int                      `json:"size,omitempty"`
+	Values *[]DefaultReviewerAndType `json:"values,omitempty"`
+}
+
+// PaginatedPullrequestComments A paginated list of pullrequest comments.
+type PaginatedPullrequestComments struct {
+	// Next Link to the next page if it exists. The last page of a collection does not have this value. Use this link to navigate the result set and refrain from constructing your own URLs.
+	Next *string `json:"next,omitempty"`
+
+	// Page Page number of the current results. This is an optional element that is not provided in all responses.
+	Page *int `json:"page,omitempty"`
+
+	// Pagelen Current number of objects on the existing page. The default value is 10 with 100 being the maximum allowed value. Individual APIs may enforce different values.
+	Pagelen *int `json:"pagelen,omitempty"`
+
+	// Previous Link to previous page if it exists. A collections first page does not have this value. This is an optional element that is not provided in all responses. Some result sets strictly support forward navigation and never provide previous links. Clients must anticipate that backwards navigation is not always available. Use this link to navigate the result set and refrain from constructing your own URLs.
+	Previous *string `json:"previous,omitempty"`
+
+	// Size Total number of objects in the response. This is an optional element that is not provided in all responses, as it can be expensive to compute.
+	Size   *int                  `json:"size,omitempty"`
+	Values *[]PullrequestComment `json:"values,omitempty"`
+}
+
+// PaginatedPullrequests A paginated list of pullrequests.
+type PaginatedPullrequests struct {
+	// Next Link to the next page if it exists. The last page of a collection does not have this value. Use this link to navigate the result set and refrain from constructing your own URLs.
+	Next *string `json:"next,omitempty"`
+
+	// Page Page number of the current results. This is an optional element that is not provided in all responses.
+	Page *int `json:"page,omitempty"`
+
+	// Pagelen Current number of objects on the existing page. The default value is 10 with 100 being the maximum allowed value. Individual APIs may enforce different values.
+	Pagelen *int `json:"pagelen,omitempty"`
+
+	// Previous Link to previous page if it exists. A collections first page does not have this value. This is an optional element that is not provided in all responses. Some result sets strictly support forward navigation and never provide previous links. Clients must anticipate that backwards navigation is not always available. Use this link to navigate the result set and refrain from constructing your own URLs.
+	Previous *string `json:"previous,omitempty"`
+
+	// Size Total number of objects in the response. This is an optional element that is not provided in all responses, as it can be expensive to compute.
 	Size   *int           `json:"size,omitempty"`
 	Values *[]Pullrequest `json:"values,omitempty"`
 }
 
+// PaginatedTasks A paginated list of tasks.
+type PaginatedTasks struct {
+	// Next Link to the next page if it exists. The last page of a collection does not have this value. Use this link to navigate the result set and refrain from constructing your own URLs.
+	Next *string `json:"next,omitempty"`
+
+	// Page Page number of the current results. This is an optional element that is not provided in all responses.
+	Page *int `json:"page,omitempty"`
+
+	// Pagelen Current number of objects on the existing page. The default value is 10 with 100 being the maximum allowed value. Individual APIs may enforce different values.
+	Pagelen *int `json:"pagelen,omitempty"`
+
+	// Previous Link to previous page if it exists. A collections first page does not have this value. This is an optional element that is not provided in all responses. Some result sets strictly support forward navigation and never provide previous links. Clients must anticipate that backwards navigation is not always available. Use this link to navigate the result set and refrain from constructing your own URLs.
+	Previous *string `json:"previous,omitempty"`
+
+	// Size Total number of objects in the response. This is an optional element that is not provided in all responses, as it can be expensive to compute.
+	Size   *int                      `json:"size,omitempty"`
+	Values *[]PullrequestCommentTask `json:"values,omitempty"`
+}
+
 // Participant defines model for participant.
 type Participant struct {
-	Approved *bool             `json:"approved,omitempty"`
-	Role     *ParticipantRole  `json:"role,omitempty"`
-	State    *ParticipantState `json:"state,omitempty"`
-	User     *Account          `json:"user,omitempty"`
+	Approved *bool `json:"approved,omitempty"`
+
+	// ParticipatedOn The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.
+	ParticipatedOn       *time.Time             `json:"participated_on,omitempty"`
+	Role                 *ParticipantRole       `json:"role,omitempty"`
+	State                *ParticipantState      `json:"state,omitempty"`
+	Type                 string                 `json:"type"`
+	User                 *Account               `json:"user,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
 }
 
 // ParticipantRole defines model for Participant.Role.
@@ -190,37 +996,344 @@ type ParticipantRole string
 // ParticipantState defines model for Participant.State.
 type ParticipantState string
 
+// Project defines model for project.
+type Project struct {
+	CreatedOn   *time.Time `json:"created_on,omitempty"`
+	Description *string    `json:"description,omitempty"`
+
+	// HasPubliclyVisibleRepos
+	// Indicates whether the project contains publicly visible repositories.
+	// Note that private projects cannot contain public repositories.
+	HasPubliclyVisibleRepos *bool `json:"has_publicly_visible_repos,omitempty"`
+
+	// IsPrivate
+	// Indicates whether the project is publicly accessible, or whether it is
+	// private to the team and consequently only visible to team members.
+	// Note that private projects cannot contain public repositories.
+	IsPrivate *bool `json:"is_private,omitempty"`
+
+	// Key The project's key.
+	Key   *string `json:"key,omitempty"`
+	Links *struct {
+		// Avatar A link to a resource related to this object.
+		Avatar *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"avatar,omitempty"`
+
+		// Html A link to a resource related to this object.
+		Html *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"html,omitempty"`
+	} `json:"links,omitempty"`
+
+	// Name The name of the project.
+	Name      *string    `json:"name,omitempty"`
+	Owner     *Team      `json:"owner,omitempty"`
+	Type      string     `json:"type"`
+	UpdatedOn *time.Time `json:"updated_on,omitempty"`
+
+	// Uuid The project's immutable id.
+	Uuid                 *string                `json:"uuid,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
 // Pullrequest defines model for pullrequest.
 type Pullrequest struct {
-	Author    *Account   `json:"author,omitempty"`
+	Author *Account `json:"author,omitempty"`
+
+	// CloseSourceBranch A boolean flag indicating if merging the pull request closes the source branch.
+	CloseSourceBranch *bool    `json:"close_source_branch,omitempty"`
+	ClosedBy          *Account `json:"closed_by,omitempty"`
+
+	// CommentCount The number of comments for a specific pull request.
+	CommentCount *int `json:"comment_count,omitempty"`
+
+	// CreatedOn The ISO8601 timestamp the request was created.
 	CreatedOn *time.Time `json:"created_on,omitempty"`
 
 	// Description Explains what the pull request does.
 	Description *string              `json:"description,omitempty"`
 	Destination *PullrequestEndpoint `json:"destination,omitempty"`
 
-	// Id The pull request's unique ID.
+	// Draft A boolean flag indicating whether the pull request is a draft.
+	Draft *bool `json:"draft,omitempty"`
+
+	// Id The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.
 	Id    *int `json:"id,omitempty"`
 	Links *struct {
-		Commits *Link `json:"commits,omitempty"`
-		Diff    *Link `json:"diff,omitempty"`
-		Html    *Link `json:"html,omitempty"`
-		Self    *Link `json:"self,omitempty"`
-	} `json:"links,omitempty"`
-	Participants *[]Participant       `json:"participants,omitempty"`
-	Reviewers    *[]Account           `json:"reviewers,omitempty"`
-	Source       *PullrequestEndpoint `json:"source,omitempty"`
+		// Activity A link to a resource related to this object.
+		Activity *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"activity,omitempty"`
 
-	// State The pull request's current state.
-	State *PullrequestState `json:"state,omitempty"`
+		// Approve A link to a resource related to this object.
+		Approve *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"approve,omitempty"`
+
+		// Comments A link to a resource related to this object.
+		Comments *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"comments,omitempty"`
+
+		// Commits A link to a resource related to this object.
+		Commits *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"commits,omitempty"`
+
+		// Decline A link to a resource related to this object.
+		Decline *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"decline,omitempty"`
+
+		// Diff A link to a resource related to this object.
+		Diff *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"diff,omitempty"`
+
+		// Diffstat A link to a resource related to this object.
+		Diffstat *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"diffstat,omitempty"`
+
+		// Html A link to a resource related to this object.
+		Html *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"html,omitempty"`
+
+		// Merge A link to a resource related to this object.
+		Merge *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"merge,omitempty"`
+
+		// Self A link to a resource related to this object.
+		Self *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"self,omitempty"`
+	} `json:"links,omitempty"`
+	MergeCommit *struct {
+		Hash *string `json:"hash,omitempty"`
+	} `json:"merge_commit,omitempty"`
+
+	// Participants         The list of users that are collaborating on this pull request.
+	//         Collaborators are user that:
+	//
+	//         * are added to the pull request as a reviewer (part of the reviewers
+	//           list)
+	//         * are not explicit reviewers, but have commented on the pull request
+	//         * are not explicit reviewers, but have approved the pull request
+	//
+	//         Each user is wrapped in an object that indicates the user's role and
+	//         whether they have approved the pull request. For performance reasons,
+	//         the API only returns this list when an API requests a pull request by
+	//         id.
+	//
+	Participants *[]Participant `json:"participants,omitempty"`
+
+	// Queued A boolean flag indicating whether the pull request is queued
+	Queued *bool `json:"queued,omitempty"`
+
+	// Reason Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.
+	Reason *string `json:"reason,omitempty"`
+
+	// Rendered User provided pull request text, interpreted in a markup language and rendered in HTML
+	Rendered *struct {
+		Description *struct {
+			// Html The user's content rendered as HTML.
+			Html *string `json:"html,omitempty"`
+
+			// Markup The type of markup language the raw content is to be interpreted in.
+			Markup *PullrequestRenderedDescriptionMarkup `json:"markup,omitempty"`
+
+			// Raw The text as it was typed by a user.
+			Raw *string `json:"raw,omitempty"`
+		} `json:"description,omitempty"`
+		Reason *struct {
+			// Html The user's content rendered as HTML.
+			Html *string `json:"html,omitempty"`
+
+			// Markup The type of markup language the raw content is to be interpreted in.
+			Markup *PullrequestRenderedReasonMarkup `json:"markup,omitempty"`
+
+			// Raw The text as it was typed by a user.
+			Raw *string `json:"raw,omitempty"`
+		} `json:"reason,omitempty"`
+		Title *struct {
+			// Html The user's content rendered as HTML.
+			Html *string `json:"html,omitempty"`
+
+			// Markup The type of markup language the raw content is to be interpreted in.
+			Markup *PullrequestRenderedTitleMarkup `json:"markup,omitempty"`
+
+			// Raw The text as it was typed by a user.
+			Raw *string `json:"raw,omitempty"`
+		} `json:"title,omitempty"`
+	} `json:"rendered,omitempty"`
+
+	// Reviewers The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.
+	Reviewers *[]Account           `json:"reviewers,omitempty"`
+	Source    *PullrequestEndpoint `json:"source,omitempty"`
+
+	// State The pull request's current status.
+	State   *PullrequestState `json:"state,omitempty"`
+	Summary *struct {
+		// Html The user's content rendered as HTML.
+		Html *string `json:"html,omitempty"`
+
+		// Markup The type of markup language the raw content is to be interpreted in.
+		Markup *PullrequestSummaryMarkup `json:"markup,omitempty"`
+
+		// Raw The text as it was typed by a user.
+		Raw *string `json:"raw,omitempty"`
+	} `json:"summary,omitempty"`
+
+	// TaskCount The number of open tasks for a specific pull request.
+	TaskCount *int `json:"task_count,omitempty"`
 
 	// Title Title of the pull request.
-	Title     *string    `json:"title,omitempty"`
-	UpdatedOn *time.Time `json:"updated_on,omitempty"`
+	Title *string `json:"title,omitempty"`
+	Type  string  `json:"type"`
+
+	// UpdatedOn The ISO8601 timestamp the request was last updated.
+	UpdatedOn            *time.Time             `json:"updated_on,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
 }
 
-// PullrequestState The pull request's current state.
+// PullrequestRenderedDescriptionMarkup The type of markup language the raw content is to be interpreted in.
+type PullrequestRenderedDescriptionMarkup string
+
+// PullrequestRenderedReasonMarkup The type of markup language the raw content is to be interpreted in.
+type PullrequestRenderedReasonMarkup string
+
+// PullrequestRenderedTitleMarkup The type of markup language the raw content is to be interpreted in.
+type PullrequestRenderedTitleMarkup string
+
+// PullrequestState The pull request's current status.
 type PullrequestState string
+
+// PullrequestSummaryMarkup The type of markup language the raw content is to be interpreted in.
+type PullrequestSummaryMarkup string
+
+// PullrequestComment defines model for pullrequest_comment.
+type PullrequestComment struct {
+	Content *struct {
+		// Html The user's content rendered as HTML.
+		Html *string `json:"html,omitempty"`
+
+		// Markup The type of markup language the raw content is to be interpreted in.
+		Markup *PullrequestCommentContentMarkup `json:"markup,omitempty"`
+
+		// Raw The text as it was typed by a user.
+		Raw *string `json:"raw,omitempty"`
+	} `json:"content,omitempty"`
+	CreatedOn *time.Time `json:"created_on,omitempty"`
+	Deleted   *bool      `json:"deleted,omitempty"`
+	Id        *int64     `json:"id,omitempty"`
+	Inline    *struct {
+		// From The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.
+		From *int `json:"from,omitempty"`
+
+		// Path The path of the file this comment is anchored to.
+		Path string `json:"path"`
+
+		// StartFrom The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.
+		StartFrom *int `json:"start_from,omitempty"`
+
+		// StartTo The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.
+		StartTo *int `json:"start_to,omitempty"`
+
+		// To The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.
+		To *int `json:"to,omitempty"`
+	} `json:"inline,omitempty"`
+	Links *struct {
+		// Code A link to a resource related to this object.
+		Code *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"code,omitempty"`
+
+		// Html A link to a resource related to this object.
+		Html *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"html,omitempty"`
+
+		// Self A link to a resource related to this object.
+		Self *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"self,omitempty"`
+	} `json:"links,omitempty"`
+	Parent      *Comment     `json:"parent,omitempty"`
+	Pending     *bool        `json:"pending,omitempty"`
+	Pullrequest *Pullrequest `json:"pullrequest,omitempty"`
+
+	// Resolution The resolution object for a Comment.
+	Resolution           *CommentResolution     `json:"resolution,omitempty"`
+	Type                 string                 `json:"type"`
+	UpdatedOn            *time.Time             `json:"updated_on,omitempty"`
+	User                 *Account               `json:"user,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// PullrequestCommentContentMarkup The type of markup language the raw content is to be interpreted in.
+type PullrequestCommentContentMarkup string
+
+// PullrequestCommentTask defines model for pullrequest_comment_task.
+type PullrequestCommentTask struct {
+	Comment *Comment `json:"comment,omitempty"`
+	Content struct {
+		// Html The user's content rendered as HTML.
+		Html *string `json:"html,omitempty"`
+
+		// Markup The type of markup language the raw content is to be interpreted in.
+		Markup *PullrequestCommentTaskContentMarkup `json:"markup,omitempty"`
+
+		// Raw The text as it was typed by a user.
+		Raw *string `json:"raw,omitempty"`
+	} `json:"content"`
+	CreatedOn time.Time `json:"created_on"`
+	Creator   Account   `json:"creator"`
+	Id        *int64    `json:"id,omitempty"`
+	Links     *struct {
+		// Html A link to a resource related to this object.
+		Html *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"html,omitempty"`
+
+		// Self A link to a resource related to this object.
+		Self *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"self,omitempty"`
+	} `json:"links,omitempty"`
+	Pending    *bool    `json:"pending,omitempty"`
+	ResolvedBy *Account `json:"resolved_by,omitempty"`
+
+	// ResolvedOn The ISO8601 timestamp for when the task was resolved.
+	ResolvedOn *time.Time                  `json:"resolved_on,omitempty"`
+	State      PullrequestCommentTaskState `json:"state"`
+	UpdatedOn  time.Time                   `json:"updated_on"`
+}
+
+// PullrequestCommentTaskContentMarkup The type of markup language the raw content is to be interpreted in.
+type PullrequestCommentTaskContentMarkup string
+
+// PullrequestCommentTaskState defines model for PullrequestCommentTask.State.
+type PullrequestCommentTaskState string
 
 // PullrequestEndpoint defines model for pullrequest_endpoint.
 type PullrequestEndpoint struct {
@@ -233,51 +1346,4215 @@ type PullrequestEndpoint struct {
 
 // PullrequestEndpointBranch defines model for pullrequest_endpoint_branch.
 type PullrequestEndpointBranch struct {
-	DefaultMergeStrategy *string                                     `json:"default_merge_strategy,omitempty"`
-	MergeStrategies      *[]PullrequestEndpointBranchMergeStrategies `json:"merge_strategies,omitempty"`
-	Name                 *string                                     `json:"name,omitempty"`
+	// DefaultMergeStrategy The default merge strategy, when this endpoint is the destination of the pull request.
+	DefaultMergeStrategy *string `json:"default_merge_strategy,omitempty"`
+
+	// MergeStrategies Available merge strategies, when this endpoint is the destination of the pull request.
+	MergeStrategies *[]PullrequestEndpointBranchMergeStrategies `json:"merge_strategies,omitempty"`
+	Name            *string                                     `json:"name,omitempty"`
 }
 
-// PullrequestEndpointBranchMergeStrategies defines model for pullrequest_endpoint_branch_merge_strategies.
+// PullrequestEndpointBranchMergeStrategies defines model for PullrequestEndpointBranch.MergeStrategies.
 type PullrequestEndpointBranchMergeStrategies string
 
-// PullrequestMergeParameters defines model for pullrequest_merge_parameters.
+// PullrequestMergeParameters The metadata that describes a pull request merge.
 type PullrequestMergeParameters struct {
-	// CloseSourceBranch Whether the source branch should be deleted after the merge.
+	// CloseSourceBranch Whether the source branch should be deleted. If this is not provided, we fallback to the value used when the pull request was created, which defaults to False
 	CloseSourceBranch *bool `json:"close_source_branch,omitempty"`
 
-	// MergeStrategy The merge strategy that will be used.
+	// MergeStrategy The merge strategy that will be used to merge the pull request.
 	MergeStrategy *PullrequestMergeParametersMergeStrategy `json:"merge_strategy,omitempty"`
 
-	// Message The commit message that will be used on the resulting commit.
-	Message *string `json:"message,omitempty"`
-	Type    *string `json:"type,omitempty"`
+	// Message The commit message that will be used on the resulting commit. Note that the size of the message is limited to 128 KiB.
+	Message              *string                `json:"message,omitempty"`
+	Type                 string                 `json:"type"`
+	AdditionalProperties map[string]interface{} `json:"-"`
 }
 
-// PullrequestMergeParametersMergeStrategy The merge strategy that will be used.
+// PullrequestMergeParametersMergeStrategy The merge strategy that will be used to merge the pull request.
 type PullrequestMergeParametersMergeStrategy string
+
+// PullrequestTask defines model for pullrequest_task.
+type PullrequestTask struct {
+	Content struct {
+		// Html The user's content rendered as HTML.
+		Html *string `json:"html,omitempty"`
+
+		// Markup The type of markup language the raw content is to be interpreted in.
+		Markup *PullrequestTaskContentMarkup `json:"markup,omitempty"`
+
+		// Raw The text as it was typed by a user.
+		Raw *string `json:"raw,omitempty"`
+	} `json:"content"`
+	CreatedOn time.Time `json:"created_on"`
+	Creator   Account   `json:"creator"`
+	Id        *int64    `json:"id,omitempty"`
+	Links     *struct {
+		// Html A link to a resource related to this object.
+		Html *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"html,omitempty"`
+
+		// Self A link to a resource related to this object.
+		Self *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"self,omitempty"`
+	} `json:"links,omitempty"`
+	Pending    *bool    `json:"pending,omitempty"`
+	ResolvedBy *Account `json:"resolved_by,omitempty"`
+
+	// ResolvedOn The ISO8601 timestamp for when the task was resolved.
+	ResolvedOn *time.Time           `json:"resolved_on,omitempty"`
+	State      PullrequestTaskState `json:"state"`
+	UpdatedOn  time.Time            `json:"updated_on"`
+}
+
+// PullrequestTaskContentMarkup The type of markup language the raw content is to be interpreted in.
+type PullrequestTaskContentMarkup string
+
+// PullrequestTaskState defines model for PullrequestTask.State.
+type PullrequestTaskState string
+
+// PullrequestTaskCreate A pullrequest task create
+type PullrequestTaskCreate struct {
+	Comment *Comment `json:"comment,omitempty"`
+
+	// Content task raw content
+	Content struct {
+		// Raw The task contents
+		Raw string `json:"raw"`
+	} `json:"content"`
+	Pending *bool `json:"pending,omitempty"`
+}
+
+// PullrequestTaskUpdate A pullrequest task update
+type PullrequestTaskUpdate struct {
+	// Content task raw content
+	Content *struct {
+		// Raw The task contents
+		Raw string `json:"raw"`
+	} `json:"content,omitempty"`
+	State *PullrequestTaskUpdateState `json:"state,omitempty"`
+}
+
+// PullrequestTaskUpdateState defines model for PullrequestTaskUpdate.State.
+type PullrequestTaskUpdateState string
+
+// Ref A ref object, representing a branch or tag in a repository.
+type Ref struct {
+	Links *struct {
+		// Commits A link to a resource related to this object.
+		Commits *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"commits,omitempty"`
+
+		// Html A link to a resource related to this object.
+		Html *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"html,omitempty"`
+
+		// Self A link to a resource related to this object.
+		Self *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"self,omitempty"`
+	} `json:"links,omitempty"`
+
+	// Name The name of the ref.
+	Name                 *string                `json:"name,omitempty"`
+	Target               *Commit                `json:"target,omitempty"`
+	Type                 string                 `json:"type"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
 
 // Repository defines model for repository.
 type Repository struct {
+	CreatedOn   *time.Time `json:"created_on,omitempty"`
+	Description *string    `json:"description,omitempty"`
+
+	// ForkPolicy
+	// Controls the rules for forking this repository.
+	//
+	// * **allow_forks**: unrestricted forking
+	// * **no_public_forks**: restrict forking to private forks (forks cannot
+	//   be made public later)
+	// * **no_forks**: deny all forking
+	ForkPolicy *RepositoryForkPolicy `json:"fork_policy,omitempty"`
+
+	// FullName The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
 	FullName *string `json:"full_name,omitempty"`
-	Links    *struct {
-		Html *Link `json:"html,omitempty"`
-		Self *Link `json:"self,omitempty"`
+
+	// HasIssues
+	// The issue tracker for this repository is enabled. Issue Tracker
+	// features are not supported for repositories in workspaces
+	// administered through admin.atlassian.com.
+	HasIssues *bool `json:"has_issues,omitempty"`
+
+	// HasWiki
+	// The wiki for this repository is enabled. Wiki
+	// features are not supported for repositories in workspaces
+	// administered through admin.atlassian.com.
+	HasWiki   *bool   `json:"has_wiki,omitempty"`
+	IsPrivate *bool   `json:"is_private,omitempty"`
+	Language  *string `json:"language,omitempty"`
+	Links     *struct {
+		// Avatar A link to a resource related to this object.
+		Avatar *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"avatar,omitempty"`
+		Clone *[]struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"clone,omitempty"`
+
+		// Commits A link to a resource related to this object.
+		Commits *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"commits,omitempty"`
+
+		// Downloads A link to a resource related to this object.
+		Downloads *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"downloads,omitempty"`
+
+		// Forks A link to a resource related to this object.
+		Forks *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"forks,omitempty"`
+
+		// Hooks A link to a resource related to this object.
+		Hooks *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"hooks,omitempty"`
+
+		// Html A link to a resource related to this object.
+		Html *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"html,omitempty"`
+
+		// Pullrequests A link to a resource related to this object.
+		Pullrequests *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"pullrequests,omitempty"`
+
+		// Self A link to a resource related to this object.
+		Self *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"self,omitempty"`
+
+		// Watchers A link to a resource related to this object.
+		Watchers *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"watchers,omitempty"`
 	} `json:"links,omitempty"`
-	Name *string `json:"name,omitempty"`
-	Uuid *string `json:"uuid,omitempty"`
+	Mainbranch *Branch        `json:"mainbranch,omitempty"`
+	Name       *string        `json:"name,omitempty"`
+	Owner      *Account       `json:"owner,omitempty"`
+	Parent     *Repository    `json:"parent,omitempty"`
+	Project    *Project       `json:"project,omitempty"`
+	Scm        *RepositoryScm `json:"scm,omitempty"`
+	Size       *int           `json:"size,omitempty"`
+	Type       string         `json:"type"`
+	UpdatedOn  *time.Time     `json:"updated_on,omitempty"`
+
+	// Uuid The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+	Uuid                 *string                `json:"uuid,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// RepositoryForkPolicy
+// Controls the rules for forking this repository.
+//
+//   - **allow_forks**: unrestricted forking
+//   - **no_public_forks**: restrict forking to private forks (forks cannot
+//     be made public later)
+//   - **no_forks**: deny all forking
+type RepositoryForkPolicy string
+
+// RepositoryScm defines model for Repository.Scm.
+type RepositoryScm string
+
+// Task A task object.
+type Task struct {
+	Content struct {
+		// Html The user's content rendered as HTML.
+		Html *string `json:"html,omitempty"`
+
+		// Markup The type of markup language the raw content is to be interpreted in.
+		Markup *TaskContentMarkup `json:"markup,omitempty"`
+
+		// Raw The text as it was typed by a user.
+		Raw *string `json:"raw,omitempty"`
+	} `json:"content"`
+	CreatedOn  time.Time `json:"created_on"`
+	Creator    Account   `json:"creator"`
+	Id         *int64    `json:"id,omitempty"`
+	Pending    *bool     `json:"pending,omitempty"`
+	ResolvedBy *Account  `json:"resolved_by,omitempty"`
+
+	// ResolvedOn The ISO8601 timestamp for when the task was resolved.
+	ResolvedOn *time.Time `json:"resolved_on,omitempty"`
+	State      TaskState  `json:"state"`
+	UpdatedOn  time.Time  `json:"updated_on"`
+}
+
+// TaskContentMarkup The type of markup language the raw content is to be interpreted in.
+type TaskContentMarkup string
+
+// TaskState defines model for Task.State.
+type TaskState string
+
+// Team defines model for team.
+type Team struct {
+	CreatedOn            *time.Time             `json:"created_on,omitempty"`
+	DisplayName          *string                `json:"display_name,omitempty"`
+	Links                *TeamLinks             `json:"links,omitempty"`
+	Type                 string                 `json:"type"`
+	Uuid                 *string                `json:"uuid,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// TeamLinks defines model for team_links.
+type TeamLinks struct {
+	// Avatar A link to a resource related to this object.
+	Avatar *Link `json:"avatar,omitempty"`
+
+	// Html A link to a resource related to this object.
+	Html *Link `json:"html,omitempty"`
+
+	// Members A link to a resource related to this object.
+	Members *Link `json:"members,omitempty"`
+
+	// Projects A link to a resource related to this object.
+	Projects *Link `json:"projects,omitempty"`
+
+	// Repositories A link to a resource related to this object.
+	Repositories *Link `json:"repositories,omitempty"`
+
+	// Self A link to a resource related to this object.
+	Self                 *Link                  `json:"self,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// User defines model for user.
+type User struct {
+	// AccountId The user's Atlassian account ID.
+	AccountId *string `json:"account_id,omitempty"`
+
+	// AccountStatus The status of the account. Currently the only possible value is "active", but more values may be added in the future.
+	AccountStatus *string    `json:"account_status,omitempty"`
+	CreatedOn     *time.Time `json:"created_on,omitempty"`
+	DisplayName   *string    `json:"display_name,omitempty"`
+	Has2faEnabled *bool      `json:"has_2fa_enabled,omitempty"`
+	IsStaff       *bool      `json:"is_staff,omitempty"`
+	Links         *UserLinks `json:"links,omitempty"`
+
+	// Nickname Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.
+	Nickname             *string                `json:"nickname,omitempty"`
+	Type                 string                 `json:"type"`
+	Uuid                 *string                `json:"uuid,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// UserLinks defines model for user_links.
+type UserLinks struct {
+	// Avatar A link to a resource related to this object.
+	Avatar *Link `json:"avatar,omitempty"`
+
+	// Html A link to a resource related to this object.
+	Html *Link `json:"html,omitempty"`
+
+	// Repositories A link to a resource related to this object.
+	Repositories *Link `json:"repositories,omitempty"`
+
+	// Self A link to a resource related to this object.
+	Self                 *Link                  `json:"self,omitempty"`
+	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+// GetPullrequestsForCommitParams defines parameters for GetPullrequestsForCommit.
+type GetPullrequestsForCommitParams struct {
+	// Page Which page to retrieve
+	Page *int32 `form:"page,omitempty" json:"page,omitempty"`
+
+	// Pagelen How many pull requests to retrieve per page
+	Pagelen *int32 `form:"pagelen,omitempty" json:"pagelen,omitempty"`
 }
 
 // ListPullRequestsParams defines parameters for ListPullRequests.
 type ListPullRequestsParams struct {
+	// State Only return pull requests that are in this state. This parameter can be repeated.
 	State *ListPullRequestsParamsState `form:"state,omitempty" json:"state,omitempty"`
 }
 
 // ListPullRequestsParamsState defines parameters for ListPullRequests.
 type ListPullRequestsParamsState string
 
-// CreatePullRequestJSONRequestBody defines body for CreatePullRequest for application/json ContentType.
-type CreatePullRequestJSONRequestBody = Pullrequest
+// MergeAPullRequestParams defines parameters for MergeAPullRequest.
+type MergeAPullRequestParams struct {
+	// Async Default value is false.
+	//
+	//
+	// When set to true, runs merge asynchronously and
+	// immediately returns a 202 with polling link to
+	// the task-status API in the Location header.
+	//
+	//
+	// When set to false, runs merge and waits for it to
+	// complete, returning 200 when it succeeds. If the
+	// duration of the merge exceeds a timeout threshold,
+	// the API returns a 202 with polling link to the
+	// task-status API in the Location header.
+	Async *bool `form:"async,omitempty" json:"async,omitempty"`
+}
 
-// MergePullRequestJSONRequestBody defines body for MergePullRequest for application/json ContentType.
-type MergePullRequestJSONRequestBody = PullrequestMergeParameters
+// ListCommitStatusesForAPullRequestParams defines parameters for ListCommitStatusesForAPullRequest.
+type ListCommitStatusesForAPullRequestParams struct {
+	// Q Query string to narrow down the response as per
+	// [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering).
+	Q *string `form:"q,omitempty" json:"q,omitempty"`
+
+	// Sort Field by which the results should be sorted as per
+	// [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering).
+	// Defaults to `created_on`.
+	Sort *string `form:"sort,omitempty" json:"sort,omitempty"`
+}
+
+// ListTasksOnAPullRequestParams defines parameters for ListTasksOnAPullRequest.
+type ListTasksOnAPullRequestParams struct {
+	// Q
+	// Query string to narrow down the response. See
+	// [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for details.
+	Q *string `form:"q,omitempty" json:"q,omitempty"`
+
+	// Sort
+	// Field by which the results should be sorted as per
+	// [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering).
+	// Defaults to `created_on`.
+	Sort *string `form:"sort,omitempty" json:"sort,omitempty"`
+
+	// Pagelen
+	// Current number of objects on the existing page.
+	// The default value is 10 with 100 being the maximum allowed value.
+	// Individual APIs may enforce different values.
+	Pagelen *int `form:"pagelen,omitempty" json:"pagelen,omitempty"`
+}
+
+// ListWorkspacePullRequestsForAUserParams defines parameters for ListWorkspacePullRequestsForAUser.
+type ListWorkspacePullRequestsForAUserParams struct {
+	// State Only return pull requests that are in this state. This parameter can be repeated.
+	State *ListWorkspacePullRequestsForAUserParamsState `form:"state,omitempty" json:"state,omitempty"`
+}
+
+// ListWorkspacePullRequestsForAUserParamsState defines parameters for ListWorkspacePullRequestsForAUser.
+type ListWorkspacePullRequestsForAUserParamsState string
+
+// CreateAPullRequestJSONRequestBody defines body for CreateAPullRequest for application/json ContentType.
+type CreateAPullRequestJSONRequestBody = Pullrequest
+
+// UpdateAPullRequestJSONRequestBody defines body for UpdateAPullRequest for application/json ContentType.
+type UpdateAPullRequestJSONRequestBody = Pullrequest
+
+// CreateACommentOnAPullRequestJSONRequestBody defines body for CreateACommentOnAPullRequest for application/json ContentType.
+type CreateACommentOnAPullRequestJSONRequestBody = PullrequestComment
+
+// UpdateACommentOnAPullRequestJSONRequestBody defines body for UpdateACommentOnAPullRequest for application/json ContentType.
+type UpdateACommentOnAPullRequestJSONRequestBody = PullrequestComment
+
+// MergeAPullRequestJSONRequestBody defines body for MergeAPullRequest for application/json ContentType.
+type MergeAPullRequestJSONRequestBody = PullrequestMergeParameters
+
+// CreateATaskOnAPullRequestJSONRequestBody defines body for CreateATaskOnAPullRequest for application/json ContentType.
+type CreateATaskOnAPullRequestJSONRequestBody = PullrequestTaskCreate
+
+// UpdateATaskOnAPullRequestJSONRequestBody defines body for UpdateATaskOnAPullRequest for application/json ContentType.
+type UpdateATaskOnAPullRequestJSONRequestBody = PullrequestTaskUpdate
+
+// Getter for additional properties for Account. Returns the specified
+// element and whether it was found
+func (a Account) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Account
+func (a *Account) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Account to handle AdditionalProperties
+func (a *Account) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["created_on"]; found {
+		err = json.Unmarshal(raw, &a.CreatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'created_on': %w", err)
+		}
+		delete(object, "created_on")
+	}
+
+	if raw, found := object["display_name"]; found {
+		err = json.Unmarshal(raw, &a.DisplayName)
+		if err != nil {
+			return fmt.Errorf("error reading 'display_name': %w", err)
+		}
+		delete(object, "display_name")
+	}
+
+	if raw, found := object["links"]; found {
+		err = json.Unmarshal(raw, &a.Links)
+		if err != nil {
+			return fmt.Errorf("error reading 'links': %w", err)
+		}
+		delete(object, "links")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if raw, found := object["uuid"]; found {
+		err = json.Unmarshal(raw, &a.Uuid)
+		if err != nil {
+			return fmt.Errorf("error reading 'uuid': %w", err)
+		}
+		delete(object, "uuid")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Account to handle AdditionalProperties
+func (a Account) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.CreatedOn != nil {
+		object["created_on"], err = json.Marshal(a.CreatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'created_on': %w", err)
+		}
+	}
+
+	if a.DisplayName != nil {
+		object["display_name"], err = json.Marshal(a.DisplayName)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'display_name': %w", err)
+		}
+	}
+
+	if a.Links != nil {
+		object["links"], err = json.Marshal(a.Links)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'links': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	if a.Uuid != nil {
+		object["uuid"], err = json.Marshal(a.Uuid)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'uuid': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for AccountLinks. Returns the specified
+// element and whether it was found
+func (a AccountLinks) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for AccountLinks
+func (a *AccountLinks) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for AccountLinks to handle AdditionalProperties
+func (a *AccountLinks) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["avatar"]; found {
+		err = json.Unmarshal(raw, &a.Avatar)
+		if err != nil {
+			return fmt.Errorf("error reading 'avatar': %w", err)
+		}
+		delete(object, "avatar")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for AccountLinks to handle AdditionalProperties
+func (a AccountLinks) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.Avatar != nil {
+		object["avatar"], err = json.Marshal(a.Avatar)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'avatar': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for Author. Returns the specified
+// element and whether it was found
+func (a Author) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Author
+func (a *Author) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Author to handle AdditionalProperties
+func (a *Author) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["raw"]; found {
+		err = json.Unmarshal(raw, &a.Raw)
+		if err != nil {
+			return fmt.Errorf("error reading 'raw': %w", err)
+		}
+		delete(object, "raw")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if raw, found := object["user"]; found {
+		err = json.Unmarshal(raw, &a.User)
+		if err != nil {
+			return fmt.Errorf("error reading 'user': %w", err)
+		}
+		delete(object, "user")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Author to handle AdditionalProperties
+func (a Author) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.Raw != nil {
+		object["raw"], err = json.Marshal(a.Raw)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'raw': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	if a.User != nil {
+		object["user"], err = json.Marshal(a.User)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'user': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for BaseCommit. Returns the specified
+// element and whether it was found
+func (a BaseCommit) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for BaseCommit
+func (a *BaseCommit) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for BaseCommit to handle AdditionalProperties
+func (a *BaseCommit) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["author"]; found {
+		err = json.Unmarshal(raw, &a.Author)
+		if err != nil {
+			return fmt.Errorf("error reading 'author': %w", err)
+		}
+		delete(object, "author")
+	}
+
+	if raw, found := object["committer"]; found {
+		err = json.Unmarshal(raw, &a.Committer)
+		if err != nil {
+			return fmt.Errorf("error reading 'committer': %w", err)
+		}
+		delete(object, "committer")
+	}
+
+	if raw, found := object["date"]; found {
+		err = json.Unmarshal(raw, &a.Date)
+		if err != nil {
+			return fmt.Errorf("error reading 'date': %w", err)
+		}
+		delete(object, "date")
+	}
+
+	if raw, found := object["hash"]; found {
+		err = json.Unmarshal(raw, &a.Hash)
+		if err != nil {
+			return fmt.Errorf("error reading 'hash': %w", err)
+		}
+		delete(object, "hash")
+	}
+
+	if raw, found := object["message"]; found {
+		err = json.Unmarshal(raw, &a.Message)
+		if err != nil {
+			return fmt.Errorf("error reading 'message': %w", err)
+		}
+		delete(object, "message")
+	}
+
+	if raw, found := object["parents"]; found {
+		err = json.Unmarshal(raw, &a.Parents)
+		if err != nil {
+			return fmt.Errorf("error reading 'parents': %w", err)
+		}
+		delete(object, "parents")
+	}
+
+	if raw, found := object["summary"]; found {
+		err = json.Unmarshal(raw, &a.Summary)
+		if err != nil {
+			return fmt.Errorf("error reading 'summary': %w", err)
+		}
+		delete(object, "summary")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for BaseCommit to handle AdditionalProperties
+func (a BaseCommit) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.Author != nil {
+		object["author"], err = json.Marshal(a.Author)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'author': %w", err)
+		}
+	}
+
+	if a.Committer != nil {
+		object["committer"], err = json.Marshal(a.Committer)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'committer': %w", err)
+		}
+	}
+
+	if a.Date != nil {
+		object["date"], err = json.Marshal(a.Date)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'date': %w", err)
+		}
+	}
+
+	if a.Hash != nil {
+		object["hash"], err = json.Marshal(a.Hash)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'hash': %w", err)
+		}
+	}
+
+	if a.Message != nil {
+		object["message"], err = json.Marshal(a.Message)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'message': %w", err)
+		}
+	}
+
+	if a.Parents != nil {
+		object["parents"], err = json.Marshal(a.Parents)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'parents': %w", err)
+		}
+	}
+
+	if a.Summary != nil {
+		object["summary"], err = json.Marshal(a.Summary)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'summary': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for Branch. Returns the specified
+// element and whether it was found
+func (a Branch) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Branch
+func (a *Branch) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Branch to handle AdditionalProperties
+func (a *Branch) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["default_merge_strategy"]; found {
+		err = json.Unmarshal(raw, &a.DefaultMergeStrategy)
+		if err != nil {
+			return fmt.Errorf("error reading 'default_merge_strategy': %w", err)
+		}
+		delete(object, "default_merge_strategy")
+	}
+
+	if raw, found := object["links"]; found {
+		err = json.Unmarshal(raw, &a.Links)
+		if err != nil {
+			return fmt.Errorf("error reading 'links': %w", err)
+		}
+		delete(object, "links")
+	}
+
+	if raw, found := object["merge_strategies"]; found {
+		err = json.Unmarshal(raw, &a.MergeStrategies)
+		if err != nil {
+			return fmt.Errorf("error reading 'merge_strategies': %w", err)
+		}
+		delete(object, "merge_strategies")
+	}
+
+	if raw, found := object["name"]; found {
+		err = json.Unmarshal(raw, &a.Name)
+		if err != nil {
+			return fmt.Errorf("error reading 'name': %w", err)
+		}
+		delete(object, "name")
+	}
+
+	if raw, found := object["target"]; found {
+		err = json.Unmarshal(raw, &a.Target)
+		if err != nil {
+			return fmt.Errorf("error reading 'target': %w", err)
+		}
+		delete(object, "target")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Branch to handle AdditionalProperties
+func (a Branch) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.DefaultMergeStrategy != nil {
+		object["default_merge_strategy"], err = json.Marshal(a.DefaultMergeStrategy)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'default_merge_strategy': %w", err)
+		}
+	}
+
+	if a.Links != nil {
+		object["links"], err = json.Marshal(a.Links)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'links': %w", err)
+		}
+	}
+
+	if a.MergeStrategies != nil {
+		object["merge_strategies"], err = json.Marshal(a.MergeStrategies)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'merge_strategies': %w", err)
+		}
+	}
+
+	if a.Name != nil {
+		object["name"], err = json.Marshal(a.Name)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'name': %w", err)
+		}
+	}
+
+	if a.Target != nil {
+		object["target"], err = json.Marshal(a.Target)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'target': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for Comment. Returns the specified
+// element and whether it was found
+func (a Comment) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Comment
+func (a *Comment) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Comment to handle AdditionalProperties
+func (a *Comment) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["content"]; found {
+		err = json.Unmarshal(raw, &a.Content)
+		if err != nil {
+			return fmt.Errorf("error reading 'content': %w", err)
+		}
+		delete(object, "content")
+	}
+
+	if raw, found := object["created_on"]; found {
+		err = json.Unmarshal(raw, &a.CreatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'created_on': %w", err)
+		}
+		delete(object, "created_on")
+	}
+
+	if raw, found := object["deleted"]; found {
+		err = json.Unmarshal(raw, &a.Deleted)
+		if err != nil {
+			return fmt.Errorf("error reading 'deleted': %w", err)
+		}
+		delete(object, "deleted")
+	}
+
+	if raw, found := object["id"]; found {
+		err = json.Unmarshal(raw, &a.Id)
+		if err != nil {
+			return fmt.Errorf("error reading 'id': %w", err)
+		}
+		delete(object, "id")
+	}
+
+	if raw, found := object["inline"]; found {
+		err = json.Unmarshal(raw, &a.Inline)
+		if err != nil {
+			return fmt.Errorf("error reading 'inline': %w", err)
+		}
+		delete(object, "inline")
+	}
+
+	if raw, found := object["links"]; found {
+		err = json.Unmarshal(raw, &a.Links)
+		if err != nil {
+			return fmt.Errorf("error reading 'links': %w", err)
+		}
+		delete(object, "links")
+	}
+
+	if raw, found := object["parent"]; found {
+		err = json.Unmarshal(raw, &a.Parent)
+		if err != nil {
+			return fmt.Errorf("error reading 'parent': %w", err)
+		}
+		delete(object, "parent")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if raw, found := object["updated_on"]; found {
+		err = json.Unmarshal(raw, &a.UpdatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'updated_on': %w", err)
+		}
+		delete(object, "updated_on")
+	}
+
+	if raw, found := object["user"]; found {
+		err = json.Unmarshal(raw, &a.User)
+		if err != nil {
+			return fmt.Errorf("error reading 'user': %w", err)
+		}
+		delete(object, "user")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Comment to handle AdditionalProperties
+func (a Comment) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.Content != nil {
+		object["content"], err = json.Marshal(a.Content)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'content': %w", err)
+		}
+	}
+
+	if a.CreatedOn != nil {
+		object["created_on"], err = json.Marshal(a.CreatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'created_on': %w", err)
+		}
+	}
+
+	if a.Deleted != nil {
+		object["deleted"], err = json.Marshal(a.Deleted)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'deleted': %w", err)
+		}
+	}
+
+	if a.Id != nil {
+		object["id"], err = json.Marshal(a.Id)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'id': %w", err)
+		}
+	}
+
+	if a.Inline != nil {
+		object["inline"], err = json.Marshal(a.Inline)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'inline': %w", err)
+		}
+	}
+
+	if a.Links != nil {
+		object["links"], err = json.Marshal(a.Links)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'links': %w", err)
+		}
+	}
+
+	if a.Parent != nil {
+		object["parent"], err = json.Marshal(a.Parent)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'parent': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	if a.UpdatedOn != nil {
+		object["updated_on"], err = json.Marshal(a.UpdatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'updated_on': %w", err)
+		}
+	}
+
+	if a.User != nil {
+		object["user"], err = json.Marshal(a.User)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'user': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for CommentResolution. Returns the specified
+// element and whether it was found
+func (a CommentResolution) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for CommentResolution
+func (a *CommentResolution) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for CommentResolution to handle AdditionalProperties
+func (a *CommentResolution) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["created_on"]; found {
+		err = json.Unmarshal(raw, &a.CreatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'created_on': %w", err)
+		}
+		delete(object, "created_on")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if raw, found := object["user"]; found {
+		err = json.Unmarshal(raw, &a.User)
+		if err != nil {
+			return fmt.Errorf("error reading 'user': %w", err)
+		}
+		delete(object, "user")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for CommentResolution to handle AdditionalProperties
+func (a CommentResolution) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.CreatedOn != nil {
+		object["created_on"], err = json.Marshal(a.CreatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'created_on': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	if a.User != nil {
+		object["user"], err = json.Marshal(a.User)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'user': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for Commit. Returns the specified
+// element and whether it was found
+func (a Commit) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Commit
+func (a *Commit) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Commit to handle AdditionalProperties
+func (a *Commit) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["author"]; found {
+		err = json.Unmarshal(raw, &a.Author)
+		if err != nil {
+			return fmt.Errorf("error reading 'author': %w", err)
+		}
+		delete(object, "author")
+	}
+
+	if raw, found := object["committer"]; found {
+		err = json.Unmarshal(raw, &a.Committer)
+		if err != nil {
+			return fmt.Errorf("error reading 'committer': %w", err)
+		}
+		delete(object, "committer")
+	}
+
+	if raw, found := object["date"]; found {
+		err = json.Unmarshal(raw, &a.Date)
+		if err != nil {
+			return fmt.Errorf("error reading 'date': %w", err)
+		}
+		delete(object, "date")
+	}
+
+	if raw, found := object["hash"]; found {
+		err = json.Unmarshal(raw, &a.Hash)
+		if err != nil {
+			return fmt.Errorf("error reading 'hash': %w", err)
+		}
+		delete(object, "hash")
+	}
+
+	if raw, found := object["message"]; found {
+		err = json.Unmarshal(raw, &a.Message)
+		if err != nil {
+			return fmt.Errorf("error reading 'message': %w", err)
+		}
+		delete(object, "message")
+	}
+
+	if raw, found := object["parents"]; found {
+		err = json.Unmarshal(raw, &a.Parents)
+		if err != nil {
+			return fmt.Errorf("error reading 'parents': %w", err)
+		}
+		delete(object, "parents")
+	}
+
+	if raw, found := object["participants"]; found {
+		err = json.Unmarshal(raw, &a.Participants)
+		if err != nil {
+			return fmt.Errorf("error reading 'participants': %w", err)
+		}
+		delete(object, "participants")
+	}
+
+	if raw, found := object["repository"]; found {
+		err = json.Unmarshal(raw, &a.Repository)
+		if err != nil {
+			return fmt.Errorf("error reading 'repository': %w", err)
+		}
+		delete(object, "repository")
+	}
+
+	if raw, found := object["summary"]; found {
+		err = json.Unmarshal(raw, &a.Summary)
+		if err != nil {
+			return fmt.Errorf("error reading 'summary': %w", err)
+		}
+		delete(object, "summary")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Commit to handle AdditionalProperties
+func (a Commit) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.Author != nil {
+		object["author"], err = json.Marshal(a.Author)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'author': %w", err)
+		}
+	}
+
+	if a.Committer != nil {
+		object["committer"], err = json.Marshal(a.Committer)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'committer': %w", err)
+		}
+	}
+
+	if a.Date != nil {
+		object["date"], err = json.Marshal(a.Date)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'date': %w", err)
+		}
+	}
+
+	if a.Hash != nil {
+		object["hash"], err = json.Marshal(a.Hash)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'hash': %w", err)
+		}
+	}
+
+	if a.Message != nil {
+		object["message"], err = json.Marshal(a.Message)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'message': %w", err)
+		}
+	}
+
+	if a.Parents != nil {
+		object["parents"], err = json.Marshal(a.Parents)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'parents': %w", err)
+		}
+	}
+
+	if a.Participants != nil {
+		object["participants"], err = json.Marshal(a.Participants)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'participants': %w", err)
+		}
+	}
+
+	if a.Repository != nil {
+		object["repository"], err = json.Marshal(a.Repository)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'repository': %w", err)
+		}
+	}
+
+	if a.Summary != nil {
+		object["summary"], err = json.Marshal(a.Summary)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'summary': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for Commitstatus. Returns the specified
+// element and whether it was found
+func (a Commitstatus) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Commitstatus
+func (a *Commitstatus) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Commitstatus to handle AdditionalProperties
+func (a *Commitstatus) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["created_on"]; found {
+		err = json.Unmarshal(raw, &a.CreatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'created_on': %w", err)
+		}
+		delete(object, "created_on")
+	}
+
+	if raw, found := object["description"]; found {
+		err = json.Unmarshal(raw, &a.Description)
+		if err != nil {
+			return fmt.Errorf("error reading 'description': %w", err)
+		}
+		delete(object, "description")
+	}
+
+	if raw, found := object["key"]; found {
+		err = json.Unmarshal(raw, &a.Key)
+		if err != nil {
+			return fmt.Errorf("error reading 'key': %w", err)
+		}
+		delete(object, "key")
+	}
+
+	if raw, found := object["links"]; found {
+		err = json.Unmarshal(raw, &a.Links)
+		if err != nil {
+			return fmt.Errorf("error reading 'links': %w", err)
+		}
+		delete(object, "links")
+	}
+
+	if raw, found := object["name"]; found {
+		err = json.Unmarshal(raw, &a.Name)
+		if err != nil {
+			return fmt.Errorf("error reading 'name': %w", err)
+		}
+		delete(object, "name")
+	}
+
+	if raw, found := object["refname"]; found {
+		err = json.Unmarshal(raw, &a.Refname)
+		if err != nil {
+			return fmt.Errorf("error reading 'refname': %w", err)
+		}
+		delete(object, "refname")
+	}
+
+	if raw, found := object["state"]; found {
+		err = json.Unmarshal(raw, &a.State)
+		if err != nil {
+			return fmt.Errorf("error reading 'state': %w", err)
+		}
+		delete(object, "state")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if raw, found := object["updated_on"]; found {
+		err = json.Unmarshal(raw, &a.UpdatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'updated_on': %w", err)
+		}
+		delete(object, "updated_on")
+	}
+
+	if raw, found := object["url"]; found {
+		err = json.Unmarshal(raw, &a.Url)
+		if err != nil {
+			return fmt.Errorf("error reading 'url': %w", err)
+		}
+		delete(object, "url")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Commitstatus to handle AdditionalProperties
+func (a Commitstatus) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.CreatedOn != nil {
+		object["created_on"], err = json.Marshal(a.CreatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'created_on': %w", err)
+		}
+	}
+
+	if a.Description != nil {
+		object["description"], err = json.Marshal(a.Description)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'description': %w", err)
+		}
+	}
+
+	object["key"], err = json.Marshal(a.Key)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'key': %w", err)
+	}
+
+	if a.Links != nil {
+		object["links"], err = json.Marshal(a.Links)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'links': %w", err)
+		}
+	}
+
+	if a.Name != nil {
+		object["name"], err = json.Marshal(a.Name)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'name': %w", err)
+		}
+	}
+
+	if a.Refname != nil {
+		object["refname"], err = json.Marshal(a.Refname)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'refname': %w", err)
+		}
+	}
+
+	object["state"], err = json.Marshal(a.State)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'state': %w", err)
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	if a.UpdatedOn != nil {
+		object["updated_on"], err = json.Marshal(a.UpdatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'updated_on': %w", err)
+		}
+	}
+
+	if a.Url != nil {
+		object["url"], err = json.Marshal(a.Url)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'url': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for Committer. Returns the specified
+// element and whether it was found
+func (a Committer) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Committer
+func (a *Committer) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Committer to handle AdditionalProperties
+func (a *Committer) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["raw"]; found {
+		err = json.Unmarshal(raw, &a.Raw)
+		if err != nil {
+			return fmt.Errorf("error reading 'raw': %w", err)
+		}
+		delete(object, "raw")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if raw, found := object["user"]; found {
+		err = json.Unmarshal(raw, &a.User)
+		if err != nil {
+			return fmt.Errorf("error reading 'user': %w", err)
+		}
+		delete(object, "user")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Committer to handle AdditionalProperties
+func (a Committer) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.Raw != nil {
+		object["raw"], err = json.Marshal(a.Raw)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'raw': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	if a.User != nil {
+		object["user"], err = json.Marshal(a.User)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'user': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for DefaultReviewerAndType. Returns the specified
+// element and whether it was found
+func (a DefaultReviewerAndType) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for DefaultReviewerAndType
+func (a *DefaultReviewerAndType) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for DefaultReviewerAndType to handle AdditionalProperties
+func (a *DefaultReviewerAndType) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["reviewer_type"]; found {
+		err = json.Unmarshal(raw, &a.ReviewerType)
+		if err != nil {
+			return fmt.Errorf("error reading 'reviewer_type': %w", err)
+		}
+		delete(object, "reviewer_type")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if raw, found := object["user"]; found {
+		err = json.Unmarshal(raw, &a.User)
+		if err != nil {
+			return fmt.Errorf("error reading 'user': %w", err)
+		}
+		delete(object, "user")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for DefaultReviewerAndType to handle AdditionalProperties
+func (a DefaultReviewerAndType) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.ReviewerType != nil {
+		object["reviewer_type"], err = json.Marshal(a.ReviewerType)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'reviewer_type': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	if a.User != nil {
+		object["user"], err = json.Marshal(a.User)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'user': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for Error. Returns the specified
+// element and whether it was found
+func (a Error) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Error
+func (a *Error) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Error to handle AdditionalProperties
+func (a *Error) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["error"]; found {
+		err = json.Unmarshal(raw, &a.Error)
+		if err != nil {
+			return fmt.Errorf("error reading 'error': %w", err)
+		}
+		delete(object, "error")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Error to handle AdditionalProperties
+func (a Error) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.Error != nil {
+		object["error"], err = json.Marshal(a.Error)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'error': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for Object. Returns the specified
+// element and whether it was found
+func (a Object) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Object
+func (a *Object) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Object to handle AdditionalProperties
+func (a *Object) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Object to handle AdditionalProperties
+func (a Object) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for Participant. Returns the specified
+// element and whether it was found
+func (a Participant) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Participant
+func (a *Participant) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Participant to handle AdditionalProperties
+func (a *Participant) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["approved"]; found {
+		err = json.Unmarshal(raw, &a.Approved)
+		if err != nil {
+			return fmt.Errorf("error reading 'approved': %w", err)
+		}
+		delete(object, "approved")
+	}
+
+	if raw, found := object["participated_on"]; found {
+		err = json.Unmarshal(raw, &a.ParticipatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'participated_on': %w", err)
+		}
+		delete(object, "participated_on")
+	}
+
+	if raw, found := object["role"]; found {
+		err = json.Unmarshal(raw, &a.Role)
+		if err != nil {
+			return fmt.Errorf("error reading 'role': %w", err)
+		}
+		delete(object, "role")
+	}
+
+	if raw, found := object["state"]; found {
+		err = json.Unmarshal(raw, &a.State)
+		if err != nil {
+			return fmt.Errorf("error reading 'state': %w", err)
+		}
+		delete(object, "state")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if raw, found := object["user"]; found {
+		err = json.Unmarshal(raw, &a.User)
+		if err != nil {
+			return fmt.Errorf("error reading 'user': %w", err)
+		}
+		delete(object, "user")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Participant to handle AdditionalProperties
+func (a Participant) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.Approved != nil {
+		object["approved"], err = json.Marshal(a.Approved)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'approved': %w", err)
+		}
+	}
+
+	if a.ParticipatedOn != nil {
+		object["participated_on"], err = json.Marshal(a.ParticipatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'participated_on': %w", err)
+		}
+	}
+
+	if a.Role != nil {
+		object["role"], err = json.Marshal(a.Role)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'role': %w", err)
+		}
+	}
+
+	if a.State != nil {
+		object["state"], err = json.Marshal(a.State)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'state': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	if a.User != nil {
+		object["user"], err = json.Marshal(a.User)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'user': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for Project. Returns the specified
+// element and whether it was found
+func (a Project) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Project
+func (a *Project) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Project to handle AdditionalProperties
+func (a *Project) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["created_on"]; found {
+		err = json.Unmarshal(raw, &a.CreatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'created_on': %w", err)
+		}
+		delete(object, "created_on")
+	}
+
+	if raw, found := object["description"]; found {
+		err = json.Unmarshal(raw, &a.Description)
+		if err != nil {
+			return fmt.Errorf("error reading 'description': %w", err)
+		}
+		delete(object, "description")
+	}
+
+	if raw, found := object["has_publicly_visible_repos"]; found {
+		err = json.Unmarshal(raw, &a.HasPubliclyVisibleRepos)
+		if err != nil {
+			return fmt.Errorf("error reading 'has_publicly_visible_repos': %w", err)
+		}
+		delete(object, "has_publicly_visible_repos")
+	}
+
+	if raw, found := object["is_private"]; found {
+		err = json.Unmarshal(raw, &a.IsPrivate)
+		if err != nil {
+			return fmt.Errorf("error reading 'is_private': %w", err)
+		}
+		delete(object, "is_private")
+	}
+
+	if raw, found := object["key"]; found {
+		err = json.Unmarshal(raw, &a.Key)
+		if err != nil {
+			return fmt.Errorf("error reading 'key': %w", err)
+		}
+		delete(object, "key")
+	}
+
+	if raw, found := object["links"]; found {
+		err = json.Unmarshal(raw, &a.Links)
+		if err != nil {
+			return fmt.Errorf("error reading 'links': %w", err)
+		}
+		delete(object, "links")
+	}
+
+	if raw, found := object["name"]; found {
+		err = json.Unmarshal(raw, &a.Name)
+		if err != nil {
+			return fmt.Errorf("error reading 'name': %w", err)
+		}
+		delete(object, "name")
+	}
+
+	if raw, found := object["owner"]; found {
+		err = json.Unmarshal(raw, &a.Owner)
+		if err != nil {
+			return fmt.Errorf("error reading 'owner': %w", err)
+		}
+		delete(object, "owner")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if raw, found := object["updated_on"]; found {
+		err = json.Unmarshal(raw, &a.UpdatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'updated_on': %w", err)
+		}
+		delete(object, "updated_on")
+	}
+
+	if raw, found := object["uuid"]; found {
+		err = json.Unmarshal(raw, &a.Uuid)
+		if err != nil {
+			return fmt.Errorf("error reading 'uuid': %w", err)
+		}
+		delete(object, "uuid")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Project to handle AdditionalProperties
+func (a Project) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.CreatedOn != nil {
+		object["created_on"], err = json.Marshal(a.CreatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'created_on': %w", err)
+		}
+	}
+
+	if a.Description != nil {
+		object["description"], err = json.Marshal(a.Description)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'description': %w", err)
+		}
+	}
+
+	if a.HasPubliclyVisibleRepos != nil {
+		object["has_publicly_visible_repos"], err = json.Marshal(a.HasPubliclyVisibleRepos)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'has_publicly_visible_repos': %w", err)
+		}
+	}
+
+	if a.IsPrivate != nil {
+		object["is_private"], err = json.Marshal(a.IsPrivate)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'is_private': %w", err)
+		}
+	}
+
+	if a.Key != nil {
+		object["key"], err = json.Marshal(a.Key)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'key': %w", err)
+		}
+	}
+
+	if a.Links != nil {
+		object["links"], err = json.Marshal(a.Links)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'links': %w", err)
+		}
+	}
+
+	if a.Name != nil {
+		object["name"], err = json.Marshal(a.Name)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'name': %w", err)
+		}
+	}
+
+	if a.Owner != nil {
+		object["owner"], err = json.Marshal(a.Owner)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'owner': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	if a.UpdatedOn != nil {
+		object["updated_on"], err = json.Marshal(a.UpdatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'updated_on': %w", err)
+		}
+	}
+
+	if a.Uuid != nil {
+		object["uuid"], err = json.Marshal(a.Uuid)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'uuid': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for Pullrequest. Returns the specified
+// element and whether it was found
+func (a Pullrequest) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Pullrequest
+func (a *Pullrequest) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Pullrequest to handle AdditionalProperties
+func (a *Pullrequest) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["author"]; found {
+		err = json.Unmarshal(raw, &a.Author)
+		if err != nil {
+			return fmt.Errorf("error reading 'author': %w", err)
+		}
+		delete(object, "author")
+	}
+
+	if raw, found := object["close_source_branch"]; found {
+		err = json.Unmarshal(raw, &a.CloseSourceBranch)
+		if err != nil {
+			return fmt.Errorf("error reading 'close_source_branch': %w", err)
+		}
+		delete(object, "close_source_branch")
+	}
+
+	if raw, found := object["closed_by"]; found {
+		err = json.Unmarshal(raw, &a.ClosedBy)
+		if err != nil {
+			return fmt.Errorf("error reading 'closed_by': %w", err)
+		}
+		delete(object, "closed_by")
+	}
+
+	if raw, found := object["comment_count"]; found {
+		err = json.Unmarshal(raw, &a.CommentCount)
+		if err != nil {
+			return fmt.Errorf("error reading 'comment_count': %w", err)
+		}
+		delete(object, "comment_count")
+	}
+
+	if raw, found := object["created_on"]; found {
+		err = json.Unmarshal(raw, &a.CreatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'created_on': %w", err)
+		}
+		delete(object, "created_on")
+	}
+
+	if raw, found := object["description"]; found {
+		err = json.Unmarshal(raw, &a.Description)
+		if err != nil {
+			return fmt.Errorf("error reading 'description': %w", err)
+		}
+		delete(object, "description")
+	}
+
+	if raw, found := object["destination"]; found {
+		err = json.Unmarshal(raw, &a.Destination)
+		if err != nil {
+			return fmt.Errorf("error reading 'destination': %w", err)
+		}
+		delete(object, "destination")
+	}
+
+	if raw, found := object["draft"]; found {
+		err = json.Unmarshal(raw, &a.Draft)
+		if err != nil {
+			return fmt.Errorf("error reading 'draft': %w", err)
+		}
+		delete(object, "draft")
+	}
+
+	if raw, found := object["id"]; found {
+		err = json.Unmarshal(raw, &a.Id)
+		if err != nil {
+			return fmt.Errorf("error reading 'id': %w", err)
+		}
+		delete(object, "id")
+	}
+
+	if raw, found := object["links"]; found {
+		err = json.Unmarshal(raw, &a.Links)
+		if err != nil {
+			return fmt.Errorf("error reading 'links': %w", err)
+		}
+		delete(object, "links")
+	}
+
+	if raw, found := object["merge_commit"]; found {
+		err = json.Unmarshal(raw, &a.MergeCommit)
+		if err != nil {
+			return fmt.Errorf("error reading 'merge_commit': %w", err)
+		}
+		delete(object, "merge_commit")
+	}
+
+	if raw, found := object["participants"]; found {
+		err = json.Unmarshal(raw, &a.Participants)
+		if err != nil {
+			return fmt.Errorf("error reading 'participants': %w", err)
+		}
+		delete(object, "participants")
+	}
+
+	if raw, found := object["queued"]; found {
+		err = json.Unmarshal(raw, &a.Queued)
+		if err != nil {
+			return fmt.Errorf("error reading 'queued': %w", err)
+		}
+		delete(object, "queued")
+	}
+
+	if raw, found := object["reason"]; found {
+		err = json.Unmarshal(raw, &a.Reason)
+		if err != nil {
+			return fmt.Errorf("error reading 'reason': %w", err)
+		}
+		delete(object, "reason")
+	}
+
+	if raw, found := object["rendered"]; found {
+		err = json.Unmarshal(raw, &a.Rendered)
+		if err != nil {
+			return fmt.Errorf("error reading 'rendered': %w", err)
+		}
+		delete(object, "rendered")
+	}
+
+	if raw, found := object["reviewers"]; found {
+		err = json.Unmarshal(raw, &a.Reviewers)
+		if err != nil {
+			return fmt.Errorf("error reading 'reviewers': %w", err)
+		}
+		delete(object, "reviewers")
+	}
+
+	if raw, found := object["source"]; found {
+		err = json.Unmarshal(raw, &a.Source)
+		if err != nil {
+			return fmt.Errorf("error reading 'source': %w", err)
+		}
+		delete(object, "source")
+	}
+
+	if raw, found := object["state"]; found {
+		err = json.Unmarshal(raw, &a.State)
+		if err != nil {
+			return fmt.Errorf("error reading 'state': %w", err)
+		}
+		delete(object, "state")
+	}
+
+	if raw, found := object["summary"]; found {
+		err = json.Unmarshal(raw, &a.Summary)
+		if err != nil {
+			return fmt.Errorf("error reading 'summary': %w", err)
+		}
+		delete(object, "summary")
+	}
+
+	if raw, found := object["task_count"]; found {
+		err = json.Unmarshal(raw, &a.TaskCount)
+		if err != nil {
+			return fmt.Errorf("error reading 'task_count': %w", err)
+		}
+		delete(object, "task_count")
+	}
+
+	if raw, found := object["title"]; found {
+		err = json.Unmarshal(raw, &a.Title)
+		if err != nil {
+			return fmt.Errorf("error reading 'title': %w", err)
+		}
+		delete(object, "title")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if raw, found := object["updated_on"]; found {
+		err = json.Unmarshal(raw, &a.UpdatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'updated_on': %w", err)
+		}
+		delete(object, "updated_on")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Pullrequest to handle AdditionalProperties
+func (a Pullrequest) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.Author != nil {
+		object["author"], err = json.Marshal(a.Author)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'author': %w", err)
+		}
+	}
+
+	if a.CloseSourceBranch != nil {
+		object["close_source_branch"], err = json.Marshal(a.CloseSourceBranch)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'close_source_branch': %w", err)
+		}
+	}
+
+	if a.ClosedBy != nil {
+		object["closed_by"], err = json.Marshal(a.ClosedBy)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'closed_by': %w", err)
+		}
+	}
+
+	if a.CommentCount != nil {
+		object["comment_count"], err = json.Marshal(a.CommentCount)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'comment_count': %w", err)
+		}
+	}
+
+	if a.CreatedOn != nil {
+		object["created_on"], err = json.Marshal(a.CreatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'created_on': %w", err)
+		}
+	}
+
+	if a.Description != nil {
+		object["description"], err = json.Marshal(a.Description)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'description': %w", err)
+		}
+	}
+
+	if a.Destination != nil {
+		object["destination"], err = json.Marshal(a.Destination)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'destination': %w", err)
+		}
+	}
+
+	if a.Draft != nil {
+		object["draft"], err = json.Marshal(a.Draft)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'draft': %w", err)
+		}
+	}
+
+	if a.Id != nil {
+		object["id"], err = json.Marshal(a.Id)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'id': %w", err)
+		}
+	}
+
+	if a.Links != nil {
+		object["links"], err = json.Marshal(a.Links)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'links': %w", err)
+		}
+	}
+
+	if a.MergeCommit != nil {
+		object["merge_commit"], err = json.Marshal(a.MergeCommit)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'merge_commit': %w", err)
+		}
+	}
+
+	if a.Participants != nil {
+		object["participants"], err = json.Marshal(a.Participants)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'participants': %w", err)
+		}
+	}
+
+	if a.Queued != nil {
+		object["queued"], err = json.Marshal(a.Queued)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'queued': %w", err)
+		}
+	}
+
+	if a.Reason != nil {
+		object["reason"], err = json.Marshal(a.Reason)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'reason': %w", err)
+		}
+	}
+
+	if a.Rendered != nil {
+		object["rendered"], err = json.Marshal(a.Rendered)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'rendered': %w", err)
+		}
+	}
+
+	if a.Reviewers != nil {
+		object["reviewers"], err = json.Marshal(a.Reviewers)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'reviewers': %w", err)
+		}
+	}
+
+	if a.Source != nil {
+		object["source"], err = json.Marshal(a.Source)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'source': %w", err)
+		}
+	}
+
+	if a.State != nil {
+		object["state"], err = json.Marshal(a.State)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'state': %w", err)
+		}
+	}
+
+	if a.Summary != nil {
+		object["summary"], err = json.Marshal(a.Summary)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'summary': %w", err)
+		}
+	}
+
+	if a.TaskCount != nil {
+		object["task_count"], err = json.Marshal(a.TaskCount)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'task_count': %w", err)
+		}
+	}
+
+	if a.Title != nil {
+		object["title"], err = json.Marshal(a.Title)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'title': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	if a.UpdatedOn != nil {
+		object["updated_on"], err = json.Marshal(a.UpdatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'updated_on': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for PullrequestComment. Returns the specified
+// element and whether it was found
+func (a PullrequestComment) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for PullrequestComment
+func (a *PullrequestComment) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for PullrequestComment to handle AdditionalProperties
+func (a *PullrequestComment) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["content"]; found {
+		err = json.Unmarshal(raw, &a.Content)
+		if err != nil {
+			return fmt.Errorf("error reading 'content': %w", err)
+		}
+		delete(object, "content")
+	}
+
+	if raw, found := object["created_on"]; found {
+		err = json.Unmarshal(raw, &a.CreatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'created_on': %w", err)
+		}
+		delete(object, "created_on")
+	}
+
+	if raw, found := object["deleted"]; found {
+		err = json.Unmarshal(raw, &a.Deleted)
+		if err != nil {
+			return fmt.Errorf("error reading 'deleted': %w", err)
+		}
+		delete(object, "deleted")
+	}
+
+	if raw, found := object["id"]; found {
+		err = json.Unmarshal(raw, &a.Id)
+		if err != nil {
+			return fmt.Errorf("error reading 'id': %w", err)
+		}
+		delete(object, "id")
+	}
+
+	if raw, found := object["inline"]; found {
+		err = json.Unmarshal(raw, &a.Inline)
+		if err != nil {
+			return fmt.Errorf("error reading 'inline': %w", err)
+		}
+		delete(object, "inline")
+	}
+
+	if raw, found := object["links"]; found {
+		err = json.Unmarshal(raw, &a.Links)
+		if err != nil {
+			return fmt.Errorf("error reading 'links': %w", err)
+		}
+		delete(object, "links")
+	}
+
+	if raw, found := object["parent"]; found {
+		err = json.Unmarshal(raw, &a.Parent)
+		if err != nil {
+			return fmt.Errorf("error reading 'parent': %w", err)
+		}
+		delete(object, "parent")
+	}
+
+	if raw, found := object["pending"]; found {
+		err = json.Unmarshal(raw, &a.Pending)
+		if err != nil {
+			return fmt.Errorf("error reading 'pending': %w", err)
+		}
+		delete(object, "pending")
+	}
+
+	if raw, found := object["pullrequest"]; found {
+		err = json.Unmarshal(raw, &a.Pullrequest)
+		if err != nil {
+			return fmt.Errorf("error reading 'pullrequest': %w", err)
+		}
+		delete(object, "pullrequest")
+	}
+
+	if raw, found := object["resolution"]; found {
+		err = json.Unmarshal(raw, &a.Resolution)
+		if err != nil {
+			return fmt.Errorf("error reading 'resolution': %w", err)
+		}
+		delete(object, "resolution")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if raw, found := object["updated_on"]; found {
+		err = json.Unmarshal(raw, &a.UpdatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'updated_on': %w", err)
+		}
+		delete(object, "updated_on")
+	}
+
+	if raw, found := object["user"]; found {
+		err = json.Unmarshal(raw, &a.User)
+		if err != nil {
+			return fmt.Errorf("error reading 'user': %w", err)
+		}
+		delete(object, "user")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for PullrequestComment to handle AdditionalProperties
+func (a PullrequestComment) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.Content != nil {
+		object["content"], err = json.Marshal(a.Content)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'content': %w", err)
+		}
+	}
+
+	if a.CreatedOn != nil {
+		object["created_on"], err = json.Marshal(a.CreatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'created_on': %w", err)
+		}
+	}
+
+	if a.Deleted != nil {
+		object["deleted"], err = json.Marshal(a.Deleted)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'deleted': %w", err)
+		}
+	}
+
+	if a.Id != nil {
+		object["id"], err = json.Marshal(a.Id)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'id': %w", err)
+		}
+	}
+
+	if a.Inline != nil {
+		object["inline"], err = json.Marshal(a.Inline)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'inline': %w", err)
+		}
+	}
+
+	if a.Links != nil {
+		object["links"], err = json.Marshal(a.Links)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'links': %w", err)
+		}
+	}
+
+	if a.Parent != nil {
+		object["parent"], err = json.Marshal(a.Parent)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'parent': %w", err)
+		}
+	}
+
+	if a.Pending != nil {
+		object["pending"], err = json.Marshal(a.Pending)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'pending': %w", err)
+		}
+	}
+
+	if a.Pullrequest != nil {
+		object["pullrequest"], err = json.Marshal(a.Pullrequest)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'pullrequest': %w", err)
+		}
+	}
+
+	if a.Resolution != nil {
+		object["resolution"], err = json.Marshal(a.Resolution)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'resolution': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	if a.UpdatedOn != nil {
+		object["updated_on"], err = json.Marshal(a.UpdatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'updated_on': %w", err)
+		}
+	}
+
+	if a.User != nil {
+		object["user"], err = json.Marshal(a.User)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'user': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for PullrequestMergeParameters. Returns the specified
+// element and whether it was found
+func (a PullrequestMergeParameters) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for PullrequestMergeParameters
+func (a *PullrequestMergeParameters) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for PullrequestMergeParameters to handle AdditionalProperties
+func (a *PullrequestMergeParameters) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["close_source_branch"]; found {
+		err = json.Unmarshal(raw, &a.CloseSourceBranch)
+		if err != nil {
+			return fmt.Errorf("error reading 'close_source_branch': %w", err)
+		}
+		delete(object, "close_source_branch")
+	}
+
+	if raw, found := object["merge_strategy"]; found {
+		err = json.Unmarshal(raw, &a.MergeStrategy)
+		if err != nil {
+			return fmt.Errorf("error reading 'merge_strategy': %w", err)
+		}
+		delete(object, "merge_strategy")
+	}
+
+	if raw, found := object["message"]; found {
+		err = json.Unmarshal(raw, &a.Message)
+		if err != nil {
+			return fmt.Errorf("error reading 'message': %w", err)
+		}
+		delete(object, "message")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for PullrequestMergeParameters to handle AdditionalProperties
+func (a PullrequestMergeParameters) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.CloseSourceBranch != nil {
+		object["close_source_branch"], err = json.Marshal(a.CloseSourceBranch)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'close_source_branch': %w", err)
+		}
+	}
+
+	if a.MergeStrategy != nil {
+		object["merge_strategy"], err = json.Marshal(a.MergeStrategy)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'merge_strategy': %w", err)
+		}
+	}
+
+	if a.Message != nil {
+		object["message"], err = json.Marshal(a.Message)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'message': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for Ref. Returns the specified
+// element and whether it was found
+func (a Ref) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Ref
+func (a *Ref) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Ref to handle AdditionalProperties
+func (a *Ref) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["links"]; found {
+		err = json.Unmarshal(raw, &a.Links)
+		if err != nil {
+			return fmt.Errorf("error reading 'links': %w", err)
+		}
+		delete(object, "links")
+	}
+
+	if raw, found := object["name"]; found {
+		err = json.Unmarshal(raw, &a.Name)
+		if err != nil {
+			return fmt.Errorf("error reading 'name': %w", err)
+		}
+		delete(object, "name")
+	}
+
+	if raw, found := object["target"]; found {
+		err = json.Unmarshal(raw, &a.Target)
+		if err != nil {
+			return fmt.Errorf("error reading 'target': %w", err)
+		}
+		delete(object, "target")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Ref to handle AdditionalProperties
+func (a Ref) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.Links != nil {
+		object["links"], err = json.Marshal(a.Links)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'links': %w", err)
+		}
+	}
+
+	if a.Name != nil {
+		object["name"], err = json.Marshal(a.Name)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'name': %w", err)
+		}
+	}
+
+	if a.Target != nil {
+		object["target"], err = json.Marshal(a.Target)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'target': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for Repository. Returns the specified
+// element and whether it was found
+func (a Repository) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Repository
+func (a *Repository) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Repository to handle AdditionalProperties
+func (a *Repository) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["created_on"]; found {
+		err = json.Unmarshal(raw, &a.CreatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'created_on': %w", err)
+		}
+		delete(object, "created_on")
+	}
+
+	if raw, found := object["description"]; found {
+		err = json.Unmarshal(raw, &a.Description)
+		if err != nil {
+			return fmt.Errorf("error reading 'description': %w", err)
+		}
+		delete(object, "description")
+	}
+
+	if raw, found := object["fork_policy"]; found {
+		err = json.Unmarshal(raw, &a.ForkPolicy)
+		if err != nil {
+			return fmt.Errorf("error reading 'fork_policy': %w", err)
+		}
+		delete(object, "fork_policy")
+	}
+
+	if raw, found := object["full_name"]; found {
+		err = json.Unmarshal(raw, &a.FullName)
+		if err != nil {
+			return fmt.Errorf("error reading 'full_name': %w", err)
+		}
+		delete(object, "full_name")
+	}
+
+	if raw, found := object["has_issues"]; found {
+		err = json.Unmarshal(raw, &a.HasIssues)
+		if err != nil {
+			return fmt.Errorf("error reading 'has_issues': %w", err)
+		}
+		delete(object, "has_issues")
+	}
+
+	if raw, found := object["has_wiki"]; found {
+		err = json.Unmarshal(raw, &a.HasWiki)
+		if err != nil {
+			return fmt.Errorf("error reading 'has_wiki': %w", err)
+		}
+		delete(object, "has_wiki")
+	}
+
+	if raw, found := object["is_private"]; found {
+		err = json.Unmarshal(raw, &a.IsPrivate)
+		if err != nil {
+			return fmt.Errorf("error reading 'is_private': %w", err)
+		}
+		delete(object, "is_private")
+	}
+
+	if raw, found := object["language"]; found {
+		err = json.Unmarshal(raw, &a.Language)
+		if err != nil {
+			return fmt.Errorf("error reading 'language': %w", err)
+		}
+		delete(object, "language")
+	}
+
+	if raw, found := object["links"]; found {
+		err = json.Unmarshal(raw, &a.Links)
+		if err != nil {
+			return fmt.Errorf("error reading 'links': %w", err)
+		}
+		delete(object, "links")
+	}
+
+	if raw, found := object["mainbranch"]; found {
+		err = json.Unmarshal(raw, &a.Mainbranch)
+		if err != nil {
+			return fmt.Errorf("error reading 'mainbranch': %w", err)
+		}
+		delete(object, "mainbranch")
+	}
+
+	if raw, found := object["name"]; found {
+		err = json.Unmarshal(raw, &a.Name)
+		if err != nil {
+			return fmt.Errorf("error reading 'name': %w", err)
+		}
+		delete(object, "name")
+	}
+
+	if raw, found := object["owner"]; found {
+		err = json.Unmarshal(raw, &a.Owner)
+		if err != nil {
+			return fmt.Errorf("error reading 'owner': %w", err)
+		}
+		delete(object, "owner")
+	}
+
+	if raw, found := object["parent"]; found {
+		err = json.Unmarshal(raw, &a.Parent)
+		if err != nil {
+			return fmt.Errorf("error reading 'parent': %w", err)
+		}
+		delete(object, "parent")
+	}
+
+	if raw, found := object["project"]; found {
+		err = json.Unmarshal(raw, &a.Project)
+		if err != nil {
+			return fmt.Errorf("error reading 'project': %w", err)
+		}
+		delete(object, "project")
+	}
+
+	if raw, found := object["scm"]; found {
+		err = json.Unmarshal(raw, &a.Scm)
+		if err != nil {
+			return fmt.Errorf("error reading 'scm': %w", err)
+		}
+		delete(object, "scm")
+	}
+
+	if raw, found := object["size"]; found {
+		err = json.Unmarshal(raw, &a.Size)
+		if err != nil {
+			return fmt.Errorf("error reading 'size': %w", err)
+		}
+		delete(object, "size")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if raw, found := object["updated_on"]; found {
+		err = json.Unmarshal(raw, &a.UpdatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'updated_on': %w", err)
+		}
+		delete(object, "updated_on")
+	}
+
+	if raw, found := object["uuid"]; found {
+		err = json.Unmarshal(raw, &a.Uuid)
+		if err != nil {
+			return fmt.Errorf("error reading 'uuid': %w", err)
+		}
+		delete(object, "uuid")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Repository to handle AdditionalProperties
+func (a Repository) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.CreatedOn != nil {
+		object["created_on"], err = json.Marshal(a.CreatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'created_on': %w", err)
+		}
+	}
+
+	if a.Description != nil {
+		object["description"], err = json.Marshal(a.Description)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'description': %w", err)
+		}
+	}
+
+	if a.ForkPolicy != nil {
+		object["fork_policy"], err = json.Marshal(a.ForkPolicy)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'fork_policy': %w", err)
+		}
+	}
+
+	if a.FullName != nil {
+		object["full_name"], err = json.Marshal(a.FullName)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'full_name': %w", err)
+		}
+	}
+
+	if a.HasIssues != nil {
+		object["has_issues"], err = json.Marshal(a.HasIssues)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'has_issues': %w", err)
+		}
+	}
+
+	if a.HasWiki != nil {
+		object["has_wiki"], err = json.Marshal(a.HasWiki)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'has_wiki': %w", err)
+		}
+	}
+
+	if a.IsPrivate != nil {
+		object["is_private"], err = json.Marshal(a.IsPrivate)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'is_private': %w", err)
+		}
+	}
+
+	if a.Language != nil {
+		object["language"], err = json.Marshal(a.Language)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'language': %w", err)
+		}
+	}
+
+	if a.Links != nil {
+		object["links"], err = json.Marshal(a.Links)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'links': %w", err)
+		}
+	}
+
+	if a.Mainbranch != nil {
+		object["mainbranch"], err = json.Marshal(a.Mainbranch)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'mainbranch': %w", err)
+		}
+	}
+
+	if a.Name != nil {
+		object["name"], err = json.Marshal(a.Name)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'name': %w", err)
+		}
+	}
+
+	if a.Owner != nil {
+		object["owner"], err = json.Marshal(a.Owner)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'owner': %w", err)
+		}
+	}
+
+	if a.Parent != nil {
+		object["parent"], err = json.Marshal(a.Parent)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'parent': %w", err)
+		}
+	}
+
+	if a.Project != nil {
+		object["project"], err = json.Marshal(a.Project)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'project': %w", err)
+		}
+	}
+
+	if a.Scm != nil {
+		object["scm"], err = json.Marshal(a.Scm)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'scm': %w", err)
+		}
+	}
+
+	if a.Size != nil {
+		object["size"], err = json.Marshal(a.Size)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'size': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	if a.UpdatedOn != nil {
+		object["updated_on"], err = json.Marshal(a.UpdatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'updated_on': %w", err)
+		}
+	}
+
+	if a.Uuid != nil {
+		object["uuid"], err = json.Marshal(a.Uuid)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'uuid': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for Team. Returns the specified
+// element and whether it was found
+func (a Team) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for Team
+func (a *Team) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for Team to handle AdditionalProperties
+func (a *Team) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["created_on"]; found {
+		err = json.Unmarshal(raw, &a.CreatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'created_on': %w", err)
+		}
+		delete(object, "created_on")
+	}
+
+	if raw, found := object["display_name"]; found {
+		err = json.Unmarshal(raw, &a.DisplayName)
+		if err != nil {
+			return fmt.Errorf("error reading 'display_name': %w", err)
+		}
+		delete(object, "display_name")
+	}
+
+	if raw, found := object["links"]; found {
+		err = json.Unmarshal(raw, &a.Links)
+		if err != nil {
+			return fmt.Errorf("error reading 'links': %w", err)
+		}
+		delete(object, "links")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if raw, found := object["uuid"]; found {
+		err = json.Unmarshal(raw, &a.Uuid)
+		if err != nil {
+			return fmt.Errorf("error reading 'uuid': %w", err)
+		}
+		delete(object, "uuid")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for Team to handle AdditionalProperties
+func (a Team) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.CreatedOn != nil {
+		object["created_on"], err = json.Marshal(a.CreatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'created_on': %w", err)
+		}
+	}
+
+	if a.DisplayName != nil {
+		object["display_name"], err = json.Marshal(a.DisplayName)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'display_name': %w", err)
+		}
+	}
+
+	if a.Links != nil {
+		object["links"], err = json.Marshal(a.Links)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'links': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	if a.Uuid != nil {
+		object["uuid"], err = json.Marshal(a.Uuid)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'uuid': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for TeamLinks. Returns the specified
+// element and whether it was found
+func (a TeamLinks) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for TeamLinks
+func (a *TeamLinks) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for TeamLinks to handle AdditionalProperties
+func (a *TeamLinks) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["avatar"]; found {
+		err = json.Unmarshal(raw, &a.Avatar)
+		if err != nil {
+			return fmt.Errorf("error reading 'avatar': %w", err)
+		}
+		delete(object, "avatar")
+	}
+
+	if raw, found := object["html"]; found {
+		err = json.Unmarshal(raw, &a.Html)
+		if err != nil {
+			return fmt.Errorf("error reading 'html': %w", err)
+		}
+		delete(object, "html")
+	}
+
+	if raw, found := object["members"]; found {
+		err = json.Unmarshal(raw, &a.Members)
+		if err != nil {
+			return fmt.Errorf("error reading 'members': %w", err)
+		}
+		delete(object, "members")
+	}
+
+	if raw, found := object["projects"]; found {
+		err = json.Unmarshal(raw, &a.Projects)
+		if err != nil {
+			return fmt.Errorf("error reading 'projects': %w", err)
+		}
+		delete(object, "projects")
+	}
+
+	if raw, found := object["repositories"]; found {
+		err = json.Unmarshal(raw, &a.Repositories)
+		if err != nil {
+			return fmt.Errorf("error reading 'repositories': %w", err)
+		}
+		delete(object, "repositories")
+	}
+
+	if raw, found := object["self"]; found {
+		err = json.Unmarshal(raw, &a.Self)
+		if err != nil {
+			return fmt.Errorf("error reading 'self': %w", err)
+		}
+		delete(object, "self")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for TeamLinks to handle AdditionalProperties
+func (a TeamLinks) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.Avatar != nil {
+		object["avatar"], err = json.Marshal(a.Avatar)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'avatar': %w", err)
+		}
+	}
+
+	if a.Html != nil {
+		object["html"], err = json.Marshal(a.Html)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'html': %w", err)
+		}
+	}
+
+	if a.Members != nil {
+		object["members"], err = json.Marshal(a.Members)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'members': %w", err)
+		}
+	}
+
+	if a.Projects != nil {
+		object["projects"], err = json.Marshal(a.Projects)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'projects': %w", err)
+		}
+	}
+
+	if a.Repositories != nil {
+		object["repositories"], err = json.Marshal(a.Repositories)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'repositories': %w", err)
+		}
+	}
+
+	if a.Self != nil {
+		object["self"], err = json.Marshal(a.Self)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'self': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for User. Returns the specified
+// element and whether it was found
+func (a User) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for User
+func (a *User) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for User to handle AdditionalProperties
+func (a *User) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["account_id"]; found {
+		err = json.Unmarshal(raw, &a.AccountId)
+		if err != nil {
+			return fmt.Errorf("error reading 'account_id': %w", err)
+		}
+		delete(object, "account_id")
+	}
+
+	if raw, found := object["account_status"]; found {
+		err = json.Unmarshal(raw, &a.AccountStatus)
+		if err != nil {
+			return fmt.Errorf("error reading 'account_status': %w", err)
+		}
+		delete(object, "account_status")
+	}
+
+	if raw, found := object["created_on"]; found {
+		err = json.Unmarshal(raw, &a.CreatedOn)
+		if err != nil {
+			return fmt.Errorf("error reading 'created_on': %w", err)
+		}
+		delete(object, "created_on")
+	}
+
+	if raw, found := object["display_name"]; found {
+		err = json.Unmarshal(raw, &a.DisplayName)
+		if err != nil {
+			return fmt.Errorf("error reading 'display_name': %w", err)
+		}
+		delete(object, "display_name")
+	}
+
+	if raw, found := object["has_2fa_enabled"]; found {
+		err = json.Unmarshal(raw, &a.Has2faEnabled)
+		if err != nil {
+			return fmt.Errorf("error reading 'has_2fa_enabled': %w", err)
+		}
+		delete(object, "has_2fa_enabled")
+	}
+
+	if raw, found := object["is_staff"]; found {
+		err = json.Unmarshal(raw, &a.IsStaff)
+		if err != nil {
+			return fmt.Errorf("error reading 'is_staff': %w", err)
+		}
+		delete(object, "is_staff")
+	}
+
+	if raw, found := object["links"]; found {
+		err = json.Unmarshal(raw, &a.Links)
+		if err != nil {
+			return fmt.Errorf("error reading 'links': %w", err)
+		}
+		delete(object, "links")
+	}
+
+	if raw, found := object["nickname"]; found {
+		err = json.Unmarshal(raw, &a.Nickname)
+		if err != nil {
+			return fmt.Errorf("error reading 'nickname': %w", err)
+		}
+		delete(object, "nickname")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if raw, found := object["uuid"]; found {
+		err = json.Unmarshal(raw, &a.Uuid)
+		if err != nil {
+			return fmt.Errorf("error reading 'uuid': %w", err)
+		}
+		delete(object, "uuid")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for User to handle AdditionalProperties
+func (a User) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.AccountId != nil {
+		object["account_id"], err = json.Marshal(a.AccountId)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'account_id': %w", err)
+		}
+	}
+
+	if a.AccountStatus != nil {
+		object["account_status"], err = json.Marshal(a.AccountStatus)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'account_status': %w", err)
+		}
+	}
+
+	if a.CreatedOn != nil {
+		object["created_on"], err = json.Marshal(a.CreatedOn)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'created_on': %w", err)
+		}
+	}
+
+	if a.DisplayName != nil {
+		object["display_name"], err = json.Marshal(a.DisplayName)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'display_name': %w", err)
+		}
+	}
+
+	if a.Has2faEnabled != nil {
+		object["has_2fa_enabled"], err = json.Marshal(a.Has2faEnabled)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'has_2fa_enabled': %w", err)
+		}
+	}
+
+	if a.IsStaff != nil {
+		object["is_staff"], err = json.Marshal(a.IsStaff)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'is_staff': %w", err)
+		}
+	}
+
+	if a.Links != nil {
+		object["links"], err = json.Marshal(a.Links)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'links': %w", err)
+		}
+	}
+
+	if a.Nickname != nil {
+		object["nickname"], err = json.Marshal(a.Nickname)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'nickname': %w", err)
+		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	if a.Uuid != nil {
+		object["uuid"], err = json.Marshal(a.Uuid)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'uuid': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for UserLinks. Returns the specified
+// element and whether it was found
+func (a UserLinks) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for UserLinks
+func (a *UserLinks) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for UserLinks to handle AdditionalProperties
+func (a *UserLinks) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["avatar"]; found {
+		err = json.Unmarshal(raw, &a.Avatar)
+		if err != nil {
+			return fmt.Errorf("error reading 'avatar': %w", err)
+		}
+		delete(object, "avatar")
+	}
+
+	if raw, found := object["html"]; found {
+		err = json.Unmarshal(raw, &a.Html)
+		if err != nil {
+			return fmt.Errorf("error reading 'html': %w", err)
+		}
+		delete(object, "html")
+	}
+
+	if raw, found := object["repositories"]; found {
+		err = json.Unmarshal(raw, &a.Repositories)
+		if err != nil {
+			return fmt.Errorf("error reading 'repositories': %w", err)
+		}
+		delete(object, "repositories")
+	}
+
+	if raw, found := object["self"]; found {
+		err = json.Unmarshal(raw, &a.Self)
+		if err != nil {
+			return fmt.Errorf("error reading 'self': %w", err)
+		}
+		delete(object, "self")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for UserLinks to handle AdditionalProperties
+func (a UserLinks) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	if a.Avatar != nil {
+		object["avatar"], err = json.Marshal(a.Avatar)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'avatar': %w", err)
+		}
+	}
+
+	if a.Html != nil {
+		object["html"], err = json.Marshal(a.Html)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'html': %w", err)
+		}
+	}
+
+	if a.Repositories != nil {
+		object["repositories"], err = json.Marshal(a.Repositories)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'repositories': %w", err)
+		}
+	}
+
+	if a.Self != nil {
+		object["self"], err = json.Marshal(a.Self)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'self': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
