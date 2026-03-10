@@ -29,9 +29,20 @@ var camelUpperBoundary = regexp.MustCompile(`([a-z])([A-Z])`)
 // ─── Schema types ─────────────────────────────────────────────────────────────
 
 type Schema struct {
-	OpenAPI string                     `yaml:"openapi"`
-	Info    map[string]any             `yaml:"info"`
-	Paths   map[string]map[string]Op   `yaml:"paths"`
+	OpenAPI string                `yaml:"openapi"`
+	Info    map[string]any        `yaml:"info"`
+	Paths   map[string]PathItem   `yaml:"paths"`
+}
+
+// PathItem represents an OpenAPI 3.0 path item, which may contain both
+// HTTP method operations and path-level parameters (a YAML sequence).
+type PathItem struct {
+	Parameters []Parameter `yaml:"parameters"`
+	Get        *Op         `yaml:"get"`
+	Post       *Op         `yaml:"post"`
+	Put        *Op         `yaml:"put"`
+	Patch      *Op         `yaml:"patch"`
+	Delete     *Op         `yaml:"delete"`
 }
 
 type Op struct {
@@ -264,11 +275,20 @@ func main() {
 	data := FileData{SchemaPath: schemaPath}
 
 	// Map operationId → command data
-	httpMethods := []string{"get", "post", "put", "patch", "delete"}
+	type methodOp struct {
+		method string
+		op     *Op
+	}
 	for _, pathItem := range schema.Paths {
-		for _, method := range httpMethods {
-			op, ok := pathItem[method]
-			if !ok || op.OperationID == "" {
+		for _, entry := range []methodOp{
+			{"get", pathItem.Get},
+			{"post", pathItem.Post},
+			{"put", pathItem.Put},
+			{"patch", pathItem.Patch},
+			{"delete", pathItem.Delete},
+		} {
+			op := entry.op
+			if op == nil || op.OperationID == "" {
 				continue
 			}
 
