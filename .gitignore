@@ -1,6 +1,7 @@
 # Binaries
 /bb-cli
 /gen_commands
+/main
 
 # Build artifacts
 /dist/
