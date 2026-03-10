@@ -234,10 +234,7 @@ components:
       type: object
       properties:
         branch:
-          type: object
-          properties:
-            name:
-              type: string
+          $ref: '#/components/schemas/pullrequest_endpoint_branch'
         repository:
           $ref: '#/components/schemas/repository'
         commit:
@@ -245,6 +242,25 @@ components:
           properties:
             hash:
               type: string
+
+    pullrequest_endpoint_branch:
+      type: object
+      properties:
+        name:
+          type: string
+        default_merge_strategy:
+          type: string
+        merge_strategies:
+          type: array
+          items:
+            $ref: '#/components/schemas/pullrequest_endpoint_branch_merge_strategies'
+
+    pullrequest_endpoint_branch_merge_strategies:
+      type: string
+      enum:
+        - merge_commit
+        - squash
+        - fast_forward
 
     pullrequest_merge_parameters:
       type: object

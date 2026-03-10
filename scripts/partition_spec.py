@@ -118,6 +118,9 @@ def main():
                     spec["components"]["schemas"][schema_name]
                 )
 
+    # Post-process schema for stable code generation
+    post_process_schema(out)
+
     output_path.write_text(
         yaml.dump(out, default_flow_style=False, sort_keys=False, allow_unicode=True)
     )
@@ -126,6 +129,44 @@ def main():
         f"{len(out['components']['schemas'])} schemas, "
         f"wrote to {output_path}"
     )
+
+
+def post_process_schema(out: dict) -> None:
+    """Normalize extracted schema for stable Go code generation.
+
+    Two transformations are applied after extraction:
+    1. Ensure ``pullrequest`` always exposes ``description`` as a direct
+       property so that the generated Go struct always has the field and
+       ``pr_create.go`` can set it without further changes.
+    2. Lift the inline ``pullrequest_endpoint.branch`` object into a named
+       schema (``pullrequest_endpoint_branch``) so that Go code can reference
+       the type by name instead of using an anonymous struct literal that
+       breaks whenever Bitbucket adds fields to the branch object.
+    """
+    schemas = out.get("components", {}).get("schemas", {})
+
+    # 1. Ensure pullrequest.description is a direct property.
+    # We check only direct properties (not inherited via allOf) because
+    # oapi-codegen may not promote embedded allOf fields to the top-level
+    # struct, making the field inaccessible as pr.Description.
+    pr = schemas.get("pullrequest")
+    if pr is not None:
+        if "description" not in pr.get("properties", {}):
+            pr.setdefault("properties", {})["description"] = {
+                "type": "string",
+                "description": "Explains what the pull request does.",
+            }
+
+    # 2. Lift pullrequest_endpoint.branch to a named schema
+    ep = schemas.get("pullrequest_endpoint")
+    if ep is not None:
+        branch = ep.get("properties", {}).get("branch")
+        if branch is not None and "$ref" not in branch and branch.get("type") == "object":
+            # Move the inline object to a named schema
+            schemas["pullrequest_endpoint_branch"] = branch
+            ep["properties"]["branch"] = {
+                "$ref": "#/components/schemas/pullrequest_endpoint_branch"
+            }
 
 
 if __name__ == "__main__":

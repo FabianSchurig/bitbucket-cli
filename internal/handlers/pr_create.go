@@ -46,17 +46,13 @@ func CreatePullRequest(ctx context.Context, c *client.BBClient, in CreatePRInput
 		if in.SourceBranch != "" {
 			branchName := in.SourceBranch
 			pr.Source = &generated.PullrequestEndpoint{
-				Branch: &struct {
-					Name *string `json:"name,omitempty"`
-				}{Name: &branchName},
+				Branch: &generated.PullrequestEndpointBranch{Name: &branchName},
 			}
 		}
 		if in.DestinationBranch != "" {
 			branchName := in.DestinationBranch
 			pr.Destination = &generated.PullrequestEndpoint{
-				Branch: &struct {
-					Name *string `json:"name,omitempty"`
-				}{Name: &branchName},
+				Branch: &generated.PullrequestEndpointBranch{Name: &branchName},
 			}
 		}
 		if len(in.ReviewerUUIDs) > 0 {

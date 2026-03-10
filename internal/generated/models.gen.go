@@ -73,21 +73,42 @@ func (e PullrequestState) Valid() bool {
 	}
 }
 
+// Defines values for PullrequestEndpointBranchMergeStrategies.
+const (
+	PullrequestEndpointBranchMergeStrategiesFastForward PullrequestEndpointBranchMergeStrategies = "fast_forward"
+	PullrequestEndpointBranchMergeStrategiesMergeCommit PullrequestEndpointBranchMergeStrategies = "merge_commit"
+	PullrequestEndpointBranchMergeStrategiesSquash      PullrequestEndpointBranchMergeStrategies = "squash"
+)
+
+// Valid indicates whether the value is a known member of the PullrequestEndpointBranchMergeStrategies enum.
+func (e PullrequestEndpointBranchMergeStrategies) Valid() bool {
+	switch e {
+	case PullrequestEndpointBranchMergeStrategiesFastForward:
+		return true
+	case PullrequestEndpointBranchMergeStrategiesMergeCommit:
+		return true
+	case PullrequestEndpointBranchMergeStrategiesSquash:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for PullrequestMergeParametersMergeStrategy.
 const (
-	FastForward PullrequestMergeParametersMergeStrategy = "fast_forward"
-	MergeCommit PullrequestMergeParametersMergeStrategy = "merge_commit"
-	Squash      PullrequestMergeParametersMergeStrategy = "squash"
+	PullrequestMergeParametersMergeStrategyFastForward PullrequestMergeParametersMergeStrategy = "fast_forward"
+	PullrequestMergeParametersMergeStrategyMergeCommit PullrequestMergeParametersMergeStrategy = "merge_commit"
+	PullrequestMergeParametersMergeStrategySquash      PullrequestMergeParametersMergeStrategy = "squash"
 )
 
 // Valid indicates whether the value is a known member of the PullrequestMergeParametersMergeStrategy enum.
 func (e PullrequestMergeParametersMergeStrategy) Valid() bool {
 	switch e {
-	case FastForward:
+	case PullrequestMergeParametersMergeStrategyFastForward:
 		return true
-	case MergeCommit:
+	case PullrequestMergeParametersMergeStrategyMergeCommit:
 		return true
-	case Squash:
+	case PullrequestMergeParametersMergeStrategySquash:
 		return true
 	default:
 		return false
@@ -203,14 +224,22 @@ type PullrequestState string
 
 // PullrequestEndpoint defines model for pullrequest_endpoint.
 type PullrequestEndpoint struct {
-	Branch *struct {
-		Name *string `json:"name,omitempty"`
-	} `json:"branch,omitempty"`
+	Branch *PullrequestEndpointBranch `json:"branch,omitempty"`
 	Commit *struct {
 		Hash *string `json:"hash,omitempty"`
 	} `json:"commit,omitempty"`
 	Repository *Repository `json:"repository,omitempty"`
 }
+
+// PullrequestEndpointBranch defines model for pullrequest_endpoint_branch.
+type PullrequestEndpointBranch struct {
+	DefaultMergeStrategy *string                                     `json:"default_merge_strategy,omitempty"`
+	MergeStrategies      *[]PullrequestEndpointBranchMergeStrategies `json:"merge_strategies,omitempty"`
+	Name                 *string                                     `json:"name,omitempty"`
+}
+
+// PullrequestEndpointBranchMergeStrategies defines model for pullrequest_endpoint_branch_merge_strategies.
+type PullrequestEndpointBranchMergeStrategies string
 
 // PullrequestMergeParameters defines model for pullrequest_merge_parameters.
 type PullrequestMergeParameters struct {
