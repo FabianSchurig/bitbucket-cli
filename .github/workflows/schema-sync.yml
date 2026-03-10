@@ -1,0 +1,86 @@
+name: Schema Sync & Release
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # Daily at 03:00 UTC
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history needed for tagging
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install pyyaml
+
+      - name: Install oapi-codegen
+        run: go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
+
+      - name: Fetch live Bitbucket spec
+        run: |
+          curl -sSL "https://dac-static.atlassian.com/cloud/bitbucket/swagger.v3.json" \
+            -o /tmp/bitbucket-raw.json
+          echo "Fetched $(wc -c < /tmp/bitbucket-raw.json) bytes"
+
+      - name: Enrich spec (inject operationIds)
+        run: python3 scripts/enrich_spec.py /tmp/bitbucket-raw.json /tmp/bitbucket-enriched.json
+
+      - name: Partition spec (extract PR paths + resolve $refs)
+        run: python3 scripts/partition_spec.py /tmp/bitbucket-enriched.json schema/pr-schema.yaml
+
+      - name: Detect schema change
+        id: diff
+        run: |
+          git diff --quiet schema/pr-schema.yaml || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Regenerate types (oapi-codegen)
+        if: steps.diff.outputs.changed == 'true'
+        run: oapi-codegen --config oapi-codegen.yaml schema/pr-schema.yaml
+
+      - name: Regenerate Cobra commands
+        if: steps.diff.outputs.changed == 'true'
+        run: go run scripts/gen_commands/main.go schema/pr-schema.yaml internal/commands/commands.gen.go
+
+      - name: Build & test
+        if: steps.diff.outputs.changed == 'true'
+        run: go build ./... && go test ./...
+
+      - name: Commit + tag release
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "bb-cli-bot"
+          git config user.email "bot@github.com"
+          git add schema/ internal/generated/ internal/commands/
+          VERSION="v$(date +%Y.%m.%d)"
+          # Append build number if tag already exists for today
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            BUILD=$(git tag --list "${VERSION}.*" | wc -l)
+            VERSION="${VERSION}.${BUILD}"
+          fi
+          git commit -m "chore: schema sync ${VERSION}"
+          git tag "$VERSION"
+          git push --follow-tags
+
+      - name: Release (goreleaser)
+        if: steps.diff.outputs.changed == 'true'
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

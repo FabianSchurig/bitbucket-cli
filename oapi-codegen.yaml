@@ -1,0 +1,14 @@
+# oapi-codegen.yaml
+# Configuration for generating Go types from the PR schema.
+# Run: oapi-codegen --config oapi-codegen.yaml schema/pr-schema.yaml
+
+package: generated
+generate:
+  models: true
+  chi-server: false
+  echo-server: false
+  client: false
+  strict-server: false
+output: internal/generated/models.gen.go
+output-options:
+  nullable-type: true
