@@ -41,13 +41,13 @@ jobs:
       - name: Enrich spec (inject operationIds)
         run: python3 scripts/enrich_spec.py /tmp/bitbucket-raw.json /tmp/bitbucket-enriched.json
 
-      - name: Partition spec (extract PR paths + resolve $refs)
-        run: python3 scripts/partition_spec.py /tmp/bitbucket-enriched.json schema/pr-schema.yaml
+      - name: Partition spec (extract paths + resolve $refs)
+        run: python3 scripts/partition_spec.py /tmp/bitbucket-enriched.json schema/ --all
 
       - name: Detect schema change
         id: diff
         run: |
-          git diff --quiet schema/pr-schema.yaml || echo "changed=true" >> "$GITHUB_OUTPUT"
+          git diff --quiet schema/ || echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Regenerate types (oapi-codegen)
         if: steps.diff.outputs.changed == 'true'
@@ -55,7 +55,9 @@ jobs:
 
       - name: Regenerate Cobra commands
         if: steps.diff.outputs.changed == 'true'
-        run: go run scripts/gen_commands/main.go schema/pr-schema.yaml internal/commands/commands.gen.go
+        run: |
+          go run scripts/gen_commands/main.go schema/pr-schema.yaml internal/commands/commands.gen.go
+          go run scripts/gen_commands/main.go schema/hooks-schema.yaml internal/commands/hooks.gen.go
 
       - name: Build & test
         if: steps.diff.outputs.changed == 'true'
