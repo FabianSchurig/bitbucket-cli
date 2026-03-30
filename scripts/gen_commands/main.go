@@ -541,7 +541,7 @@ cmd.Flags().{{flagFuncName .GoType}}Var(&{{.GoName}}, "{{.FlagName}}", {{.Defaul
 cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 {{- end}}
 {{- if .Paginated}}
-cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
 {{- end}}
 return cmd
 }
@@ -651,6 +651,35 @@ func main() {
 				})
 			}
 
+			paginated := isPaginated(op)
+
+			// Bitbucket supports page/pagelen on all paginated endpoints,
+			// but the spec doesn't always declare them. Inject if missing.
+			if paginated {
+				hasFlag := func(name string) bool {
+					for _, f := range flags {
+						if f.RawName == name {
+							return true
+						}
+					}
+					return false
+				}
+				if !hasFlag("page") {
+					flags = append(flags, FlagData{
+						Name: "page", GoName: "page", GoType: "int",
+						Default: "0", Usage: "Page number (query parameter)",
+						In: "query", RawName: "page",
+					})
+				}
+				if !hasFlag("pagelen") {
+					flags = append(flags, FlagData{
+						Name: "pagelen", GoName: "pagelen", GoType: "int",
+						Default: "0", Usage: "Number of items per page (query parameter)",
+						In: "query", RawName: "pagelen",
+					})
+				}
+			}
+
 			kebab := strings.ToLower(camelUpperBoundary.ReplaceAllString(op.OperationID, "${1}-${2}"))
 
 			data.Commands = append(data.Commands, CommandData{
@@ -663,7 +692,7 @@ func main() {
 				Flags:       flags,
 				BodyFields:  bodyFields,
 				HasBody:     op.RequestBody != nil,
-				Paginated:   isPaginated(op),
+				Paginated:   paginated,
 			})
 		}
 	}

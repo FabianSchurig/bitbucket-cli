@@ -129,7 +129,7 @@ cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
 cmd.Flags().IntVar(&page, "page", 0, "page (query parameter)")
 cmd.Flags().IntVar(&pagelen, "pagelen", 0, "pagelen (query parameter)")
-cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
 return cmd
 }
 
@@ -139,6 +139,8 @@ func newListDefaultReviewersCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
+page int
+pagelen int
 all bool
 )
 
@@ -167,6 +169,8 @@ pathParams := map[string]string{
 "workspace": workspace,
 }
 queryParams := map[string]string{
+"page": strconv.Itoa(page),
+"pagelen": strconv.Itoa(pagelen),
 }
 body := ""
 return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/default-reviewers", pathParams, queryParams, body, all)
@@ -174,7 +178,9 @@ return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspa
 }
 cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
 return cmd
 }
 
@@ -323,6 +329,8 @@ func newListEffectiveDefaultReviewersCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
+page int
+pagelen int
 all bool
 )
 
@@ -350,6 +358,8 @@ pathParams := map[string]string{
 "workspace": workspace,
 }
 queryParams := map[string]string{
+"page": strconv.Itoa(page),
+"pagelen": strconv.Itoa(pagelen),
 }
 body := ""
 return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/effective-default-reviewers", pathParams, queryParams, body, all)
@@ -357,7 +367,9 @@ return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspa
 }
 cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
 return cmd
 }
 
@@ -368,6 +380,8 @@ var (
 repoSlug string
 workspace string
 state string
+page int
+pagelen int
 all bool
 )
 
@@ -392,6 +406,8 @@ pathParams := map[string]string{
 }
 queryParams := map[string]string{
 "state": state,
+"page": strconv.Itoa(page),
+"pagelen": strconv.Itoa(pagelen),
 }
 body := ""
 return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests", pathParams, queryParams, body, all)
@@ -400,7 +416,9 @@ return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspa
 cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 cmd.Flags().StringVar(&state, "state", "", "state (query parameter)")
-cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
 return cmd
 }
 
@@ -848,6 +866,8 @@ var (
 pullRequestId int
 repoSlug string
 workspace string
+page int
+pagelen int
 all bool
 )
 
@@ -875,6 +895,8 @@ pathParams := map[string]string{
 "workspace": workspace,
 }
 queryParams := map[string]string{
+"page": strconv.Itoa(page),
+"pagelen": strconv.Itoa(pagelen),
 }
 body := ""
 return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments", pathParams, queryParams, body, all)
@@ -883,7 +905,9 @@ return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspa
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
 cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
 return cmd
 }
 
@@ -1737,6 +1761,8 @@ repoSlug string
 workspace string
 q string
 sort string
+page int
+pagelen int
 all bool
 )
 
@@ -1767,6 +1793,8 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 "q": q,
 "sort": sort,
+"page": strconv.Itoa(page),
+"pagelen": strconv.Itoa(pagelen),
 }
 body := ""
 return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/statuses", pathParams, queryParams, body, all)
@@ -1777,7 +1805,9 @@ cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
 cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
-cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
 return cmd
 }
 
@@ -1791,6 +1821,7 @@ workspace string
 q string
 sort string
 pagelen int
+page int
 all bool
 )
 
@@ -1824,6 +1855,7 @@ queryParams := map[string]string{
 "q": q,
 "sort": sort,
 "pagelen": strconv.Itoa(pagelen),
+"page": strconv.Itoa(page),
 }
 body := ""
 return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks", pathParams, queryParams, body, all)
@@ -1835,7 +1867,8 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
 cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
 cmd.Flags().IntVar(&pagelen, "pagelen", 0, "pagelen (query parameter)")
-cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
 return cmd
 }
 
@@ -2086,6 +2119,8 @@ var (
 selectedUser string
 workspace string
 state string
+page int
+pagelen int
 all bool
 )
 
@@ -2110,6 +2145,8 @@ pathParams := map[string]string{
 }
 queryParams := map[string]string{
 "state": state,
+"page": strconv.Itoa(page),
+"pagelen": strconv.Itoa(pagelen),
 }
 body := ""
 return handlers.Dispatch(context.Background(), c, "GET", "/workspaces/{workspace}/pullrequests/{selected_user}", pathParams, queryParams, body, all)
@@ -2118,7 +2155,9 @@ return handlers.Dispatch(context.Background(), c, "GET", "/workspaces/{workspace
 cmd.Flags().StringVar(&selectedUser, "selected-user", "", "selected_user (path parameter)")
 cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 cmd.Flags().StringVar(&state, "state", "", "state (query parameter)")
-cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
 return cmd
 }
 

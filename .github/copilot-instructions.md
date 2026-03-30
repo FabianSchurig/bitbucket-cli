@@ -56,6 +56,6 @@ go run scripts/gen_commands/main.go schema/pr-schema.yaml internal/commands/comm
 - **Auth**: `BITBUCKET_USERNAME` + `BITBUCKET_APP_PASSWORD` (Basic) or `BITBUCKET_TOKEN` (Bearer)
 - **Flags**: path params → `--workspace`, `--repo-slug`; body fields → flattened with dots (`--source-branch` maps to `source.branch`)
 - **Output**: `--output table|json|id`; table is default
-- **Pagination**: `--all` flag auto-follows cursor-based `next` links
+- **Pagination**: `--all` flag (default: **true**) auto-follows cursor-based `next` links; pass `--all=false` for a single page
 - **Versioning**: semver `v1.x.y` — compatible with `go install` / pkg.go.dev; patch is auto-bumped by CI on schema changes
 - **CI**: Daily cron at 03:00 UTC fetches spec, regenerates, tests, and releases if changed

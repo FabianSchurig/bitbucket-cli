@@ -1,5 +1,66 @@
 # bitbucket-cli
 
+A low-maintenance CLI for [Bitbucket Cloud](https://bitbucket.org/) pull requests. Most code is **auto-generated** from the live Bitbucket OpenAPI spec — only a thin hand-written layer ties it together. A daily CI job fetches the latest spec, regenerates the code, and releases a new version if anything changed.
+
+## Why?
+
+Bitbucket Cloud has no official CLI. Managing pull requests through the web UI is slow when you just want to list, approve, merge, or decline from the terminal. This project fills that gap with a single binary that:
+
+- **Stays up-to-date automatically** — new API endpoints appear without manual work.
+- **Requires near-zero maintenance** — the generic dispatch layer means no per-endpoint glue code.
+- **Works everywhere** — Linux, macOS, Windows; install via `go install` or download a binary.
+- **Built for AI agents** — designed to be called by coding assistants like GitHub Copilot, Cursor, and similar tools to automate PR workflows: post summaries, add review comments, approve or merge pull requests, and more.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A["Bitbucket OpenAPI spec\n(live)"] --> B["enrich_spec.py\n+ operationIds"]
+    B --> C["partition_spec.py\nextract PR paths"]
+    C --> D["pr-schema.yaml"]
+    D --> E["oapi-codegen\nmodels.gen.go"]
+    D --> F["gen_commands\ncommands.gen.go"]
+    E & F --> G["bb-cli binary"]
+    G --> H["auth · dispatch · output\n(hand-written)"]
+```
+
+## Example Usage
+
+List open pull requests:
+
+```bash
+bb-cli pr list-pull-requests --workspace myteam --repo-slug myrepo
+```
+
+Add a comment on a pull request:
+
+```bash
+bb-cli pr create-acomment-on-apull-request \
+  --workspace myteam --repo-slug myrepo --pull-request-id 42 \
+  --content-raw "Looks good — approved!"
+```
+
+List comments with markdown output (useful for AI agents):
+
+```bash
+bb-cli pr list-comments-on-apull-request \
+  --workspace myteam --repo-slug myrepo --pull-request-id 42 \
+  --output markdown
+```
+
+Merge a pull request:
+
+```bash
+bb-cli pr merge-apull-request \
+  --workspace myteam --repo-slug myrepo --pull-request-id 42
+```
+
+See all available PR commands:
+
+```bash
+bb-cli pr --help
+```
+
 ## Installation
 
 ### Go install (recommended)
