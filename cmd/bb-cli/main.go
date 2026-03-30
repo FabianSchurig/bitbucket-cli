@@ -1,4 +1,8 @@
-// bb-cli: A command-line interface for Bitbucket pull requests.
+// bb-cli is a command-line interface for Bitbucket Cloud pull requests.
+//
+// Install:
+//
+//	go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-cli@latest
 //
 // Authentication:
 //
@@ -8,21 +12,13 @@
 //
 //	OAuth2 access token:
 //	  export BITBUCKET_TOKEN=<token>
-//
-// Usage examples:
-//
-//	bb-cli pr list --workspace myorg --repo myrepo --state OPEN
-//	bb-cli pr list --workspace myorg --repo myrepo --all
-//	bb-cli pr get  --workspace myorg --repo myrepo --id 42
-//	bb-cli pr create --workspace myorg --repo myrepo --title "My feature" \
-//	  --source-branch feature/x --destination-branch main
-//	bb-cli pr merge --workspace myorg --repo myrepo --id 42 --strategy squash
 package main
 
 import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/commands"
@@ -58,9 +54,48 @@ Set authentication environment variables before running:
     BITBUCKET_TOKEN       your OAuth2 access token`,
 	}
 
+	setColoredHelp(rootCmd)
+
 	prCmd := commands.NewPRCommand()
 	commands.AddOutputFlag(prCmd)
 
 	rootCmd.AddCommand(prCmd)
 	return rootCmd
+}
+
+func setColoredHelp(cmd *cobra.Command) {
+	bold := color.New(color.Bold).SprintFunc()
+	yellow := color.New(color.FgYellow).SprintFunc()
+	cyan := color.New(color.FgCyan).SprintFunc()
+
+	cobra.AddTemplateFunc("bold", bold)
+	cobra.AddTemplateFunc("yellow", yellow)
+	cobra.AddTemplateFunc("cyan", cyan)
+
+	cmd.SetUsageTemplate(`{{bold "Usage:"}}{{if .Runnable}}
+  {{yellow .UseLine}}{{end}}{{if .HasAvailableSubCommands}}
+  {{yellow .CommandPath}} [command]{{end}}{{if gt (len .Aliases) 0}}
+
+{{bold "Aliases:"}} {{.NameAndAliases}}{{end}}{{if .HasAvailableSubCommands}}{{$cmds := .Commands}}{{if eq (len .Groups) 0}}
+
+{{bold "Available Commands:"}}{{range $cmds}}{{if (or .IsAvailableCommand (eq .Name "help"))}}
+  {{cyan (rpad .Name .NamePadding)}} {{.Short}}{{end}}{{end}}{{else}}{{range $group := .Groups}}
+
+{{bold .Title}}{{range $cmds}}{{if (and (eq .GroupID $group.ID) (or .IsAvailableCommand (eq .Name "help")))}}
+  {{cyan (rpad .Name .NamePadding)}} {{.Short}}{{end}}{{end}}{{end}}{{if not .AllChildCommandsHaveGroup}}
+
+{{bold "Additional Commands:"}}{{range $cmds}}{{if (and (eq .GroupID "") (or .IsAvailableCommand (eq .Name "help")))}}
+  {{cyan (rpad .Name .NamePadding)}} {{.Short}}{{end}}{{end}}{{end}}{{end}}{{end}}{{if .HasAvailableLocalFlags}}
+
+{{bold "Flags:"}}
+{{.LocalFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}{{if .HasAvailableInheritedFlags}}
+
+{{bold "Global Flags:"}}
+{{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}{{if .HasHelpSubCommands}}
+
+Additional help topics:{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
+  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}{{end}}{{end}}{{end}}{{if .HasAvailableSubCommands}}
+
+Use "{{yellow (print .CommandPath " [command] --help")}}" for more information about a command.{{end}}
+`)
 }

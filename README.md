@@ -8,6 +8,28 @@
 go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-cli@latest
 ```
 
+Make sure `$(go env GOPATH)/bin` is in your `PATH`:
+
+```bash
+export PATH="$PATH:$(go env GOPATH)/bin"
+```
+
+### Shell completion
+
+```bash
+# Bash
+bb-cli completion bash > /etc/bash_completion.d/bb-cli
+
+# Zsh
+bb-cli completion zsh > "${fpath[1]}/_bb-cli"
+
+# Fish
+bb-cli completion fish > ~/.config/fish/completions/bb-cli.fish
+
+# PowerShell
+bb-cli completion powershell > bb-cli.ps1
+```
+
 ### Download binary
 
 Download a pre-built binary from the [GitHub Releases](https://github.com/FabianSchurig/bitbucket-cli/releases) page. Archives are available for Linux, macOS, and Windows (amd64/arm64).

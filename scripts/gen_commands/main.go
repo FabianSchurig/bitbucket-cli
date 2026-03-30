@@ -550,7 +550,7 @@ const outputFlagName = "output"
 
 func AddOutputFlag(cmd *cobra.Command) {
 cmd.PersistentFlags().StringVar(&output.Format, outputFlagName, "table",
-"Output format: table, json, id")
+"Output format: table, markdown, json, id")
 }
 `
 

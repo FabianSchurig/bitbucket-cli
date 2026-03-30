@@ -106,3 +106,200 @@ func TestRenderUnknownFormat(t *testing.T) {
 		t.Error("expected error for unknown format, got nil")
 	}
 }
+
+func TestRenderMapSliceTable_AllKeysShown(t *testing.T) {
+	output.Format = "table"
+
+	items := []any{
+		map[string]any{
+			"id":         float64(1),
+			"content":    map[string]any{"raw": "hello world"},
+			"user":       map[string]any{"display_name": "alice"},
+			"created_on": "2026-01-01T00:00:00Z",
+			"updated_on": "2026-01-01T00:00:00Z",
+			"pending":    false,
+			"type":       "pullrequest_comment",
+			"inline":     map[string]any{"path": "main.go"},
+		},
+	}
+
+	var buf bytes.Buffer
+	if err := output.RenderTo(&buf, items); err != nil {
+		t.Fatalf("RenderTo: %v", err)
+	}
+
+	got := buf.String()
+
+	// All keys must appear as column headers.
+	for _, col := range []string{"ID", "CONTENT", "USER", "CREATED_ON", "UPDATED_ON", "INLINE", "PENDING", "TYPE"} {
+		if !strings.Contains(got, col) {
+			t.Errorf("expected column %q in table output, got:\n%s", col, got)
+		}
+	}
+}
+
+func TestRenderMapSliceTable_PriorityKeysFirst(t *testing.T) {
+	output.Format = "table"
+
+	items := []any{
+		map[string]any{
+			"id":         float64(1),
+			"content":    map[string]any{"raw": "text"},
+			"created_on": "2026-01-01T00:00:00Z",
+			"zebra":      "extra",
+			"alpha":      "extra",
+		},
+	}
+
+	var buf bytes.Buffer
+	if err := output.RenderTo(&buf, items); err != nil {
+		t.Fatalf("RenderTo: %v", err)
+	}
+
+	got := buf.String()
+
+	// In KV format each key is on its own line. Priority keys should come first.
+	idPos := strings.Index(got, "ID")
+	createdPos := strings.Index(got, "CREATED_ON")
+	alphaPos := strings.Index(got, "ALPHA")
+	zebraPos := strings.Index(got, "ZEBRA")
+
+	if idPos < 0 || createdPos < 0 || alphaPos < 0 || zebraPos < 0 {
+		t.Fatalf("missing expected keys in output:\n%s", got)
+	}
+	if idPos > createdPos {
+		t.Errorf("ID should come before CREATED_ON")
+	}
+	if createdPos > alphaPos {
+		t.Errorf("CREATED_ON (priority) should come before ALPHA (non-priority)")
+	}
+	if alphaPos > zebraPos {
+		t.Errorf("ALPHA should come before ZEBRA (alphabetical)")
+	}
+}
+
+func TestRenderMapTable_AllKeysShown(t *testing.T) {
+	output.Format = "table"
+
+	m := map[string]any{
+		"id":     float64(42),
+		"title":  "My PR",
+		"custom": "value",
+	}
+
+	var buf bytes.Buffer
+	if err := output.RenderTo(&buf, m); err != nil {
+		t.Fatalf("RenderTo: %v", err)
+	}
+
+	got := buf.String()
+	for _, col := range []string{"ID", "TITLE", "CUSTOM"} {
+		if !strings.Contains(got, col) {
+			t.Errorf("expected key %q in output, got:\n%s", col, got)
+		}
+	}
+}
+
+func TestFlatValue_FullTextNotTruncated(t *testing.T) {
+	output.Format = "table"
+
+	longText := strings.Repeat("a", 200)
+	items := []any{
+		map[string]any{
+			"id":      float64(1),
+			"content": map[string]any{"raw": longText},
+		},
+	}
+
+	var buf bytes.Buffer
+	if err := output.RenderTo(&buf, items); err != nil {
+		t.Fatalf("RenderTo: %v", err)
+	}
+
+	got := buf.String()
+	if !strings.Contains(got, longText) {
+		t.Errorf("expected full text (200 chars) in output, but it was truncated:\n%s", got)
+	}
+}
+
+func TestFlatValue_DateFormatting(t *testing.T) {
+	output.Format = "table"
+
+	items := []any{
+		map[string]any{
+			"id":         float64(1),
+			"created_on": "2026-03-30T11:17:47.606820+00:00",
+			"updated_on": "2026-01-15T09:30:00Z",
+		},
+	}
+
+	var buf bytes.Buffer
+	if err := output.RenderTo(&buf, items); err != nil {
+		t.Fatalf("RenderTo: %v", err)
+	}
+
+	got := buf.String()
+	if !strings.Contains(got, "30 Mar 2026") {
+		t.Errorf("expected pretty-printed date '30 Mar 2026' in output, got:\n%s", got)
+	}
+	if !strings.Contains(got, "15 Jan 2026") {
+		t.Errorf("expected pretty-printed date '15 Jan 2026' in output, got:\n%s", got)
+	}
+	// Should NOT contain raw ISO 8601 strings.
+	if strings.Contains(got, "2026-03-30T") {
+		t.Errorf("expected ISO 8601 date to be formatted, but raw date found:\n%s", got)
+	}
+}
+
+func TestRenderTable_KVFormat(t *testing.T) {
+	output.Format = "table"
+
+	items := []any{
+		map[string]any{"id": float64(1), "title": "First"},
+		map[string]any{"id": float64(2), "title": "Second"},
+	}
+
+	var buf bytes.Buffer
+	if err := output.RenderTo(&buf, items); err != nil {
+		t.Fatalf("RenderTo: %v", err)
+	}
+
+	got := buf.String()
+	// KV format should NOT contain markdown pipe separators.
+	if strings.Contains(got, "| ") {
+		t.Errorf("table format should not contain markdown pipes, got:\n%s", got)
+	}
+	// Should contain both records separated by a blank line.
+	if !strings.Contains(got, "First") || !strings.Contains(got, "Second") {
+		t.Errorf("expected both records in output, got:\n%s", got)
+	}
+	if !strings.Contains(got, "\n\n") {
+		t.Errorf("expected blank line between records, got:\n%s", got)
+	}
+}
+
+func TestRenderMarkdown_MapSlice(t *testing.T) {
+	output.Format = "markdown"
+
+	items := []any{
+		map[string]any{"id": float64(1), "title": "First"},
+		map[string]any{"id": float64(2), "title": "Second"},
+	}
+
+	var buf bytes.Buffer
+	if err := output.RenderTo(&buf, items); err != nil {
+		t.Fatalf("RenderTo: %v", err)
+	}
+
+	got := buf.String()
+	// Markdown format should contain pipe-delimited table.
+	if !strings.Contains(got, "|") {
+		t.Errorf("markdown format should contain pipes, got:\n%s", got)
+	}
+	if !strings.Contains(got, "---") {
+		t.Errorf("markdown format should contain separator row, got:\n%s", got)
+	}
+	if !strings.Contains(got, "First") || !strings.Contains(got, "Second") {
+		t.Errorf("expected both records in output, got:\n%s", got)
+	}
+}

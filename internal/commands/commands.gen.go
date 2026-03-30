@@ -7,2093 +7,2124 @@
 package commands
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"strconv"
+"context"
+"encoding/json"
+"fmt"
+"strconv"
 
-	"github.com/spf13/cobra"
+"github.com/spf13/cobra"
 
-	"github.com/FabianSchurig/bitbucket-cli/internal/client"
-	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
-	"github.com/FabianSchurig/bitbucket-cli/internal/output"
+"github.com/FabianSchurig/bitbucket-cli/internal/client"
+"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
+"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
 
 // Ensure imports are used.
 var (
-	_ = context.Background
-	_ = fmt.Errorf
-	_ = json.Marshal
-	_ = strconv.Itoa
-	_ = client.NewClient
-	_ = handlers.Dispatch
-	_ = output.Format
+_ = context.Background
+_ = fmt.Errorf
+_ = json.Marshal
+_ = strconv.Itoa
+_ = client.NewClient
+_ = handlers.Dispatch
+_ = output.Format
 )
 
 // NewPRCommand returns the "pr" cobra command with all sub-commands registered.
 func NewPRCommand() *cobra.Command {
-	prCmd := &cobra.Command{
-		Use:   "pr",
-		Short: "Manage Bitbucket pull requests",
-		Long:  "Commands for listing, creating, reading, and merging Bitbucket pull requests.",
-	}
+prCmd := &cobra.Command{
+Use:   "pr",
+Short: "Manage Bitbucket pull requests",
+Long:  "Commands for listing, creating, reading, and merging Bitbucket pull requests.",
+}
 
-	prCmd.AddCommand(
-		newGetPullrequestsForCommitCmd(),
-		newListDefaultReviewersCmd(),
-		newGetADefaultReviewerCmd(),
-		newAddAUserToTheDefaultReviewersCmd(),
-		newRemoveAUserFromTheDefaultReviewersCmd(),
-		newListEffectiveDefaultReviewersCmd(),
-		newListPullRequestsCmd(),
-		newCreateAPullRequestCmd(),
-		newListAPullRequestActivityLogCmd(),
-		newGetAPullRequestCmd(),
-		newUpdateAPullRequestCmd(),
-		newListPullRequestActivityLogCmd(),
-		newApproveAPullRequestCmd(),
-		newUnapproveAPullRequestCmd(),
-		newListCommentsOnAPullRequestCmd(),
-		newCreateACommentOnAPullRequestCmd(),
-		newGetACommentOnAPullRequestCmd(),
-		newUpdateACommentOnAPullRequestCmd(),
-		newDeleteACommentOnAPullRequestCmd(),
-		newResolveACommentThreadCmd(),
-		newReopenACommentThreadCmd(),
-		newListCommitsOnAPullRequestCmd(),
-		newDeclineAPullRequestCmd(),
-		newListChangesInAPullRequestCmd(),
-		newGetTheDiffStatForAPullRequestCmd(),
-		newMergeAPullRequestCmd(),
-		newGetTheMergeTaskStatusForAPullRequestCmd(),
-		newGetThePatchForAPullRequestCmd(),
-		newRequestChangesForAPullRequestCmd(),
-		newRemoveChangeRequestForAPullRequestCmd(),
-		newListCommitStatusesForAPullRequestCmd(),
-		newListTasksOnAPullRequestCmd(),
-		newCreateATaskOnAPullRequestCmd(),
-		newGetATaskOnAPullRequestCmd(),
-		newUpdateATaskOnAPullRequestCmd(),
-		newDeleteATaskOnAPullRequestCmd(),
-		newListWorkspacePullRequestsForAUserCmd(),
-	)
+prCmd.AddCommand(
+newGetPullrequestsForCommitCmd(),
+newListDefaultReviewersCmd(),
+newGetADefaultReviewerCmd(),
+newAddAUserToTheDefaultReviewersCmd(),
+newRemoveAUserFromTheDefaultReviewersCmd(),
+newListEffectiveDefaultReviewersCmd(),
+newListPullRequestsCmd(),
+newCreateAPullRequestCmd(),
+newListAPullRequestActivityLogCmd(),
+newGetAPullRequestCmd(),
+newUpdateAPullRequestCmd(),
+newListPullRequestActivityLogCmd(),
+newApproveAPullRequestCmd(),
+newUnapproveAPullRequestCmd(),
+newListCommentsOnAPullRequestCmd(),
+newCreateACommentOnAPullRequestCmd(),
+newGetACommentOnAPullRequestCmd(),
+newUpdateACommentOnAPullRequestCmd(),
+newDeleteACommentOnAPullRequestCmd(),
+newResolveACommentThreadCmd(),
+newReopenACommentThreadCmd(),
+newListCommitsOnAPullRequestCmd(),
+newDeclineAPullRequestCmd(),
+newListChangesInAPullRequestCmd(),
+newGetTheDiffStatForAPullRequestCmd(),
+newMergeAPullRequestCmd(),
+newGetTheMergeTaskStatusForAPullRequestCmd(),
+newGetThePatchForAPullRequestCmd(),
+newRequestChangesForAPullRequestCmd(),
+newRemoveChangeRequestForAPullRequestCmd(),
+newListCommitStatusesForAPullRequestCmd(),
+newListTasksOnAPullRequestCmd(),
+newCreateATaskOnAPullRequestCmd(),
+newGetATaskOnAPullRequestCmd(),
+newUpdateATaskOnAPullRequestCmd(),
+newDeleteATaskOnAPullRequestCmd(),
+newListWorkspacePullRequestsForAUserCmd(),
+)
 
-	return prCmd
+return prCmd
 }
 
 // newGetPullrequestsForCommitCmd returns the "pr get-pullrequests-for-commit" cobra command.
 // operationId: getPullrequestsForCommit
 func newGetPullrequestsForCommitCmd() *cobra.Command {
-	var (
-		workspace string
-		repoSlug  string
-		commit    string
-		page      int
-		pagelen   int
-		all       bool
-	)
+var (
+workspace string
+repoSlug string
+commit string
+page int
+pagelen int
+all bool
+)
 
-	cmd := &cobra.Command{
-		Use:   "get-pullrequests-for-commit",
-		Short: `List pull requests that contain a commit`,
-		Long:  `Returns a paginated list of all pull requests as part of which this commit was reviewed. Pull Request Commit Links app must be installed first before using this API; installation automatically occurs when 'Go to pull request' is clicked from the web interface for a commit's details.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if commit == "" {
-				return fmt.Errorf("--commit is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
-				"commit":    commit,
-			}
-			queryParams := map[string]string{
-				"page":    strconv.Itoa(page),
-				"pagelen": strconv.Itoa(pagelen),
-			}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/commit/{commit}/pullrequests", pathParams, queryParams, body, all)
-		},
-	}
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
-	cmd.Flags().IntVar(&page, "page", 0, "page (query parameter)")
-	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "pagelen (query parameter)")
-	cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "get-pullrequests-for-commit",
+Short: `List pull requests that contain a commit`,
+Long:  `Returns a paginated list of all pull requests as part of which this commit was reviewed. Pull Request Commit Links app must be installed first before using this API; installation automatically occurs when 'Go to pull request' is clicked from the web interface for a commit's details.`,
+RunE: func(cmd *cobra.Command, args []string) error {
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if commit == "" {
+return fmt.Errorf("--commit is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"workspace": workspace,
+"repo_slug": repoSlug,
+"commit": commit,
+}
+queryParams := map[string]string{
+"page": strconv.Itoa(page),
+"pagelen": strconv.Itoa(pagelen),
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/commit/{commit}/pullrequests", pathParams, queryParams, body, all)
+},
+}
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
+cmd.Flags().IntVar(&page, "page", 0, "page (query parameter)")
+cmd.Flags().IntVar(&pagelen, "pagelen", 0, "pagelen (query parameter)")
+cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+return cmd
 }
 
 // newListDefaultReviewersCmd returns the "pr list-default-reviewers" cobra command.
 // operationId: listDefaultReviewers
 func newListDefaultReviewersCmd() *cobra.Command {
-	var (
-		repoSlug  string
-		workspace string
-		all       bool
-	)
+var (
+repoSlug string
+workspace string
+all bool
+)
 
-	cmd := &cobra.Command{
-		Use:   "list-default-reviewers",
-		Short: `List default reviewers`,
-		Long: `Returns the repository's default reviewers.
+cmd := &cobra.Command{
+Use:   "list-default-reviewers",
+Short: `List default reviewers`,
+Long:  `Returns the repository's default reviewers.
 
 These are the users that are automatically added as reviewers on every
 new pull request that is created. To obtain the repository's default reviewers
 as well as the default reviewers inherited from the project, use the
 [effective-default-reveiwers](#api-repositories-workspace-repo-slug-effective-default-reviewers-get) endpoint.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/default-reviewers", pathParams, queryParams, body, all)
-		},
-	}
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
-	return cmd
+RunE: func(cmd *cobra.Command, args []string) error {
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/default-reviewers", pathParams, queryParams, body, all)
+},
+}
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+return cmd
 }
 
 // newGetADefaultReviewerCmd returns the "pr get-adefault-reviewer" cobra command.
 // operationId: getADefaultReviewer
 func newGetADefaultReviewerCmd() *cobra.Command {
-	var (
-		repoSlug       string
-		targetUsername string
-		workspace      string
-	)
+var (
+repoSlug string
+targetUsername string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "get-adefault-reviewer",
-		Short: `Get a default reviewer`,
-		Long: `Returns the specified reviewer.
+cmd := &cobra.Command{
+Use:   "get-adefault-reviewer",
+Short: `Get a default reviewer`,
+Long:  `Returns the specified reviewer.
 
 This can be used to test whether a user is among the repository's
 default reviewers list. A 404 indicates that that specified user is not
 a default reviewer.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if targetUsername == "" {
-				return fmt.Errorf("--target-username is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug":       repoSlug,
-				"target_username": targetUsername,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&targetUsername, "target-username", "", "target_username (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+RunE: func(cmd *cobra.Command, args []string) error {
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if targetUsername == "" {
+return fmt.Errorf("--target-username is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"repo_slug": repoSlug,
+"target_username": targetUsername,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&targetUsername, "target-username", "", "target_username (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newAddAUserToTheDefaultReviewersCmd returns the "pr add-auser-to-the-default-reviewers" cobra command.
 // operationId: addAUserToTheDefaultReviewers
 func newAddAUserToTheDefaultReviewersCmd() *cobra.Command {
-	var (
-		repoSlug       string
-		targetUsername string
-		workspace      string
-	)
+var (
+repoSlug string
+targetUsername string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "add-auser-to-the-default-reviewers",
-		Short: `Add a user to the default reviewers`,
-		Long: `Adds the specified user to the repository's list of default
+cmd := &cobra.Command{
+Use:   "add-auser-to-the-default-reviewers",
+Short: `Add a user to the default reviewers`,
+Long:  `Adds the specified user to the repository's list of default
 reviewers.
 
 This method is idempotent. Adding a user a second time has no effect.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if targetUsername == "" {
-				return fmt.Errorf("--target-username is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug":       repoSlug,
-				"target_username": targetUsername,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "PUT", "/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&targetUsername, "target-username", "", "target_username (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+RunE: func(cmd *cobra.Command, args []string) error {
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if targetUsername == "" {
+return fmt.Errorf("--target-username is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"repo_slug": repoSlug,
+"target_username": targetUsername,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "PUT", "/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&targetUsername, "target-username", "", "target_username (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newRemoveAUserFromTheDefaultReviewersCmd returns the "pr remove-auser-from-the-default-reviewers" cobra command.
 // operationId: removeAUserFromTheDefaultReviewers
 func newRemoveAUserFromTheDefaultReviewersCmd() *cobra.Command {
-	var (
-		repoSlug       string
-		targetUsername string
-		workspace      string
-	)
+var (
+repoSlug string
+targetUsername string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "remove-auser-from-the-default-reviewers",
-		Short: `Remove a user from the default reviewers`,
-		Long:  `Removes a default reviewer from the repository.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if targetUsername == "" {
-				return fmt.Errorf("--target-username is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug":       repoSlug,
-				"target_username": targetUsername,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&targetUsername, "target-username", "", "target_username (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "remove-auser-from-the-default-reviewers",
+Short: `Remove a user from the default reviewers`,
+Long:  `Removes a default reviewer from the repository.`,
+RunE: func(cmd *cobra.Command, args []string) error {
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if targetUsername == "" {
+return fmt.Errorf("--target-username is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"repo_slug": repoSlug,
+"target_username": targetUsername,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&targetUsername, "target-username", "", "target_username (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newListEffectiveDefaultReviewersCmd returns the "pr list-effective-default-reviewers" cobra command.
 // operationId: listEffectiveDefaultReviewers
 func newListEffectiveDefaultReviewersCmd() *cobra.Command {
-	var (
-		repoSlug  string
-		workspace string
-		all       bool
-	)
+var (
+repoSlug string
+workspace string
+all bool
+)
 
-	cmd := &cobra.Command{
-		Use:   "list-effective-default-reviewers",
-		Short: `List effective default reviewers`,
-		Long: `Returns the repository's effective default reviewers. This includes both default
+cmd := &cobra.Command{
+Use:   "list-effective-default-reviewers",
+Short: `List effective default reviewers`,
+Long:  `Returns the repository's effective default reviewers. This includes both default
 reviewers defined at the repository level as well as those inherited from its project.
 
 These are the users that are automatically added as reviewers on every
 new pull request that is created.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/effective-default-reviewers", pathParams, queryParams, body, all)
-		},
-	}
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
-	return cmd
+RunE: func(cmd *cobra.Command, args []string) error {
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/effective-default-reviewers", pathParams, queryParams, body, all)
+},
+}
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+return cmd
 }
 
 // newListPullRequestsCmd returns the "pr list-pull-requests" cobra command.
 // operationId: listPullRequests
 func newListPullRequestsCmd() *cobra.Command {
-	var (
-		repoSlug  string
-		workspace string
-		state     string
-		all       bool
-	)
+var (
+repoSlug string
+workspace string
+state string
+all bool
+)
 
-	cmd := &cobra.Command{
-		Use:   "list-pull-requests",
-		Short: `List pull requests`,
-		Long:  "Returns all pull requests on the specified repository.\n\nBy default only open pull requests are returned. This can be controlled\nusing the `state` query parameter. To retrieve pull requests that are\nin one of multiple states, repeat the `state` parameter for each\nindividual state.\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
-			}
-			queryParams := map[string]string{
-				"state": state,
-			}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests", pathParams, queryParams, body, all)
-		},
-	}
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().StringVar(&state, "state", "", "state (query parameter)")
-	cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "list-pull-requests",
+Short: `List pull requests`,
+Long:  "Returns all pull requests on the specified repository.\n\nBy default only open pull requests are returned. This can be controlled\nusing the `state` query parameter. To retrieve pull requests that are\nin one of multiple states, repeat the `state` parameter for each\nindividual state.\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.",
+RunE: func(cmd *cobra.Command, args []string) error {
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+"state": state,
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests", pathParams, queryParams, body, all)
+},
+}
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().StringVar(&state, "state", "", "state (query parameter)")
+cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+return cmd
 }
 
 // newCreateAPullRequestCmd returns the "pr create-apull-request" cobra command.
 // operationId: createAPullRequest
 func newCreateAPullRequestCmd() *cobra.Command {
-	var (
-		repoSlug                                  string
-		workspace                                 string
-		bodyCloseSourceBranch                     bool
-		bodyDescription                           string
-		bodyDestinationBranchDefaultMergeStrategy string
-		bodyDestinationBranchName                 string
-		bodyDestinationCommitHash                 string
-		bodyDraft                                 bool
-		bodyReason                                string
-		bodySourceBranchDefaultMergeStrategy      string
-		bodySourceBranchName                      string
-		bodySourceCommitHash                      string
-		bodyState                                 string
-		bodyTitle                                 string
-		body                                      string
-	)
+var (
+repoSlug string
+workspace string
+bodyCloseSourceBranch bool
+bodyDescription string
+bodyDestinationBranchDefaultMergeStrategy string
+bodyDestinationBranchName string
+bodyDestinationCommitHash string
+bodyDraft bool
+bodyReason string
+bodySourceBranchDefaultMergeStrategy string
+bodySourceBranchName string
+bodySourceCommitHash string
+bodyState string
+bodyTitle string
+body string
+)
 
-	cmd := &cobra.Command{
-		Use:   "create-apull-request",
-		Short: `Create a pull request`,
-		Long:  "Creates a new pull request where the destination repository is\nthis repository and the author is the authenticated user.\n\nThe minimum required fields to create a pull request are `title` and\n`source`, specified by a branch name.\n\n```\ncurl https://api.bitbucket.org/2.0/repositories/my-workspace/my-repository/pullrequests \\\n    -u my-username:my-password \\\n    --request POST \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n        \"title\": \"My Title\",\n        \"source\": {\n            \"branch\": {\n                \"name\": \"staging\"\n            }\n        }\n    }'\n```\n\nIf the pull request's `destination` is not specified, it will default\nto the `repository.mainbranch`. To open a pull request to a\ndifferent branch, say from a feature branch to a staging branch,\nspecify a `destination` (same format as the `source`):\n\n```\n{\n    \"title\": \"My Title\",\n    \"source\": {\n        \"branch\": {\n            \"name\": \"my-feature-branch\"\n        }\n    },\n    \"destination\": {\n        \"branch\": {\n            \"name\": \"staging\"\n        }\n    }\n}\n```\n\nReviewers can be specified by adding an array of user objects as the\n`reviewers` property.\n\n```\n{\n    \"title\": \"My Title\",\n    \"source\": {\n        \"branch\": {\n            \"name\": \"my-feature-branch\"\n        }\n    },\n    \"reviewers\": [\n        {\n            \"uuid\": \"{504c3b62-8120-4f0c-a7bc-87800b9d6f70}\"\n        }\n    ]\n}\n```\n\nOther fields:\n\n* `description` - a string\n* `close_source_branch` - boolean that specifies if the source branch should be closed upon merging\n* `draft` - boolean that specifies whether the pull request is a draft",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
-			}
-			queryParams := map[string]string{}
-			if body == "" {
-				bodyObj := map[string]any{}
-				if bodyCloseSourceBranch {
-					handlers.SetNested(bodyObj, "close_source_branch", bodyCloseSourceBranch)
-				}
-				if bodyDescription != "" {
-					handlers.SetNested(bodyObj, "description", bodyDescription)
-				}
-				if bodyDestinationBranchDefaultMergeStrategy != "" {
-					handlers.SetNested(bodyObj, "destination.branch.default_merge_strategy", bodyDestinationBranchDefaultMergeStrategy)
-				}
-				if bodyDestinationBranchName != "" {
-					handlers.SetNested(bodyObj, "destination.branch.name", bodyDestinationBranchName)
-				}
-				if bodyDestinationCommitHash != "" {
-					handlers.SetNested(bodyObj, "destination.commit.hash", bodyDestinationCommitHash)
-				}
-				if bodyDraft {
-					handlers.SetNested(bodyObj, "draft", bodyDraft)
-				}
-				if bodyReason != "" {
-					handlers.SetNested(bodyObj, "reason", bodyReason)
-				}
-				if bodySourceBranchDefaultMergeStrategy != "" {
-					handlers.SetNested(bodyObj, "source.branch.default_merge_strategy", bodySourceBranchDefaultMergeStrategy)
-				}
-				if bodySourceBranchName != "" {
-					handlers.SetNested(bodyObj, "source.branch.name", bodySourceBranchName)
-				}
-				if bodySourceCommitHash != "" {
-					handlers.SetNested(bodyObj, "source.commit.hash", bodySourceCommitHash)
-				}
-				if bodyState != "" {
-					handlers.SetNested(bodyObj, "state", bodyState)
-				}
-				if bodyTitle != "" {
-					handlers.SetNested(bodyObj, "title", bodyTitle)
-				}
-				if len(bodyObj) > 0 {
-					b, _ := json.Marshal(bodyObj)
-					body = string(b)
-				}
-			}
-			return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().BoolVar(&bodyCloseSourceBranch, "close-source-branch", false, `A boolean flag indicating if merging the pull request closes the source branch.`)
-	cmd.Flags().StringVar(&bodyDescription, "description", "", `Explains what the pull request does.`)
-	cmd.Flags().StringVar(&bodyDestinationBranchDefaultMergeStrategy, "destination-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
-	cmd.Flags().StringVar(&bodyDestinationBranchName, "destination-branch-name", "", `destination.branch.name`)
-	cmd.Flags().StringVar(&bodyDestinationCommitHash, "destination-commit-hash", "", `destination.commit.hash`)
-	cmd.Flags().BoolVar(&bodyDraft, "draft", false, `A boolean flag indicating whether the pull request is a draft.`)
-	cmd.Flags().StringVar(&bodyReason, "reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
-	cmd.Flags().StringVar(&bodySourceBranchDefaultMergeStrategy, "source-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
-	cmd.Flags().StringVar(&bodySourceBranchName, "source-branch-name", "", `source.branch.name`)
-	cmd.Flags().StringVar(&bodySourceCommitHash, "source-commit-hash", "", `source.commit.hash`)
-	cmd.Flags().StringVar(&bodyState, "state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)
-	cmd.Flags().StringVar(&bodyTitle, "title", "", `Title of the pull request.`)
-	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "create-apull-request",
+Short: `Create a pull request`,
+Long:  "Creates a new pull request where the destination repository is\nthis repository and the author is the authenticated user.\n\nThe minimum required fields to create a pull request are `title` and\n`source`, specified by a branch name.\n\n```\ncurl https://api.bitbucket.org/2.0/repositories/my-workspace/my-repository/pullrequests \\\n    -u my-username:my-password \\\n    --request POST \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n        \"title\": \"My Title\",\n        \"source\": {\n            \"branch\": {\n                \"name\": \"staging\"\n            }\n        }\n    }'\n```\n\nIf the pull request's `destination` is not specified, it will default\nto the `repository.mainbranch`. To open a pull request to a\ndifferent branch, say from a feature branch to a staging branch,\nspecify a `destination` (same format as the `source`):\n\n```\n{\n    \"title\": \"My Title\",\n    \"source\": {\n        \"branch\": {\n            \"name\": \"my-feature-branch\"\n        }\n    },\n    \"destination\": {\n        \"branch\": {\n            \"name\": \"staging\"\n        }\n    }\n}\n```\n\nReviewers can be specified by adding an array of user objects as the\n`reviewers` property.\n\n```\n{\n    \"title\": \"My Title\",\n    \"source\": {\n        \"branch\": {\n            \"name\": \"my-feature-branch\"\n        }\n    },\n    \"reviewers\": [\n        {\n            \"uuid\": \"{504c3b62-8120-4f0c-a7bc-87800b9d6f70}\"\n        }\n    ]\n}\n```\n\nOther fields:\n\n* `description` - a string\n* `close_source_branch` - boolean that specifies if the source branch should be closed upon merging\n* `draft` - boolean that specifies whether the pull request is a draft",
+RunE: func(cmd *cobra.Command, args []string) error {
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+if body == "" {
+bodyObj := map[string]any{}
+if bodyCloseSourceBranch {
+handlers.SetNested(bodyObj, "close_source_branch", bodyCloseSourceBranch)
+}
+if bodyDescription != "" {
+handlers.SetNested(bodyObj, "description", bodyDescription)
+}
+if bodyDestinationBranchDefaultMergeStrategy != "" {
+handlers.SetNested(bodyObj, "destination.branch.default_merge_strategy", bodyDestinationBranchDefaultMergeStrategy)
+}
+if bodyDestinationBranchName != "" {
+handlers.SetNested(bodyObj, "destination.branch.name", bodyDestinationBranchName)
+}
+if bodyDestinationCommitHash != "" {
+handlers.SetNested(bodyObj, "destination.commit.hash", bodyDestinationCommitHash)
+}
+if bodyDraft {
+handlers.SetNested(bodyObj, "draft", bodyDraft)
+}
+if bodyReason != "" {
+handlers.SetNested(bodyObj, "reason", bodyReason)
+}
+if bodySourceBranchDefaultMergeStrategy != "" {
+handlers.SetNested(bodyObj, "source.branch.default_merge_strategy", bodySourceBranchDefaultMergeStrategy)
+}
+if bodySourceBranchName != "" {
+handlers.SetNested(bodyObj, "source.branch.name", bodySourceBranchName)
+}
+if bodySourceCommitHash != "" {
+handlers.SetNested(bodyObj, "source.commit.hash", bodySourceCommitHash)
+}
+if bodyState != "" {
+handlers.SetNested(bodyObj, "state", bodyState)
+}
+if bodyTitle != "" {
+handlers.SetNested(bodyObj, "title", bodyTitle)
+}
+if len(bodyObj) > 0 {
+b, _ := json.Marshal(bodyObj)
+body = string(b)
+}
+}
+return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().BoolVar(&bodyCloseSourceBranch, "close-source-branch", false, `A boolean flag indicating if merging the pull request closes the source branch.`)
+cmd.Flags().StringVar(&bodyDescription, "description", "", `Explains what the pull request does.`)
+cmd.Flags().StringVar(&bodyDestinationBranchDefaultMergeStrategy, "destination-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
+cmd.Flags().StringVar(&bodyDestinationBranchName, "destination-branch-name", "", `destination.branch.name`)
+cmd.Flags().StringVar(&bodyDestinationCommitHash, "destination-commit-hash", "", `destination.commit.hash`)
+cmd.Flags().BoolVar(&bodyDraft, "draft", false, `A boolean flag indicating whether the pull request is a draft.`)
+cmd.Flags().StringVar(&bodyReason, "reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
+cmd.Flags().StringVar(&bodySourceBranchDefaultMergeStrategy, "source-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
+cmd.Flags().StringVar(&bodySourceBranchName, "source-branch-name", "", `source.branch.name`)
+cmd.Flags().StringVar(&bodySourceCommitHash, "source-commit-hash", "", `source.commit.hash`)
+cmd.Flags().StringVar(&bodyState, "state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)
+cmd.Flags().StringVar(&bodyTitle, "title", "", `Title of the pull request.`)
+cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+return cmd
 }
 
 // newListAPullRequestActivityLogCmd returns the "pr list-apull-request-activity-log" cobra command.
 // operationId: listAPullRequestActivityLog
 func newListAPullRequestActivityLogCmd() *cobra.Command {
-	var (
-		repoSlug  string
-		workspace string
-	)
+var (
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "list-apull-request-activity-log",
-		Short: `List a pull request activity log`,
-		Long:  "Returns a paginated list of the pull request's activity log.\n\nThis handler serves both a v20 and internal endpoint. The v20 endpoint\nreturns reviewer comments, updates, approvals and request changes. The internal\nendpoint includes those plus tasks and attachments.\n\nComments created on a file or a line of code have an inline property.\n\nComment example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"comment\": {\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695/comments/118571088\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695/_/diff#comment-118571088\"\n                    }\n                },\n                \"deleted\": false,\n                \"pullrequest\": {\n                    \"type\": \"pullrequest\",\n                    \"id\": 5695,\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                        }\n                    },\n                    \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n                },\n                \"content\": {\n                    \"raw\": \"inline with to a dn from lines\",\n                    \"markup\": \"markdown\",\n                    \"html\": \"<p>inline with to a dn from lines</p>\",\n                    \"type\": \"rendered\"\n                },\n                \"created_on\": \"2019-09-27T00:33:46.039178+00:00\",\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"created_on\": \"2019-09-27T00:33:46.039178+00:00\",\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"updated_on\": \"2019-09-27T00:33:46.055384+00:00\",\n                \"inline\": {\n                    \"context_lines\": \"\",\n                    \"to\": null,\n                    \"path\": \"\",\n                    \"outdated\": false,\n                    \"from\": 211\n                },\n                \"type\": \"pullrequest_comment\",\n                \"id\": 118571088\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```\n\nUpdates include a state property of OPEN, MERGED, or DECLINED.\n\nUpdate example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"update\": {\n                \"description\": \"\",\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\",\n                \"destination\": {\n                    \"commit\": {\n                        \"type\": \"commit\",\n                        \"hash\": \"6a2c16e4a152\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/commit/6a2c16e4a152\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/commits/6a2c16e4a152\"\n                            }\n                        }\n                    },\n                    \"branch\": {\n                        \"name\": \"master\"\n                    },\n                    \"repository\": {\n                        \"name\": \"Atlaskit-MK-2\",\n                        \"type\": \"repository\",\n                        \"full_name\": \"atlassian/atlaskit-mk-2\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2\"\n                            },\n                            \"avatar\": {\n                                \"href\": \"https://bytebucket.org/ravatar/%7B%7D?ts=js\"\n                            }\n                        },\n                        \"uuid\": \"{}\"\n                    }\n                },\n                \"reason\": \"\",\n                \"source\": {\n                    \"commit\": {\n                        \"type\": \"commit\",\n                        \"hash\": \"728c8bad1813\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/commit/728c8bad1813\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/commits/728c8bad1813\"\n                            }\n                        }\n                    },\n                    \"branch\": {\n                        \"name\": \"username/NONE-add-onClick-prop-for-accessibility\"\n                    },\n                    \"repository\": {\n                        \"name\": \"Atlaskit-MK-2\",\n                        \"type\": \"repository\",\n                        \"full_name\": \"atlassian/atlaskit-mk-2\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2\"\n                            },\n                            \"avatar\": {\n                                \"href\": \"https://bytebucket.org/ravatar/%7B%7D?ts=js\"\n                            }\n                        },\n                        \"uuid\": \"{}\"\n                    }\n                },\n                \"state\": \"OPEN\",\n                \"author\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"date\": \"2019-05-10T06:48:25.305565+00:00\"\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```\n\nApproval example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"approval\": {\n                \"date\": \"2019-09-27T00:37:19.849534+00:00\",\n                \"pullrequest\": {\n                    \"type\": \"pullrequest\",\n                    \"id\": 5695,\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                        }\n                    },\n                    \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n                },\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                }\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/activity", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "list-apull-request-activity-log",
+Short: `List a pull request activity log`,
+Long:  "Returns a paginated list of the pull request's activity log.\n\nThis handler serves both a v20 and internal endpoint. The v20 endpoint\nreturns reviewer comments, updates, approvals and request changes. The internal\nendpoint includes those plus tasks and attachments.\n\nComments created on a file or a line of code have an inline property.\n\nComment example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"comment\": {\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695/comments/118571088\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695/_/diff#comment-118571088\"\n                    }\n                },\n                \"deleted\": false,\n                \"pullrequest\": {\n                    \"type\": \"pullrequest\",\n                    \"id\": 5695,\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                        }\n                    },\n                    \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n                },\n                \"content\": {\n                    \"raw\": \"inline with to a dn from lines\",\n                    \"markup\": \"markdown\",\n                    \"html\": \"<p>inline with to a dn from lines</p>\",\n                    \"type\": \"rendered\"\n                },\n                \"created_on\": \"2019-09-27T00:33:46.039178+00:00\",\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"created_on\": \"2019-09-27T00:33:46.039178+00:00\",\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"updated_on\": \"2019-09-27T00:33:46.055384+00:00\",\n                \"inline\": {\n                    \"context_lines\": \"\",\n                    \"to\": null,\n                    \"path\": \"\",\n                    \"outdated\": false,\n                    \"from\": 211\n                },\n                \"type\": \"pullrequest_comment\",\n                \"id\": 118571088\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```\n\nUpdates include a state property of OPEN, MERGED, or DECLINED.\n\nUpdate example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"update\": {\n                \"description\": \"\",\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\",\n                \"destination\": {\n                    \"commit\": {\n                        \"type\": \"commit\",\n                        \"hash\": \"6a2c16e4a152\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/commit/6a2c16e4a152\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/commits/6a2c16e4a152\"\n                            }\n                        }\n                    },\n                    \"branch\": {\n                        \"name\": \"master\"\n                    },\n                    \"repository\": {\n                        \"name\": \"Atlaskit-MK-2\",\n                        \"type\": \"repository\",\n                        \"full_name\": \"atlassian/atlaskit-mk-2\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2\"\n                            },\n                            \"avatar\": {\n                                \"href\": \"https://bytebucket.org/ravatar/%7B%7D?ts=js\"\n                            }\n                        },\n                        \"uuid\": \"{}\"\n                    }\n                },\n                \"reason\": \"\",\n                \"source\": {\n                    \"commit\": {\n                        \"type\": \"commit\",\n                        \"hash\": \"728c8bad1813\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/commit/728c8bad1813\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/commits/728c8bad1813\"\n                            }\n                        }\n                    },\n                    \"branch\": {\n                        \"name\": \"username/NONE-add-onClick-prop-for-accessibility\"\n                    },\n                    \"repository\": {\n                        \"name\": \"Atlaskit-MK-2\",\n                        \"type\": \"repository\",\n                        \"full_name\": \"atlassian/atlaskit-mk-2\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2\"\n                            },\n                            \"avatar\": {\n                                \"href\": \"https://bytebucket.org/ravatar/%7B%7D?ts=js\"\n                            }\n                        },\n                        \"uuid\": \"{}\"\n                    }\n                },\n                \"state\": \"OPEN\",\n                \"author\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"date\": \"2019-05-10T06:48:25.305565+00:00\"\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```\n\nApproval example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"approval\": {\n                \"date\": \"2019-09-27T00:37:19.849534+00:00\",\n                \"pullrequest\": {\n                    \"type\": \"pullrequest\",\n                    \"id\": 5695,\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                        }\n                    },\n                    \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n                },\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                }\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```",
+RunE: func(cmd *cobra.Command, args []string) error {
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/activity", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newGetAPullRequestCmd returns the "pr get-apull-request" cobra command.
 // operationId: getAPullRequest
 func newGetAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "get-apull-request",
-		Short: `Get a pull request`,
-		Long:  `Returns the specified pull request.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "get-apull-request",
+Short: `Get a pull request`,
+Long:  `Returns the specified pull request.`,
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newUpdateAPullRequestCmd returns the "pr update-apull-request" cobra command.
 // operationId: updateAPullRequest
 func newUpdateAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId                             int
-		repoSlug                                  string
-		workspace                                 string
-		bodyCloseSourceBranch                     bool
-		bodyDescription                           string
-		bodyDestinationBranchDefaultMergeStrategy string
-		bodyDestinationBranchName                 string
-		bodyDestinationCommitHash                 string
-		bodyDraft                                 bool
-		bodyReason                                string
-		bodySourceBranchDefaultMergeStrategy      string
-		bodySourceBranchName                      string
-		bodySourceCommitHash                      string
-		bodyState                                 string
-		bodyTitle                                 string
-		body                                      string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+bodyCloseSourceBranch bool
+bodyDescription string
+bodyDestinationBranchDefaultMergeStrategy string
+bodyDestinationBranchName string
+bodyDestinationCommitHash string
+bodyDraft bool
+bodyReason string
+bodySourceBranchDefaultMergeStrategy string
+bodySourceBranchName string
+bodySourceCommitHash string
+bodyState string
+bodyTitle string
+body string
+)
 
-	cmd := &cobra.Command{
-		Use:   "update-apull-request",
-		Short: `Update a pull request`,
-		Long: `Mutates the specified pull request.
+cmd := &cobra.Command{
+Use:   "update-apull-request",
+Short: `Update a pull request`,
+Long:  `Mutates the specified pull request.
 
 This can be used to change the pull request's branches or description.
 
 Only open pull requests can be mutated.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			if body == "" {
-				bodyObj := map[string]any{}
-				if bodyCloseSourceBranch {
-					handlers.SetNested(bodyObj, "close_source_branch", bodyCloseSourceBranch)
-				}
-				if bodyDescription != "" {
-					handlers.SetNested(bodyObj, "description", bodyDescription)
-				}
-				if bodyDestinationBranchDefaultMergeStrategy != "" {
-					handlers.SetNested(bodyObj, "destination.branch.default_merge_strategy", bodyDestinationBranchDefaultMergeStrategy)
-				}
-				if bodyDestinationBranchName != "" {
-					handlers.SetNested(bodyObj, "destination.branch.name", bodyDestinationBranchName)
-				}
-				if bodyDestinationCommitHash != "" {
-					handlers.SetNested(bodyObj, "destination.commit.hash", bodyDestinationCommitHash)
-				}
-				if bodyDraft {
-					handlers.SetNested(bodyObj, "draft", bodyDraft)
-				}
-				if bodyReason != "" {
-					handlers.SetNested(bodyObj, "reason", bodyReason)
-				}
-				if bodySourceBranchDefaultMergeStrategy != "" {
-					handlers.SetNested(bodyObj, "source.branch.default_merge_strategy", bodySourceBranchDefaultMergeStrategy)
-				}
-				if bodySourceBranchName != "" {
-					handlers.SetNested(bodyObj, "source.branch.name", bodySourceBranchName)
-				}
-				if bodySourceCommitHash != "" {
-					handlers.SetNested(bodyObj, "source.commit.hash", bodySourceCommitHash)
-				}
-				if bodyState != "" {
-					handlers.SetNested(bodyObj, "state", bodyState)
-				}
-				if bodyTitle != "" {
-					handlers.SetNested(bodyObj, "title", bodyTitle)
-				}
-				if len(bodyObj) > 0 {
-					b, _ := json.Marshal(bodyObj)
-					body = string(b)
-				}
-			}
-			return handlers.Dispatch(context.Background(), c, "PUT", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().BoolVar(&bodyCloseSourceBranch, "close-source-branch", false, `A boolean flag indicating if merging the pull request closes the source branch.`)
-	cmd.Flags().StringVar(&bodyDescription, "description", "", `Explains what the pull request does.`)
-	cmd.Flags().StringVar(&bodyDestinationBranchDefaultMergeStrategy, "destination-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
-	cmd.Flags().StringVar(&bodyDestinationBranchName, "destination-branch-name", "", `destination.branch.name`)
-	cmd.Flags().StringVar(&bodyDestinationCommitHash, "destination-commit-hash", "", `destination.commit.hash`)
-	cmd.Flags().BoolVar(&bodyDraft, "draft", false, `A boolean flag indicating whether the pull request is a draft.`)
-	cmd.Flags().StringVar(&bodyReason, "reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
-	cmd.Flags().StringVar(&bodySourceBranchDefaultMergeStrategy, "source-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
-	cmd.Flags().StringVar(&bodySourceBranchName, "source-branch-name", "", `source.branch.name`)
-	cmd.Flags().StringVar(&bodySourceCommitHash, "source-commit-hash", "", `source.commit.hash`)
-	cmd.Flags().StringVar(&bodyState, "state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)
-	cmd.Flags().StringVar(&bodyTitle, "title", "", `Title of the pull request.`)
-	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-	return cmd
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+if body == "" {
+bodyObj := map[string]any{}
+if bodyCloseSourceBranch {
+handlers.SetNested(bodyObj, "close_source_branch", bodyCloseSourceBranch)
+}
+if bodyDescription != "" {
+handlers.SetNested(bodyObj, "description", bodyDescription)
+}
+if bodyDestinationBranchDefaultMergeStrategy != "" {
+handlers.SetNested(bodyObj, "destination.branch.default_merge_strategy", bodyDestinationBranchDefaultMergeStrategy)
+}
+if bodyDestinationBranchName != "" {
+handlers.SetNested(bodyObj, "destination.branch.name", bodyDestinationBranchName)
+}
+if bodyDestinationCommitHash != "" {
+handlers.SetNested(bodyObj, "destination.commit.hash", bodyDestinationCommitHash)
+}
+if bodyDraft {
+handlers.SetNested(bodyObj, "draft", bodyDraft)
+}
+if bodyReason != "" {
+handlers.SetNested(bodyObj, "reason", bodyReason)
+}
+if bodySourceBranchDefaultMergeStrategy != "" {
+handlers.SetNested(bodyObj, "source.branch.default_merge_strategy", bodySourceBranchDefaultMergeStrategy)
+}
+if bodySourceBranchName != "" {
+handlers.SetNested(bodyObj, "source.branch.name", bodySourceBranchName)
+}
+if bodySourceCommitHash != "" {
+handlers.SetNested(bodyObj, "source.commit.hash", bodySourceCommitHash)
+}
+if bodyState != "" {
+handlers.SetNested(bodyObj, "state", bodyState)
+}
+if bodyTitle != "" {
+handlers.SetNested(bodyObj, "title", bodyTitle)
+}
+if len(bodyObj) > 0 {
+b, _ := json.Marshal(bodyObj)
+body = string(b)
+}
+}
+return handlers.Dispatch(context.Background(), c, "PUT", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().BoolVar(&bodyCloseSourceBranch, "close-source-branch", false, `A boolean flag indicating if merging the pull request closes the source branch.`)
+cmd.Flags().StringVar(&bodyDescription, "description", "", `Explains what the pull request does.`)
+cmd.Flags().StringVar(&bodyDestinationBranchDefaultMergeStrategy, "destination-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
+cmd.Flags().StringVar(&bodyDestinationBranchName, "destination-branch-name", "", `destination.branch.name`)
+cmd.Flags().StringVar(&bodyDestinationCommitHash, "destination-commit-hash", "", `destination.commit.hash`)
+cmd.Flags().BoolVar(&bodyDraft, "draft", false, `A boolean flag indicating whether the pull request is a draft.`)
+cmd.Flags().StringVar(&bodyReason, "reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
+cmd.Flags().StringVar(&bodySourceBranchDefaultMergeStrategy, "source-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
+cmd.Flags().StringVar(&bodySourceBranchName, "source-branch-name", "", `source.branch.name`)
+cmd.Flags().StringVar(&bodySourceCommitHash, "source-commit-hash", "", `source.commit.hash`)
+cmd.Flags().StringVar(&bodyState, "state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)
+cmd.Flags().StringVar(&bodyTitle, "title", "", `Title of the pull request.`)
+cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+return cmd
 }
 
 // newListPullRequestActivityLogCmd returns the "pr list-pull-request-activity-log" cobra command.
 // operationId: listPullRequestActivityLog
 func newListPullRequestActivityLogCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "list-pull-request-activity-log",
-		Short: `List a pull request activity log`,
-		Long:  "Returns a paginated list of the pull request's activity log.\n\nThis handler serves both a v20 and internal endpoint. The v20 endpoint\nreturns reviewer comments, updates, approvals and request changes. The internal\nendpoint includes those plus tasks and attachments.\n\nComments created on a file or a line of code have an inline property.\n\nComment example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"comment\": {\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695/comments/118571088\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695/_/diff#comment-118571088\"\n                    }\n                },\n                \"deleted\": false,\n                \"pullrequest\": {\n                    \"type\": \"pullrequest\",\n                    \"id\": 5695,\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                        }\n                    },\n                    \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n                },\n                \"content\": {\n                    \"raw\": \"inline with to a dn from lines\",\n                    \"markup\": \"markdown\",\n                    \"html\": \"<p>inline with to a dn from lines</p>\",\n                    \"type\": \"rendered\"\n                },\n                \"created_on\": \"2019-09-27T00:33:46.039178+00:00\",\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"created_on\": \"2019-09-27T00:33:46.039178+00:00\",\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"updated_on\": \"2019-09-27T00:33:46.055384+00:00\",\n                \"inline\": {\n                    \"context_lines\": \"\",\n                    \"to\": null,\n                    \"path\": \"\",\n                    \"outdated\": false,\n                    \"from\": 211\n                },\n                \"type\": \"pullrequest_comment\",\n                \"id\": 118571088\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```\n\nUpdates include a state property of OPEN, MERGED, or DECLINED.\n\nUpdate example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"update\": {\n                \"description\": \"\",\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\",\n                \"destination\": {\n                    \"commit\": {\n                        \"type\": \"commit\",\n                        \"hash\": \"6a2c16e4a152\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/commit/6a2c16e4a152\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/commits/6a2c16e4a152\"\n                            }\n                        }\n                    },\n                    \"branch\": {\n                        \"name\": \"master\"\n                    },\n                    \"repository\": {\n                        \"name\": \"Atlaskit-MK-2\",\n                        \"type\": \"repository\",\n                        \"full_name\": \"atlassian/atlaskit-mk-2\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2\"\n                            },\n                            \"avatar\": {\n                                \"href\": \"https://bytebucket.org/ravatar/%7B%7D?ts=js\"\n                            }\n                        },\n                        \"uuid\": \"{}\"\n                    }\n                },\n                \"reason\": \"\",\n                \"source\": {\n                    \"commit\": {\n                        \"type\": \"commit\",\n                        \"hash\": \"728c8bad1813\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/commit/728c8bad1813\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/commits/728c8bad1813\"\n                            }\n                        }\n                    },\n                    \"branch\": {\n                        \"name\": \"username/NONE-add-onClick-prop-for-accessibility\"\n                    },\n                    \"repository\": {\n                        \"name\": \"Atlaskit-MK-2\",\n                        \"type\": \"repository\",\n                        \"full_name\": \"atlassian/atlaskit-mk-2\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2\"\n                            },\n                            \"avatar\": {\n                                \"href\": \"https://bytebucket.org/ravatar/%7B%7D?ts=js\"\n                            }\n                        },\n                        \"uuid\": \"{}\"\n                    }\n                },\n                \"state\": \"OPEN\",\n                \"author\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"date\": \"2019-05-10T06:48:25.305565+00:00\"\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```\n\nApproval example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"approval\": {\n                \"date\": \"2019-09-27T00:37:19.849534+00:00\",\n                \"pullrequest\": {\n                    \"type\": \"pullrequest\",\n                    \"id\": 5695,\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                        }\n                    },\n                    \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n                },\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                }\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/activity", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "list-pull-request-activity-log",
+Short: `List a pull request activity log`,
+Long:  "Returns a paginated list of the pull request's activity log.\n\nThis handler serves both a v20 and internal endpoint. The v20 endpoint\nreturns reviewer comments, updates, approvals and request changes. The internal\nendpoint includes those plus tasks and attachments.\n\nComments created on a file or a line of code have an inline property.\n\nComment example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"comment\": {\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695/comments/118571088\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695/_/diff#comment-118571088\"\n                    }\n                },\n                \"deleted\": false,\n                \"pullrequest\": {\n                    \"type\": \"pullrequest\",\n                    \"id\": 5695,\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                        }\n                    },\n                    \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n                },\n                \"content\": {\n                    \"raw\": \"inline with to a dn from lines\",\n                    \"markup\": \"markdown\",\n                    \"html\": \"<p>inline with to a dn from lines</p>\",\n                    \"type\": \"rendered\"\n                },\n                \"created_on\": \"2019-09-27T00:33:46.039178+00:00\",\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"created_on\": \"2019-09-27T00:33:46.039178+00:00\",\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"updated_on\": \"2019-09-27T00:33:46.055384+00:00\",\n                \"inline\": {\n                    \"context_lines\": \"\",\n                    \"to\": null,\n                    \"path\": \"\",\n                    \"outdated\": false,\n                    \"from\": 211\n                },\n                \"type\": \"pullrequest_comment\",\n                \"id\": 118571088\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```\n\nUpdates include a state property of OPEN, MERGED, or DECLINED.\n\nUpdate example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"update\": {\n                \"description\": \"\",\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\",\n                \"destination\": {\n                    \"commit\": {\n                        \"type\": \"commit\",\n                        \"hash\": \"6a2c16e4a152\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/commit/6a2c16e4a152\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/commits/6a2c16e4a152\"\n                            }\n                        }\n                    },\n                    \"branch\": {\n                        \"name\": \"master\"\n                    },\n                    \"repository\": {\n                        \"name\": \"Atlaskit-MK-2\",\n                        \"type\": \"repository\",\n                        \"full_name\": \"atlassian/atlaskit-mk-2\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2\"\n                            },\n                            \"avatar\": {\n                                \"href\": \"https://bytebucket.org/ravatar/%7B%7D?ts=js\"\n                            }\n                        },\n                        \"uuid\": \"{}\"\n                    }\n                },\n                \"reason\": \"\",\n                \"source\": {\n                    \"commit\": {\n                        \"type\": \"commit\",\n                        \"hash\": \"728c8bad1813\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/commit/728c8bad1813\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/commits/728c8bad1813\"\n                            }\n                        }\n                    },\n                    \"branch\": {\n                        \"name\": \"username/NONE-add-onClick-prop-for-accessibility\"\n                    },\n                    \"repository\": {\n                        \"name\": \"Atlaskit-MK-2\",\n                        \"type\": \"repository\",\n                        \"full_name\": \"atlassian/atlaskit-mk-2\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2\"\n                            },\n                            \"avatar\": {\n                                \"href\": \"https://bytebucket.org/ravatar/%7B%7D?ts=js\"\n                            }\n                        },\n                        \"uuid\": \"{}\"\n                    }\n                },\n                \"state\": \"OPEN\",\n                \"author\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"date\": \"2019-05-10T06:48:25.305565+00:00\"\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```\n\nApproval example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"approval\": {\n                \"date\": \"2019-09-27T00:37:19.849534+00:00\",\n                \"pullrequest\": {\n                    \"type\": \"pullrequest\",\n                    \"id\": 5695,\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                        }\n                    },\n                    \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n                },\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                }\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```",
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/activity", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newApproveAPullRequestCmd returns the "pr approve-apull-request" cobra command.
 // operationId: approveAPullRequest
 func newApproveAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "approve-apull-request",
-		Short: `Approve a pull request`,
-		Long:  `Approve the specified pull request as the authenticated user.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/approve", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "approve-apull-request",
+Short: `Approve a pull request`,
+Long:  `Approve the specified pull request as the authenticated user.`,
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/approve", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newUnapproveAPullRequestCmd returns the "pr unapprove-apull-request" cobra command.
 // operationId: unapproveAPullRequest
 func newUnapproveAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "unapprove-apull-request",
-		Short: `Unapprove a pull request`,
-		Long: `Redact the authenticated user's approval of the specified pull
+cmd := &cobra.Command{
+Use:   "unapprove-apull-request",
+Short: `Unapprove a pull request`,
+Long:  `Redact the authenticated user's approval of the specified pull
 request.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/approve", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/approve", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newListCommentsOnAPullRequestCmd returns the "pr list-comments-on-apull-request" cobra command.
 // operationId: listCommentsOnAPullRequest
 func newListCommentsOnAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-		all           bool
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+all bool
+)
 
-	cmd := &cobra.Command{
-		Use:   "list-comments-on-apull-request",
-		Short: `List comments on a pull request`,
-		Long:  "Returns a paginated list of the pull request's comments.\n\nThis includes both global, inline comments and replies.\n\nThe default sorting is oldest to newest and can be overridden with\nthe `sort` query parameter.\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more\ndetails.",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments", pathParams, queryParams, body, all)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "list-comments-on-apull-request",
+Short: `List comments on a pull request`,
+Long:  "Returns a paginated list of the pull request's comments.\n\nThis includes both global, inline comments and replies.\n\nThe default sorting is oldest to newest and can be overridden with\nthe `sort` query parameter.\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more\ndetails.",
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments", pathParams, queryParams, body, all)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+return cmd
 }
 
 // newCreateACommentOnAPullRequestCmd returns the "pr create-acomment-on-apull-request" cobra command.
 // operationId: createACommentOnAPullRequest
 func newCreateACommentOnAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId       int
-		repoSlug            string
-		workspace           string
-		bodyContentMarkup   string
-		bodyContentRaw      string
-		bodyInlineFrom      int
-		bodyInlinePath      string
-		bodyInlineStartFrom int
-		bodyInlineStartTo   int
-		bodyInlineTo        int
-		bodyParentId        int
-		bodyPending         bool
-		body                string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+bodyContentMarkup string
+bodyContentRaw string
+bodyInlineFrom int
+bodyInlinePath string
+bodyInlineStartFrom int
+bodyInlineStartTo int
+bodyInlineTo int
+bodyParentId int
+bodyPending bool
+body string
+)
 
-	cmd := &cobra.Command{
-		Use:   "create-acomment-on-apull-request",
-		Short: `Create a comment on a pull request`,
-		Long: `Creates a new pull request comment.
+cmd := &cobra.Command{
+Use:   "create-acomment-on-apull-request",
+Short: `Create a comment on a pull request`,
+Long:  `Creates a new pull request comment.
 
 Returns the newly created pull request comment.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			if body == "" {
-				bodyObj := map[string]any{}
-				if bodyContentMarkup != "" {
-					handlers.SetNested(bodyObj, "content.markup", bodyContentMarkup)
-				}
-				if bodyContentRaw != "" {
-					handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
-				}
-				if bodyInlineFrom != 0 {
-					handlers.SetNested(bodyObj, "inline.from", bodyInlineFrom)
-				}
-				if bodyInlinePath != "" {
-					handlers.SetNested(bodyObj, "inline.path", bodyInlinePath)
-				}
-				if bodyInlineStartFrom != 0 {
-					handlers.SetNested(bodyObj, "inline.start_from", bodyInlineStartFrom)
-				}
-				if bodyInlineStartTo != 0 {
-					handlers.SetNested(bodyObj, "inline.start_to", bodyInlineStartTo)
-				}
-				if bodyInlineTo != 0 {
-					handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
-				}
-				if bodyParentId != 0 {
-					handlers.SetNested(bodyObj, "parent.id", bodyParentId)
-				}
-				if bodyPending {
-					handlers.SetNested(bodyObj, "pending", bodyPending)
-				}
-				if len(bodyObj) > 0 {
-					b, _ := json.Marshal(bodyObj)
-					body = string(b)
-				}
-			}
-			return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().StringVar(&bodyContentMarkup, "content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
-	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
-	cmd.Flags().IntVar(&bodyInlineFrom, "inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
-	cmd.Flags().StringVar(&bodyInlinePath, "inline-path", "", `The path of the file this comment is anchored to.`)
-	cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
-	cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
-	cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
-	cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `ID of referenced parent`)
-	cmd.Flags().BoolVar(&bodyPending, "pending", false, `pending`)
-	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-	return cmd
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+if body == "" {
+bodyObj := map[string]any{}
+if bodyContentMarkup != "" {
+handlers.SetNested(bodyObj, "content.markup", bodyContentMarkup)
+}
+if bodyContentRaw != "" {
+handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
+}
+if bodyInlineFrom != 0 {
+handlers.SetNested(bodyObj, "inline.from", bodyInlineFrom)
+}
+if bodyInlinePath != "" {
+handlers.SetNested(bodyObj, "inline.path", bodyInlinePath)
+}
+if bodyInlineStartFrom != 0 {
+handlers.SetNested(bodyObj, "inline.start_from", bodyInlineStartFrom)
+}
+if bodyInlineStartTo != 0 {
+handlers.SetNested(bodyObj, "inline.start_to", bodyInlineStartTo)
+}
+if bodyInlineTo != 0 {
+handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
+}
+if bodyParentId != 0 {
+handlers.SetNested(bodyObj, "parent.id", bodyParentId)
+}
+if bodyPending {
+handlers.SetNested(bodyObj, "pending", bodyPending)
+}
+if len(bodyObj) > 0 {
+b, _ := json.Marshal(bodyObj)
+body = string(b)
+}
+}
+return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().StringVar(&bodyContentMarkup, "content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
+cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
+cmd.Flags().IntVar(&bodyInlineFrom, "inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
+cmd.Flags().StringVar(&bodyInlinePath, "inline-path", "", `The path of the file this comment is anchored to.`)
+cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
+cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
+cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
+cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `ID of referenced parent`)
+cmd.Flags().BoolVar(&bodyPending, "pending", false, `pending`)
+cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+return cmd
 }
 
 // newGetACommentOnAPullRequestCmd returns the "pr get-acomment-on-apull-request" cobra command.
 // operationId: getACommentOnAPullRequest
 func newGetACommentOnAPullRequestCmd() *cobra.Command {
-	var (
-		commentId     int
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+commentId int
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "get-acomment-on-apull-request",
-		Short: `Get a comment on a pull request`,
-		Long:  `Returns a specific pull request comment.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if commentId == 0 {
-				return fmt.Errorf("--comment-id is required")
-			}
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"comment_id":      strconv.Itoa(commentId),
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "get-acomment-on-apull-request",
+Short: `Get a comment on a pull request`,
+Long:  `Returns a specific pull request comment.`,
+RunE: func(cmd *cobra.Command, args []string) error {
+if commentId == 0 {
+return fmt.Errorf("--comment-id is required")
+}
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"comment_id": strconv.Itoa(commentId),
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newUpdateACommentOnAPullRequestCmd returns the "pr update-acomment-on-apull-request" cobra command.
 // operationId: updateACommentOnAPullRequest
 func newUpdateACommentOnAPullRequestCmd() *cobra.Command {
-	var (
-		commentId           int
-		pullRequestId       int
-		repoSlug            string
-		workspace           string
-		bodyContentMarkup   string
-		bodyContentRaw      string
-		bodyInlineFrom      int
-		bodyInlinePath      string
-		bodyInlineStartFrom int
-		bodyInlineStartTo   int
-		bodyInlineTo        int
-		bodyParentId        int
-		bodyPending         bool
-		body                string
-	)
+var (
+commentId int
+pullRequestId int
+repoSlug string
+workspace string
+bodyContentMarkup string
+bodyContentRaw string
+bodyInlineFrom int
+bodyInlinePath string
+bodyInlineStartFrom int
+bodyInlineStartTo int
+bodyInlineTo int
+bodyParentId int
+bodyPending bool
+body string
+)
 
-	cmd := &cobra.Command{
-		Use:   "update-acomment-on-apull-request",
-		Short: `Update a comment on a pull request`,
-		Long:  `Updates a specific pull request comment.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if commentId == 0 {
-				return fmt.Errorf("--comment-id is required")
-			}
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"comment_id":      strconv.Itoa(commentId),
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			if body == "" {
-				bodyObj := map[string]any{}
-				if bodyContentMarkup != "" {
-					handlers.SetNested(bodyObj, "content.markup", bodyContentMarkup)
-				}
-				if bodyContentRaw != "" {
-					handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
-				}
-				if bodyInlineFrom != 0 {
-					handlers.SetNested(bodyObj, "inline.from", bodyInlineFrom)
-				}
-				if bodyInlinePath != "" {
-					handlers.SetNested(bodyObj, "inline.path", bodyInlinePath)
-				}
-				if bodyInlineStartFrom != 0 {
-					handlers.SetNested(bodyObj, "inline.start_from", bodyInlineStartFrom)
-				}
-				if bodyInlineStartTo != 0 {
-					handlers.SetNested(bodyObj, "inline.start_to", bodyInlineStartTo)
-				}
-				if bodyInlineTo != 0 {
-					handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
-				}
-				if bodyParentId != 0 {
-					handlers.SetNested(bodyObj, "parent.id", bodyParentId)
-				}
-				if bodyPending {
-					handlers.SetNested(bodyObj, "pending", bodyPending)
-				}
-				if len(bodyObj) > 0 {
-					b, _ := json.Marshal(bodyObj)
-					body = string(b)
-				}
-			}
-			return handlers.Dispatch(context.Background(), c, "PUT", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().StringVar(&bodyContentMarkup, "content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
-	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
-	cmd.Flags().IntVar(&bodyInlineFrom, "inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
-	cmd.Flags().StringVar(&bodyInlinePath, "inline-path", "", `The path of the file this comment is anchored to.`)
-	cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
-	cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
-	cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
-	cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `ID of referenced parent`)
-	cmd.Flags().BoolVar(&bodyPending, "pending", false, `pending`)
-	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "update-acomment-on-apull-request",
+Short: `Update a comment on a pull request`,
+Long:  `Updates a specific pull request comment.`,
+RunE: func(cmd *cobra.Command, args []string) error {
+if commentId == 0 {
+return fmt.Errorf("--comment-id is required")
+}
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"comment_id": strconv.Itoa(commentId),
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+if body == "" {
+bodyObj := map[string]any{}
+if bodyContentMarkup != "" {
+handlers.SetNested(bodyObj, "content.markup", bodyContentMarkup)
+}
+if bodyContentRaw != "" {
+handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
+}
+if bodyInlineFrom != 0 {
+handlers.SetNested(bodyObj, "inline.from", bodyInlineFrom)
+}
+if bodyInlinePath != "" {
+handlers.SetNested(bodyObj, "inline.path", bodyInlinePath)
+}
+if bodyInlineStartFrom != 0 {
+handlers.SetNested(bodyObj, "inline.start_from", bodyInlineStartFrom)
+}
+if bodyInlineStartTo != 0 {
+handlers.SetNested(bodyObj, "inline.start_to", bodyInlineStartTo)
+}
+if bodyInlineTo != 0 {
+handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
+}
+if bodyParentId != 0 {
+handlers.SetNested(bodyObj, "parent.id", bodyParentId)
+}
+if bodyPending {
+handlers.SetNested(bodyObj, "pending", bodyPending)
+}
+if len(bodyObj) > 0 {
+b, _ := json.Marshal(bodyObj)
+body = string(b)
+}
+}
+return handlers.Dispatch(context.Background(), c, "PUT", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().StringVar(&bodyContentMarkup, "content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
+cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
+cmd.Flags().IntVar(&bodyInlineFrom, "inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
+cmd.Flags().StringVar(&bodyInlinePath, "inline-path", "", `The path of the file this comment is anchored to.`)
+cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
+cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
+cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
+cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `ID of referenced parent`)
+cmd.Flags().BoolVar(&bodyPending, "pending", false, `pending`)
+cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+return cmd
 }
 
 // newDeleteACommentOnAPullRequestCmd returns the "pr delete-acomment-on-apull-request" cobra command.
 // operationId: deleteACommentOnAPullRequest
 func newDeleteACommentOnAPullRequestCmd() *cobra.Command {
-	var (
-		commentId     int
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+commentId int
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "delete-acomment-on-apull-request",
-		Short: `Delete a comment on a pull request`,
-		Long:  `Deletes a specific pull request comment.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if commentId == 0 {
-				return fmt.Errorf("--comment-id is required")
-			}
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"comment_id":      strconv.Itoa(commentId),
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "delete-acomment-on-apull-request",
+Short: `Delete a comment on a pull request`,
+Long:  `Deletes a specific pull request comment.`,
+RunE: func(cmd *cobra.Command, args []string) error {
+if commentId == 0 {
+return fmt.Errorf("--comment-id is required")
+}
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"comment_id": strconv.Itoa(commentId),
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newResolveACommentThreadCmd returns the "pr resolve-acomment-thread" cobra command.
 // operationId: resolveACommentThread
 func newResolveACommentThreadCmd() *cobra.Command {
-	var (
-		commentId     int
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+commentId int
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "resolve-acomment-thread",
-		Short: `Resolve a comment thread`,
-		Long:  ``,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if commentId == 0 {
-				return fmt.Errorf("--comment-id is required")
-			}
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"comment_id":      strconv.Itoa(commentId),
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}/resolve", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "resolve-acomment-thread",
+Short: `Resolve a comment thread`,
+Long:  ``,
+RunE: func(cmd *cobra.Command, args []string) error {
+if commentId == 0 {
+return fmt.Errorf("--comment-id is required")
+}
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"comment_id": strconv.Itoa(commentId),
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}/resolve", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newReopenACommentThreadCmd returns the "pr reopen-acomment-thread" cobra command.
 // operationId: reopenACommentThread
 func newReopenACommentThreadCmd() *cobra.Command {
-	var (
-		commentId     int
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+commentId int
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "reopen-acomment-thread",
-		Short: `Reopen a comment thread`,
-		Long:  ``,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if commentId == 0 {
-				return fmt.Errorf("--comment-id is required")
-			}
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"comment_id":      strconv.Itoa(commentId),
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}/resolve", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "reopen-acomment-thread",
+Short: `Reopen a comment thread`,
+Long:  ``,
+RunE: func(cmd *cobra.Command, args []string) error {
+if commentId == 0 {
+return fmt.Errorf("--comment-id is required")
+}
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"comment_id": strconv.Itoa(commentId),
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}/resolve", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newListCommitsOnAPullRequestCmd returns the "pr list-commits-on-apull-request" cobra command.
 // operationId: listCommitsOnAPullRequest
 func newListCommitsOnAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "list-commits-on-apull-request",
-		Short: `List commits on a pull request`,
-		Long: `Returns a paginated list of the pull request's commits.
+cmd := &cobra.Command{
+Use:   "list-commits-on-apull-request",
+Short: `List commits on a pull request`,
+Long:  `Returns a paginated list of the pull request's commits.
 
 These are the commits that are being merged into the destination
 branch when the pull requests gets accepted.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/commits", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/commits", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newDeclineAPullRequestCmd returns the "pr decline-apull-request" cobra command.
 // operationId: declineAPullRequest
 func newDeclineAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "decline-apull-request",
-		Short: `Decline a pull request`,
-		Long:  `Declines the pull request.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/decline", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "decline-apull-request",
+Short: `Decline a pull request`,
+Long:  `Declines the pull request.`,
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/decline", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newListChangesInAPullRequestCmd returns the "pr list-changes-in-apull-request" cobra command.
 // operationId: listChangesInAPullRequest
 func newListChangesInAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "list-changes-in-apull-request",
-		Short: `List changes in a pull request`,
-		Long: `Redirects to the [repository diff](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diff-spec-get)
+cmd := &cobra.Command{
+Use:   "list-changes-in-apull-request",
+Short: `List changes in a pull request`,
+Long:  `Redirects to the [repository diff](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diff-spec-get)
 with the revspec that corresponds to the pull request.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/diff", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/diff", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newGetTheDiffStatForAPullRequestCmd returns the "pr get-the-diff-stat-for-apull-request" cobra command.
 // operationId: getTheDiffStatForAPullRequest
 func newGetTheDiffStatForAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "get-the-diff-stat-for-apull-request",
-		Short: `Get the diff stat for a pull request`,
-		Long: `Redirects to the [repository diffstat](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get)
+cmd := &cobra.Command{
+Use:   "get-the-diff-stat-for-apull-request",
+Short: `Get the diff stat for a pull request`,
+Long:  `Redirects to the [repository diffstat](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get)
 with the revspec that corresponds to the pull request.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/diffstat", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/diffstat", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newMergeAPullRequestCmd returns the "pr merge-apull-request" cobra command.
 // operationId: mergeAPullRequest
 func newMergeAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId         int
-		repoSlug              string
-		workspace             string
-		async                 bool
-		bodyCloseSourceBranch bool
-		bodyMergeStrategy     string
-		bodyMessage           string
-		bodyType              string
-		body                  string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+async bool
+bodyCloseSourceBranch bool
+bodyMergeStrategy string
+bodyMessage string
+bodyType string
+body string
+)
 
-	cmd := &cobra.Command{
-		Use:   "merge-apull-request",
-		Short: `Merge a pull request`,
-		Long:  `Merges the pull request.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{
-				"async": strconv.FormatBool(async),
-			}
-			if body == "" {
-				bodyObj := map[string]any{}
-				if bodyCloseSourceBranch {
-					handlers.SetNested(bodyObj, "close_source_branch", bodyCloseSourceBranch)
-				}
-				if bodyMergeStrategy != "" {
-					handlers.SetNested(bodyObj, "merge_strategy", bodyMergeStrategy)
-				}
-				if bodyMessage != "" {
-					handlers.SetNested(bodyObj, "message", bodyMessage)
-				}
-				if bodyType != "" {
-					handlers.SetNested(bodyObj, "type", bodyType)
-				}
-				if len(bodyObj) > 0 {
-					b, _ := json.Marshal(bodyObj)
-					body = string(b)
-				}
-			}
-			return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/merge", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().BoolVar(&async, "async", false, "async (query parameter)")
-	cmd.Flags().BoolVar(&bodyCloseSourceBranch, "close-source-branch", false, `Whether the source branch should be deleted. If this is not provided, we fallback to the value used when the pull request was created, which defaults to False`)
-	cmd.Flags().StringVar(&bodyMergeStrategy, "merge-strategy", "", `The merge strategy that will be used to merge the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`)
-	cmd.Flags().StringVar(&bodyMessage, "message", "", `The commit message that will be used on the resulting commit. Note that the size of the message is limited to 128 KiB.`)
-	cmd.Flags().StringVar(&bodyType, "type", "", `type`)
-	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "merge-apull-request",
+Short: `Merge a pull request`,
+Long:  `Merges the pull request.`,
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+"async": strconv.FormatBool(async),
+}
+if body == "" {
+bodyObj := map[string]any{}
+if bodyCloseSourceBranch {
+handlers.SetNested(bodyObj, "close_source_branch", bodyCloseSourceBranch)
+}
+if bodyMergeStrategy != "" {
+handlers.SetNested(bodyObj, "merge_strategy", bodyMergeStrategy)
+}
+if bodyMessage != "" {
+handlers.SetNested(bodyObj, "message", bodyMessage)
+}
+if bodyType != "" {
+handlers.SetNested(bodyObj, "type", bodyType)
+}
+if len(bodyObj) > 0 {
+b, _ := json.Marshal(bodyObj)
+body = string(b)
+}
+}
+return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/merge", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().BoolVar(&async, "async", false, "async (query parameter)")
+cmd.Flags().BoolVar(&bodyCloseSourceBranch, "close-source-branch", false, `Whether the source branch should be deleted. If this is not provided, we fallback to the value used when the pull request was created, which defaults to False`)
+cmd.Flags().StringVar(&bodyMergeStrategy, "merge-strategy", "", `The merge strategy that will be used to merge the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`)
+cmd.Flags().StringVar(&bodyMessage, "message", "", `The commit message that will be used on the resulting commit. Note that the size of the message is limited to 128 KiB.`)
+cmd.Flags().StringVar(&bodyType, "type", "", `type`)
+cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+return cmd
 }
 
 // newGetTheMergeTaskStatusForAPullRequestCmd returns the "pr get-the-merge-task-status-for-apull-request" cobra command.
 // operationId: getTheMergeTaskStatusForAPullRequest
 func newGetTheMergeTaskStatusForAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		taskId        string
-		workspace     string
-	)
+var (
+pullRequestId int
+repoSlug string
+taskId string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "get-the-merge-task-status-for-apull-request",
-		Short: `Get the merge task status for a pull request`,
-		Long:  "When merging a pull request takes too long, the client receives a\ntask ID along with a 202 status code. The task ID can be used in a call\nto this endpoint to check the status of a merge task.\n\n```\ncurl -X GET https://api.bitbucket.org/2.0/repositories/atlassian/bitbucket/pullrequests/2286/merge/task-status/<task_id>\n```\n\nIf the merge task is not yet finished, a PENDING status will be returned.\n\n```\nHTTP/2 200\n{\n    \"task_status\": \"PENDING\",\n    \"links\": {\n        \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bitbucket/pullrequests/2286/merge/task-status/<task_id>\"\n        }\n    }\n}\n```\n\nIf the merge was successful, a SUCCESS status will be returned.\n\n```\nHTTP/2 200\n{\n    \"task_status\": \"SUCCESS\",\n    \"links\": {\n        \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bitbucket/pullrequests/2286/merge/task-status/<task_id>\"\n        }\n    },\n    \"merge_result\": <the merged pull request object>\n}\n```\n\nIf the merge task failed, an error will be returned.\n\n```\n{\n    \"type\": \"error\",\n    \"error\": {\n        \"message\": \"<error message>\"\n    }\n}\n```",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if taskId == "" {
-				return fmt.Errorf("--task-id is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"task_id":         taskId,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/merge/task-status/{task_id}", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&taskId, "task-id", "", "task_id (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "get-the-merge-task-status-for-apull-request",
+Short: `Get the merge task status for a pull request`,
+Long:  "When merging a pull request takes too long, the client receives a\ntask ID along with a 202 status code. The task ID can be used in a call\nto this endpoint to check the status of a merge task.\n\n```\ncurl -X GET https://api.bitbucket.org/2.0/repositories/atlassian/bitbucket/pullrequests/2286/merge/task-status/<task_id>\n```\n\nIf the merge task is not yet finished, a PENDING status will be returned.\n\n```\nHTTP/2 200\n{\n    \"task_status\": \"PENDING\",\n    \"links\": {\n        \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bitbucket/pullrequests/2286/merge/task-status/<task_id>\"\n        }\n    }\n}\n```\n\nIf the merge was successful, a SUCCESS status will be returned.\n\n```\nHTTP/2 200\n{\n    \"task_status\": \"SUCCESS\",\n    \"links\": {\n        \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bitbucket/pullrequests/2286/merge/task-status/<task_id>\"\n        }\n    },\n    \"merge_result\": <the merged pull request object>\n}\n```\n\nIf the merge task failed, an error will be returned.\n\n```\n{\n    \"type\": \"error\",\n    \"error\": {\n        \"message\": \"<error message>\"\n    }\n}\n```",
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if taskId == "" {
+return fmt.Errorf("--task-id is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"task_id": taskId,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/merge/task-status/{task_id}", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&taskId, "task-id", "", "task_id (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newGetThePatchForAPullRequestCmd returns the "pr get-the-patch-for-apull-request" cobra command.
 // operationId: getThePatchForAPullRequest
 func newGetThePatchForAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "get-the-patch-for-apull-request",
-		Short: `Get the patch for a pull request`,
-		Long: `Redirects to the [repository patch](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-patch-spec-get)
+cmd := &cobra.Command{
+Use:   "get-the-patch-for-apull-request",
+Short: `Get the patch for a pull request`,
+Long:  `Redirects to the [repository patch](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-patch-spec-get)
 with the revspec that corresponds to pull request.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/patch", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/patch", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newRequestChangesForAPullRequestCmd returns the "pr request-changes-for-apull-request" cobra command.
 // operationId: requestChangesForAPullRequest
 func newRequestChangesForAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "request-changes-for-apull-request",
-		Short: `Request changes for a pull request`,
-		Long:  ``,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/request-changes", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "request-changes-for-apull-request",
+Short: `Request changes for a pull request`,
+Long:  ``,
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/request-changes", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newRemoveChangeRequestForAPullRequestCmd returns the "pr remove-change-request-for-apull-request" cobra command.
 // operationId: removeChangeRequestForAPullRequest
 func newRemoveChangeRequestForAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "remove-change-request-for-apull-request",
-		Short: `Remove change request for a pull request`,
-		Long:  ``,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/request-changes", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "remove-change-request-for-apull-request",
+Short: `Remove change request for a pull request`,
+Long:  ``,
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/request-changes", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newListCommitStatusesForAPullRequestCmd returns the "pr list-commit-statuses-for-apull-request" cobra command.
 // operationId: listCommitStatusesForAPullRequest
 func newListCommitStatusesForAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-		q             string
-		sort          string
-		all           bool
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+q string
+sort string
+all bool
+)
 
-	cmd := &cobra.Command{
-		Use:   "list-commit-statuses-for-apull-request",
-		Short: `List commit statuses for a pull request`,
-		Long: `Returns all statuses (e.g. build results) for the given pull
+cmd := &cobra.Command{
+Use:   "list-commit-statuses-for-apull-request",
+Short: `List commit statuses for a pull request`,
+Long:  `Returns all statuses (e.g. build results) for the given pull
 request.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{
-				"q":    q,
-				"sort": sort,
-			}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/statuses", pathParams, queryParams, body, all)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
-	cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
-	cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
-	return cmd
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+"q": q,
+"sort": sort,
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/statuses", pathParams, queryParams, body, all)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
+cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
+cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+return cmd
 }
 
 // newListTasksOnAPullRequestCmd returns the "pr list-tasks-on-apull-request" cobra command.
 // operationId: listTasksOnAPullRequest
 func newListTasksOnAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		workspace     string
-		q             string
-		sort          string
-		pagelen       int
-		all           bool
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+q string
+sort string
+pagelen int
+all bool
+)
 
-	cmd := &cobra.Command{
-		Use:   "list-tasks-on-apull-request",
-		Short: `List tasks on a pull request`,
-		Long: `Returns a paginated list of the pull request's tasks.
+cmd := &cobra.Command{
+Use:   "list-tasks-on-apull-request",
+Short: `List tasks on a pull request`,
+Long:  `Returns a paginated list of the pull request's tasks.
 
 This endpoint supports filtering and sorting of the results by the 'task' field.
 See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{
-				"q":       q,
-				"sort":    sort,
-				"pagelen": strconv.Itoa(pagelen),
-			}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks", pathParams, queryParams, body, all)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
-	cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
-	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "pagelen (query parameter)")
-	cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
-	return cmd
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+"q": q,
+"sort": sort,
+"pagelen": strconv.Itoa(pagelen),
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks", pathParams, queryParams, body, all)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
+cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
+cmd.Flags().IntVar(&pagelen, "pagelen", 0, "pagelen (query parameter)")
+cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+return cmd
 }
 
 // newCreateATaskOnAPullRequestCmd returns the "pr create-atask-on-apull-request" cobra command.
 // operationId: createATaskOnAPullRequest
 func newCreateATaskOnAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId  int
-		repoSlug       string
-		workspace      string
-		bodyCommentId  int
-		bodyContentRaw string
-		bodyPending    bool
-		body           string
-	)
+var (
+pullRequestId int
+repoSlug string
+workspace string
+bodyCommentId int
+bodyContentRaw string
+bodyPending bool
+body string
+)
 
-	cmd := &cobra.Command{
-		Use:   "create-atask-on-apull-request",
-		Short: `Create a task on a pull request`,
-		Long: `Creates a new pull request task.
+cmd := &cobra.Command{
+Use:   "create-atask-on-apull-request",
+Short: `Create a task on a pull request`,
+Long:  `Creates a new pull request task.
 
 Returns the newly created pull request task.
 
 Tasks can optionally be created in relation to a comment specified by the comment's ID which
 will cause the task to appear below the comment on a pull request when viewed in Bitbucket.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			if body == "" {
-				bodyObj := map[string]any{}
-				if bodyCommentId != 0 {
-					handlers.SetNested(bodyObj, "comment.id", bodyCommentId)
-				}
-				if bodyContentRaw != "" {
-					handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
-				}
-				if bodyPending {
-					handlers.SetNested(bodyObj, "pending", bodyPending)
-				}
-				if len(bodyObj) > 0 {
-					b, _ := json.Marshal(bodyObj)
-					body = string(b)
-				}
-			}
-			return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().IntVar(&bodyCommentId, "comment-id", 0, `ID of referenced comment`)
-	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The task contents`)
-	cmd.Flags().BoolVar(&bodyPending, "pending", false, `pending`)
-	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-	return cmd
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+if body == "" {
+bodyObj := map[string]any{}
+if bodyCommentId != 0 {
+handlers.SetNested(bodyObj, "comment.id", bodyCommentId)
+}
+if bodyContentRaw != "" {
+handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
+}
+if bodyPending {
+handlers.SetNested(bodyObj, "pending", bodyPending)
+}
+if len(bodyObj) > 0 {
+b, _ := json.Marshal(bodyObj)
+body = string(b)
+}
+}
+return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().IntVar(&bodyCommentId, "comment-id", 0, `ID of referenced comment`)
+cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The task contents`)
+cmd.Flags().BoolVar(&bodyPending, "pending", false, `pending`)
+cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+return cmd
 }
 
 // newGetATaskOnAPullRequestCmd returns the "pr get-atask-on-apull-request" cobra command.
 // operationId: getATaskOnAPullRequest
 func newGetATaskOnAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		taskId        int
-		workspace     string
-	)
+var (
+pullRequestId int
+repoSlug string
+taskId int
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "get-atask-on-apull-request",
-		Short: `Get a task on a pull request`,
-		Long:  `Returns a specific pull request task.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if taskId == 0 {
-				return fmt.Errorf("--task-id is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"task_id":         strconv.Itoa(taskId),
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks/{task_id}", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().IntVar(&taskId, "task-id", 0, "task_id (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "get-atask-on-apull-request",
+Short: `Get a task on a pull request`,
+Long:  `Returns a specific pull request task.`,
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if taskId == 0 {
+return fmt.Errorf("--task-id is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"task_id": strconv.Itoa(taskId),
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks/{task_id}", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().IntVar(&taskId, "task-id", 0, "task_id (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newUpdateATaskOnAPullRequestCmd returns the "pr update-atask-on-apull-request" cobra command.
 // operationId: updateATaskOnAPullRequest
 func newUpdateATaskOnAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId  int
-		repoSlug       string
-		taskId         int
-		workspace      string
-		bodyContentRaw string
-		bodyState      string
-		body           string
-	)
+var (
+pullRequestId int
+repoSlug string
+taskId int
+workspace string
+bodyContentRaw string
+bodyState string
+body string
+)
 
-	cmd := &cobra.Command{
-		Use:   "update-atask-on-apull-request",
-		Short: `Update a task on a pull request`,
-		Long:  `Updates a specific pull request task.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if taskId == 0 {
-				return fmt.Errorf("--task-id is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"task_id":         strconv.Itoa(taskId),
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			if body == "" {
-				bodyObj := map[string]any{}
-				if bodyContentRaw != "" {
-					handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
-				}
-				if bodyState != "" {
-					handlers.SetNested(bodyObj, "state", bodyState)
-				}
-				if len(bodyObj) > 0 {
-					b, _ := json.Marshal(bodyObj)
-					body = string(b)
-				}
-			}
-			return handlers.Dispatch(context.Background(), c, "PUT", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks/{task_id}", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().IntVar(&taskId, "task-id", 0, "task_id (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The task contents`)
-	cmd.Flags().StringVar(&bodyState, "state", "", `[RESOLVED, UNRESOLVED]`)
-	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "update-atask-on-apull-request",
+Short: `Update a task on a pull request`,
+Long:  `Updates a specific pull request task.`,
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if taskId == 0 {
+return fmt.Errorf("--task-id is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"task_id": strconv.Itoa(taskId),
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+if body == "" {
+bodyObj := map[string]any{}
+if bodyContentRaw != "" {
+handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
+}
+if bodyState != "" {
+handlers.SetNested(bodyObj, "state", bodyState)
+}
+if len(bodyObj) > 0 {
+b, _ := json.Marshal(bodyObj)
+body = string(b)
+}
+}
+return handlers.Dispatch(context.Background(), c, "PUT", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks/{task_id}", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().IntVar(&taskId, "task-id", 0, "task_id (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The task contents`)
+cmd.Flags().StringVar(&bodyState, "state", "", `[RESOLVED, UNRESOLVED]`)
+cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+return cmd
 }
 
 // newDeleteATaskOnAPullRequestCmd returns the "pr delete-atask-on-apull-request" cobra command.
 // operationId: deleteATaskOnAPullRequest
 func newDeleteATaskOnAPullRequestCmd() *cobra.Command {
-	var (
-		pullRequestId int
-		repoSlug      string
-		taskId        int
-		workspace     string
-	)
+var (
+pullRequestId int
+repoSlug string
+taskId int
+workspace string
+)
 
-	cmd := &cobra.Command{
-		Use:   "delete-atask-on-apull-request",
-		Short: `Delete a task on a pull request`,
-		Long:  `Deletes a specific pull request task.`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if taskId == 0 {
-				return fmt.Errorf("--task-id is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"task_id":         strconv.Itoa(taskId),
-				"workspace":       workspace,
-			}
-			queryParams := map[string]string{}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks/{task_id}", pathParams, queryParams, body, false)
-		},
-	}
-	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-	cmd.Flags().IntVar(&taskId, "task-id", 0, "task_id (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "delete-atask-on-apull-request",
+Short: `Delete a task on a pull request`,
+Long:  `Deletes a specific pull request task.`,
+RunE: func(cmd *cobra.Command, args []string) error {
+if pullRequestId == 0 {
+return fmt.Errorf("--pull-request-id is required")
+}
+if repoSlug == "" {
+return fmt.Errorf("--repo-slug is required")
+}
+if taskId == 0 {
+return fmt.Errorf("--task-id is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"pull_request_id": strconv.Itoa(pullRequestId),
+"repo_slug": repoSlug,
+"task_id": strconv.Itoa(taskId),
+"workspace": workspace,
+}
+queryParams := map[string]string{
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks/{task_id}", pathParams, queryParams, body, false)
+},
+}
+cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+cmd.Flags().IntVar(&taskId, "task-id", 0, "task_id (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+return cmd
 }
 
 // newListWorkspacePullRequestsForAUserCmd returns the "pr list-workspace-pull-requests-for-auser" cobra command.
 // operationId: listWorkspacePullRequestsForAUser
 func newListWorkspacePullRequestsForAUserCmd() *cobra.Command {
-	var (
-		selectedUser string
-		workspace    string
-		state        string
-		all          bool
-	)
+var (
+selectedUser string
+workspace string
+state string
+all bool
+)
 
-	cmd := &cobra.Command{
-		Use:   "list-workspace-pull-requests-for-auser",
-		Short: `List workspace pull requests for a user`,
-		Long:  "Returns all workspace pull requests authored by the specified user.\n\nBy default only open pull requests are returned. This can be controlled\nusing the `state` query parameter. To retrieve pull requests that are\nin one of multiple states, repeat the `state` parameter for each\nindividual state.\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if selectedUser == "" {
-				return fmt.Errorf("--selected-user is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			pathParams := map[string]string{
-				"selected_user": selectedUser,
-				"workspace":     workspace,
-			}
-			queryParams := map[string]string{
-				"state": state,
-			}
-			body := ""
-			return handlers.Dispatch(context.Background(), c, "GET", "/workspaces/{workspace}/pullrequests/{selected_user}", pathParams, queryParams, body, all)
-		},
-	}
-	cmd.Flags().StringVar(&selectedUser, "selected-user", "", "selected_user (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().StringVar(&state, "state", "", "state (query parameter)")
-	cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
-	return cmd
+cmd := &cobra.Command{
+Use:   "list-workspace-pull-requests-for-auser",
+Short: `List workspace pull requests for a user`,
+Long:  "Returns all workspace pull requests authored by the specified user.\n\nBy default only open pull requests are returned. This can be controlled\nusing the `state` query parameter. To retrieve pull requests that are\nin one of multiple states, repeat the `state` parameter for each\nindividual state.\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.",
+RunE: func(cmd *cobra.Command, args []string) error {
+if selectedUser == "" {
+return fmt.Errorf("--selected-user is required")
+}
+if workspace == "" {
+return fmt.Errorf("--workspace is required")
+}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+"selected_user": selectedUser,
+"workspace": workspace,
+}
+queryParams := map[string]string{
+"state": state,
+}
+body := ""
+return handlers.Dispatch(context.Background(), c, "GET", "/workspaces/{workspace}/pullrequests/{selected_user}", pathParams, queryParams, body, all)
+},
+}
+cmd.Flags().StringVar(&selectedUser, "selected-user", "", "selected_user (path parameter)")
+cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+cmd.Flags().StringVar(&state, "state", "", "state (query parameter)")
+cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+return cmd
 }
 
 const outputFlagName = "output"
 
 func AddOutputFlag(cmd *cobra.Command) {
-	cmd.PersistentFlags().StringVar(&output.Format, outputFlagName, "table",
-		"Output format: table, json, id")
+cmd.PersistentFlags().StringVar(&output.Format, outputFlagName, "table",
+"Output format: table, markdown, json, id")
 }
