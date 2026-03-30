@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-partition_spec.py: Extract PR paths and recursively resolve all $refs.
+partition_spec.py: Extract API paths by command group and recursively resolve $refs.
 
-Produces a self-contained pr-schema.yaml with no dangling references.
+Produces self-contained schema YAML files with no dangling references.
 
-Usage: python3 partition_spec.py <input.json> <output.yaml>
+Usage:
+  python3 partition_spec.py <input.json> <output.yaml>          # single group (default: pr)
+  python3 partition_spec.py <input.json> <output_dir> --all     # all groups
 """
 
 import copy
@@ -27,19 +29,60 @@ def safe_path(raw: str, allowed_extensions: set[str]) -> Path:
     return p
 
 
-# Target tags to extract — set to {"Pullrequests"} for initial scope
-TARGET_TAGS = {"Pullrequests"}
+def safe_dir(raw: str) -> Path:
+    """Resolve a CLI argument to a canonical directory path."""
+    if "\0" in raw:
+        raise ValueError(f"Null byte in path: {raw!r}")
+    p = Path(raw).resolve()
+    if not p.is_dir():
+        raise ValueError(f"Not a directory: {p}")
+    return p
 
-# Explicit PR paths (fallback if tag-based filtering is insufficient)
-PR_PATHS = [
-    "/repositories/{workspace}/{repo_slug}/pullrequests",
-    "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}",
-    "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/merge",
-    "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/diff",
-    "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/commits",
-    "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments",
-    "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/approve",
-]
+
+# ─── Command group definitions ────────────────────────────────────────────────
+# Each group produces a separate schema file and Cobra parent command.
+
+COMMAND_GROUPS = {
+    "pr": {
+        "filename": "pr-schema.yaml",
+        "title": "Bitbucket Pull Requests CLI",
+        "tags": {"Pullrequests"},
+        "paths": [
+            "/repositories/{workspace}/{repo_slug}/pullrequests",
+            "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}",
+            "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/merge",
+            "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/diff",
+            "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/commits",
+            "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments",
+            "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/approve",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "PR",
+            "x-cli-command-use": "pr",
+            "x-cli-command-short": "Manage Bitbucket pull requests",
+            "x-cli-command-long": "Commands for listing, creating, reading, "
+                                  "and merging Bitbucket pull requests.",
+        },
+    },
+    "hooks": {
+        "filename": "hooks-schema.yaml",
+        "title": "Bitbucket Webhooks CLI",
+        "tags": {"Webhooks"},
+        "paths": [
+            "/repositories/{workspace}/{repo_slug}/hooks",
+            "/repositories/{workspace}/{repo_slug}/hooks/{uid}",
+            "/workspaces/{workspace}/hooks",
+            "/workspaces/{workspace}/hooks/{uid}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Hooks",
+            "x-cli-command-use": "hooks",
+            "x-cli-command-short": "Manage Bitbucket webhooks",
+            "x-cli-command-long": "Commands for listing, creating, updating, "
+                                  "and deleting Bitbucket webhooks.",
+        },
+    },
+}
 
 HTTP_METHODS = {"get", "post", "put", "patch", "delete"}
 
@@ -68,55 +111,49 @@ def collect_refs(node, spec, collected: set):
             collect_refs(item, spec, collected)
 
 
-def extract_paths_by_tag(spec: dict) -> dict:
-    """Extract paths matching TARGET_TAGS using tag-based filtering."""
+def extract_paths_by_tag(spec: dict, tags: set[str]) -> dict:
+    """Extract paths matching the given tags using tag-based filtering."""
     out_paths = {}
     for path, path_item in spec.get("paths", {}).items():
         for method, op in path_item.items():
-            if method in HTTP_METHODS and set(op.get("tags", [])) & TARGET_TAGS:
+            if method in HTTP_METHODS and set(op.get("tags", [])) & tags:
                 out_paths[path] = copy.deepcopy(path_item)
                 break
     return out_paths
 
 
-def extract_paths_explicit(spec: dict) -> dict:
-    """Extract paths using the explicit PR_PATHS list."""
+def extract_paths_explicit(spec: dict, paths: list[str]) -> dict:
+    """Extract paths using an explicit path list."""
     out_paths = {}
-    for path in PR_PATHS:
+    for path in paths:
         if path in spec.get("paths", {}):
             out_paths[path] = copy.deepcopy(spec["paths"][path])
     return out_paths
 
 
-def main():
-    if len(sys.argv) != 3:
-        print(
-            f"Usage: {sys.argv[0]} <input.json> <output.yaml>", file=sys.stderr)
-        sys.exit(1)
-
-    input_path = safe_path(sys.argv[1], {".json"})
-    output_path = safe_path(sys.argv[2], {".yaml", ".yml"})
-
-    spec = json.loads(input_path.read_text())
-
-    # Build output spec
+def build_schema(spec: dict, group: dict) -> dict:
+    """Build a self-contained schema for a single command group."""
     version = spec.get("info", {}).get("version", "2.0.0")
+    info = {"title": group["title"], "version": version}
+    info.update(group["cli_meta"])
+
     out = {
         "openapi": "3.0.0",
-        "info": {"title": "Bitbucket Pull Requests CLI", "version": version},
+        "info": info,
         "paths": {},
         "components": {"schemas": {}},
     }
 
     # Try tag-based extraction first, fall back to explicit paths
-    paths_by_tag = extract_paths_by_tag(spec)
-    paths_explicit = extract_paths_explicit(spec)
+    paths_by_tag = extract_paths_by_tag(spec, group["tags"])
+    paths_explicit = extract_paths_explicit(spec, group["paths"])
 
     # Merge both (tag-based takes priority, explicit fills gaps)
     out["paths"] = {**paths_explicit, **paths_by_tag}
 
     if not out["paths"]:
-        print("Warning: no PR paths found in spec", file=sys.stderr)
+        print(f"Warning: no paths found for group '{group['title']}'",
+              file=sys.stderr)
 
     # Collect all $refs referenced by those paths
     refs: set = set()
@@ -135,6 +172,11 @@ def main():
     # Post-process schema for stable code generation
     post_process_schema(out)
 
+    return out
+
+
+def write_schema(out: dict, output_path: Path) -> None:
+    """Write a schema dict to a YAML file."""
     output_path.write_text(
         yaml.dump(out, default_flow_style=False,
                   sort_keys=False, allow_unicode=True)
@@ -144,6 +186,40 @@ def main():
         f"{len(out['components']['schemas'])} schemas, "
         f"wrote to {output_path}"
     )
+
+
+def main():
+    if len(sys.argv) < 3 or len(sys.argv) > 4:
+        print(
+            f"Usage: {sys.argv[0]} <input.json> <output.yaml>",
+            file=sys.stderr,
+        )
+        print(
+            f"       {sys.argv[0]} <input.json> <output_dir> --all",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    input_path = safe_path(sys.argv[1], {".json"})
+    spec = json.loads(input_path.read_text())
+
+    all_mode = len(sys.argv) == 4 and sys.argv[3] == "--all"
+
+    if all_mode:
+        output_dir = safe_dir(sys.argv[2])
+        for group in COMMAND_GROUPS.values():
+            out = build_schema(spec, group)
+            write_schema(out, output_dir / group["filename"])
+    else:
+        output_path = safe_path(sys.argv[2], {".yaml", ".yml"})
+        # Determine group from output filename, default to "pr"
+        group_key = "pr"
+        for key, group in COMMAND_GROUPS.items():
+            if output_path.name == group["filename"]:
+                group_key = key
+                break
+        out = build_schema(spec, COMMAND_GROUPS[group_key])
+        write_schema(out, output_path)
 
 
 def post_process_schema(out: dict) -> None:

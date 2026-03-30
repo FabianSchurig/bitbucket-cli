@@ -59,7 +59,10 @@ Set authentication environment variables before running:
 	prCmd := commands.NewPRCommand()
 	commands.AddOutputFlag(prCmd)
 
-	rootCmd.AddCommand(prCmd)
+	hooksCmd := commands.NewHooksCommand()
+	commands.AddOutputFlag(hooksCmd)
+
+	rootCmd.AddCommand(prCmd, hooksCmd)
 	return rootCmd
 }
 
