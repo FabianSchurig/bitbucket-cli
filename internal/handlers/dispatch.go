@@ -7,101 +7,139 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/go-resty/resty/v2"
+
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
 
+// Request holds all parameters for a Dispatch call.
+type Request struct {
+	Method      string
+	URLTemplate string
+	PathParams  map[string]string
+	QueryParams map[string]string
+	Body        string
+	All         bool
+}
+
+// pageResult holds extracted pagination data from a response.
+type pageResult struct {
+	values  []any
+	nextURL string
+}
+
 // Dispatch performs a generic Bitbucket API request.
 //
-// It substitutes {param} placeholders in urlTemplate with pathParams,
+// It substitutes {param} placeholders in the URL template with path params,
 // sets query parameters, sends body for POST/PUT/PATCH, and handles
-// Bitbucket's cursor-based pagination when all is true.
-func Dispatch(
-	ctx context.Context,
-	c *client.BBClient,
-	method, urlTemplate string,
-	pathParams, queryParams map[string]string,
-	body string,
-	all bool,
-) error {
-	// Build URL from template and path params.
-	url := urlTemplate
-	for k, v := range pathParams {
-		url = strings.ReplaceAll(url, "{"+k+"}", v)
-	}
-
+// Bitbucket's cursor-based pagination when Request.All is true.
+func Dispatch(ctx context.Context, c *client.BBClient, r Request) error {
+	baseURL := buildURL(r.URLTemplate, r.PathParams)
 	var allValues []any
-	fetchURL := url
+	fetchURL := baseURL
 
 	for {
-		req := c.R().SetContext(ctx)
-
-		// Set query params (skip empty values) only on the first request;
-		// subsequent pagination URLs are absolute and already contain params.
-		if fetchURL == url {
-			for k, v := range queryParams {
-				if v != "" && v != "0" && v != "false" {
-					req = req.SetQueryParam(k, v)
-				}
-			}
-		}
-
-		// Set body for methods that accept one.
-		if body != "" && (method == "POST" || method == "PUT" || method == "PATCH") {
-			req = req.SetHeader("Content-Type", "application/json").SetBody(body)
-		}
-
-		resp, err := req.Execute(method, fetchURL)
+		resp, err := executeRequest(ctx, c, r, fetchURL, baseURL)
 		if err != nil {
-			return fmt.Errorf("%s %s: %w", method, fetchURL, err)
+			return fmt.Errorf("%s %s: %w", r.Method, fetchURL, err)
 		}
 		if resp.IsError() {
 			return client.ParseError(resp)
 		}
 
-		// If the response is empty (e.g. 204 No Content), we're done.
-		respBody := resp.Body()
-		if len(respBody) == 0 {
-			fmt.Println("OK")
+		result, done, err := parseResponse(resp)
+		if err != nil {
+			return err
+		}
+		if done {
 			return nil
 		}
 
-		// If the response is not JSON (e.g. raw diff), print it as-is.
-		ct := resp.Header().Get("Content-Type")
-		if !strings.Contains(ct, "json") {
-			fmt.Print(string(respBody))
-			return nil
-		}
-
-		// Parse the response as generic JSON.
-		var result any
-		if err := json.Unmarshal(respBody, &result); err != nil {
-			return fmt.Errorf("parsing response: %w", err)
-		}
-
-		// Check for paginated response pattern: {"values": [...], "next": "..."}
-		m, isMap := result.(map[string]any)
-		if isMap {
-			if values, ok := m["values"]; ok {
-				if arr, ok := values.([]any); ok {
-					allValues = append(allValues, arr...)
-
-					if all {
-						if next, ok := m["next"].(string); ok && next != "" {
-							fetchURL = next
-							continue
-						}
-					}
-
-					// Paginated response — render collected values.
-					return output.Render(allValues)
-				}
+		if page := extractPage(result); page != nil {
+			allValues = append(allValues, page.values...)
+			if r.All && page.nextURL != "" {
+				fetchURL = page.nextURL
+				continue
 			}
+			return output.Render(allValues)
 		}
 
-		// Non-paginated response — render the whole result.
 		return output.Render(result)
 	}
+}
+
+// buildURL substitutes {param} placeholders in a URL template.
+func buildURL(template string, pathParams map[string]string) string {
+	url := template
+	for k, v := range pathParams {
+		url = strings.ReplaceAll(url, "{"+k+"}", v)
+	}
+	return url
+}
+
+// executeRequest builds and executes a single HTTP request.
+// Query params are only set on the first request; pagination URLs already contain them.
+func executeRequest(ctx context.Context, c *client.BBClient, r Request, fetchURL, baseURL string) (*resty.Response, error) {
+	req := c.R().SetContext(ctx)
+
+	if fetchURL == baseURL {
+		for k, v := range r.QueryParams {
+			if v != "" && v != "0" && v != "false" {
+				req = req.SetQueryParam(k, v)
+			}
+		}
+	}
+
+	if r.Body != "" && (r.Method == "POST" || r.Method == "PUT" || r.Method == "PATCH") {
+		req = req.SetHeader("Content-Type", "application/json").SetBody(r.Body)
+	}
+
+	return req.Execute(r.Method, fetchURL)
+}
+
+// parseResponse handles empty and non-JSON responses.
+// Returns the parsed result, or done=true if output was already written.
+func parseResponse(resp *resty.Response) (result any, done bool, err error) {
+	respBody := resp.Body()
+	if len(respBody) == 0 {
+		fmt.Println("OK")
+		return nil, true, nil
+	}
+
+	ct := resp.Header().Get("Content-Type")
+	if !strings.Contains(ct, "json") {
+		fmt.Print(string(respBody))
+		return nil, true, nil
+	}
+
+	var parsed any
+	if err := json.Unmarshal(respBody, &parsed); err != nil {
+		return nil, false, fmt.Errorf("parsing response: %w", err)
+	}
+	return parsed, false, nil
+}
+
+// extractPage checks whether result is a paginated Bitbucket response
+// with a {"values": [...], "next": "..."} shape.
+func extractPage(result any) *pageResult {
+	m, ok := result.(map[string]any)
+	if !ok {
+		return nil
+	}
+	values, ok := m["values"]
+	if !ok {
+		return nil
+	}
+	arr, ok := values.([]any)
+	if !ok {
+		return nil
+	}
+	page := &pageResult{values: arr}
+	if next, ok := m["next"].(string); ok && next != "" {
+		page.nextURL = next
+	}
+	return page
 }
 
 // SetNested sets a value in a nested map using a dot-separated path.

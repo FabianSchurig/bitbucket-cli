@@ -90,7 +90,8 @@ def extract_paths_explicit(spec: dict) -> dict:
 
 def main():
     if len(sys.argv) != 3:
-        print(f"Usage: {sys.argv[0]} <input.json> <output.yaml>", file=sys.stderr)
+        print(
+            f"Usage: {sys.argv[0]} <input.json> <output.yaml>", file=sys.stderr)
         sys.exit(1)
 
     input_path = safe_path(sys.argv[1], {".json"})
@@ -135,7 +136,8 @@ def main():
     post_process_schema(out)
 
     output_path.write_text(
-        yaml.dump(out, default_flow_style=False, sort_keys=False, allow_unicode=True)
+        yaml.dump(out, default_flow_style=False,
+                  sort_keys=False, allow_unicode=True)
     )
     print(
         f"Extracted {len(out['paths'])} paths, "
@@ -185,7 +187,8 @@ def post_process_schema(out: dict) -> None:
             top_level_desc = pr.get("properties", {}).pop("description", None)
             if top_level_desc and "description" not in allof_props:
                 if inline_sub is not None:
-                    inline_sub.setdefault("properties", {})["description"] = top_level_desc
+                    inline_sub.setdefault("properties", {})[
+                        "description"] = top_level_desc
                 # Clean up the now-empty top-level properties dict
                 if not pr.get("properties"):
                     pr.pop("properties", None)

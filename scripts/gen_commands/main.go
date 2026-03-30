@@ -232,6 +232,8 @@ func makeBodyField(path, oaType, desc string) BodyField {
 
 // ─── Body schema resolution ──────────────────────────────────────────────────
 
+const schemaRefPrefix = "#/components/schemas/"
+
 var skipAllOfRefs = map[string]bool{
 	"object": true,
 }
@@ -272,7 +274,7 @@ func resolveBodyRef(rb *RequestBody) string {
 }
 
 func resolveBodyFields(schemas map[string]any, ref, prefix string, visited map[string]bool) []BodyField {
-	name := strings.TrimPrefix(ref, "#/components/schemas/")
+	name := strings.TrimPrefix(ref, schemaRefPrefix)
 	if visited[name] {
 		return nil
 	}
@@ -292,24 +294,7 @@ func resolveBodyFields(schemas map[string]any, ref, prefix string, visited map[s
 
 func resolveSchemaObj(schemas map[string]any, schema map[string]any, prefix string, visited map[string]bool) []BodyField {
 	if allOfRaw, ok := schema["allOf"]; ok {
-		allOf, _ := allOfRaw.([]any)
-		var fields []BodyField
-		for _, entry := range allOf {
-			m, ok := entry.(map[string]any)
-			if !ok {
-				continue
-			}
-			if ref, ok := m["$ref"].(string); ok {
-				refName := strings.TrimPrefix(ref, "#/components/schemas/")
-				if skipAllOfRefs[refName] {
-					continue
-				}
-				fields = append(fields, resolveBodyFields(schemas, ref, prefix, visited)...)
-			} else {
-				fields = append(fields, resolveSchemaObj(schemas, m, prefix, visited)...)
-			}
-		}
-		return fields
+		return resolveAllOf(schemas, allOfRaw, prefix, visited)
 	}
 
 	propsRaw, ok := schema["properties"]
@@ -321,6 +306,27 @@ func resolveSchemaObj(schemas map[string]any, schema map[string]any, prefix stri
 		return nil
 	}
 	return flattenProperties(schemas, props, prefix, visited)
+}
+
+func resolveAllOf(schemas map[string]any, allOfRaw any, prefix string, visited map[string]bool) []BodyField {
+	allOf, _ := allOfRaw.([]any)
+	var fields []BodyField
+	for _, entry := range allOf {
+		m, ok := entry.(map[string]any)
+		if !ok {
+			continue
+		}
+		ref, ok := m["$ref"].(string)
+		if !ok {
+			fields = append(fields, resolveSchemaObj(schemas, m, prefix, visited)...)
+			continue
+		}
+		refName := strings.TrimPrefix(ref, schemaRefPrefix)
+		if !skipAllOfRefs[refName] {
+			fields = append(fields, resolveBodyFields(schemas, ref, prefix, visited)...)
+		}
+	}
+	return fields
 }
 
 func flattenProperties(schemas map[string]any, props map[string]any, prefix string, visited map[string]bool) []BodyField {
@@ -337,52 +343,62 @@ func flattenProperties(schemas map[string]any, props map[string]any, prefix stri
 		if prefix != "" {
 			path = prefix + "." + name
 		}
-
-		if ref, ok := prop["$ref"].(string); ok {
-			refName := strings.TrimPrefix(ref, "#/components/schemas/")
-			if skipPropertyRefs[refName] {
-				continue
-			}
-			if refIdOnlySchemas[refName] || visited[refName] {
-				fields = append(fields, makeBodyField(path+".id", "integer", fmt.Sprintf("ID of referenced %s", name)))
-				continue
-			}
-			fields = append(fields, resolveBodyFields(schemas, ref, path, visited)...)
-			continue
-		}
-
-		if _, ok := prop["allOf"]; ok {
-			fields = append(fields, resolveSchemaObj(schemas, prop, path, visited)...)
-			continue
-		}
-
-		typ, _ := prop["type"].(string)
-		desc, _ := prop["description"].(string)
-
-		if enumRaw, ok := prop["enum"]; ok {
-			if enumArr, ok := enumRaw.([]any); ok {
-				vals := make([]string, 0, len(enumArr))
-				for _, v := range enumArr {
-					vals = append(vals, fmt.Sprintf("%v", v))
-				}
-				if desc != "" {
-					desc += " "
-				}
-				desc += "[" + strings.Join(vals, ", ") + "]"
-			}
-		}
-
-		switch typ {
-		case "string", "integer", "boolean":
-			fields = append(fields, makeBodyField(path, typ, desc))
-		case "object":
-			subProps, ok := prop["properties"].(map[string]any)
-			if ok {
-				fields = append(fields, flattenProperties(schemas, subProps, path, visited)...)
-			}
-		}
+		fields = append(fields, flattenProperty(schemas, name, path, prop, visited)...)
 	}
 	return fields
+}
+
+func flattenProperty(schemas map[string]any, name, path string, prop map[string]any, visited map[string]bool) []BodyField {
+	if ref, ok := prop["$ref"].(string); ok {
+		return resolveRefProperty(schemas, name, path, ref, visited)
+	}
+	if _, ok := prop["allOf"]; ok {
+		return resolveSchemaObj(schemas, prop, path, visited)
+	}
+
+	typ, _ := prop["type"].(string)
+	desc, _ := prop["description"].(string)
+	desc = appendEnumValues(prop, desc)
+
+	switch typ {
+	case "string", "integer", "boolean":
+		return []BodyField{makeBodyField(path, typ, desc)}
+	case "object":
+		if subProps, ok := prop["properties"].(map[string]any); ok {
+			return flattenProperties(schemas, subProps, path, visited)
+		}
+	}
+	return nil
+}
+
+func resolveRefProperty(schemas map[string]any, name, path, ref string, visited map[string]bool) []BodyField {
+	refName := strings.TrimPrefix(ref, schemaRefPrefix)
+	if skipPropertyRefs[refName] {
+		return nil
+	}
+	if refIdOnlySchemas[refName] || visited[refName] {
+		return []BodyField{makeBodyField(path+".id", "integer", fmt.Sprintf("ID of referenced %s", name))}
+	}
+	return resolveBodyFields(schemas, ref, path, visited)
+}
+
+func appendEnumValues(prop map[string]any, desc string) string {
+	enumRaw, ok := prop["enum"]
+	if !ok {
+		return desc
+	}
+	enumArr, ok := enumRaw.([]any)
+	if !ok {
+		return desc
+	}
+	vals := make([]string, 0, len(enumArr))
+	for _, v := range enumArr {
+		vals = append(vals, fmt.Sprintf("%v", v))
+	}
+	if desc != "" {
+		desc += " "
+	}
+	return desc + "[" + strings.Join(vals, ", ") + "]"
 }
 
 // ─── Code generation template ─────────────────────────────────────────────────
@@ -527,7 +543,14 @@ body = string(b)
 {{- if not .HasBody}}
 body := ""
 {{- end}}
-return handlers.Dispatch(context.Background(), c, "{{.Method}}", "{{.Path}}", pathParams, queryParams, body, {{if .Paginated}}all{{else}}false{{end}})
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "{{.Method}}",
+					URLTemplate: "{{.Path}}",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         {{if .Paginated}}all{{else}}false{{end}},
+				})
 },
 }
 
@@ -561,6 +584,186 @@ type FileData struct {
 	Commands   []CommandData
 }
 
+type pathEntry struct {
+	path     string
+	pathItem PathItem
+}
+
+type methodOp struct {
+	method string
+	op     *Op
+}
+
+func loadSchema(path string) (*Schema, error) {
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("reading schema: %w", err)
+	}
+	var schema Schema
+	if err := yaml.Unmarshal(raw, &schema); err != nil {
+		return nil, fmt.Errorf("parsing schema: %w", err)
+	}
+	return &schema, nil
+}
+
+func sortedPathEntries(paths map[string]PathItem) []pathEntry {
+	entries := make([]pathEntry, 0, len(paths))
+	for p, pi := range paths {
+		entries = append(entries, pathEntry{p, pi})
+	}
+	sort.Slice(entries, func(i, j int) bool {
+		return entries[i].path < entries[j].path
+	})
+	return entries
+}
+
+func mergeParams(pathParams, opParams []Parameter) []Parameter {
+	opParamNames := make(map[string]bool, len(opParams))
+	for _, p := range opParams {
+		opParamNames[p.Name] = true
+	}
+	var merged []Parameter
+	for _, p := range pathParams {
+		if !opParamNames[p.Name] {
+			merged = append(merged, p)
+		}
+	}
+	return append(merged, opParams...)
+}
+
+func paramsToFlags(params []Parameter) []FlagData {
+	flags := make([]FlagData, 0, len(params))
+	for _, p := range params {
+		gt := goType(p.Schema.Type)
+		flags = append(flags, FlagData{
+			Name:     flagName(p.Name),
+			GoName:   toGoName(p.Name),
+			GoType:   gt,
+			Default:  defaultValue(gt),
+			Usage:    fmt.Sprintf("%s (%s parameter)", p.Name, p.In),
+			Required: p.Required && p.In == "path",
+			In:       p.In,
+			RawName:  p.Name,
+		})
+	}
+	return flags
+}
+
+func injectPaginationFlags(flags []FlagData) []FlagData {
+	hasFlag := func(name string) bool {
+		for _, f := range flags {
+			if f.RawName == name {
+				return true
+			}
+		}
+		return false
+	}
+	if !hasFlag("page") {
+		flags = append(flags, FlagData{
+			Name: "page", GoName: "page", GoType: "int",
+			Default: "0", Usage: "Page number (query parameter)",
+			In: "query", RawName: "page",
+		})
+	}
+	if !hasFlag("pagelen") {
+		flags = append(flags, FlagData{
+			Name: "pagelen", GoName: "pagelen", GoType: "int",
+			Default: "0", Usage: "Number of items per page (query parameter)",
+			In: "query", RawName: "pagelen",
+		})
+	}
+	return flags
+}
+
+func buildCommand(pe pathEntry, entry methodOp, schema *Schema) CommandData {
+	op := entry.op
+	allParams := mergeParams(pe.pathItem.Parameters, op.Parameters)
+	flags := paramsToFlags(allParams)
+
+	var bodyFields []BodyField
+	bodyRef := resolveBodyRef(op.RequestBody)
+	if bodyRef != "" && schema.Components.Schemas != nil {
+		visited := make(map[string]bool)
+		bodyFields = resolveBodyFields(schema.Components.Schemas, bodyRef, "", visited)
+		sort.Slice(bodyFields, func(i, j int) bool {
+			return bodyFields[i].Path < bodyFields[j].Path
+		})
+	}
+
+	paginated := isPaginated(op)
+	if paginated {
+		flags = injectPaginationFlags(flags)
+	}
+
+	kebab := strings.ToLower(camelUpperBoundary.ReplaceAllString(op.OperationID, "${1}-${2}"))
+
+	return CommandData{
+		OperationID: op.OperationID,
+		Use:         kebab,
+		Short:       op.Summary,
+		Long:        op.Description,
+		Method:      entry.method,
+		Path:        pe.path,
+		Flags:       flags,
+		BodyFields:  bodyFields,
+		HasBody:     op.RequestBody != nil,
+		Paginated:   paginated,
+	}
+}
+
+func buildCommands(schema *Schema) []CommandData {
+	var commands []CommandData
+	for _, pe := range sortedPathEntries(schema.Paths) {
+		pathItem := pe.pathItem
+		for _, entry := range []methodOp{
+			{"GET", pathItem.Get},
+			{"POST", pathItem.Post},
+			{"PUT", pathItem.Put},
+			{"PATCH", pathItem.Patch},
+			{"DELETE", pathItem.Delete},
+		} {
+			if entry.op == nil || entry.op.OperationID == "" {
+				continue
+			}
+			commands = append(commands, buildCommand(pe, entry, schema))
+		}
+	}
+	return commands
+}
+
+var templateFuncMap = template.FuncMap{
+	"toCamel":     toCamel,
+	"goStringLit": goStringLit,
+	"flagFuncName": func(goType string) string {
+		switch goType {
+		case "int":
+			return "Int"
+		case "bool":
+			return "Bool"
+		default:
+			return "String"
+		}
+	},
+}
+
+func generate(data FileData, outputPath string) error {
+	tmpl, err := template.New("commands").Funcs(templateFuncMap).Parse(fileTemplate)
+	if err != nil {
+		return fmt.Errorf("parsing template: %w", err)
+	}
+
+	f, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("creating output file: %w", err)
+	}
+	defer f.Close()
+
+	if err := tmpl.Execute(f, data); err != nil {
+		return fmt.Errorf("executing template: %w", err)
+	}
+	return nil
+}
+
 func main() {
 	if len(os.Args) != 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s <schema.yaml> <output.go>\n", os.Args[0])
@@ -570,163 +773,19 @@ func main() {
 	schemaPath := os.Args[1]
 	outputPath := os.Args[2]
 
-	raw, err := os.ReadFile(schemaPath)
+	schema, err := loadSchema(schemaPath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "reading schema: %v\n", err)
+		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
 
-	var schema Schema
-	if err := yaml.Unmarshal(raw, &schema); err != nil {
-		fmt.Fprintf(os.Stderr, "parsing schema: %v\n", err)
-		os.Exit(1)
+	data := FileData{
+		SchemaPath: schemaPath,
+		Commands:   buildCommands(schema),
 	}
 
-	data := FileData{SchemaPath: schemaPath}
-
-	type pathEntry struct {
-		path     string
-		pathItem PathItem
-	}
-	var sortedPaths []pathEntry
-	for p, pi := range schema.Paths {
-		sortedPaths = append(sortedPaths, pathEntry{p, pi})
-	}
-	sort.Slice(sortedPaths, func(i, j int) bool {
-		return sortedPaths[i].path < sortedPaths[j].path
-	})
-
-	type methodOp struct {
-		method string
-		op     *Op
-	}
-	for _, pe := range sortedPaths {
-		pathItem := pe.pathItem
-		for _, entry := range []methodOp{
-			{"GET", pathItem.Get},
-			{"POST", pathItem.Post},
-			{"PUT", pathItem.Put},
-			{"PATCH", pathItem.Patch},
-			{"DELETE", pathItem.Delete},
-		} {
-			op := entry.op
-			if op == nil || op.OperationID == "" {
-				continue
-			}
-
-			opParamNames := make(map[string]bool)
-			for _, p := range op.Parameters {
-				opParamNames[p.Name] = true
-			}
-			var allParams []Parameter
-			for _, p := range pathItem.Parameters {
-				if !opParamNames[p.Name] {
-					allParams = append(allParams, p)
-				}
-			}
-			allParams = append(allParams, op.Parameters...)
-
-			var flags []FlagData
-			for _, p := range allParams {
-				gt := goType(p.Schema.Type)
-				flags = append(flags, FlagData{
-					Name:     flagName(p.Name),
-					GoName:   toGoName(p.Name),
-					GoType:   gt,
-					Default:  defaultValue(gt),
-					Usage:    fmt.Sprintf("%s (%s parameter)", p.Name, p.In),
-					Required: p.Required && p.In == "path",
-					In:       p.In,
-					RawName:  p.Name,
-				})
-			}
-
-			var bodyFields []BodyField
-			bodyRef := resolveBodyRef(op.RequestBody)
-			if bodyRef != "" && schema.Components.Schemas != nil {
-				visited := make(map[string]bool)
-				bodyFields = resolveBodyFields(schema.Components.Schemas, bodyRef, "", visited)
-				sort.Slice(bodyFields, func(i, j int) bool {
-					return bodyFields[i].Path < bodyFields[j].Path
-				})
-			}
-
-			paginated := isPaginated(op)
-
-			// Bitbucket supports page/pagelen on all paginated endpoints,
-			// but the spec doesn't always declare them. Inject if missing.
-			if paginated {
-				hasFlag := func(name string) bool {
-					for _, f := range flags {
-						if f.RawName == name {
-							return true
-						}
-					}
-					return false
-				}
-				if !hasFlag("page") {
-					flags = append(flags, FlagData{
-						Name: "page", GoName: "page", GoType: "int",
-						Default: "0", Usage: "Page number (query parameter)",
-						In: "query", RawName: "page",
-					})
-				}
-				if !hasFlag("pagelen") {
-					flags = append(flags, FlagData{
-						Name: "pagelen", GoName: "pagelen", GoType: "int",
-						Default: "0", Usage: "Number of items per page (query parameter)",
-						In: "query", RawName: "pagelen",
-					})
-				}
-			}
-
-			kebab := strings.ToLower(camelUpperBoundary.ReplaceAllString(op.OperationID, "${1}-${2}"))
-
-			data.Commands = append(data.Commands, CommandData{
-				OperationID: op.OperationID,
-				Use:         kebab,
-				Short:       op.Summary,
-				Long:        op.Description,
-				Method:      entry.method,
-				Path:        pe.path,
-				Flags:       flags,
-				BodyFields:  bodyFields,
-				HasBody:     op.RequestBody != nil,
-				Paginated:   paginated,
-			})
-		}
-	}
-
-	funcMap := template.FuncMap{
-		"toCamel":     toCamel,
-		"goStringLit": goStringLit,
-		"flagFuncName": func(goType string) string {
-			switch goType {
-			case "int":
-				return "Int"
-			case "bool":
-				return "Bool"
-			default:
-				return "String"
-			}
-		},
-	}
-
-	tmpl, err := template.New("commands").Funcs(funcMap).Parse(fileTemplate)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "parsing template: %v\n", err)
-		os.Exit(1)
-	}
-
-	f, err := os.Create(outputPath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "creating output file: %v\n", err)
-		os.Exit(1)
-	}
-	defer f.Close()
-
-	if err := tmpl.Execute(f, data); err != nil {
-		fmt.Fprintf(os.Stderr, "executing template: %v\n", err)
+	if err := generate(data, outputPath); err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
 

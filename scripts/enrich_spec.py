@@ -43,7 +43,8 @@ def path_slug(path: str, method: str) -> str:
 
 def main():
     if len(sys.argv) != 3:
-        print(f"Usage: {sys.argv[0]} <input.json> <output.json>", file=sys.stderr)
+        print(
+            f"Usage: {sys.argv[0]} <input.json> <output.json>", file=sys.stderr)
         sys.exit(1)
 
     input_path = safe_path(sys.argv[1], {".json"})
@@ -61,7 +62,8 @@ def main():
                 continue
             if "operationId" not in op:
                 summary = op.get("summary", "")
-                op["operationId"] = to_camel(summary) if summary else path_slug(path, method)
+                op["operationId"] = to_camel(
+                    summary) if summary else path_slug(path, method)
             count += 1
 
     # Deduplicate operationIds: when two different operations share the same

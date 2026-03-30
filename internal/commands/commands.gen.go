@@ -121,7 +121,14 @@ queryParams := map[string]string{
 "pagelen": strconv.Itoa(pagelen),
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/commit/{commit}/pullrequests", pathParams, queryParams, body, all)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/pullrequests",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         all,
+				})
 },
 }
 cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
@@ -173,7 +180,14 @@ queryParams := map[string]string{
 "pagelen": strconv.Itoa(pagelen),
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/default-reviewers", pathParams, queryParams, body, all)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/default-reviewers",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         all,
+				})
 },
 }
 cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
@@ -223,7 +237,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
@@ -270,7 +291,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "PUT", "/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "PUT",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
@@ -314,7 +342,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "DELETE",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
@@ -362,7 +397,14 @@ queryParams := map[string]string{
 "pagelen": strconv.Itoa(pagelen),
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/effective-default-reviewers", pathParams, queryParams, body, all)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/effective-default-reviewers",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         all,
+				})
 },
 }
 cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
@@ -410,7 +452,14 @@ queryParams := map[string]string{
 "pagelen": strconv.Itoa(pagelen),
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests", pathParams, queryParams, body, all)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         all,
+				})
 },
 }
 cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
@@ -507,7 +556,14 @@ b, _ := json.Marshal(bodyObj)
 body = string(b)
 }
 }
-return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "POST",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
@@ -558,7 +614,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/activity", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/activity",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
@@ -601,7 +664,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -704,7 +774,14 @@ b, _ := json.Marshal(bodyObj)
 body = string(b)
 }
 }
-return handlers.Dispatch(context.Background(), c, "PUT", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "PUT",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -761,7 +838,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/activity", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/activity",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -805,7 +889,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/approve", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "POST",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/approve",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -850,7 +941,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/approve", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "DELETE",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/approve",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -899,7 +997,14 @@ queryParams := map[string]string{
 "pagelen": strconv.Itoa(pagelen),
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments", pathParams, queryParams, body, all)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         all,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -991,7 +1096,14 @@ b, _ := json.Marshal(bodyObj)
 body = string(b)
 }
 }
-return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "POST",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -1050,7 +1162,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
@@ -1143,7 +1262,14 @@ b, _ := json.Marshal(bodyObj)
 body = string(b)
 }
 }
-return handlers.Dispatch(context.Background(), c, "PUT", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "PUT",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
@@ -1203,7 +1329,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "DELETE",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
@@ -1253,7 +1386,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}/resolve", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "POST",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}/resolve",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
@@ -1303,7 +1443,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}/resolve", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "DELETE",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}/resolve",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
@@ -1351,7 +1498,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/commits", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/commits",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -1395,7 +1549,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/decline", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "POST",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/decline",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -1440,7 +1601,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/diff", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/diff",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -1485,7 +1653,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/diffstat", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/diffstat",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -1554,7 +1729,14 @@ b, _ := json.Marshal(bodyObj)
 body = string(b)
 }
 }
-return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/merge", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "POST",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/merge",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -1609,7 +1791,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/merge/task-status/{task_id}", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/merge/task-status/{task_id}",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -1655,7 +1844,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/patch", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/patch",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -1699,7 +1895,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/request-changes", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "POST",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/request-changes",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -1743,7 +1946,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/request-changes", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "DELETE",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/request-changes",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -1797,7 +2007,14 @@ queryParams := map[string]string{
 "pagelen": strconv.Itoa(pagelen),
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/statuses", pathParams, queryParams, body, all)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/statuses",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         all,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -1858,7 +2075,14 @@ queryParams := map[string]string{
 "page": strconv.Itoa(page),
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks", pathParams, queryParams, body, all)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         all,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -1931,7 +2155,14 @@ b, _ := json.Marshal(bodyObj)
 body = string(b)
 }
 }
-return handlers.Dispatch(context.Background(), c, "POST", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "POST",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -1984,7 +2215,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks/{task_id}", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks/{task_id}",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -2049,7 +2287,14 @@ b, _ := json.Marshal(bodyObj)
 body = string(b)
 }
 }
-return handlers.Dispatch(context.Background(), c, "PUT", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks/{task_id}", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "PUT",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks/{task_id}",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -2102,7 +2347,14 @@ pathParams := map[string]string{
 queryParams := map[string]string{
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "DELETE", "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks/{task_id}", pathParams, queryParams, body, false)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "DELETE",
+					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks/{task_id}",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         false,
+				})
 },
 }
 cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
@@ -2149,7 +2401,14 @@ queryParams := map[string]string{
 "pagelen": strconv.Itoa(pagelen),
 }
 body := ""
-return handlers.Dispatch(context.Background(), c, "GET", "/workspaces/{workspace}/pullrequests/{selected_user}", pathParams, queryParams, body, all)
+return handlers.Dispatch(context.Background(), c, handlers.Request{
+					Method:      "GET",
+					URLTemplate: "/workspaces/{workspace}/pullrequests/{selected_user}",
+					PathParams:  pathParams,
+					QueryParams: queryParams,
+					Body:        body,
+					All:         all,
+				})
 },
 }
 cmd.Flags().StringVar(&selectedUser, "selected-user", "", "selected_user (path parameter)")

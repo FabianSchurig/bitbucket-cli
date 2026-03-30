@@ -7,14 +7,16 @@
     },
     "ghcr.io/devcontainers/features/python:1": {
       "version": "3.12"
-    }
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
   "customizations": {
     "vscode": {
       "extensions": [
         "golang.go",
         "ms-python.python",
-        "ms-python.vscode-pylance"
+        "ms-python.vscode-pylance",
+        "SonarSource.sonarlint-vscode"
       ],
       "settings": {
         "go.toolsManagement.checkForUpdates": "local",

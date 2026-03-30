@@ -38,11 +38,11 @@ func TestDispatch_GET_SingleResource(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	err := handlers.Dispatch(context.Background(), c, "GET",
-		"/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}",
-		map[string]string{"workspace": "myorg", "repo_slug": "myrepo", "pull_request_id": "42"},
-		nil, "", false,
-	)
+	err := handlers.Dispatch(context.Background(), c, handlers.Request{
+		Method:      "GET",
+		URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}",
+		PathParams:  map[string]string{"workspace": "myorg", "repo_slug": "myrepo", "pull_request_id": "42"},
+	})
 	if err != nil {
 		t.Fatalf("Dispatch: %v", err)
 	}
@@ -68,12 +68,12 @@ func TestDispatch_GET_Paginated_SinglePage(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	err := handlers.Dispatch(context.Background(), c, "GET",
-		"/repositories/{workspace}/{repo_slug}/pullrequests",
-		map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
-		map[string]string{"state": "OPEN"},
-		"", false,
-	)
+	err := handlers.Dispatch(context.Background(), c, handlers.Request{
+		Method:      "GET",
+		URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests",
+		PathParams:  map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
+		QueryParams: map[string]string{"state": "OPEN"},
+	})
 	if err != nil {
 		t.Fatalf("Dispatch: %v", err)
 	}
@@ -105,11 +105,12 @@ func TestDispatch_GET_Paginated_AllPages(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	err := handlers.Dispatch(context.Background(), c, "GET",
-		"/repositories/{workspace}/{repo_slug}/pullrequests",
-		map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
-		nil, "", true,
-	)
+	err := handlers.Dispatch(context.Background(), c, handlers.Request{
+		Method:      "GET",
+		URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests",
+		PathParams:  map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
+		All:         true,
+	})
 	if err != nil {
 		t.Fatalf("Dispatch: %v", err)
 	}
@@ -137,11 +138,12 @@ func TestDispatch_POST_WithBody(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	err := handlers.Dispatch(context.Background(), c, "POST",
-		"/repositories/{workspace}/{repo_slug}/pullrequests",
-		map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
-		nil, `{"title":"My Feature","source":{"branch":{"name":"feature/x"}}}`, false,
-	)
+	err := handlers.Dispatch(context.Background(), c, handlers.Request{
+		Method:      "POST",
+		URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests",
+		PathParams:  map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
+		Body:        `{"title":"My Feature","source":{"branch":{"name":"feature/x"}}}`,
+	})
 	if err != nil {
 		t.Fatalf("Dispatch: %v", err)
 	}
@@ -157,11 +159,11 @@ func TestDispatch_APIError(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	err := handlers.Dispatch(context.Background(), c, "GET",
-		"/repositories/{workspace}/{repo_slug}/pullrequests",
-		map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
-		nil, "", false,
-	)
+	err := handlers.Dispatch(context.Background(), c, handlers.Request{
+		Method:      "GET",
+		URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests",
+		PathParams:  map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
+	})
 	if err == nil {
 		t.Error("expected error for 401 response, got nil")
 	}
@@ -179,11 +181,11 @@ func TestDispatch_DELETE_NoContent(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	err := handlers.Dispatch(context.Background(), c, "DELETE",
-		"/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/approve",
-		map[string]string{"workspace": "myorg", "repo_slug": "myrepo", "pull_request_id": "5"},
-		nil, "", false,
-	)
+	err := handlers.Dispatch(context.Background(), c, handlers.Request{
+		Method:      "DELETE",
+		URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/approve",
+		PathParams:  map[string]string{"workspace": "myorg", "repo_slug": "myrepo", "pull_request_id": "5"},
+	})
 	if err != nil {
 		t.Fatalf("Dispatch: %v", err)
 	}
