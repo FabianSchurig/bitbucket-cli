@@ -27,7 +27,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var camelUpperBoundary = regexp.MustCompile(`([a-z])([A-Z])`)
+var (
+	camelUpperBoundary = regexp.MustCompile(`([a-z0-9])([A-Z])`)
+	camelUpperRun      = regexp.MustCompile(`([A-Z]+)([A-Z][a-z])`)
+)
 
 // ─── Schema types ─────────────────────────────────────────────────────────────
 
@@ -693,7 +696,8 @@ func buildCommand(pe pathEntry, entry methodOp, schema *Schema) CommandData {
 		flags = injectPaginationFlags(flags)
 	}
 
-	kebab := strings.ToLower(camelUpperBoundary.ReplaceAllString(op.OperationID, "${1}-${2}"))
+	kebab := camelUpperBoundary.ReplaceAllString(op.OperationID, "${1}-${2}")
+	kebab = strings.ToLower(camelUpperRun.ReplaceAllString(kebab, "${1}-${2}"))
 
 	return CommandData{
 		OperationID: op.OperationID,
