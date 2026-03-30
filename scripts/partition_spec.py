@@ -100,6 +100,69 @@ COMMAND_GROUPS = {
                                   "or team.",
         },
     },
+    "refs": {
+        "filename": "refs-schema.yaml",
+        "title": "Bitbucket Refs CLI",
+        "tags": {"Refs"},
+        "paths": [
+            "/repositories/{workspace}/{repo_slug}/refs",
+            "/repositories/{workspace}/{repo_slug}/refs/branches",
+            "/repositories/{workspace}/{repo_slug}/refs/branches/{name}",
+            "/repositories/{workspace}/{repo_slug}/refs/tags",
+            "/repositories/{workspace}/{repo_slug}/refs/tags/{name}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Refs",
+            "x-cli-command-use": "refs",
+            "x-cli-command-short": "Manage Bitbucket branches and tags",
+            "x-cli-command-long": "Commands for listing, creating, and deleting "
+                                  "branches and tags in Bitbucket repositories.",
+        },
+    },
+    "commits": {
+        "filename": "commits-schema.yaml",
+        "title": "Bitbucket Commits CLI",
+        "tags": set(),
+        "paths": [
+            "/repositories/{workspace}/{repo_slug}/commits",
+            "/repositories/{workspace}/{repo_slug}/commits/{revision}",
+            "/repositories/{workspace}/{repo_slug}/commit/{commit}",
+            "/repositories/{workspace}/{repo_slug}/commit/{commit}/approve",
+            "/repositories/{workspace}/{repo_slug}/commit/{commit}/comments",
+            "/repositories/{workspace}/{repo_slug}/commit/{commit}/comments/{comment_id}",
+            "/repositories/{workspace}/{repo_slug}/diff/{spec}",
+            "/repositories/{workspace}/{repo_slug}/diffstat/{spec}",
+            "/repositories/{workspace}/{repo_slug}/merge-base/{revspec}",
+            "/repositories/{workspace}/{repo_slug}/patch/{spec}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Commits",
+            "x-cli-command-use": "commits",
+            "x-cli-command-short": "Manage Bitbucket commits",
+            "x-cli-command-long": "Commands for listing, viewing, approving, "
+                                  "and commenting on commits in Bitbucket "
+                                  "repositories.",
+        },
+    },
+    "reports": {
+        "filename": "reports-schema.yaml",
+        "title": "Bitbucket Reports CLI",
+        "tags": set(),
+        "paths": [
+            "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports",
+            "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}",
+            "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}/annotations",
+            "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}/annotations/{annotationId}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Reports",
+            "x-cli-command-use": "reports",
+            "x-cli-command-short": "Manage Bitbucket commit reports and annotations",
+            "x-cli-command-long": "Commands for listing, creating, updating, "
+                                  "and deleting commit reports and annotations "
+                                  "in Bitbucket repositories.",
+        },
+    },
 }
 
 HTTP_METHODS = {"get", "post", "put", "patch", "delete"}

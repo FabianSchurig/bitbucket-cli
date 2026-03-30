@@ -59,6 +59,9 @@ jobs:
           go run scripts/gen_commands/main.go schema/pr-schema.yaml internal/commands/commands.gen.go
           go run scripts/gen_commands/main.go schema/hooks-schema.yaml internal/commands/hooks.gen.go
           go run scripts/gen_commands/main.go schema/search-schema.yaml internal/commands/search.gen.go
+          go run scripts/gen_commands/main.go schema/refs-schema.yaml internal/commands/refs.gen.go
+          go run scripts/gen_commands/main.go schema/commits-schema.yaml internal/commands/commits.gen.go
+          go run scripts/gen_commands/main.go schema/reports-schema.yaml internal/commands/reports.gen.go
 
       - name: Build & test
         if: steps.diff.outputs.changed == 'true'

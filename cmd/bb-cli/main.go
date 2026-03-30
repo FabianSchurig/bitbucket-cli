@@ -65,7 +65,16 @@ Set authentication environment variables before running:
 	searchCmd := commands.NewSearchCommand()
 	commands.AddOutputFlag(searchCmd)
 
-	rootCmd.AddCommand(prCmd, hooksCmd, searchCmd)
+	refsCmd := commands.NewRefsCommand()
+	commands.AddOutputFlag(refsCmd)
+
+	commitsCmd := commands.NewCommitsCommand()
+	commands.AddOutputFlag(commitsCmd)
+
+	reportsCmd := commands.NewReportsCommand()
+	commands.AddOutputFlag(reportsCmd)
+
+	rootCmd.AddCommand(prCmd, hooksCmd, searchCmd, refsCmd, commitsCmd, reportsCmd)
 	return rootCmd
 }
 

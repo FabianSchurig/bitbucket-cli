@@ -147,6 +147,16 @@ func toCamel(s string) string {
 	return b.String()
 }
 
+// reservedGoNames contains identifiers that would shadow Go packages or
+// builtins used by generated code. When a parameter name resolves to one
+// of these, toGoName appends "Param" to avoid the conflict.
+var reservedGoNames = map[string]bool{
+	"context": true, "fmt": true, "json": true, "strconv": true,
+	"client": true, "handlers": true, "output": true, "cobra": true,
+	"error": true, "string": true, "int": true, "bool": true,
+	"cmd": true, "args": true, "err": true, "body": true, "all": true,
+}
+
 func toGoName(s string) string {
 	cc := toCamel(s)
 	if len(cc) == 0 {
@@ -154,7 +164,11 @@ func toGoName(s string) string {
 	}
 	runes := []rune(cc)
 	runes[0] = unicode.ToLower(runes[0])
-	return string(runes)
+	name := string(runes)
+	if reservedGoNames[name] {
+		return name + "Param"
+	}
+	return name
 }
 
 func flagName(s string) string {
