@@ -10,7 +10,6 @@ import (
 	"github.com/go-resty/resty/v2"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
-	"github.com/FabianSchurig/bitbucket-cli/internal/generated"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -22,46 +21,66 @@ func newTestClient(t *testing.T, serverURL string) *client.BBClient {
 	return &client.BBClient{Client: r}
 }
 
-func TestListPullRequests_SinglePage(t *testing.T) {
+func TestDispatch_GET_SingleResource(t *testing.T) {
 	output.Format = "json"
 
-	id1 := 1
-	title1 := "First PR"
-	state := generated.PullrequestStateOPEN
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		expected := "/repositories/myorg/myrepo/pullrequests/42"
+		if r.URL.Path != expected {
+			t.Errorf("expected path %s, got %s", expected, r.URL.Path)
+		}
+		if r.Method != http.MethodGet {
+			t.Errorf("expected GET, got %s", r.Method)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]any{"id": 42, "title": "My PR"})
+	}))
+	defer srv.Close()
 
-	page := generated.PaginatedPullrequests{
-		Values: &[]generated.Pullrequest{
-			{Id: &id1, Title: &title1, State: &state},
-		},
+	c := newTestClient(t, srv.URL)
+	err := handlers.Dispatch(context.Background(), c, "GET",
+		"/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}",
+		map[string]string{"workspace": "myorg", "repo_slug": "myrepo", "pull_request_id": "42"},
+		nil, "", false,
+	)
+	if err != nil {
+		t.Fatalf("Dispatch: %v", err)
 	}
+}
+
+func TestDispatch_GET_Paginated_SinglePage(t *testing.T) {
+	output.Format = "json"
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/repositories/myorg/myrepo/pullrequests" {
 			t.Errorf("unexpected path: %s", r.URL.Path)
 		}
-		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(page); err != nil {
-			t.Errorf("encoding response: %v", err)
+		if r.URL.Query().Get("state") != "OPEN" {
+			t.Errorf("expected state=OPEN query param, got %s", r.URL.Query().Get("state"))
 		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]any{
+			"values": []any{
+				map[string]any{"id": 1, "title": "First PR"},
+			},
+		})
 	}))
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	err := handlers.ListPullRequests(context.Background(), c, handlers.ListPRsInput{
-		Workspace: "myorg",
-		RepoSlug:  "myrepo",
-	})
+	err := handlers.Dispatch(context.Background(), c, "GET",
+		"/repositories/{workspace}/{repo_slug}/pullrequests",
+		map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
+		map[string]string{"state": "OPEN"},
+		"", false,
+	)
 	if err != nil {
-		t.Fatalf("ListPullRequests: %v", err)
+		t.Fatalf("Dispatch: %v", err)
 	}
 }
 
-func TestListPullRequests_Pagination(t *testing.T) {
+func TestDispatch_GET_Paginated_AllPages(t *testing.T) {
 	output.Format = "json"
-
-	id1, id2 := 1, 2
-	t1, t2 := "PR 1", "PR 2"
-	state := generated.PullrequestStateOPEN
 
 	callCount := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -70,27 +89,15 @@ func TestListPullRequests_Pagination(t *testing.T) {
 
 		switch r.URL.Path {
 		case "/repositories/myorg/myrepo/pullrequests":
-			// First page — return a "next" cursor pointing to the absolute URL
-			next := r.Host
-			if next == "" {
-				next = "localhost"
-			}
 			nextURL := "http://" + r.Host + "/page2"
-			page := generated.PaginatedPullrequests{
-				Values: &[]generated.Pullrequest{{Id: &id1, Title: &t1, State: &state}},
-				Next:   &nextURL,
-			}
-			if err := json.NewEncoder(w).Encode(page); err != nil {
-				t.Errorf("encoding page 1: %v", err)
-			}
+			json.NewEncoder(w).Encode(map[string]any{
+				"values": []any{map[string]any{"id": 1, "title": "PR 1"}},
+				"next":   nextURL,
+			})
 		case "/page2":
-			// Second page — no "next"
-			page := generated.PaginatedPullrequests{
-				Values: &[]generated.Pullrequest{{Id: &id2, Title: &t2, State: &state}},
-			}
-			if err := json.NewEncoder(w).Encode(page); err != nil {
-				t.Errorf("encoding page 2: %v", err)
-			}
+			json.NewEncoder(w).Encode(map[string]any{
+				"values": []any{map[string]any{"id": 2, "title": "PR 2"}},
+			})
 		default:
 			http.NotFound(w, r)
 		}
@@ -98,139 +105,86 @@ func TestListPullRequests_Pagination(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	err := handlers.ListPullRequests(context.Background(), c, handlers.ListPRsInput{
-		Workspace: "myorg",
-		RepoSlug:  "myrepo",
-		All:       true,
-	})
+	err := handlers.Dispatch(context.Background(), c, "GET",
+		"/repositories/{workspace}/{repo_slug}/pullrequests",
+		map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
+		nil, "", true,
+	)
 	if err != nil {
-		t.Fatalf("ListPullRequests: %v", err)
+		t.Fatalf("Dispatch: %v", err)
 	}
 	if callCount != 2 {
 		t.Errorf("expected 2 pages fetched, got %d", callCount)
 	}
 }
 
-func TestGetPullRequest(t *testing.T) {
+func TestDispatch_POST_WithBody(t *testing.T) {
 	output.Format = "json"
 
-	id := 42
-	title := "My PR"
-
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		expected := "/repositories/myorg/myrepo/pullrequests/42"
-		if r.URL.Path != expected {
-			t.Errorf("expected path %s, got %s", expected, r.URL.Path)
-		}
-		w.Header().Set("Content-Type", "application/json")
-		pr := generated.Pullrequest{Id: &id, Title: &title}
-		if err := json.NewEncoder(w).Encode(pr); err != nil {
-			t.Errorf("encoding response: %v", err)
-		}
-	}))
-	defer srv.Close()
-
-	c := newTestClient(t, srv.URL)
-	err := handlers.GetPullRequest(context.Background(), c, handlers.GetPRInput{
-		Workspace:     "myorg",
-		RepoSlug:      "myrepo",
-		PullRequestID: 42,
-	})
-	if err != nil {
-		t.Fatalf("GetPullRequest: %v", err)
-	}
-}
-
-func TestCreatePullRequest(t *testing.T) {
-	output.Format = "json"
-
-	id := 1
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Errorf("expected POST, got %s", r.Method)
 		}
-
-		var body generated.Pullrequest
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			t.Errorf("decoding request body: %v", err)
+		var body map[string]any
+		json.NewDecoder(r.Body).Decode(&body)
+		if body["title"] != "My Feature" {
+			t.Errorf("expected title 'My Feature', got %v", body["title"])
 		}
-		if body.Title == nil || *body.Title != "My Feature" {
-			t.Errorf("expected title 'My Feature', got %v", body.Title)
-		}
-
 		w.WriteHeader(http.StatusCreated)
 		w.Header().Set("Content-Type", "application/json")
-		resp := generated.Pullrequest{Id: &id, Title: body.Title}
-		if err := json.NewEncoder(w).Encode(resp); err != nil {
-			t.Errorf("encoding response: %v", err)
-		}
+		json.NewEncoder(w).Encode(map[string]any{"id": 1, "title": "My Feature"})
 	}))
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	err := handlers.CreatePullRequest(context.Background(), c, handlers.CreatePRInput{
-		Workspace:         "myorg",
-		RepoSlug:          "myrepo",
-		Title:             "My Feature",
-		SourceBranch:      "feature/x",
-		DestinationBranch: "main",
-	})
+	err := handlers.Dispatch(context.Background(), c, "POST",
+		"/repositories/{workspace}/{repo_slug}/pullrequests",
+		map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
+		nil, `{"title":"My Feature","source":{"branch":{"name":"feature/x"}}}`, false,
+	)
 	if err != nil {
-		t.Fatalf("CreatePullRequest: %v", err)
+		t.Fatalf("Dispatch: %v", err)
 	}
 }
 
-func TestMergePullRequest(t *testing.T) {
-	output.Format = "json"
-
-	id := 5
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		expected := "/repositories/myorg/myrepo/pullrequests/5/merge"
-		if r.URL.Path != expected {
-			t.Errorf("expected path %s, got %s", expected, r.URL.Path)
-		}
-		if r.Method != http.MethodPost {
-			t.Errorf("expected POST, got %s", r.Method)
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		state := generated.PullrequestStateMERGED
-		resp := generated.Pullrequest{Id: &id, State: &state}
-		if err := json.NewEncoder(w).Encode(resp); err != nil {
-			t.Errorf("encoding response: %v", err)
-		}
-	}))
-	defer srv.Close()
-
-	c := newTestClient(t, srv.URL)
-	err := handlers.MergePullRequest(context.Background(), c, handlers.MergePRInput{
-		Workspace:     "myorg",
-		RepoSlug:      "myrepo",
-		PullRequestID: 5,
-		Strategy:      "squash",
-	})
-	if err != nil {
-		t.Fatalf("MergePullRequest: %v", err)
-	}
-}
-
-func TestListPullRequests_APIError(t *testing.T) {
+func TestDispatch_APIError(t *testing.T) {
 	output.Format = "json"
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
-		if _, err := w.Write([]byte(`{"error": {"message": "Unauthorized"}}`)); err != nil {
-			t.Errorf("writing response: %v", err)
-		}
+		w.Write([]byte(`{"error": {"message": "Unauthorized"}}`))
 	}))
 	defer srv.Close()
 
 	c := newTestClient(t, srv.URL)
-	err := handlers.ListPullRequests(context.Background(), c, handlers.ListPRsInput{
-		Workspace: "myorg",
-		RepoSlug:  "myrepo",
-	})
+	err := handlers.Dispatch(context.Background(), c, "GET",
+		"/repositories/{workspace}/{repo_slug}/pullrequests",
+		map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
+		nil, "", false,
+	)
 	if err == nil {
 		t.Error("expected error for 401 response, got nil")
+	}
+}
+
+func TestDispatch_DELETE_NoContent(t *testing.T) {
+	output.Format = "json"
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			t.Errorf("expected DELETE, got %s", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer srv.Close()
+
+	c := newTestClient(t, srv.URL)
+	err := handlers.Dispatch(context.Background(), c, "DELETE",
+		"/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/approve",
+		map[string]string{"workspace": "myorg", "repo_slug": "myrepo", "pull_request_id": "5"},
+		nil, "", false,
+	)
+	if err != nil {
+		t.Fatalf("Dispatch: %v", err)
 	}
 }

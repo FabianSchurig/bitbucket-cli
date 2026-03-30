@@ -52,6 +52,23 @@ def main():
                 op["operationId"] = to_camel(summary) if summary else path_slug(path, method)
             count += 1
 
+    # Deduplicate operationIds: when two different operations share the same
+    # operationId (e.g. two "List a pull request activity log" endpoints at
+    # different paths), regenerate the duplicate using path_slug which
+    # incorporates the full URL path and is therefore unique.
+    seen: dict[str, tuple[str, str]] = {}  # operationId → (path, method)
+    for path, path_item in spec.get("paths", {}).items():
+        for method in http_methods:
+            op = path_item.get(method)
+            if not op or "operationId" not in op:
+                continue
+            oid = op["operationId"]
+            if oid in seen:
+                # Collision — regenerate this one using path-based slug
+                op["operationId"] = path_slug(path, method)
+            else:
+                seen[oid] = (path, method)
+
     output_path.write_text(json.dumps(spec, indent=2))
     print(f"Enriched {count} operations, wrote to {output_path}")
 

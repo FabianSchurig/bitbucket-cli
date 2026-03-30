@@ -7,7 +7,9 @@
 // sub-commands under a "pr" parent command. Each generated command:
 //   - Reads path parameters as required --flags
 //   - Reads query parameters as optional --flags (typed from schema)
-//   - For POST/PUT operations, accepts --body for raw JSON or expanded flat flags
+//   - For POST/PUT/PATCH operations, generates typed --flags from the request body schema
+//   - Falls back to --body for raw JSON input (advanced)
+//   - Calls handlers.Dispatch with method, URL template, params, etc.
 //
 // This script is run in CI whenever the schema changes.
 package main
@@ -16,6 +18,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"text/template"
@@ -24,19 +27,21 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// camelUpperBoundary matches the transition from lowercase to uppercase (e.g. 'l' before 'P' in "listPullRequests").
 var camelUpperBoundary = regexp.MustCompile(`([a-z])([A-Z])`)
 
 // ─── Schema types ─────────────────────────────────────────────────────────────
 
 type Schema struct {
-	OpenAPI string                `yaml:"openapi"`
-	Info    map[string]any        `yaml:"info"`
-	Paths   map[string]PathItem   `yaml:"paths"`
+	OpenAPI    string              `yaml:"openapi"`
+	Info       map[string]any      `yaml:"info"`
+	Paths      map[string]PathItem `yaml:"paths"`
+	Components ComponentsSection   `yaml:"components"`
 }
 
-// PathItem represents an OpenAPI 3.0 path item, which may contain both
-// HTTP method operations and path-level parameters (a YAML sequence).
+type ComponentsSection struct {
+	Schemas map[string]any `yaml:"schemas"`
+}
+
 type PathItem struct {
 	Parameters []Parameter `yaml:"parameters"`
 	Get        *Op         `yaml:"get"`
@@ -47,18 +52,19 @@ type PathItem struct {
 }
 
 type Op struct {
-	OperationID string      `yaml:"operationId"`
-	Summary     string      `yaml:"summary"`
-	Description string      `yaml:"description"`
-	Tags        []string    `yaml:"tags"`
-	Parameters  []Parameter `yaml:"parameters"`
+	OperationID string       `yaml:"operationId"`
+	Summary     string       `yaml:"summary"`
+	Description string       `yaml:"description"`
+	Tags        []string     `yaml:"tags"`
+	Parameters  []Parameter  `yaml:"parameters"`
 	RequestBody *RequestBody `yaml:"requestBody"`
+	Responses   Responses    `yaml:"responses"`
 }
 
 type Parameter struct {
-	Name     string         `yaml:"name"`
-	In       string         `yaml:"in"`
-	Required bool           `yaml:"required"`
+	Name     string          `yaml:"name"`
+	In       string          `yaml:"in"`
+	Required bool            `yaml:"required"`
 	Schema   ParameterSchema `yaml:"schema"`
 }
 
@@ -67,7 +73,22 @@ type ParameterSchema struct {
 }
 
 type RequestBody struct {
-	Required bool `yaml:"required"`
+	Required bool                 `yaml:"required"`
+	Content  map[string]MediaType `yaml:"content"`
+}
+
+type Responses map[string]ResponseDef
+
+type ResponseDef struct {
+	Content map[string]MediaType `yaml:"content"`
+}
+
+type MediaType struct {
+	Schema RefSchema `yaml:"schema"`
+}
+
+type RefSchema struct {
+	Ref string `yaml:"$ref"`
 }
 
 // ─── Template data types ──────────────────────────────────────────────────────
@@ -77,10 +98,12 @@ type CommandData struct {
 	Use         string
 	Short       string
 	Long        string
-	HandlerCall string
+	Method      string
+	Path        string
 	Flags       []FlagData
+	BodyFields  []BodyField
 	HasBody     bool
-	HasIntFlag  bool // true when any flag requires strconv
+	Paginated   bool
 }
 
 type FlagData struct {
@@ -90,13 +113,23 @@ type FlagData struct {
 	Default  string
 	Usage    string
 	Required bool
+	In       string
+	RawName  string
+}
+
+type BodyField struct {
+	Path     string // "content.raw"
+	FlagName string // "content-raw"
+	GoName   string // "bodyContentRaw"
+	GoType   string // "string", "int", "bool"
+	Default  string // `""`, "0", "false"
+	Desc     string
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 var nonAlpha = regexp.MustCompile(`[^a-zA-Z0-9]+`)
 
-// toCamel converts "list_pull_requests" or "list-pull-requests" to "ListPullRequests".
 func toCamel(s string) string {
 	parts := nonAlpha.Split(s, -1)
 	var b strings.Builder
@@ -111,7 +144,6 @@ func toCamel(s string) string {
 	return b.String()
 }
 
-// toGoName converts "pull_request_id" to "pullRequestID".
 func toGoName(s string) string {
 	cc := toCamel(s)
 	if len(cc) == 0 {
@@ -122,12 +154,10 @@ func toGoName(s string) string {
 	return string(runes)
 }
 
-// flagName converts a parameter name like "pull_request_id" to "pull-request-id".
 func flagName(s string) string {
 	return strings.ReplaceAll(s, "_", "-")
 }
 
-// goType maps an OpenAPI parameter type to a Go type.
 func goType(t string) string {
 	switch t {
 	case "integer":
@@ -139,7 +169,6 @@ func goType(t string) string {
 	}
 }
 
-// defaultValue returns the zero value for a Go type as a string literal.
 func defaultValue(t string) string {
 	switch t {
 	case "int":
@@ -151,14 +180,209 @@ func defaultValue(t string) string {
 	}
 }
 
-// goStringLit returns a valid Go string literal for s.
-// Uses a backtick raw string literal when s contains no backticks;
-// otherwise falls back to strconv.Quote (a double-quoted interpreted literal).
 func goStringLit(s string) string {
 	if !strings.Contains(s, "`") {
 		return "`" + s + "`"
 	}
 	return strconv.Quote(s)
+}
+
+func isPaginated(op *Op) bool {
+	for _, code := range []string{"200", "201"} {
+		resp, ok := op.Responses[code]
+		if !ok {
+			continue
+		}
+		for _, mt := range resp.Content {
+			if strings.Contains(mt.Schema.Ref, "paginated_") {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// ─── Body field helpers ───────────────────────────────────────────────────────
+
+func bodyFlagName(path string) string {
+	s := strings.ReplaceAll(path, ".", "-")
+	s = strings.ReplaceAll(s, "_", "-")
+	return s
+}
+
+func bodyGoName(path string) string {
+	combined := strings.ReplaceAll(path, ".", "_")
+	return "body" + toCamel(combined)
+}
+
+func makeBodyField(path, oaType, desc string) BodyField {
+	gt := goType(oaType)
+	if desc == "" {
+		desc = path
+	}
+	return BodyField{
+		Path:     path,
+		FlagName: bodyFlagName(path),
+		GoName:   bodyGoName(path),
+		GoType:   gt,
+		Default:  defaultValue(gt),
+		Desc:     desc,
+	}
+}
+
+// ─── Body schema resolution ──────────────────────────────────────────────────
+
+var skipAllOfRefs = map[string]bool{
+	"object": true,
+}
+
+var skipPropNames = map[string]bool{
+	"links": true, "user": true, "author": true,
+	"created_on": true, "updated_on": true,
+	"rendered": true, "closed_by": true,
+	"id": true, "html": true, "deleted": true,
+	"participants": true, "comment_count": true,
+	"task_count": true, "merge_commit": true,
+	"queued": true, "summary": true,
+	"resolved_on": true, "resolved_by": true,
+}
+
+var skipPropertyRefs = map[string]bool{
+	"account": true, "user": true, "team": true,
+	"repository": true, "link": true,
+	"account_links": true, "team_links": true, "user_links": true,
+	"comment_resolution": true, "commitstatus": true,
+	"pullrequest": true, "base_commit": true, "commit": true,
+}
+
+var refIdOnlySchemas = map[string]bool{
+	"comment": true,
+}
+
+func resolveBodyRef(rb *RequestBody) string {
+	if rb == nil {
+		return ""
+	}
+	for _, mt := range rb.Content {
+		if mt.Schema.Ref != "" {
+			return mt.Schema.Ref
+		}
+	}
+	return ""
+}
+
+func resolveBodyFields(schemas map[string]any, ref, prefix string, visited map[string]bool) []BodyField {
+	name := strings.TrimPrefix(ref, "#/components/schemas/")
+	if visited[name] {
+		return nil
+	}
+	visited[name] = true
+	defer func() { delete(visited, name) }()
+
+	raw, ok := schemas[name]
+	if !ok {
+		return nil
+	}
+	schema, ok := raw.(map[string]any)
+	if !ok {
+		return nil
+	}
+	return resolveSchemaObj(schemas, schema, prefix, visited)
+}
+
+func resolveSchemaObj(schemas map[string]any, schema map[string]any, prefix string, visited map[string]bool) []BodyField {
+	if allOfRaw, ok := schema["allOf"]; ok {
+		allOf, _ := allOfRaw.([]any)
+		var fields []BodyField
+		for _, entry := range allOf {
+			m, ok := entry.(map[string]any)
+			if !ok {
+				continue
+			}
+			if ref, ok := m["$ref"].(string); ok {
+				refName := strings.TrimPrefix(ref, "#/components/schemas/")
+				if skipAllOfRefs[refName] {
+					continue
+				}
+				fields = append(fields, resolveBodyFields(schemas, ref, prefix, visited)...)
+			} else {
+				fields = append(fields, resolveSchemaObj(schemas, m, prefix, visited)...)
+			}
+		}
+		return fields
+	}
+
+	propsRaw, ok := schema["properties"]
+	if !ok {
+		return nil
+	}
+	props, ok := propsRaw.(map[string]any)
+	if !ok {
+		return nil
+	}
+	return flattenProperties(schemas, props, prefix, visited)
+}
+
+func flattenProperties(schemas map[string]any, props map[string]any, prefix string, visited map[string]bool) []BodyField {
+	var fields []BodyField
+	for name, propRaw := range props {
+		if skipPropNames[name] {
+			continue
+		}
+		prop, ok := propRaw.(map[string]any)
+		if !ok {
+			continue
+		}
+		path := name
+		if prefix != "" {
+			path = prefix + "." + name
+		}
+
+		if ref, ok := prop["$ref"].(string); ok {
+			refName := strings.TrimPrefix(ref, "#/components/schemas/")
+			if skipPropertyRefs[refName] {
+				continue
+			}
+			if refIdOnlySchemas[refName] || visited[refName] {
+				fields = append(fields, makeBodyField(path+".id", "integer", fmt.Sprintf("ID of referenced %s", name)))
+				continue
+			}
+			fields = append(fields, resolveBodyFields(schemas, ref, path, visited)...)
+			continue
+		}
+
+		if _, ok := prop["allOf"]; ok {
+			fields = append(fields, resolveSchemaObj(schemas, prop, path, visited)...)
+			continue
+		}
+
+		typ, _ := prop["type"].(string)
+		desc, _ := prop["description"].(string)
+
+		if enumRaw, ok := prop["enum"]; ok {
+			if enumArr, ok := enumRaw.([]any); ok {
+				vals := make([]string, 0, len(enumArr))
+				for _, v := range enumArr {
+					vals = append(vals, fmt.Sprintf("%v", v))
+				}
+				if desc != "" {
+					desc += " "
+				}
+				desc += "[" + strings.Join(vals, ", ") + "]"
+			}
+		}
+
+		switch typ {
+		case "string", "integer", "boolean":
+			fields = append(fields, makeBodyField(path, typ, desc))
+		case "object":
+			subProps, ok := prop["properties"].(map[string]any)
+			if ok {
+				fields = append(fields, flattenProperties(schemas, subProps, path, visited)...)
+			}
+		}
+	}
+	return fields
 }
 
 // ─── Code generation template ─────────────────────────────────────────────────
@@ -172,94 +396,169 @@ const fileTemplate = `// Code generated by scripts/gen_commands/main.go DO NOT E
 package commands
 
 import (
-	"context"
-	"fmt"
-{{- if .NeedsStrconv}}
-	"strconv"
-{{- end}}
+"context"
+"encoding/json"
+"fmt"
+"strconv"
 
-	"github.com/spf13/cobra"
+"github.com/spf13/cobra"
 
-	"github.com/FabianSchurig/bitbucket-cli/internal/client"
-	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
-	"github.com/FabianSchurig/bitbucket-cli/internal/output"
+"github.com/FabianSchurig/bitbucket-cli/internal/client"
+"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
+"github.com/FabianSchurig/bitbucket-cli/internal/output"
+)
+
+// Ensure imports are used.
+var (
+_ = context.Background
+_ = fmt.Errorf
+_ = json.Marshal
+_ = strconv.Itoa
+_ = client.NewClient
+_ = handlers.Dispatch
+_ = output.Format
 )
 
 // NewPRCommand returns the "pr" cobra command with all sub-commands registered.
 func NewPRCommand() *cobra.Command {
-	prCmd := &cobra.Command{
-		Use:   "pr",
-		Short: "Manage Bitbucket pull requests",
-		Long:  "Commands for listing, creating, reading, and merging Bitbucket pull requests.",
-	}
+prCmd := &cobra.Command{
+Use:   "pr",
+Short: "Manage Bitbucket pull requests",
+Long:  "Commands for listing, creating, reading, and merging Bitbucket pull requests.",
+}
 
-	prCmd.AddCommand(
+prCmd.AddCommand(
 {{- range .Commands}}
-		new{{toCamel .OperationID}}Cmd(),
+new{{toCamel .OperationID}}Cmd(),
 {{- end}}
-	)
+)
 
-	return prCmd
+return prCmd
 }
 {{range .Commands}}
 // new{{toCamel .OperationID}}Cmd returns the "pr {{.Use}}" cobra command.
 // operationId: {{.OperationID}}
 func new{{toCamel .OperationID}}Cmd() *cobra.Command {
-	var (
+var (
 {{- range .Flags}}
-		{{.GoName}} {{.GoType}}
+{{.GoName}} {{.GoType}}
+{{- end}}
+{{- range .BodyFields}}
+{{.GoName}} {{.GoType}}
 {{- end}}
 {{- if .HasBody}}
-		body string
+body string
 {{- end}}
-	)
+{{- if .Paginated}}
+all bool
+{{- end}}
+)
 
-	cmd := &cobra.Command{
-		Use:   "{{.Use}}",
-		Short: "{{.Short}}",
-		Long:  {{goStringLit .Long}},
-		RunE: func(cmd *cobra.Command, args []string) error {
+cmd := &cobra.Command{
+Use:   "{{.Use}}",
+Short: {{goStringLit .Short}},
+Long:  {{goStringLit .Long}},
+RunE: func(cmd *cobra.Command, args []string) error {
 {{- range .Flags}}
 {{- if .Required}}
-			if {{.GoName}} == {{.Default}} {
-				return fmt.Errorf("--{{.Name}} is required")
-			}
+{{- if eq .GoType "int"}}
+if {{.GoName}} == 0 {
+return fmt.Errorf("--{{.Name}} is required")
+}
+{{- else if eq .GoType "string"}}
+if {{.GoName}} == "" {
+return fmt.Errorf("--{{.Name}} is required")
+}
 {{- end}}
 {{- end}}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
-			return {{.HandlerCall}}
-		},
-	}
+{{- end}}
+c, err := client.NewClient()
+if err != nil {
+return err
+}
+pathParams := map[string]string{
+{{- range .Flags}}
+{{- if eq .In "path"}}
+{{- if eq .GoType "int"}}
+"{{.RawName}}": strconv.Itoa({{.GoName}}),
+{{- else}}
+"{{.RawName}}": {{.GoName}},
+{{- end}}
+{{- end}}
+{{- end}}
+}
+queryParams := map[string]string{
+{{- range .Flags}}
+{{- if eq .In "query"}}
+{{- if eq .GoType "int"}}
+"{{.RawName}}": strconv.Itoa({{.GoName}}),
+{{- else if eq .GoType "bool"}}
+"{{.RawName}}": strconv.FormatBool({{.GoName}}),
+{{- else}}
+"{{.RawName}}": {{.GoName}},
+{{- end}}
+{{- end}}
+{{- end}}
+}
+{{- if .HasBody}}
+if body == "" {
+bodyObj := map[string]any{}
+{{- range .BodyFields}}
+{{- if eq .GoType "string"}}
+if {{.GoName}} != "" {
+handlers.SetNested(bodyObj, "{{.Path}}", {{.GoName}})
+}
+{{- else if eq .GoType "int"}}
+if {{.GoName}} != 0 {
+handlers.SetNested(bodyObj, "{{.Path}}", {{.GoName}})
+}
+{{- else if eq .GoType "bool"}}
+if {{.GoName}} {
+handlers.SetNested(bodyObj, "{{.Path}}", {{.GoName}})
+}
+{{- end}}
+{{- end}}
+if len(bodyObj) > 0 {
+b, _ := json.Marshal(bodyObj)
+body = string(b)
+}
+}
+{{- end}}
+{{- if not .HasBody}}
+body := ""
+{{- end}}
+return handlers.Dispatch(context.Background(), c, "{{.Method}}", "{{.Path}}", pathParams, queryParams, body, {{if .Paginated}}all{{else}}false{{end}})
+},
+}
 
 {{- range .Flags}}
-	cmd.Flags().{{flagFuncName .GoType}}Var(&{{.GoName}}, "{{.Name}}", {{.Default}}, "{{.Usage}}")
+cmd.Flags().{{flagFuncName .GoType}}Var(&{{.GoName}}, "{{.Name}}", {{.Default}}, "{{.Usage}}")
+{{- end}}
+{{- range .BodyFields}}
+cmd.Flags().{{flagFuncName .GoType}}Var(&{{.GoName}}, "{{.FlagName}}", {{.Default}}, {{goStringLit .Desc}})
 {{- end}}
 {{- if .HasBody}}
-	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (overrides all other flags)")
+cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 {{- end}}
-	_ = body
-	return cmd
+{{- if .Paginated}}
+cmd.Flags().BoolVar(&all, "all", false, "Traverse all pages (follows 'next' cursor)")
+{{- end}}
+return cmd
 }
 {{end}}
-// outputFlagName is the shared --output flag used by all commands.
 const outputFlagName = "output"
 
-// AddOutputFlag adds the --output flag to a command and wires it to output.Format.
 func AddOutputFlag(cmd *cobra.Command) {
-	cmd.PersistentFlags().StringVar(&output.Format, outputFlagName, "table",
-		"Output format: table, json, id")
+cmd.PersistentFlags().StringVar(&output.Format, outputFlagName, "table",
+"Output format: table, json, id")
 }
 `
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 type FileData struct {
-	SchemaPath    string
-	Commands      []CommandData
-	NeedsStrconv  bool // true if any command has an integer flag (requires strconv import)
+	SchemaPath string
+	Commands   []CommandData
 }
 
 func main() {
@@ -285,31 +584,51 @@ func main() {
 
 	data := FileData{SchemaPath: schemaPath}
 
-	// Map operationId → command data
+	type pathEntry struct {
+		path     string
+		pathItem PathItem
+	}
+	var sortedPaths []pathEntry
+	for p, pi := range schema.Paths {
+		sortedPaths = append(sortedPaths, pathEntry{p, pi})
+	}
+	sort.Slice(sortedPaths, func(i, j int) bool {
+		return sortedPaths[i].path < sortedPaths[j].path
+	})
+
 	type methodOp struct {
 		method string
 		op     *Op
 	}
-	for _, pathItem := range schema.Paths {
+	for _, pe := range sortedPaths {
+		pathItem := pe.pathItem
 		for _, entry := range []methodOp{
-			{"get", pathItem.Get},
-			{"post", pathItem.Post},
-			{"put", pathItem.Put},
-			{"patch", pathItem.Patch},
-			{"delete", pathItem.Delete},
+			{"GET", pathItem.Get},
+			{"POST", pathItem.Post},
+			{"PUT", pathItem.Put},
+			{"PATCH", pathItem.Patch},
+			{"DELETE", pathItem.Delete},
 		} {
 			op := entry.op
 			if op == nil || op.OperationID == "" {
 				continue
 			}
 
-			var flags []FlagData
-			hasIntFlag := false
+			opParamNames := make(map[string]bool)
 			for _, p := range op.Parameters {
-				gt := goType(p.Schema.Type)
-				if gt == "int" {
-					hasIntFlag = true
+				opParamNames[p.Name] = true
+			}
+			var allParams []Parameter
+			for _, p := range pathItem.Parameters {
+				if !opParamNames[p.Name] {
+					allParams = append(allParams, p)
 				}
+			}
+			allParams = append(allParams, op.Parameters...)
+
+			var flags []FlagData
+			for _, p := range allParams {
+				gt := goType(p.Schema.Type)
 				flags = append(flags, FlagData{
 					Name:     flagName(p.Name),
 					GoName:   toGoName(p.Name),
@@ -317,39 +636,41 @@ func main() {
 					Default:  defaultValue(gt),
 					Usage:    fmt.Sprintf("%s (%s parameter)", p.Name, p.In),
 					Required: p.Required && p.In == "path",
+					In:       p.In,
+					RawName:  p.Name,
 				})
 			}
 
-			// Build a simple handler call stub — actual dispatch is in handlers package
-			handlerCall := fmt.Sprintf("handlers.Dispatch(context.Background(), c, %q, map[string]any{})",
-				op.OperationID)
-
-			// Derive the CLI subcommand name: extract the leading verb from camelCase operationId.
-			// e.g. "listPullRequests" → "list", "getPullRequest" → "get"
-			// Strategy: insert a hyphen at every lowercase→uppercase transition, then take the first word.
-			kebab := strings.ToLower(camelUpperBoundary.ReplaceAllString(op.OperationID, "${1}-${2}"))
-			use := strings.SplitN(kebab, "-", 2)[0]
-
-			if hasIntFlag {
-				data.NeedsStrconv = true
+			var bodyFields []BodyField
+			bodyRef := resolveBodyRef(op.RequestBody)
+			if bodyRef != "" && schema.Components.Schemas != nil {
+				visited := make(map[string]bool)
+				bodyFields = resolveBodyFields(schema.Components.Schemas, bodyRef, "", visited)
+				sort.Slice(bodyFields, func(i, j int) bool {
+					return bodyFields[i].Path < bodyFields[j].Path
+				})
 			}
+
+			kebab := strings.ToLower(camelUpperBoundary.ReplaceAllString(op.OperationID, "${1}-${2}"))
 
 			data.Commands = append(data.Commands, CommandData{
 				OperationID: op.OperationID,
-				Use:         use,
+				Use:         kebab,
 				Short:       op.Summary,
 				Long:        op.Description,
-				HandlerCall: handlerCall,
+				Method:      entry.method,
+				Path:        pe.path,
 				Flags:       flags,
+				BodyFields:  bodyFields,
 				HasBody:     op.RequestBody != nil,
-				HasIntFlag:  hasIntFlag,
+				Paginated:   isPaginated(op),
 			})
 		}
 	}
 
 	funcMap := template.FuncMap{
-		"toCamel":      toCamel,
-		"goStringLit":  goStringLit,
+		"toCamel":     toCamel,
+		"goStringLit": goStringLit,
 		"flagFuncName": func(goType string) string {
 			switch goType {
 			case "int":
