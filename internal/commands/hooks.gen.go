@@ -56,14 +56,14 @@ newDeleteAWebhookForAWorkspaceCmd(),
 return cmd
 }
 
-// newGetAWebhookResourceCmd returns the "hooks get-awebhook-resource" cobra command.
+// newGetAWebhookResourceCmd returns the "hooks get-a-webhook-resource" cobra command.
 // operationId: getAWebhookResource
 func newGetAWebhookResourceCmd() *cobra.Command {
 var (
 )
 
 cmd := &cobra.Command{
-Use:   "get-awebhook-resource",
+Use:   "get-a-webhook-resource",
 Short: `Get a webhook resource`,
 Long:  "Returns the webhook resource or subject types on which webhooks can\nbe registered.\n\nEach resource/subject type contains an `events` link that returns the\npaginated list of specific events each individual subject type can\nemit.\n\nThis endpoint is publicly accessible and does not require\nauthentication or scopes.",
 RunE: func(cmd *cobra.Command, args []string) error {
@@ -136,7 +136,7 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newListWebhooksForARepositoryCmd returns the "hooks list-webhooks-for-arepository" cobra command.
+// newListWebhooksForARepositoryCmd returns the "hooks list-webhooks-for-a-repository" cobra command.
 // operationId: listWebhooksForARepository
 func newListWebhooksForARepositoryCmd() *cobra.Command {
 var (
@@ -148,7 +148,7 @@ all bool
 )
 
 cmd := &cobra.Command{
-Use:   "list-webhooks-for-arepository",
+Use:   "list-webhooks-for-a-repository",
 Short: `List webhooks for a repository`,
 Long:  `Returns a paginated list of webhooks installed on this repository.`,
 RunE: func(cmd *cobra.Command, args []string) error {
@@ -189,7 +189,7 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newCreateAWebhookForARepositoryCmd returns the "hooks create-awebhook-for-arepository" cobra command.
+// newCreateAWebhookForARepositoryCmd returns the "hooks create-a-webhook-for-a-repository" cobra command.
 // operationId: createAWebhookForARepository
 func newCreateAWebhookForARepositoryCmd() *cobra.Command {
 var (
@@ -198,7 +198,7 @@ workspace string
 )
 
 cmd := &cobra.Command{
-Use:   "create-awebhook-for-arepository",
+Use:   "create-a-webhook-for-a-repository",
 Short: `Create a webhook for a repository`,
 Long:  "Creates a new webhook on the specified repository.\n\nExample:\n\n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n  https://api.bitbucket.org/2.0/repositories/my-workspace/my-repo-slug/hooks\n  -d '\n    {\n      \"description\": \"Webhook Description\",\n      \"url\": \"https://example.com/\",\n      \"active\": true,\n      \"secret\": \"this is a really bad secret\",\n      \"events\": [\n        \"repo:push\",\n        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n```\n\nWhen the `secret` is provided it will be used as the key to generate a HMAC\ndigest value sent in the `X-Hub-Signature` header at delivery time. Passing\na `null` or empty `secret` or not passing a `secret` will leave the webhook's\nsecret unset. Bitbucket only generates the `X-Hub-Signature` when the webhook's\nsecret is set.\n\nNote that this call requires the webhook scope, as well as any scope\nthat applies to the events that the webhook subscribes to. In the\nexample above that means: `webhook`, `repository` and `issue`.\n\nAlso note that the `url` must properly resolve and cannot be an\ninternal, non-routed address.",
 RunE: func(cmd *cobra.Command, args []string) error {
@@ -234,7 +234,7 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newGetAWebhookForARepositoryCmd returns the "hooks get-awebhook-for-arepository" cobra command.
+// newGetAWebhookForARepositoryCmd returns the "hooks get-a-webhook-for-a-repository" cobra command.
 // operationId: getAWebhookForARepository
 func newGetAWebhookForARepositoryCmd() *cobra.Command {
 var (
@@ -244,7 +244,7 @@ workspace string
 )
 
 cmd := &cobra.Command{
-Use:   "get-awebhook-for-arepository",
+Use:   "get-a-webhook-for-a-repository",
 Short: `Get a webhook for a repository`,
 Long:  `Returns the webhook with the specified id installed on the specified
 repository.`,
@@ -286,7 +286,7 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newUpdateAWebhookForARepositoryCmd returns the "hooks update-awebhook-for-arepository" cobra command.
+// newUpdateAWebhookForARepositoryCmd returns the "hooks update-a-webhook-for-a-repository" cobra command.
 // operationId: updateAWebhookForARepository
 func newUpdateAWebhookForARepositoryCmd() *cobra.Command {
 var (
@@ -296,7 +296,7 @@ workspace string
 )
 
 cmd := &cobra.Command{
-Use:   "update-awebhook-for-arepository",
+Use:   "update-a-webhook-for-a-repository",
 Short: `Update a webhook for a repository`,
 Long:  "Updates the specified webhook subscription.\n\nThe following properties can be mutated:\n\n* `description`\n* `url`\n* `secret`\n* `active`\n* `events`\n\nThe hook's secret is used as a key to generate the HMAC hex digest sent in the\n`X-Hub-Signature` header at delivery time. This signature is only generated\nwhen the hook has a secret.\n\nSet the hook's secret by passing the new value in the `secret` field. Passing a\n`null` value in the `secret` field will remove the secret from the hook. The\nhook's secret can be left unchanged by not passing the `secret` field in the\nrequest.",
 RunE: func(cmd *cobra.Command, args []string) error {
@@ -337,7 +337,7 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newDeleteAWebhookForARepositoryCmd returns the "hooks delete-awebhook-for-arepository" cobra command.
+// newDeleteAWebhookForARepositoryCmd returns the "hooks delete-a-webhook-for-a-repository" cobra command.
 // operationId: deleteAWebhookForARepository
 func newDeleteAWebhookForARepositoryCmd() *cobra.Command {
 var (
@@ -347,7 +347,7 @@ workspace string
 )
 
 cmd := &cobra.Command{
-Use:   "delete-awebhook-for-arepository",
+Use:   "delete-a-webhook-for-a-repository",
 Short: `Delete a webhook for a repository`,
 Long:  `Deletes the specified webhook subscription from the given
 repository.`,
@@ -389,7 +389,7 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newListWebhooksForAWorkspaceCmd returns the "hooks list-webhooks-for-aworkspace" cobra command.
+// newListWebhooksForAWorkspaceCmd returns the "hooks list-webhooks-for-a-workspace" cobra command.
 // operationId: listWebhooksForAWorkspace
 func newListWebhooksForAWorkspaceCmd() *cobra.Command {
 var (
@@ -400,7 +400,7 @@ all bool
 )
 
 cmd := &cobra.Command{
-Use:   "list-webhooks-for-aworkspace",
+Use:   "list-webhooks-for-a-workspace",
 Short: `List webhooks for a workspace`,
 Long:  `Returns a paginated list of webhooks installed on this workspace.`,
 RunE: func(cmd *cobra.Command, args []string) error {
@@ -436,7 +436,7 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newCreateAWebhookForAWorkspaceCmd returns the "hooks create-awebhook-for-aworkspace" cobra command.
+// newCreateAWebhookForAWorkspaceCmd returns the "hooks create-a-webhook-for-a-workspace" cobra command.
 // operationId: createAWebhookForAWorkspace
 func newCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 var (
@@ -444,7 +444,7 @@ workspace string
 )
 
 cmd := &cobra.Command{
-Use:   "create-awebhook-for-aworkspace",
+Use:   "create-a-webhook-for-a-workspace",
 Short: `Create a webhook for a workspace`,
 Long:  "Creates a new webhook on the specified workspace.\n\nWorkspace webhooks are fired for events from all repositories contained\nby that workspace.\n\nExample:\n\n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n  https://api.bitbucket.org/2.0/workspaces/my-workspace/hooks\n  -d '\n    {\n      \"description\": \"Webhook Description\",\n      \"url\": \"https://example.com/\",\n      \"active\": true,\n      \"secret\": \"this is a really bad secret\",\n      \"events\": [\n        \"repo:push\",\n        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n```\n\nWhen the `secret` is provided it will be used as the key to generate a HMAC\ndigest value sent in the `X-Hub-Signature` header at delivery time. Passing\na `null` or empty `secret` or not passing a `secret` will leave the webhook's\nsecret unset. Bitbucket only generates the `X-Hub-Signature` when the webhook's\nsecret is set.\n\nThis call requires the webhook scope, as well as any scope\nthat applies to the events that the webhook subscribes to. In the\nexample above that means: `webhook`, `repository` and `issue`.\n\nThe `url` must properly resolve and cannot be an internal, non-routed address.\n\nOnly workspace owners can install webhooks on workspaces.",
 RunE: func(cmd *cobra.Command, args []string) error {
@@ -475,7 +475,7 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newGetAWebhookForAWorkspaceCmd returns the "hooks get-awebhook-for-aworkspace" cobra command.
+// newGetAWebhookForAWorkspaceCmd returns the "hooks get-a-webhook-for-a-workspace" cobra command.
 // operationId: getAWebhookForAWorkspace
 func newGetAWebhookForAWorkspaceCmd() *cobra.Command {
 var (
@@ -484,7 +484,7 @@ workspace string
 )
 
 cmd := &cobra.Command{
-Use:   "get-awebhook-for-aworkspace",
+Use:   "get-a-webhook-for-a-workspace",
 Short: `Get a webhook for a workspace`,
 Long:  `Returns the webhook with the specified id installed on the given
 workspace.`,
@@ -521,7 +521,7 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newUpdateAWebhookForAWorkspaceCmd returns the "hooks update-awebhook-for-aworkspace" cobra command.
+// newUpdateAWebhookForAWorkspaceCmd returns the "hooks update-a-webhook-for-a-workspace" cobra command.
 // operationId: updateAWebhookForAWorkspace
 func newUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 var (
@@ -530,7 +530,7 @@ workspace string
 )
 
 cmd := &cobra.Command{
-Use:   "update-awebhook-for-aworkspace",
+Use:   "update-a-webhook-for-a-workspace",
 Short: `Update a webhook for a workspace`,
 Long:  "Updates the specified webhook subscription.\n\nThe following properties can be mutated:\n\n* `description`\n* `url`\n* `secret`\n* `active`\n* `events`\n\nThe hook's secret is used as a key to generate the HMAC hex digest sent in the\n`X-Hub-Signature` header at delivery time. This signature is only generated\nwhen the hook has a secret.\n\nSet the hook's secret by passing the new value in the `secret` field. Passing a\n`null` value in the `secret` field will remove the secret from the hook. The\nhook's secret can be left unchanged by not passing the `secret` field in the\nrequest.",
 RunE: func(cmd *cobra.Command, args []string) error {
@@ -566,7 +566,7 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newDeleteAWebhookForAWorkspaceCmd returns the "hooks delete-awebhook-for-aworkspace" cobra command.
+// newDeleteAWebhookForAWorkspaceCmd returns the "hooks delete-a-webhook-for-a-workspace" cobra command.
 // operationId: deleteAWebhookForAWorkspace
 func newDeleteAWebhookForAWorkspaceCmd() *cobra.Command {
 var (
@@ -575,7 +575,7 @@ workspace string
 )
 
 cmd := &cobra.Command{
-Use:   "delete-awebhook-for-aworkspace",
+Use:   "delete-a-webhook-for-a-workspace",
 Short: `Delete a webhook for a workspace`,
 Long:  `Deletes the specified webhook subscription from the given workspace.`,
 RunE: func(cmd *cobra.Command, args []string) error {
