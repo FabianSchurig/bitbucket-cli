@@ -198,6 +198,10 @@ func isPaginated(op *Op) bool {
 		}
 		for _, mt := range resp.Content {
 			ref := mt.Schema.Ref
+			// Standard Bitbucket paginated responses use a "paginated_" prefix
+			// (e.g. "paginated_pullrequests"). The search API uses a distinct
+			// schema name ("search_result_page") that follows the same cursor-
+			// based pagination pattern (values + next URL).
 			if strings.Contains(ref, "paginated_") || strings.HasSuffix(ref, "search_result_page") {
 				return true
 			}
