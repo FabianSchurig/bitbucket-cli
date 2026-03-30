@@ -197,7 +197,8 @@ func isPaginated(op *Op) bool {
 			continue
 		}
 		for _, mt := range resp.Content {
-			if strings.Contains(mt.Schema.Ref, "paginated_") {
+			ref := mt.Schema.Ref
+			if strings.Contains(ref, "paginated_") || strings.HasSuffix(ref, "search_result_page") {
 				return true
 			}
 		}

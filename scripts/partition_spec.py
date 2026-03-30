@@ -82,6 +82,24 @@ COMMAND_GROUPS = {
                                   "and deleting Bitbucket webhooks.",
         },
     },
+    "search": {
+        "filename": "search-schema.yaml",
+        "title": "Bitbucket Code Search CLI",
+        "tags": {"Search"},
+        "paths": [
+            "/users/{selected_user}/search/code",
+            "/workspaces/{workspace}/search/code",
+            "/teams/{username}/search/code",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Search",
+            "x-cli-command-use": "search",
+            "x-cli-command-short": "Search Bitbucket code",
+            "x-cli-command-long": "Commands for searching code across "
+                                  "Bitbucket repositories by user, workspace, "
+                                  "or team.",
+        },
+    },
 }
 
 HTTP_METHODS = {"get", "post", "put", "patch", "delete"}
