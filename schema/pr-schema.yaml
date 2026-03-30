@@ -1553,7 +1553,7 @@ paths:
       x-atlassian-auth-types:
       - forge-oauth2
       - api-token
-      operationId: listAPullRequestActivityLog
+      operationId: listPullRequestActivityLog
     parameters:
     - name: pull_request_id
       in: path

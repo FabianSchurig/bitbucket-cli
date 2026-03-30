@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"reflect"
+	"sort"
 	"strings"
 	"text/tabwriter"
 )
@@ -36,8 +37,18 @@ func RenderTo(w io.Writer, v any) error {
 }
 
 // renderTable renders v as a tab-aligned table. It handles slices of structs
-// and single structs by reflecting over exported fields.
+// and single structs by reflecting over exported fields, plus map[string]any
+// and []any from generic API dispatch.
 func renderTable(w io.Writer, v any) error {
+	// Handle []any (e.g. collected paginated values from generic dispatch)
+	if items, ok := v.([]any); ok {
+		return renderMapSliceTable(w, items)
+	}
+	// Handle map[string]any (single resource from generic dispatch)
+	if m, ok := v.(map[string]any); ok {
+		return renderMapTable(w, m)
+	}
+
 	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
 
 	val := reflect.ValueOf(v)
@@ -136,6 +147,25 @@ func tableRowsFor(t reflect.Type) (headers []string, indices []int) {
 
 // renderIDs prints only ID fields (or the first field) for scripting.
 func renderIDs(w io.Writer, v any) error {
+	// Handle []any from generic dispatch
+	if items, ok := v.([]any); ok {
+		for _, item := range items {
+			if m, ok := item.(map[string]any); ok {
+				if id, ok := m["id"]; ok {
+					fmt.Fprintln(w, flatValue(id))
+				}
+			}
+		}
+		return nil
+	}
+	// Handle map[string]any from generic dispatch
+	if m, ok := v.(map[string]any); ok {
+		if id, ok := m["id"]; ok {
+			fmt.Fprintln(w, flatValue(id))
+		}
+		return nil
+	}
+
 	val := reflect.ValueOf(v)
 	for val.Kind() == reflect.Ptr {
 		val = val.Elem()
@@ -159,6 +189,113 @@ func renderIDs(w io.Writer, v any) error {
 		}
 	}
 	return nil
+}
+
+// mapPriorityKeys controls which keys appear first in table output for maps.
+var mapPriorityKeys = []string{"id", "title", "state", "display_name", "name", "author", "created_on", "updated_on"}
+
+// renderMapSliceTable renders a []any (slice of maps) as a table.
+func renderMapSliceTable(w io.Writer, items []any) error {
+	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
+
+	if len(items) == 0 {
+		fmt.Fprintln(tw, "(no results)")
+		return tw.Flush()
+	}
+
+	first, ok := items[0].(map[string]any)
+	if !ok {
+		// Not maps — fall back to one-value-per-line.
+		for _, item := range items {
+			fmt.Fprintf(tw, "%v\n", item)
+		}
+		return tw.Flush()
+	}
+
+	cols := pickMapColumns(first)
+	headers := make([]string, len(cols))
+	for i, c := range cols {
+		headers[i] = strings.ToUpper(c)
+	}
+	fmt.Fprintln(tw, strings.Join(headers, "\t"))
+
+	for _, item := range items {
+		m, ok := item.(map[string]any)
+		if !ok {
+			continue
+		}
+		fields := make([]string, len(cols))
+		for i, c := range cols {
+			fields[i] = flatValue(m[c])
+		}
+		fmt.Fprintln(tw, strings.Join(fields, "\t"))
+	}
+	return tw.Flush()
+}
+
+// renderMapTable renders a single map[string]any as key-value pairs.
+func renderMapTable(w io.Writer, m map[string]any) error {
+	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
+	cols := pickMapColumns(m)
+	for _, k := range cols {
+		fmt.Fprintf(tw, "%s\t%s\n", strings.ToUpper(k), flatValue(m[k]))
+	}
+	return tw.Flush()
+}
+
+// pickMapColumns returns map keys in priority order, followed by remaining keys sorted.
+func pickMapColumns(m map[string]any) []string {
+	seen := make(map[string]bool)
+	var cols []string
+	for _, k := range mapPriorityKeys {
+		if _, ok := m[k]; ok {
+			cols = append(cols, k)
+			seen[k] = true
+		}
+	}
+	var rest []string
+	for k := range m {
+		if !seen[k] {
+			rest = append(rest, k)
+		}
+	}
+	sort.Strings(rest)
+	cols = append(cols, rest...)
+	return cols
+}
+
+// flatValue converts any value to a flat string for table display.
+// Nested maps/slices are shown as compact JSON.
+func flatValue(v any) string {
+	if v == nil {
+		return "<nil>"
+	}
+	switch val := v.(type) {
+	case string:
+		return val
+	case float64:
+		if val == float64(int64(val)) {
+			return fmt.Sprintf("%d", int64(val))
+		}
+		return fmt.Sprintf("%g", val)
+	case bool:
+		return fmt.Sprintf("%t", val)
+	case map[string]any:
+		// For nested objects, try to extract a meaningful single value.
+		if name, ok := val["name"].(string); ok {
+			return name
+		}
+		if dn, ok := val["display_name"].(string); ok {
+			return dn
+		}
+		b, _ := json.Marshal(val)
+		return string(b)
+	case []any:
+		b, _ := json.Marshal(val)
+		return string(b)
+	default:
+		return fmt.Sprintf("%v", val)
+	}
 }
 
 // deref dereferences a pointer reflect.Value for display.
