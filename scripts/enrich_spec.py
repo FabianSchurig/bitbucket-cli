@@ -15,6 +15,18 @@ import sys
 from pathlib import Path
 
 
+def safe_path(raw: str, allowed_extensions: set[str]) -> Path:
+    """Resolve a CLI argument to a canonical path, guarding against path injection."""
+    if "\0" in raw:
+        raise ValueError(f"Null byte in path: {raw!r}")
+    p = Path(raw).resolve()
+    if p.suffix.lower() not in allowed_extensions:
+        raise ValueError(
+            f"Unexpected file extension {p.suffix!r}, expected one of {allowed_extensions}"
+        )
+    return p
+
+
 def to_camel(s: str) -> str:
     """'List pull requests' -> 'listPullRequests'"""
     words = re.sub(r"[^a-zA-Z0-9 ]", "", s).split()
@@ -34,8 +46,8 @@ def main():
         print(f"Usage: {sys.argv[0]} <input.json> <output.json>", file=sys.stderr)
         sys.exit(1)
 
-    input_path = Path(sys.argv[1])
-    output_path = Path(sys.argv[2])
+    input_path = safe_path(sys.argv[1], {".json"})
+    output_path = safe_path(sys.argv[2], {".json"})
 
     spec = json.loads(input_path.read_text())
 

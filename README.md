@@ -95,6 +95,18 @@ bb-cli completion powershell > bb-cli.ps1
 
 Download a pre-built binary from the [GitHub Releases](https://github.com/FabianSchurig/bitbucket-cli/releases) page. Archives are available for Linux, macOS, and Windows (amd64/arm64).
 
+### Docker
+
+```bash
+docker pull ghcr.io/fabianschurig/bitbucket-cli:latest
+
+docker run --rm \
+  -e BITBUCKET_USERNAME \
+  -e BITBUCKET_APP_PASSWORD \
+  ghcr.io/fabianschurig/bitbucket-cli pr list-pull-requests \
+    --workspace myteam --repo-slug myrepo
+```
+
 ### Build from source
 
 ```bash

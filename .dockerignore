@@ -1,0 +1,10 @@
+.git
+.github
+.devcontainer
+scripts
+schema
+*.md
+LICENSE
+goreleaser.yaml
+oapi-codegen.yaml
+sonar-project.properties
