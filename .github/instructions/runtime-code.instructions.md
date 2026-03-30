@@ -21,7 +21,7 @@ applyTo: ["internal/client/**", "internal/handlers/**", "internal/output/**"]
 
 ## Pagination
 
-Bitbucket uses cursor-based pagination (`values` array + `next` URL). The `--all` flag triggers automatic page-following in `Dispatch()`.
+Bitbucket uses cursor-based pagination (`values` array + `next` URL). The `--all` flag (default: `true`) triggers automatic page-following in `Dispatch()`. Pass `--all=false` to fetch only the first page.
 
 ## Auth priority
 
