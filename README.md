@@ -135,7 +135,7 @@ This repository includes a [Dev Container](https://containers.dev/) configuratio
 
 After the container starts you will have:
 
-- **Go 1.24** – for building and testing the CLI.
+- **Go 1.25** – for building and testing the CLI.
 - **Python 3.12** – for running the helper scripts under `scripts/`.
 - Go and Python VS Code extensions pre-installed and configured.
 
