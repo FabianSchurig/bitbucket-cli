@@ -18,8 +18,8 @@ import (
 var Format = "table"
 
 const (
-	noResults    = "(no results)"
-	mdRowFormat  = "| %s |\n"
+	noResults   = "(no results)"
+	mdRowFormat = "| %s |\n"
 )
 
 // Render writes v to stdout in the configured format.
