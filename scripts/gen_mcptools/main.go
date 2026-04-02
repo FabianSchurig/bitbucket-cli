@@ -136,7 +136,9 @@ func operationToMCPOp(op spec.OperationDef) MCPOpData {
 }
 
 func buildToolDescription(cmdShort string, operations []MCPOpData) string {
+	// Estimate ~60 chars per operation line.
 	var sb strings.Builder
+	sb.Grow(len(cmdShort) + 30 + len(operations)*60)
 	sb.WriteString(cmdShort)
 	sb.WriteString("\n\nAvailable operations:\n")
 	for _, op := range operations {

@@ -160,8 +160,11 @@ func InjectPaginationParams(params []ParamDef) []ParamDef {
 		}
 		return false
 	}
+	// Pre-allocate capacity for up to 2 additional params.
+	result := make([]ParamDef, len(params), len(params)+2)
+	copy(result, params)
 	if !hasParam("page") {
-		params = append(params, ParamDef{
+		result = append(result, ParamDef{
 			Name:     "page",
 			In:       "query",
 			Type:     "integer",
@@ -169,14 +172,14 @@ func InjectPaginationParams(params []ParamDef) []ParamDef {
 		})
 	}
 	if !hasParam("pagelen") {
-		params = append(params, ParamDef{
+		result = append(result, ParamDef{
 			Name:     "pagelen",
 			In:       "query",
 			Type:     "integer",
 			Desc:     "Number of items per page (query parameter)",
 		})
 	}
-	return params
+	return result
 }
 
 // OperationDef holds metadata for a single API operation.

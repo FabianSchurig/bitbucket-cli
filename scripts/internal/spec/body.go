@@ -50,10 +50,15 @@ func MakeBodyField(path, oaType, desc string) BodyField {
 
 const schemaRefPrefix = "#/components/schemas/"
 
+// skipAllOfRefs lists schema names in allOf that should be skipped during
+// body field resolution (e.g., the generic "object" base schema).
 var skipAllOfRefs = map[string]bool{
 	"object": true,
 }
 
+// skipPropNames lists property names that are auto-managed by the API and
+// should not be exposed as writable body fields (e.g., timestamps, links,
+// computed counts).
 var skipPropNames = map[string]bool{
 	"links": true, "user": true, "author": true,
 	"created_on": true, "updated_on": true,
@@ -65,6 +70,9 @@ var skipPropNames = map[string]bool{
 	"resolved_on": true, "resolved_by": true,
 }
 
+// skipPropertyRefs lists schema reference names whose nested properties should
+// not be inlined into body fields (complex linked entities like users,
+// repositories, commits).
 var skipPropertyRefs = map[string]bool{
 	"account": true, "user": true, "team": true,
 	"repository": true, "link": true,
@@ -73,6 +81,8 @@ var skipPropertyRefs = map[string]bool{
 	"pullrequest": true, "base_commit": true, "commit": true,
 }
 
+// refIdOnlySchemas lists schema names where only the "id" sub-field should be
+// exposed (rather than inlining the full schema), used for referenced entities.
 var refIdOnlySchemas = map[string]bool{
 	"comment": true,
 }
