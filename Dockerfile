@@ -5,13 +5,13 @@
 # from the Go module proxy — no local source build required.
 #
 # Targets:
-#   bb-cli  — Bitbucket CLI (default)
-#   bb-mcp  — Bitbucket MCP server
+#   bb-cli  — Bitbucket CLI
+#   bb-mcp  — Bitbucket MCP server (Docker default: last stage)
 #
 # Build examples:
+#   docker build -t bb-mcp .                 # uses default (bb-mcp)
 #   docker build --target bb-cli -t bb-cli .
 #   docker build --target bb-mcp -t bb-mcp .
-#
 # Extending this Dockerfile:
 #   To add a new binary target, add a new stage that installs the binary
 #   with `go install` (use the existing stages as a template), then add
