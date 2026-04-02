@@ -11,7 +11,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"go/format"
 	"os"
 	"strings"
 	"text/template"
@@ -190,15 +192,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	f, err := os.Create(outputPath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "creating output file: %v\n", err)
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		fmt.Fprintf(os.Stderr, "executing template: %v\n", err)
 		os.Exit(1)
 	}
-	defer f.Close()
 
-	if err := tmpl.Execute(f, data); err != nil {
-		fmt.Fprintf(os.Stderr, "executing template: %v\n", err)
+	formatted, err := format.Source(buf.Bytes())
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "formatting generated code: %v\n", err)
+		os.Exit(1)
+	}
+
+	if err := os.WriteFile(outputPath, formatted, 0o644); err != nil {
+		fmt.Fprintf(os.Stderr, "writing output file: %v\n", err)
 		os.Exit(1)
 	}
 

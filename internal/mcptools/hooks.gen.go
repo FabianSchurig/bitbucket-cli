@@ -8,7 +8,7 @@ package mcptools
 
 // HooksToolGroup contains the MCP tool definition for the "bitbucket_hooks" tool group.
 var HooksToolGroup = ToolGroup{
-	Name:        `bitbucket_hooks`,
+	Name: `bitbucket_hooks`,
 	Description: `Manage Bitbucket webhooks
 
 Available operations:
@@ -32,12 +32,10 @@ Available operations:
 			Path:        `/hook_events`,
 			Summary:     `Get a webhook resource`,
 			Description: "Returns the webhook resource or subject types on which webhooks can\nbe registered.\n\nEach resource/subject type contains an `events` link that returns the\npaginated list of specific events each individual subject type can\nemit.\n\nThis endpoint is publicly accessible and does not require\nauthentication or scopes.",
-			Params: []ParamDef{
-			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			Params:      []ParamDef{},
+			BodyFields:  []BodyFieldDef{},
+			HasBody:     false,
+			Paginated:   false,
 		},
 		{
 			OperationID: `listSubscribableWebhookTypes`,
@@ -50,10 +48,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `listWebhooksForARepository`,
@@ -67,10 +64,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createAWebhookForARepository`,
@@ -82,10 +78,9 @@ Available operations:
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getAWebhookForARepository`,
@@ -99,10 +94,9 @@ repository.`,
 				{Name: `uid`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateAWebhookForARepository`,
@@ -115,10 +109,9 @@ repository.`,
 				{Name: `uid`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteAWebhookForARepository`,
@@ -132,10 +125,9 @@ repository.`,
 				{Name: `uid`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `listWebhooksForAWorkspace`,
@@ -148,10 +140,9 @@ repository.`,
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createAWebhookForAWorkspace`,
@@ -162,10 +153,9 @@ repository.`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getAWebhookForAWorkspace`,
@@ -178,10 +168,9 @@ workspace.`,
 				{Name: `uid`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateAWebhookForAWorkspace`,
@@ -193,10 +182,9 @@ workspace.`,
 				{Name: `uid`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteAWebhookForAWorkspace`,
@@ -208,10 +196,9 @@ workspace.`,
 				{Name: `uid`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 	},
 }

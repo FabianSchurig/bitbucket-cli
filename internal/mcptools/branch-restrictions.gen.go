@@ -8,7 +8,7 @@ package mcptools
 
 // BranchRestrictionsToolGroup contains the MCP tool definition for the "bitbucket_branch-restrictions" tool group.
 var BranchRestrictionsToolGroup = ToolGroup{
-	Name:        `bitbucket_branch-restrictions`,
+	Name: `bitbucket_branch-restrictions`,
 	Description: `Manage Bitbucket branch restrictions
 
 Available operations:
@@ -34,10 +34,9 @@ repository.`,
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createABranchRestrictionRule`,
@@ -70,10 +69,9 @@ repository.`,
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateABranchRestrictionRule`,
@@ -107,10 +105,9 @@ repository.`,
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 	},
 }

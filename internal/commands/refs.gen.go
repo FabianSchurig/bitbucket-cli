@@ -7,69 +7,69 @@
 package commands
 
 import (
-"context"
-"encoding/json"
-"fmt"
-"strconv"
+	"context"
+	"encoding/json"
+	"fmt"
+	"strconv"
 
-"github.com/spf13/cobra"
+	"github.com/spf13/cobra"
 
-"github.com/FabianSchurig/bitbucket-cli/internal/client"
-"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
-"github.com/FabianSchurig/bitbucket-cli/internal/output"
+	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
+	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
 
 // Ensure imports are used.
 var (
-_ = context.Background
-_ = fmt.Errorf
-_ = json.Marshal
-_ = strconv.Itoa
-_ = client.NewClient
-_ = handlers.Dispatch
-_ = output.Format
+	_ = context.Background
+	_ = fmt.Errorf
+	_ = json.Marshal
+	_ = strconv.Itoa
+	_ = client.NewClient
+	_ = handlers.Dispatch
+	_ = output.Format
 )
 
 // NewRefsCommand returns the "refs" cobra command with all sub-commands registered.
 func NewRefsCommand() *cobra.Command {
-cmd := &cobra.Command{
-Use:   "refs",
-Short: `Manage Bitbucket branches and tags`,
-Long:  `Commands for listing, creating, and deleting branches and tags in Bitbucket repositories.`,
-}
+	cmd := &cobra.Command{
+		Use:   "refs",
+		Short: `Manage Bitbucket branches and tags`,
+		Long:  `Commands for listing, creating, and deleting branches and tags in Bitbucket repositories.`,
+	}
 
-cmd.AddCommand(
-newRefsListBranchesAndTagsCmd(),
-newRefsListOpenBranchesCmd(),
-newRefsCreateABranchCmd(),
-newRefsGetABranchCmd(),
-newRefsDeleteABranchCmd(),
-newRefsListTagsCmd(),
-newRefsCreateATagCmd(),
-newRefsGetATagCmd(),
-newRefsDeleteATagCmd(),
-)
+	cmd.AddCommand(
+		newRefsListBranchesAndTagsCmd(),
+		newRefsListOpenBranchesCmd(),
+		newRefsCreateABranchCmd(),
+		newRefsGetABranchCmd(),
+		newRefsDeleteABranchCmd(),
+		newRefsListTagsCmd(),
+		newRefsCreateATagCmd(),
+		newRefsGetATagCmd(),
+		newRefsDeleteATagCmd(),
+	)
 
-return cmd
+	return cmd
 }
 
 // newRefsListBranchesAndTagsCmd returns the "refs list-branches-and-tags" cobra command.
 // operationId: listBranchesAndTags
 func newRefsListBranchesAndTagsCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-q string
-sort string
-page int
-pagelen int
-all bool
-)
+	var (
+		repoSlug  string
+		workspace string
+		q         string
+		sort      string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "list-branches-and-tags",
-Short: `List branches and tags`,
-Long:  `Returns the branches and tags in the repository.
+	cmd := &cobra.Command{
+		Use:   "list-branches-and-tags",
+		Short: `List branches and tags`,
+		Long: `Returns the branches and tags in the repository.
 
 By default, results will be in the order the underlying source control system returns them and identical to
 the ordering one sees when running "$ git show-ref". Note that this follows simple
@@ -81,165 +81,164 @@ sorted ["branch1", "branch10", "branch2", "v10", "v11", "v9"] instead of ["branc
 
 Sorting can be changed using the ?sort= query parameter. When using ?sort=name to explicitly sort on ref name,
 Bitbucket will apply natural sorting and interpret numerical values as numbers instead of strings.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-"q": q,
-"sort": sort,
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/refs",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
-cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{
+				"q":       q,
+				"sort":    sort,
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/refs",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
+	cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newRefsListOpenBranchesCmd returns the "refs list-open-branches" cobra command.
 // operationId: listOpenBranches
 func newRefsListOpenBranchesCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-q string
-sort string
-page int
-pagelen int
-all bool
-)
+	var (
+		repoSlug  string
+		workspace string
+		q         string
+		sort      string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "list-open-branches",
-Short: `List open branches`,
-Long:  "Returns a list of all open branches within the specified repository.\nResults will be in the order the source control manager returns them.\n\nBranches support [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering)\nthat can be used to search for specific branches. For instance, to find\nall branches that have \"stab\" in their name:\n\n```\ncurl -s https://api.bitbucket.org/2.0/repositories/atlassian/aui/refs/branches -G --data-urlencode 'q=name ~ \"stab\"'\n```\n\nBy default, results will be in the order the underlying source control system returns them and identical to\nthe ordering one sees when running \"$ git branch --list\". Note that this follows simple\nlexical ordering of the ref names.\n\nThis can be undesirable as it does apply any natural sorting semantics, meaning for instance that tags are\nsorted [\"v10\", \"v11\", \"v9\"] instead of [\"v9\", \"v10\", \"v11\"].\n\nSorting can be changed using the ?q= query parameter. When using ?q=name to explicitly sort on ref name,\nBitbucket will apply natural sorting and interpret numerical values as numbers instead of strings.",
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-"q": q,
-"sort": sort,
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/branches",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
-cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "list-open-branches",
+		Short: `List open branches`,
+		Long:  "Returns a list of all open branches within the specified repository.\nResults will be in the order the source control manager returns them.\n\nBranches support [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering)\nthat can be used to search for specific branches. For instance, to find\nall branches that have \"stab\" in their name:\n\n```\ncurl -s https://api.bitbucket.org/2.0/repositories/atlassian/aui/refs/branches -G --data-urlencode 'q=name ~ \"stab\"'\n```\n\nBy default, results will be in the order the underlying source control system returns them and identical to\nthe ordering one sees when running \"$ git branch --list\". Note that this follows simple\nlexical ordering of the ref names.\n\nThis can be undesirable as it does apply any natural sorting semantics, meaning for instance that tags are\nsorted [\"v10\", \"v11\", \"v9\"] instead of [\"v9\", \"v10\", \"v11\"].\n\nSorting can be changed using the ?q= query parameter. When using ?q=name to explicitly sort on ref name,\nBitbucket will apply natural sorting and interpret numerical values as numbers instead of strings.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{
+				"q":       q,
+				"sort":    sort,
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/branches",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
+	cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newRefsCreateABranchCmd returns the "refs create-a-branch" cobra command.
 // operationId: createABranch
 func newRefsCreateABranchCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-)
+	var (
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "create-a-branch",
-Short: `Create a branch`,
-Long:  "Creates a new branch in the specified repository.\n\nThe payload of the POST should consist of a JSON document that\ncontains the name of the tag and the target hash.\n\n```\ncurl https://api.bitbucket.org/2.0/repositories/seanfarley/hg/refs/branches \\\n-s -u seanfarley -X POST -H \"Content-Type: application/json\" \\\n-d '{\n    \"name\" : \"smf/create-feature\",\n    \"target\" : {\n        \"hash\" : \"default\",\n    }\n}'\n```\n\nThis call requires authentication. Private repositories require the\ncaller to authenticate with an account that has appropriate\nauthorization.\n\nThe branch name should not include any prefixes (e.g.\nrefs/heads). This endpoint does support using short hash prefixes for\nthe commit hash, but it may return a 400 response if the provided\nprefix is ambiguous. Using a full commit hash is the preferred\napproach.",
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/branches",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "create-a-branch",
+		Short: `Create a branch`,
+		Long:  "Creates a new branch in the specified repository.\n\nThe payload of the POST should consist of a JSON document that\ncontains the name of the tag and the target hash.\n\n```\ncurl https://api.bitbucket.org/2.0/repositories/seanfarley/hg/refs/branches \\\n-s -u seanfarley -X POST -H \"Content-Type: application/json\" \\\n-d '{\n    \"name\" : \"smf/create-feature\",\n    \"target\" : {\n        \"hash\" : \"default\",\n    }\n}'\n```\n\nThis call requires authentication. Private repositories require the\ncaller to authenticate with an account that has appropriate\nauthorization.\n\nThe branch name should not include any prefixes (e.g.\nrefs/heads). This endpoint does support using short hash prefixes for\nthe commit hash, but it may return a 400 response if the provided\nprefix is ambiguous. Using a full commit hash is the preferred\napproach.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/branches",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newRefsGetABranchCmd returns the "refs get-a-branch" cobra command.
 // operationId: getABranch
 func newRefsGetABranchCmd() *cobra.Command {
-var (
-name string
-repoSlug string
-workspace string
-)
+	var (
+		name      string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-a-branch",
-Short: `Get a branch`,
-Long:  `Returns a branch object within the specified repository.
+	cmd := &cobra.Command{
+		Use:   "get-a-branch",
+		Short: `Get a branch`,
+		Long: `Returns a branch object within the specified repository.
 
 This call requires authentication. Private repositories require the
 caller to authenticate with an account that has appropriate
@@ -247,118 +246,116 @@ authorization.
 
 For Git, the branch name should not include any prefixes (e.g.
 refs/heads).`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if name == "" {
-return fmt.Errorf("--name is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"name": name,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/branches/{name}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&name, "name", "", "name (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if name == "" {
+				return fmt.Errorf("--name is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"name":      name,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/branches/{name}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&name, "name", "", "name (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newRefsDeleteABranchCmd returns the "refs delete-a-branch" cobra command.
 // operationId: deleteABranch
 func newRefsDeleteABranchCmd() *cobra.Command {
-var (
-name string
-repoSlug string
-workspace string
-)
+	var (
+		name      string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "delete-a-branch",
-Short: `Delete a branch`,
-Long:  `Delete a branch in the specified repository.
+	cmd := &cobra.Command{
+		Use:   "delete-a-branch",
+		Short: `Delete a branch`,
+		Long: `Delete a branch in the specified repository.
 
 The main branch is not allowed to be deleted and will return a 400
 response.
 
 The branch name should not include any prefixes (e.g.
 refs/heads).`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if name == "" {
-return fmt.Errorf("--name is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"name": name,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "DELETE",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/branches/{name}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&name, "name", "", "name (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if name == "" {
+				return fmt.Errorf("--name is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"name":      name,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "DELETE",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/branches/{name}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&name, "name", "", "name (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newRefsListTagsCmd returns the "refs list-tags" cobra command.
 // operationId: listTags
 func newRefsListTagsCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-q string
-sort string
-page int
-pagelen int
-all bool
-)
+	var (
+		repoSlug  string
+		workspace string
+		q         string
+		sort      string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "list-tags",
-Short: `List tags`,
-Long:  `Returns the tags in the repository.
+	cmd := &cobra.Command{
+		Use:   "list-tags",
+		Short: `List tags`,
+		Long: `Returns the tags in the repository.
 
 By default, results will be in the order the underlying source control system returns them and identical to
 the ordering one sees when running "$ git tag --list". Note that this follows simple
@@ -369,227 +366,223 @@ sorted ["v10", "v11", "v9"] instead of ["v9", "v10", "v11"].
 
 Sorting can be changed using the ?sort= query parameter. When using ?sort=name to explicitly sort on ref name,
 Bitbucket will apply natural sorting and interpret numerical values as numbers instead of strings.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-"q": q,
-"sort": sort,
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/tags",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
-cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{
+				"q":       q,
+				"sort":    sort,
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/tags",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
+	cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newRefsCreateATagCmd returns the "refs create-a-tag" cobra command.
 // operationId: createATag
 func newRefsCreateATagCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-bodyDate string
-bodyMessage string
-bodyName string
-bodyTaggerRaw string
-bodyType string
-body string
-)
+	var (
+		repoSlug      string
+		workspace     string
+		bodyDate      string
+		bodyMessage   string
+		bodyName      string
+		bodyTaggerRaw string
+		bodyType      string
+		body          string
+	)
 
-cmd := &cobra.Command{
-Use:   "create-a-tag",
-Short: `Create a tag`,
-Long:  "Creates a new annotated tag in the specified repository.\n\nThe payload of the POST should consist of a JSON document that\ncontains the name of the tag and the target hash.\n\n```\ncurl https://api.bitbucket.org/2.0/repositories/jdoe/myrepo/refs/tags \\\n-s -u jdoe -X POST -H \"Content-Type: application/json\" \\\n-d '{\n    \"name\" : \"new-tag-name\",\n    \"target\" : {\n        \"hash\" : \"a1b2c3d4e5f6\",\n    }\n}'\n```\n\nThis endpoint does support using short hash prefixes for the commit\nhash, but it may return a 400 response if the provided prefix is\nambiguous. Using a full commit hash is the preferred approach.\n\nA message for the tag object may optionally be provided. If it is\nomitted or the provided message is empty, a default message of\n\"Added tag <tagname> for changeset <shorthash>\" will be used.",
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-if body == "" {
-bodyObj := map[string]any{}
-if bodyDate != "" {
-handlers.SetNested(bodyObj, "date", bodyDate)
-}
-if bodyMessage != "" {
-handlers.SetNested(bodyObj, "message", bodyMessage)
-}
-if bodyName != "" {
-handlers.SetNested(bodyObj, "name", bodyName)
-}
-if bodyTaggerRaw != "" {
-handlers.SetNested(bodyObj, "tagger.raw", bodyTaggerRaw)
-}
-if bodyType != "" {
-handlers.SetNested(bodyObj, "type", bodyType)
-}
-if len(bodyObj) > 0 {
-b, _ := json.Marshal(bodyObj)
-body = string(b)
-}
-}
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/tags",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&bodyDate, "date", "", `The date that the tag was created, if available`)
-cmd.Flags().StringVar(&bodyMessage, "message", "", `The message associated with the tag, if available.`)
-cmd.Flags().StringVar(&bodyName, "name", "", `The name of the ref.`)
-cmd.Flags().StringVar(&bodyTaggerRaw, "tagger-raw", "", `The raw author value from the repository. This may be the only value available if the author does not match a user in Bitbucket.`)
-cmd.Flags().StringVar(&bodyType, "type", "", `type`)
-cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "create-a-tag",
+		Short: `Create a tag`,
+		Long:  "Creates a new annotated tag in the specified repository.\n\nThe payload of the POST should consist of a JSON document that\ncontains the name of the tag and the target hash.\n\n```\ncurl https://api.bitbucket.org/2.0/repositories/jdoe/myrepo/refs/tags \\\n-s -u jdoe -X POST -H \"Content-Type: application/json\" \\\n-d '{\n    \"name\" : \"new-tag-name\",\n    \"target\" : {\n        \"hash\" : \"a1b2c3d4e5f6\",\n    }\n}'\n```\n\nThis endpoint does support using short hash prefixes for the commit\nhash, but it may return a 400 response if the provided prefix is\nambiguous. Using a full commit hash is the preferred approach.\n\nA message for the tag object may optionally be provided. If it is\nomitted or the provided message is empty, a default message of\n\"Added tag <tagname> for changeset <shorthash>\" will be used.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyDate != "" {
+					handlers.SetNested(bodyObj, "date", bodyDate)
+				}
+				if bodyMessage != "" {
+					handlers.SetNested(bodyObj, "message", bodyMessage)
+				}
+				if bodyName != "" {
+					handlers.SetNested(bodyObj, "name", bodyName)
+				}
+				if bodyTaggerRaw != "" {
+					handlers.SetNested(bodyObj, "tagger.raw", bodyTaggerRaw)
+				}
+				if bodyType != "" {
+					handlers.SetNested(bodyObj, "type", bodyType)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/tags",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyDate, "date", "", `The date that the tag was created, if available`)
+	cmd.Flags().StringVar(&bodyMessage, "message", "", `The message associated with the tag, if available.`)
+	cmd.Flags().StringVar(&bodyName, "name", "", `The name of the ref.`)
+	cmd.Flags().StringVar(&bodyTaggerRaw, "tagger-raw", "", `The raw author value from the repository. This may be the only value available if the author does not match a user in Bitbucket.`)
+	cmd.Flags().StringVar(&bodyType, "type", "", `type`)
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+	return cmd
 }
 
 // newRefsGetATagCmd returns the "refs get-a-tag" cobra command.
 // operationId: getATag
 func newRefsGetATagCmd() *cobra.Command {
-var (
-name string
-repoSlug string
-workspace string
-)
+	var (
+		name      string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-a-tag",
-Short: `Get a tag`,
-Long:  "Returns the specified tag.\n\n```\n$ curl -s https://api.bitbucket.org/2.0/repositories/seanfarley/hg/refs/tags/3.8 -G | jq .\n{\n  \"name\": \"3.8\",\n  \"links\": {\n    \"commits\": {\n      \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commits/3.8\"\n    },\n    \"self\": {\n      \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/refs/tags/3.8\"\n    },\n    \"html\": {\n      \"href\": \"https://bitbucket.org/seanfarley/hg/commits/tag/3.8\"\n    }\n  },\n  \"tagger\": {\n    \"raw\": \"Matt Mackall <mpm@selenic.com>\",\n    \"type\": \"author\",\n    \"user\": {\n      \"username\": \"mpmselenic\",\n      \"nickname\": \"mpmselenic\",\n      \"display_name\": \"Matt Mackall\",\n      \"type\": \"user\",\n      \"uuid\": \"{a4934530-db4c-419c-a478-9ab4964c2ee7}\",\n      \"links\": {\n        \"self\": {\n          \"href\": \"https://api.bitbucket.org/2.0/users/mpmselenic\"\n        },\n        \"html\": {\n          \"href\": \"https://bitbucket.org/mpmselenic/\"\n        },\n        \"avatar\": {\n          \"href\": \"https://bitbucket.org/account/mpmselenic/avatar/32/\"\n        }\n      }\n    }\n  },\n  \"date\": \"2016-05-01T18:52:25+00:00\",\n  \"message\": \"Added tag 3.8 for changeset f85de28eae32\",\n  \"type\": \"tag\",\n  \"target\": {\n    \"hash\": \"f85de28eae32e7d3064b1a1321309071bbaaa069\",\n    \"repository\": {\n      \"links\": {\n        \"self\": {\n          \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg\"\n        },\n        \"html\": {\n          \"href\": \"https://bitbucket.org/seanfarley/hg\"\n        },\n        \"avatar\": {\n          \"href\": \"https://bitbucket.org/seanfarley/hg/avatar/32/\"\n        }\n      },\n      \"type\": \"repository\",\n      \"name\": \"hg\",\n      \"full_name\": \"seanfarley/hg\",\n      \"uuid\": \"{c75687fb-e99d-4579-9087-190dbd406d30}\"\n    },\n    \"links\": {\n      \"self\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/f85de28eae32e7d3064b1a1321309071bbaaa069\"\n      },\n      \"comments\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/f85de28eae32e7d3064b1a1321309071bbaaa069/comments\"\n      },\n      \"patch\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/patch/f85de28eae32e7d3064b1a1321309071bbaaa069\"\n      },\n      \"html\": {\n        \"href\": \"https://bitbucket.org/seanfarley/hg/commits/f85de28eae32e7d3064b1a1321309071bbaaa069\"\n      },\n      \"diff\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/diff/f85de28eae32e7d3064b1a1321309071bbaaa069\"\n      },\n      \"approve\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/f85de28eae32e7d3064b1a1321309071bbaaa069/approve\"\n      },\n      \"statuses\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/f85de28eae32e7d3064b1a1321309071bbaaa069/statuses\"\n      }\n    },\n    \"author\": {\n      \"raw\": \"Sean Farley <sean@farley.io>\",\n      \"type\": \"author\",\n      \"user\": {\n        \"username\": \"seanfarley\",\n        \"nickname\": \"seanfarley\",\n        \"display_name\": \"Sean Farley\",\n        \"type\": \"user\",\n        \"uuid\": \"{a295f8a8-5876-4d43-89b5-3ad8c6c3c51d}\",\n        \"links\": {\n          \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/users/seanfarley\"\n          },\n          \"html\": {\n            \"href\": \"https://bitbucket.org/seanfarley/\"\n          },\n          \"avatar\": {\n            \"href\": \"https://bitbucket.org/account/seanfarley/avatar/32/\"\n          }\n        }\n      }\n    },\n    \"parents\": [\n      {\n        \"hash\": \"9a98d0e5b07fc60887f9d3d34d9ac7d536f470d2\",\n        \"type\": \"commit\",\n        \"links\": {\n          \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/9a98d0e5b07fc60887f9d3d34d9ac7d536f470d2\"\n          },\n          \"html\": {\n            \"href\": \"https://bitbucket.org/seanfarley/hg/commits/9a98d0e5b07fc60887f9d3d34d9ac7d536f470d2\"\n          }\n        }\n      }\n    ],\n    \"date\": \"2016-05-01T04:21:17+00:00\",\n    \"message\": \"debian: alphabetize build deps\",\n    \"type\": \"commit\"\n  }\n}\n```",
-RunE: func(cmd *cobra.Command, args []string) error {
-if name == "" {
-return fmt.Errorf("--name is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"name": name,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/tags/{name}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&name, "name", "", "name (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-a-tag",
+		Short: `Get a tag`,
+		Long:  "Returns the specified tag.\n\n```\n$ curl -s https://api.bitbucket.org/2.0/repositories/seanfarley/hg/refs/tags/3.8 -G | jq .\n{\n  \"name\": \"3.8\",\n  \"links\": {\n    \"commits\": {\n      \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commits/3.8\"\n    },\n    \"self\": {\n      \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/refs/tags/3.8\"\n    },\n    \"html\": {\n      \"href\": \"https://bitbucket.org/seanfarley/hg/commits/tag/3.8\"\n    }\n  },\n  \"tagger\": {\n    \"raw\": \"Matt Mackall <mpm@selenic.com>\",\n    \"type\": \"author\",\n    \"user\": {\n      \"username\": \"mpmselenic\",\n      \"nickname\": \"mpmselenic\",\n      \"display_name\": \"Matt Mackall\",\n      \"type\": \"user\",\n      \"uuid\": \"{a4934530-db4c-419c-a478-9ab4964c2ee7}\",\n      \"links\": {\n        \"self\": {\n          \"href\": \"https://api.bitbucket.org/2.0/users/mpmselenic\"\n        },\n        \"html\": {\n          \"href\": \"https://bitbucket.org/mpmselenic/\"\n        },\n        \"avatar\": {\n          \"href\": \"https://bitbucket.org/account/mpmselenic/avatar/32/\"\n        }\n      }\n    }\n  },\n  \"date\": \"2016-05-01T18:52:25+00:00\",\n  \"message\": \"Added tag 3.8 for changeset f85de28eae32\",\n  \"type\": \"tag\",\n  \"target\": {\n    \"hash\": \"f85de28eae32e7d3064b1a1321309071bbaaa069\",\n    \"repository\": {\n      \"links\": {\n        \"self\": {\n          \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg\"\n        },\n        \"html\": {\n          \"href\": \"https://bitbucket.org/seanfarley/hg\"\n        },\n        \"avatar\": {\n          \"href\": \"https://bitbucket.org/seanfarley/hg/avatar/32/\"\n        }\n      },\n      \"type\": \"repository\",\n      \"name\": \"hg\",\n      \"full_name\": \"seanfarley/hg\",\n      \"uuid\": \"{c75687fb-e99d-4579-9087-190dbd406d30}\"\n    },\n    \"links\": {\n      \"self\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/f85de28eae32e7d3064b1a1321309071bbaaa069\"\n      },\n      \"comments\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/f85de28eae32e7d3064b1a1321309071bbaaa069/comments\"\n      },\n      \"patch\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/patch/f85de28eae32e7d3064b1a1321309071bbaaa069\"\n      },\n      \"html\": {\n        \"href\": \"https://bitbucket.org/seanfarley/hg/commits/f85de28eae32e7d3064b1a1321309071bbaaa069\"\n      },\n      \"diff\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/diff/f85de28eae32e7d3064b1a1321309071bbaaa069\"\n      },\n      \"approve\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/f85de28eae32e7d3064b1a1321309071bbaaa069/approve\"\n      },\n      \"statuses\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/f85de28eae32e7d3064b1a1321309071bbaaa069/statuses\"\n      }\n    },\n    \"author\": {\n      \"raw\": \"Sean Farley <sean@farley.io>\",\n      \"type\": \"author\",\n      \"user\": {\n        \"username\": \"seanfarley\",\n        \"nickname\": \"seanfarley\",\n        \"display_name\": \"Sean Farley\",\n        \"type\": \"user\",\n        \"uuid\": \"{a295f8a8-5876-4d43-89b5-3ad8c6c3c51d}\",\n        \"links\": {\n          \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/users/seanfarley\"\n          },\n          \"html\": {\n            \"href\": \"https://bitbucket.org/seanfarley/\"\n          },\n          \"avatar\": {\n            \"href\": \"https://bitbucket.org/account/seanfarley/avatar/32/\"\n          }\n        }\n      }\n    },\n    \"parents\": [\n      {\n        \"hash\": \"9a98d0e5b07fc60887f9d3d34d9ac7d536f470d2\",\n        \"type\": \"commit\",\n        \"links\": {\n          \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/9a98d0e5b07fc60887f9d3d34d9ac7d536f470d2\"\n          },\n          \"html\": {\n            \"href\": \"https://bitbucket.org/seanfarley/hg/commits/9a98d0e5b07fc60887f9d3d34d9ac7d536f470d2\"\n          }\n        }\n      }\n    ],\n    \"date\": \"2016-05-01T04:21:17+00:00\",\n    \"message\": \"debian: alphabetize build deps\",\n    \"type\": \"commit\"\n  }\n}\n```",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if name == "" {
+				return fmt.Errorf("--name is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"name":      name,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/tags/{name}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&name, "name", "", "name (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newRefsDeleteATagCmd returns the "refs delete-a-tag" cobra command.
 // operationId: deleteATag
 func newRefsDeleteATagCmd() *cobra.Command {
-var (
-name string
-repoSlug string
-workspace string
-)
+	var (
+		name      string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "delete-a-tag",
-Short: `Delete a tag`,
-Long:  `Delete a tag in the specified repository.
+	cmd := &cobra.Command{
+		Use:   "delete-a-tag",
+		Short: `Delete a tag`,
+		Long: `Delete a tag in the specified repository.
 
 The tag name should not include any prefixes (e.g. refs/tags).`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if name == "" {
-return fmt.Errorf("--name is required")
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if name == "" {
+				return fmt.Errorf("--name is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"name":      name,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "DELETE",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/tags/{name}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&name, "name", "", "name (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"name": name,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "DELETE",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/refs/tags/{name}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&name, "name", "", "name (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
-}
-

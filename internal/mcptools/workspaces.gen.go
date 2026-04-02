@@ -8,7 +8,7 @@ package mcptools
 
 // WorkspacesToolGroup contains the MCP tool definition for the "bitbucket_workspaces" tool group.
 var WorkspacesToolGroup = ToolGroup{
-	Name:        `bitbucket_workspaces`,
+	Name: `bitbucket_workspaces`,
 	Description: `Manage Bitbucket workspaces
 
 Available operations:
@@ -47,10 +47,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `getUserWorkspaces`,
@@ -64,10 +63,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `getUserPermissionOnAWorkspace`,
@@ -78,10 +76,9 @@ Available operations:
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `listWorkspacesForUser`,
@@ -96,10 +93,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `getAWorkspace`,
@@ -110,10 +106,9 @@ Available operations:
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `listWebhooksForAWorkspace`,
@@ -126,10 +121,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createAWebhookForAWorkspace`,
@@ -140,10 +134,9 @@ Available operations:
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getAWebhookForAWorkspace`,
@@ -156,10 +149,9 @@ workspace.`,
 				{Name: `uid`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateAWebhookForAWorkspace`,
@@ -171,10 +163,9 @@ workspace.`,
 				{Name: `uid`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteAWebhookForAWorkspace`,
@@ -186,10 +177,9 @@ workspace.`,
 				{Name: `uid`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `listUsersInAWorkspace`,
@@ -202,10 +192,9 @@ workspace.`,
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `getUserMembershipForAWorkspace`,
@@ -217,10 +206,9 @@ workspace.`,
 				{Name: `member`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `listUserPermissionsInAWorkspace`,
@@ -234,10 +222,9 @@ workspace.`,
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `listAllRepositoryPermissionsForAWorkspace`,
@@ -252,10 +239,9 @@ workspace.`,
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `listARepositoryPermissionsForAWorkspace`,
@@ -271,10 +257,9 @@ workspace.`,
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `listProjectsInAWorkspace`,
@@ -287,10 +272,9 @@ workspace.`,
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createAProjectInAWorkspace`,
@@ -301,10 +285,9 @@ workspace.`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    true,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getAProjectForAWorkspace`,
@@ -316,10 +299,9 @@ workspace.`,
 				{Name: `project_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateAProjectForAWorkspace`,
@@ -331,10 +313,9 @@ workspace.`,
 				{Name: `project_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    true,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteAProjectForAWorkspace`,
@@ -346,10 +327,9 @@ workspace.`,
 				{Name: `project_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `listWorkspacePullRequestsForAUser`,
@@ -364,10 +344,9 @@ workspace.`,
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 	},
 }

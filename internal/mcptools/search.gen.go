@@ -8,7 +8,7 @@ package mcptools
 
 // SearchToolGroup contains the MCP tool definition for the "bitbucket_search" tool group.
 var SearchToolGroup = ToolGroup{
-	Name:        `bitbucket_search`,
+	Name: `bitbucket_search`,
 	Description: `Search Bitbucket code
 
 Available operations:
@@ -29,10 +29,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `searchAccount`,
@@ -46,10 +45,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `searchWorkspace`,
@@ -63,10 +61,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 	},
 }

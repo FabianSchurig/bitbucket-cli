@@ -8,7 +8,7 @@ package mcptools
 
 // UsersToolGroup contains the MCP tool definition for the "bitbucket_users" tool group.
 var UsersToolGroup = ToolGroup{
-	Name:        `bitbucket_users`,
+	Name: `bitbucket_users`,
 	Description: `Manage Bitbucket users
 
 Available operations:
@@ -33,12 +33,10 @@ Available operations:
 			Path:        `/user`,
 			Summary:     `Get current user`,
 			Description: `Returns the currently logged in user.`,
-			Params: []ParamDef{
-			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			Params:      []ParamDef{},
+			BodyFields:  []BodyFieldDef{},
+			HasBody:     false,
+			Paginated:   false,
 		},
 		{
 			OperationID: `listEmailAddressesForCurrentUser`,
@@ -47,12 +45,10 @@ Available operations:
 			Summary:     `List email addresses for current user`,
 			Description: `Returns all the authenticated user's email addresses. Both
 confirmed and unconfirmed.`,
-			Params: []ParamDef{
-			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			Params:     []ParamDef{},
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getAnEmailAddressForCurrentUser`,
@@ -67,10 +63,9 @@ whether it is the user's primary address or not.`,
 			Params: []ParamDef{
 				{Name: `email`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getAUser`,
@@ -81,10 +76,9 @@ whether it is the user's primary address or not.`,
 			Params: []ParamDef{
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `listGpgKeys`,
@@ -97,10 +91,9 @@ whether it is the user's primary address or not.`,
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `addANewGpgKey`,
@@ -135,10 +128,9 @@ whether it is the user's primary address or not.`,
 				{Name: `fingerprint`, In: `path`, Type: `string`, Required: true},
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteAGpgKey`,
@@ -150,10 +142,9 @@ whether it is the user's primary address or not.`,
 				{Name: `fingerprint`, In: `path`, Type: `string`, Required: true},
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `listSshKeys`,
@@ -166,10 +157,9 @@ whether it is the user's primary address or not.`,
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `addANewSshKey`,
@@ -203,10 +193,9 @@ whether it is the user's primary address or not.`,
 				{Name: `key_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateASshKey`,
@@ -240,10 +229,9 @@ whether it is the user's primary address or not.`,
 				{Name: `key_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 	},
 }

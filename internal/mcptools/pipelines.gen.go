@@ -8,7 +8,7 @@ package mcptools
 
 // PipelinesToolGroup contains the MCP tool definition for the "bitbucket_pipelines" tool group.
 var PipelinesToolGroup = ToolGroup{
-	Name:        `bitbucket_pipelines`,
+	Name: `bitbucket_pipelines`,
 	Description: `Manage Bitbucket Pipelines
 
 Available operations:
@@ -95,10 +95,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createDeploymentVariable`,
@@ -153,10 +152,9 @@ Available operations:
 				{Name: `environment_uuid`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPipelinesForRepository`,
@@ -186,10 +184,9 @@ for specific details.
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createPipelineForRepository`,
@@ -222,10 +219,9 @@ for specific details.
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `deleteRepositoryPipelineCaches`,
@@ -238,10 +234,9 @@ for specific details.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `name`, In: `query`, Type: `string`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteRepositoryPipelineCache`,
@@ -254,10 +249,9 @@ for specific details.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `cache_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getRepositoryPipelineCacheContentURI`,
@@ -270,10 +264,9 @@ for specific details.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `cache_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getRepositoryRunners`,
@@ -287,10 +280,9 @@ for specific details.
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createRepositoryRunner`,
@@ -302,10 +294,9 @@ for specific details.
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getRepositoryRunner`,
@@ -318,10 +309,9 @@ for specific details.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `runner_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateRepositoryRunner`,
@@ -334,10 +324,9 @@ for specific details.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `runner_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteRepositoryRunner`,
@@ -350,10 +339,9 @@ for specific details.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `runner_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPipelineForRepository`,
@@ -366,10 +354,9 @@ for specific details.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `pipeline_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPipelineStepsForRepository`,
@@ -384,10 +371,9 @@ for specific details.
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `getPipelineStepForRepository`,
@@ -401,10 +387,9 @@ for specific details.
 				{Name: `pipeline_uuid`, In: `path`, Type: `string`, Required: true},
 				{Name: `step_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPipelineStepLogForRepository`,
@@ -420,10 +405,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `pipeline_uuid`, In: `path`, Type: `string`, Required: true},
 				{Name: `step_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPipelineContainerLog`,
@@ -440,10 +424,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `step_uuid`, In: `path`, Type: `string`, Required: true},
 				{Name: `log_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPipelineTestReports`,
@@ -457,10 +440,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `pipeline_uuid`, In: `path`, Type: `string`, Required: true},
 				{Name: `step_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPipelineTestReportTestCases`,
@@ -474,10 +456,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `pipeline_uuid`, In: `path`, Type: `string`, Required: true},
 				{Name: `step_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPipelineTestReportTestCaseReasons`,
@@ -492,10 +473,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `step_uuid`, In: `path`, Type: `string`, Required: true},
 				{Name: `test_case_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `stopPipeline`,
@@ -508,10 +488,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `pipeline_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getRepositoryPipelineConfig`,
@@ -523,10 +502,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateRepositoryPipelineConfig`,
@@ -572,10 +550,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createRepositoryPipelineSchedule`,
@@ -609,10 +586,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `schedule_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateRepositoryPipelineSchedule`,
@@ -642,10 +618,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `schedule_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getRepositoryPipelineScheduleExecutions`,
@@ -660,10 +635,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `getRepositoryPipelineSshKeyPair`,
@@ -675,10 +649,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateRepositoryPipelineKeyPair`,
@@ -707,10 +680,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getRepositoryPipelineKnownHosts`,
@@ -724,10 +696,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createRepositoryPipelineKnownHost`,
@@ -761,10 +732,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `known_host_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateRepositoryPipelineKnownHost`,
@@ -799,10 +769,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `known_host_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getRepositoryPipelineVariables`,
@@ -816,10 +785,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createRepositoryPipelineVariable`,
@@ -851,10 +819,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateRepositoryPipelineVariable`,
@@ -887,10 +854,9 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPipelineVariablesForTeam`,
@@ -904,10 +870,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createPipelineVariableForTeam`,
@@ -919,10 +884,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			Params: []ParamDef{
 				{Name: `username`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    true,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPipelineVariableForTeam`,
@@ -935,10 +899,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `username`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updatePipelineVariableForTeam`,
@@ -951,10 +914,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `username`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    true,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deletePipelineVariableForTeam`,
@@ -967,10 +929,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `username`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPipelineVariablesForUser`,
@@ -984,10 +945,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createPipelineVariableForUser`,
@@ -999,10 +959,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			Params: []ParamDef{
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    true,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPipelineVariableForUser`,
@@ -1015,10 +974,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updatePipelineVariableForUser`,
@@ -1031,10 +989,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    true,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deletePipelineVariableForUser`,
@@ -1047,10 +1004,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getOIDCConfiguration`,
@@ -1061,10 +1017,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getOIDCKeys`,
@@ -1075,10 +1030,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getWorkspaceRunners`,
@@ -1091,10 +1045,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createWorkspaceRunner`,
@@ -1105,10 +1058,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getWorkspaceRunner`,
@@ -1120,10 +1072,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `runner_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateWorkspaceRunner`,
@@ -1135,10 +1086,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `runner_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteWorkspaceRunner`,
@@ -1150,10 +1100,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `runner_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPipelineVariablesForWorkspace`,
@@ -1166,10 +1115,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createPipelineVariableForWorkspace`,
@@ -1180,10 +1128,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    true,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPipelineVariableForWorkspace`,
@@ -1195,10 +1142,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updatePipelineVariableForWorkspace`,
@@ -1210,10 +1156,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    true,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deletePipelineVariableForWorkspace`,
@@ -1225,10 +1170,9 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 	},
 }

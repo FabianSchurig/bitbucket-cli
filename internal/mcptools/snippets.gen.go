@@ -8,7 +8,7 @@ package mcptools
 
 // SnippetsToolGroup contains the MCP tool definition for the "bitbucket_snippets" tool group.
 var SnippetsToolGroup = ToolGroup{
-	Name:        `bitbucket_snippets`,
+	Name: `bitbucket_snippets`,
 	Description: `Manage Bitbucket snippets
 
 Available operations:
@@ -50,10 +50,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createASnippet`,
@@ -61,12 +60,10 @@ Available operations:
 			Path:        `/snippets`,
 			Summary:     `Create a snippet`,
 			Description: "Creates a new snippet under the authenticated user's account.\n\nSnippets can contain multiple files. Both text and binary files are\nsupported.\n\nThe simplest way to create a new snippet from a local file:\n\n    $ curl -u username:password -X POST https://api.bitbucket.org/2.0/snippets               -F file=@image.png\n\nCreating snippets through curl has a few limitations and so let's look\nat a more complicated scenario.\n\nSnippets are created with a multipart POST. Both `multipart/form-data`\nand `multipart/related` are supported. Both allow the creation of\nsnippets with both meta data (title, etc), as well as multiple text\nand binary files.\n\nThe main difference is that `multipart/related` can use rich encoding\nfor the meta data (currently JSON).\n\n\nmultipart/related (RFC-2387)\n----------------------------\n\nThis is the most advanced and efficient way to create a paste.\n\n    POST /2.0/snippets/evzijst HTTP/1.1\n    Content-Length: 1188\n    Content-Type: multipart/related; start=\"snippet\"; boundary=\"===============1438169132528273974==\"\n    MIME-Version: 1.0\n\n    --===============1438169132528273974==\n    Content-Type: application/json; charset=\"utf-8\"\n    MIME-Version: 1.0\n    Content-ID: snippet\n\n    {\n      \"title\": \"My snippet\",\n      \"is_private\": true,\n      \"scm\": \"git\",\n      \"files\": {\n          \"foo.txt\": {},\n          \"image.png\": {}\n        }\n    }\n\n    --===============1438169132528273974==\n    Content-Type: text/plain; charset=\"us-ascii\"\n    MIME-Version: 1.0\n    Content-Transfer-Encoding: 7bit\n    Content-ID: \"foo.txt\"\n    Content-Disposition: attachment; filename=\"foo.txt\"\n\n    foo\n\n    --===============1438169132528273974==\n    Content-Type: image/png\n    MIME-Version: 1.0\n    Content-Transfer-Encoding: base64\n    Content-ID: \"image.png\"\n    Content-Disposition: attachment; filename=\"image.png\"\n\n    iVBORw0KGgoAAAANSUhEUgAAABQAAAAoCAYAAAD+MdrbAAABD0lEQVR4Ae3VMUoDQRTG8ccUaW2m\n    TKONFxArJYJamCvkCnZTaa+VnQdJSBFl2SMsLFrEWNjZBZs0JgiL/+KrhhVmJRbCLPx4O+/DT2TB\n    cbblJxf+UWFVVRNsEGAtgvJxnLm2H+A5RQ93uIl+3632PZyl/skjfOn9Gvdwmlcw5aPUwimG+NT5\n    EnNN036IaZePUuIcK533NVfal7/5yjWeot2z9ta1cAczHEf7I+3J0ws9Cgx0fsOFpmlfwKcWPuBQ\n    73Oc4FHzBaZ8llq4q1mr5B2mOUCt815qYR8eB1hG2VJ7j35q4RofaH7IG+Xrf/PfJhfmwtfFYoIN\n    AqxFUD6OMxcvkO+UfKfkOyXfKdsv/AYCHMLVkHAFWgAAAABJRU5ErkJggg==\n    --===============1438169132528273974==--\n\nThe request contains multiple parts and is structured as follows.\n\nThe first part is the JSON document that describes the snippet's\nproperties or meta data. It either has to be the first part, or the\nrequest's `Content-Type` header must contain the `start` parameter to\npoint to it.\n\nThe remaining parts are the files of which there can be zero or more.\nEach file part should contain the `Content-ID` MIME header through\nwhich the JSON meta data's `files` element addresses it. The value\nshould be the name of the file.\n\n`Content-Disposition` is an optional MIME header. The header's\noptional `filename` parameter can be used to specify the file name\nthat Bitbucket should use when writing the file to disk. When present,\n`filename` takes precedence over the value of `Content-ID`.\n\nWhen the JSON body omits the `files` element, the remaining parts are\nnot ignored. Instead, each file is added to the new snippet as if its\nname was explicitly linked (the use of the `files` elements is\nmandatory for some operations like deleting or renaming files).\n\n\nmultipart/form-data\n-------------------\n\nThe use of JSON for the snippet's meta data is optional. Meta data can\nalso be supplied as regular form fields in a more conventional\n`multipart/form-data` request:\n\n    $ curl -X POST -u credentials https://api.bitbucket.org/2.0/snippets               -F title=\"My snippet\"               -F file=@foo.txt -F file=@image.png\n\n    POST /2.0/snippets HTTP/1.1\n    Content-Length: 951\n    Content-Type: multipart/form-data; boundary=----------------------------63a4b224c59f\n\n    ------------------------------63a4b224c59f\n    Content-Disposition: form-data; name=\"file\"; filename=\"foo.txt\"\n    Content-Type: text/plain\n\n    foo\n\n    ------------------------------63a4b224c59f\n    Content-Disposition: form-data; name=\"file\"; filename=\"image.png\"\n    Content-Type: application/octet-stream\n\n    ?PNG\n\n    IHDR?1??I.....\n    ------------------------------63a4b224c59f\n    Content-Disposition: form-data; name=\"title\"\n\n    My snippet\n    ------------------------------63a4b224c59f--\n\nHere the meta data properties are included as flat, top-level form\nfields. The file attachments use the `file` field name. To attach\nmultiple files, simply repeat the field.\n\nThe advantage of `multipart/form-data` over `multipart/related` is\nthat it can be easier to build clients.\n\nEssentially all properties are optional, `title` and `files` included.\n\n\nSharing and Visibility\n----------------------\n\nSnippets can be either public (visible to anyone on Bitbucket, as well\nas anonymous users), or private (visible only to members of the workspace).\nThis is controlled through the snippet's `is_private` element:\n\n* **is_private=false** -- everyone, including anonymous users can view\n  the snippet\n* **is_private=true** -- only workspace members can view the snippet\n\nTo create the snippet under a workspace, just append the workspace ID\nto the URL. See [`/2.0/snippets/{workspace}`](/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-post).",
-			Params: []ParamDef{
-			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			Params:      []ParamDef{},
+			BodyFields:  []BodyFieldDef{},
+			HasBody:     true,
+			Paginated:   false,
 		},
 		{
 			OperationID: `listSnippetsInAWorkspace`,
@@ -80,10 +77,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createASnippetForAWorkspace`,
@@ -94,10 +90,9 @@ Available operations:
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    true,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getASnippet`,
@@ -109,10 +104,9 @@ Available operations:
 				{Name: `encoded_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateASnippet`,
@@ -124,10 +118,9 @@ Available operations:
 				{Name: `encoded_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteASnippet`,
@@ -139,10 +132,9 @@ Available operations:
 				{Name: `encoded_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `listCommentsOnASnippet`,
@@ -156,10 +148,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createACommentOnASnippet`,
@@ -190,10 +181,9 @@ Available operations:
 				{Name: `encoded_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateACommentOnASnippet`,
@@ -227,10 +217,9 @@ Comments can only be removed by the comment author, snippet creator, or workspac
 				{Name: `encoded_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `listSnippetChanges`,
@@ -244,10 +233,9 @@ Comments can only be removed by the comment author, snippet creator, or workspac
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `getAPreviousSnippetChange`,
@@ -260,10 +248,9 @@ Comments can only be removed by the comment author, snippet creator, or workspac
 				{Name: `revision`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getASnippetsRawFileAtHead`,
@@ -278,10 +265,9 @@ out the versioned file links.`,
 				{Name: `path`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `checkIfTheCurrentUserIsWatchingASnippet`,
@@ -298,10 +284,9 @@ Hitting this endpoint anonymously always returns a 404.`,
 				{Name: `encoded_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `watchASnippet`,
@@ -313,10 +298,9 @@ Hitting this endpoint anonymously always returns a 404.`,
 				{Name: `encoded_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `stopWatchingASnippet`,
@@ -329,10 +313,9 @@ to indicate success.`,
 				{Name: `encoded_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `listUsersWatchingASnippet`,
@@ -346,10 +329,9 @@ to indicate success.`,
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `getAPreviousRevisionOfASnippet`,
@@ -362,10 +344,9 @@ to indicate success.`,
 				{Name: `node_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateAPreviousRevisionOfASnippet`,
@@ -378,10 +359,9 @@ to indicate success.`,
 				{Name: `node_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteAPreviousRevisionOfASnippet`,
@@ -394,10 +374,9 @@ to indicate success.`,
 				{Name: `node_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getASnippetsRawFile`,
@@ -411,10 +390,9 @@ to indicate success.`,
 				{Name: `path`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getSnippetChangesBetweenVersions`,
@@ -428,10 +406,9 @@ to indicate success.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `path`, In: `query`, Type: `string`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getSnippetPatchBetweenVersions`,
@@ -444,10 +421,9 @@ to indicate success.`,
 				{Name: `revision`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 	},
 }

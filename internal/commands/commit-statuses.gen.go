@@ -7,201 +7,200 @@
 package commands
 
 import (
-"context"
-"encoding/json"
-"fmt"
-"strconv"
+	"context"
+	"encoding/json"
+	"fmt"
+	"strconv"
 
-"github.com/spf13/cobra"
+	"github.com/spf13/cobra"
 
-"github.com/FabianSchurig/bitbucket-cli/internal/client"
-"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
-"github.com/FabianSchurig/bitbucket-cli/internal/output"
+	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
+	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
 
 // Ensure imports are used.
 var (
-_ = context.Background
-_ = fmt.Errorf
-_ = json.Marshal
-_ = strconv.Itoa
-_ = client.NewClient
-_ = handlers.Dispatch
-_ = output.Format
+	_ = context.Background
+	_ = fmt.Errorf
+	_ = json.Marshal
+	_ = strconv.Itoa
+	_ = client.NewClient
+	_ = handlers.Dispatch
+	_ = output.Format
 )
 
 // NewCommitStatusesCommand returns the "commit-statuses" cobra command with all sub-commands registered.
 func NewCommitStatusesCommand() *cobra.Command {
-cmd := &cobra.Command{
-Use:   "commit-statuses",
-Short: `Manage Bitbucket commit statuses`,
-Long:  `Commands for listing, creating, and updating build statuses on commits in Bitbucket repositories.`,
-}
+	cmd := &cobra.Command{
+		Use:   "commit-statuses",
+		Short: `Manage Bitbucket commit statuses`,
+		Long:  `Commands for listing, creating, and updating build statuses on commits in Bitbucket repositories.`,
+	}
 
-cmd.AddCommand(
-newCommitStatusesListCommitStatusesForACommitCmd(),
-newCommitStatusesCreateABuildStatusForACommitCmd(),
-newCommitStatusesGetABuildStatusForACommitCmd(),
-newCommitStatusesUpdateABuildStatusForACommitCmd(),
-newCommitStatusesListCommitStatusesForAPullRequestCmd(),
-)
+	cmd.AddCommand(
+		newCommitStatusesListCommitStatusesForACommitCmd(),
+		newCommitStatusesCreateABuildStatusForACommitCmd(),
+		newCommitStatusesGetABuildStatusForACommitCmd(),
+		newCommitStatusesUpdateABuildStatusForACommitCmd(),
+		newCommitStatusesListCommitStatusesForAPullRequestCmd(),
+	)
 
-return cmd
+	return cmd
 }
 
 // newCommitStatusesListCommitStatusesForACommitCmd returns the "commit-statuses list-commit-statuses-for-a-commit" cobra command.
 // operationId: listCommitStatusesForACommit
 func newCommitStatusesListCommitStatusesForACommitCmd() *cobra.Command {
-var (
-commit string
-repoSlug string
-workspace string
-refname string
-q string
-sort string
-page int
-pagelen int
-all bool
-)
+	var (
+		commit    string
+		repoSlug  string
+		workspace string
+		refname   string
+		q         string
+		sort      string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "list-commit-statuses-for-a-commit",
-Short: `List commit statuses for a commit`,
-Long:  `Returns all statuses (e.g. build results) for a specific commit.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if commit == "" {
-return fmt.Errorf("--commit is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"commit": commit,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-"refname": refname,
-"q": q,
-"sort": sort,
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&refname, "refname", "", "refname (query parameter)")
-cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
-cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "list-commit-statuses-for-a-commit",
+		Short: `List commit statuses for a commit`,
+		Long:  `Returns all statuses (e.g. build results) for a specific commit.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if commit == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"commit":    commit,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{
+				"refname": refname,
+				"q":       q,
+				"sort":    sort,
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&refname, "refname", "", "refname (query parameter)")
+	cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
+	cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newCommitStatusesCreateABuildStatusForACommitCmd returns the "commit-statuses create-a-build-status-for-a-commit" cobra command.
 // operationId: createABuildStatusForACommit
 func newCommitStatusesCreateABuildStatusForACommitCmd() *cobra.Command {
-var (
-commit string
-repoSlug string
-workspace string
-bodyDescription string
-bodyKey string
-bodyName string
-bodyRefname string
-bodyState string
-bodyUrl string
-body string
-)
+	var (
+		commit          string
+		repoSlug        string
+		workspace       string
+		bodyDescription string
+		bodyKey         string
+		bodyName        string
+		bodyRefname     string
+		bodyState       string
+		bodyUrl         string
+		body            string
+	)
 
-cmd := &cobra.Command{
-Use:   "create-a-build-status-for-a-commit",
-Short: `Create a build status for a commit`,
-Long:  "Creates a new build status against the specified commit.\n\nIf the specified key already exists, the existing status object will\nbe overwritten.\n\nExample:\n\n```\ncurl https://api.bitbucket.org/2.0/repositories/my-workspace/my-repo/commit/e10dae226959c2194f2b07b077c07762d93821cf/statuses/build/           -X POST -u jdoe -H 'Content-Type: application/json'           -d '{\n    \"key\": \"MY-BUILD\",\n    \"state\": \"SUCCESSFUL\",\n    \"description\": \"42 tests passed\",\n    \"url\": \"https://www.example.org/my-build-result\"\n  }'\n```\n\nWhen creating a new commit status, you can use a URI template for the URL.\nTemplates are URLs that contain variable names that Bitbucket will\nevaluate at runtime whenever the URL is displayed anywhere similar to\nparameter substitution in\n[Bitbucket Connect](https://developer.atlassian.com/bitbucket/concepts/context-parameters.html).\nFor example, one could use `https://foo.com/builds/{repository.full_name}`\nwhich Bitbucket will turn into `https://foo.com/builds/foo/bar` at render time.\nThe context variables available are `repository` and `commit`.\n\nTo associate a commit status to a pull request, the refname field must be set to the source branch\nof the pull request.\n\nExample:\n```\ncurl https://api.bitbucket.org/2.0/repositories/my-workspace/my-repo/commit/e10dae226959c2194f2b07b077c07762d93821cf/statuses/build/           -X POST -u jdoe -H 'Content-Type: application/json'           -d '{\n    \"key\": \"MY-BUILD\",\n    \"state\": \"SUCCESSFUL\",\n    \"description\": \"42 tests passed\",\n    \"url\": \"https://www.example.org/my-build-result\",\n    \"refname\": \"my-pr-branch\"\n  }'\n```",
-RunE: func(cmd *cobra.Command, args []string) error {
-if commit == "" {
-return fmt.Errorf("--commit is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"commit": commit,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-if body == "" {
-bodyObj := map[string]any{}
-if bodyDescription != "" {
-handlers.SetNested(bodyObj, "description", bodyDescription)
-}
-if bodyKey != "" {
-handlers.SetNested(bodyObj, "key", bodyKey)
-}
-if bodyName != "" {
-handlers.SetNested(bodyObj, "name", bodyName)
-}
-if bodyRefname != "" {
-handlers.SetNested(bodyObj, "refname", bodyRefname)
-}
-if bodyState != "" {
-handlers.SetNested(bodyObj, "state", bodyState)
-}
-if bodyUrl != "" {
-handlers.SetNested(bodyObj, "url", bodyUrl)
-}
-if len(bodyObj) > 0 {
-b, _ := json.Marshal(bodyObj)
-body = string(b)
-}
-}
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses/build",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&bodyDescription, "description", "", `A description of the build (e.g. "Unit tests in Bamboo")`)
-cmd.Flags().StringVar(&bodyKey, "key", "", `An identifier for the status that's unique to
+	cmd := &cobra.Command{
+		Use:   "create-a-build-status-for-a-commit",
+		Short: `Create a build status for a commit`,
+		Long:  "Creates a new build status against the specified commit.\n\nIf the specified key already exists, the existing status object will\nbe overwritten.\n\nExample:\n\n```\ncurl https://api.bitbucket.org/2.0/repositories/my-workspace/my-repo/commit/e10dae226959c2194f2b07b077c07762d93821cf/statuses/build/           -X POST -u jdoe -H 'Content-Type: application/json'           -d '{\n    \"key\": \"MY-BUILD\",\n    \"state\": \"SUCCESSFUL\",\n    \"description\": \"42 tests passed\",\n    \"url\": \"https://www.example.org/my-build-result\"\n  }'\n```\n\nWhen creating a new commit status, you can use a URI template for the URL.\nTemplates are URLs that contain variable names that Bitbucket will\nevaluate at runtime whenever the URL is displayed anywhere similar to\nparameter substitution in\n[Bitbucket Connect](https://developer.atlassian.com/bitbucket/concepts/context-parameters.html).\nFor example, one could use `https://foo.com/builds/{repository.full_name}`\nwhich Bitbucket will turn into `https://foo.com/builds/foo/bar` at render time.\nThe context variables available are `repository` and `commit`.\n\nTo associate a commit status to a pull request, the refname field must be set to the source branch\nof the pull request.\n\nExample:\n```\ncurl https://api.bitbucket.org/2.0/repositories/my-workspace/my-repo/commit/e10dae226959c2194f2b07b077c07762d93821cf/statuses/build/           -X POST -u jdoe -H 'Content-Type: application/json'           -d '{\n    \"key\": \"MY-BUILD\",\n    \"state\": \"SUCCESSFUL\",\n    \"description\": \"42 tests passed\",\n    \"url\": \"https://www.example.org/my-build-result\",\n    \"refname\": \"my-pr-branch\"\n  }'\n```",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if commit == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"commit":    commit,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyDescription != "" {
+					handlers.SetNested(bodyObj, "description", bodyDescription)
+				}
+				if bodyKey != "" {
+					handlers.SetNested(bodyObj, "key", bodyKey)
+				}
+				if bodyName != "" {
+					handlers.SetNested(bodyObj, "name", bodyName)
+				}
+				if bodyRefname != "" {
+					handlers.SetNested(bodyObj, "refname", bodyRefname)
+				}
+				if bodyState != "" {
+					handlers.SetNested(bodyObj, "state", bodyState)
+				}
+				if bodyUrl != "" {
+					handlers.SetNested(bodyObj, "url", bodyUrl)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses/build",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyDescription, "description", "", `A description of the build (e.g. "Unit tests in Bamboo")`)
+	cmd.Flags().StringVar(&bodyKey, "key", "", `An identifier for the status that's unique to
         its type (current "build" is the only supported type) and the vendor,
         e.g. BB-DEPLOY`)
-cmd.Flags().StringVar(&bodyName, "name", "", `An identifier for the build itself, e.g. BB-DEPLOY-1`)
-cmd.Flags().StringVar(&bodyRefname, "refname", "", `
+	cmd.Flags().StringVar(&bodyName, "name", "", `An identifier for the build itself, e.g. BB-DEPLOY-1`)
+	cmd.Flags().StringVar(&bodyRefname, "refname", "", `
 The name of the ref that pointed to this commit at the time the status
 object was created. Note that this the ref may since have moved off of
 the commit. This optional field can be useful for build systems whose
@@ -209,160 +208,158 @@ build triggers and configuration are branch-dependent (e.g. a Pipeline
 build).
 It is legitimate for this field to not be set, or even apply (e.g. a
 static linting job).`)
-cmd.Flags().StringVar(&bodyState, "state", "", `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`)
-cmd.Flags().StringVar(&bodyUrl, "url", "", "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time.")
-cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-return cmd
+	cmd.Flags().StringVar(&bodyState, "state", "", `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`)
+	cmd.Flags().StringVar(&bodyUrl, "url", "", "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time.")
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+	return cmd
 }
 
 // newCommitStatusesGetABuildStatusForACommitCmd returns the "commit-statuses get-a-build-status-for-a-commit" cobra command.
 // operationId: getABuildStatusForACommit
 func newCommitStatusesGetABuildStatusForACommitCmd() *cobra.Command {
-var (
-commit string
-key string
-repoSlug string
-workspace string
-)
+	var (
+		commit    string
+		key       string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-a-build-status-for-a-commit",
-Short: `Get a build status for a commit`,
-Long:  `Returns the specified build status for a commit.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if commit == "" {
-return fmt.Errorf("--commit is required")
-}
-if key == "" {
-return fmt.Errorf("--key is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"commit": commit,
-"key": key,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses/build/{key}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
-cmd.Flags().StringVar(&key, "key", "", "key (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-a-build-status-for-a-commit",
+		Short: `Get a build status for a commit`,
+		Long:  `Returns the specified build status for a commit.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if commit == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			if key == "" {
+				return fmt.Errorf("--key is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"commit":    commit,
+				"key":       key,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses/build/{key}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
+	cmd.Flags().StringVar(&key, "key", "", "key (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newCommitStatusesUpdateABuildStatusForACommitCmd returns the "commit-statuses update-a-build-status-for-a-commit" cobra command.
 // operationId: updateABuildStatusForACommit
 func newCommitStatusesUpdateABuildStatusForACommitCmd() *cobra.Command {
-var (
-commit string
-key string
-repoSlug string
-workspace string
-bodyDescription string
-bodyKey string
-bodyName string
-bodyRefname string
-bodyState string
-bodyUrl string
-body string
-)
+	var (
+		commit          string
+		key             string
+		repoSlug        string
+		workspace       string
+		bodyDescription string
+		bodyKey         string
+		bodyName        string
+		bodyRefname     string
+		bodyState       string
+		bodyUrl         string
+		body            string
+	)
 
-cmd := &cobra.Command{
-Use:   "update-a-build-status-for-a-commit",
-Short: `Update a build status for a commit`,
-Long:  "Used to update the current status of a build status object on the\nspecific commit.\n\nThis operation can also be used to change other properties of the\nbuild status:\n\n* `state`\n* `name`\n* `description`\n* `url`\n* `refname`\n\nThe `key` cannot be changed.",
-RunE: func(cmd *cobra.Command, args []string) error {
-if commit == "" {
-return fmt.Errorf("--commit is required")
-}
-if key == "" {
-return fmt.Errorf("--key is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"commit": commit,
-"key": key,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-if body == "" {
-bodyObj := map[string]any{}
-if bodyDescription != "" {
-handlers.SetNested(bodyObj, "description", bodyDescription)
-}
-if bodyKey != "" {
-handlers.SetNested(bodyObj, "key", bodyKey)
-}
-if bodyName != "" {
-handlers.SetNested(bodyObj, "name", bodyName)
-}
-if bodyRefname != "" {
-handlers.SetNested(bodyObj, "refname", bodyRefname)
-}
-if bodyState != "" {
-handlers.SetNested(bodyObj, "state", bodyState)
-}
-if bodyUrl != "" {
-handlers.SetNested(bodyObj, "url", bodyUrl)
-}
-if len(bodyObj) > 0 {
-b, _ := json.Marshal(bodyObj)
-body = string(b)
-}
-}
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "PUT",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses/build/{key}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
-cmd.Flags().StringVar(&key, "key", "", "key (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&bodyDescription, "description", "", `A description of the build (e.g. "Unit tests in Bamboo")`)
-cmd.Flags().StringVar(&bodyKey, "body-key", "", `An identifier for the status that's unique to
+	cmd := &cobra.Command{
+		Use:   "update-a-build-status-for-a-commit",
+		Short: `Update a build status for a commit`,
+		Long:  "Used to update the current status of a build status object on the\nspecific commit.\n\nThis operation can also be used to change other properties of the\nbuild status:\n\n* `state`\n* `name`\n* `description`\n* `url`\n* `refname`\n\nThe `key` cannot be changed.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if commit == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			if key == "" {
+				return fmt.Errorf("--key is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"commit":    commit,
+				"key":       key,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyDescription != "" {
+					handlers.SetNested(bodyObj, "description", bodyDescription)
+				}
+				if bodyKey != "" {
+					handlers.SetNested(bodyObj, "key", bodyKey)
+				}
+				if bodyName != "" {
+					handlers.SetNested(bodyObj, "name", bodyName)
+				}
+				if bodyRefname != "" {
+					handlers.SetNested(bodyObj, "refname", bodyRefname)
+				}
+				if bodyState != "" {
+					handlers.SetNested(bodyObj, "state", bodyState)
+				}
+				if bodyUrl != "" {
+					handlers.SetNested(bodyObj, "url", bodyUrl)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "PUT",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses/build/{key}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
+	cmd.Flags().StringVar(&key, "key", "", "key (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyDescription, "description", "", `A description of the build (e.g. "Unit tests in Bamboo")`)
+	cmd.Flags().StringVar(&bodyKey, "body-key", "", `An identifier for the status that's unique to
         its type (current "build" is the only supported type) and the vendor,
         e.g. BB-DEPLOY`)
-cmd.Flags().StringVar(&bodyName, "name", "", `An identifier for the build itself, e.g. BB-DEPLOY-1`)
-cmd.Flags().StringVar(&bodyRefname, "refname", "", `
+	cmd.Flags().StringVar(&bodyName, "name", "", `An identifier for the build itself, e.g. BB-DEPLOY-1`)
+	cmd.Flags().StringVar(&bodyRefname, "refname", "", `
 The name of the ref that pointed to this commit at the time the status
 object was created. Note that this the ref may since have moved off of
 the commit. This optional field can be useful for build systems whose
@@ -370,75 +367,74 @@ build triggers and configuration are branch-dependent (e.g. a Pipeline
 build).
 It is legitimate for this field to not be set, or even apply (e.g. a
 static linting job).`)
-cmd.Flags().StringVar(&bodyState, "state", "", `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`)
-cmd.Flags().StringVar(&bodyUrl, "url", "", "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time.")
-cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-return cmd
+	cmd.Flags().StringVar(&bodyState, "state", "", `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`)
+	cmd.Flags().StringVar(&bodyUrl, "url", "", "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time.")
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+	return cmd
 }
 
 // newCommitStatusesListCommitStatusesForAPullRequestCmd returns the "commit-statuses list-commit-statuses-for-a-pull-request" cobra command.
 // operationId: listCommitStatusesForAPullRequest
 func newCommitStatusesListCommitStatusesForAPullRequestCmd() *cobra.Command {
-var (
-pullRequestId int
-repoSlug string
-workspace string
-q string
-sort string
-page int
-pagelen int
-all bool
-)
+	var (
+		pullRequestId int
+		repoSlug      string
+		workspace     string
+		q             string
+		sort          string
+		page          int
+		pagelen       int
+		all           bool
+	)
 
-cmd := &cobra.Command{
-Use:   "list-commit-statuses-for-a-pull-request",
-Short: `List commit statuses for a pull request`,
-Long:  `Returns all statuses (e.g. build results) for the given pull
+	cmd := &cobra.Command{
+		Use:   "list-commit-statuses-for-a-pull-request",
+		Short: `List commit statuses for a pull request`,
+		Long: `Returns all statuses (e.g. build results) for the given pull
 request.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if pullRequestId == 0 {
-return fmt.Errorf("--pull-request-id is required")
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if pullRequestId == 0 {
+				return fmt.Errorf("--pull-request-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
+			}
+			queryParams := map[string]string{
+				"q":       q,
+				"sort":    sort,
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/statuses",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
+	cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"pull_request_id": strconv.Itoa(pullRequestId),
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-"q": q,
-"sort": sort,
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/statuses",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
-cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
-}
-

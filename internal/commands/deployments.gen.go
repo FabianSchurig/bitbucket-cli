@@ -7,880 +7,867 @@
 package commands
 
 import (
-"context"
-"encoding/json"
-"fmt"
-"strconv"
+	"context"
+	"encoding/json"
+	"fmt"
+	"strconv"
 
-"github.com/spf13/cobra"
+	"github.com/spf13/cobra"
 
-"github.com/FabianSchurig/bitbucket-cli/internal/client"
-"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
-"github.com/FabianSchurig/bitbucket-cli/internal/output"
+	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
+	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
 
 // Ensure imports are used.
 var (
-_ = context.Background
-_ = fmt.Errorf
-_ = json.Marshal
-_ = strconv.Itoa
-_ = client.NewClient
-_ = handlers.Dispatch
-_ = output.Format
+	_ = context.Background
+	_ = fmt.Errorf
+	_ = json.Marshal
+	_ = strconv.Itoa
+	_ = client.NewClient
+	_ = handlers.Dispatch
+	_ = output.Format
 )
 
 // NewDeploymentsCommand returns the "deployments" cobra command with all sub-commands registered.
 func NewDeploymentsCommand() *cobra.Command {
-cmd := &cobra.Command{
-Use:   "deployments",
-Short: `Manage Bitbucket deployments`,
-Long:  `Commands for managing deploy keys, deployments, and environments in Bitbucket repositories and projects.`,
-}
+	cmd := &cobra.Command{
+		Use:   "deployments",
+		Short: `Manage Bitbucket deployments`,
+		Long:  `Commands for managing deploy keys, deployments, and environments in Bitbucket repositories and projects.`,
+	}
 
-cmd.AddCommand(
-newDeploymentsListRepositoryDeployKeysCmd(),
-newDeploymentsAddARepositoryDeployKeyCmd(),
-newDeploymentsGetARepositoryDeployKeyCmd(),
-newDeploymentsUpdateARepositoryDeployKeyCmd(),
-newDeploymentsDeleteARepositoryDeployKeyCmd(),
-newDeploymentsGetDeploymentsForRepositoryCmd(),
-newDeploymentsGetDeploymentForRepositoryCmd(),
-newDeploymentsGetEnvironmentsForRepositoryCmd(),
-newDeploymentsCreateEnvironmentCmd(),
-newDeploymentsGetEnvironmentForRepositoryCmd(),
-newDeploymentsDeleteEnvironmentForRepositoryCmd(),
-newDeploymentsUpdateEnvironmentForRepositoryCmd(),
-newDeploymentsListProjectDeployKeysCmd(),
-newDeploymentsCreateAProjectDeployKeyCmd(),
-newDeploymentsGetAProjectDeployKeyCmd(),
-newDeploymentsDeleteADeployKeyFromAProjectCmd(),
-)
+	cmd.AddCommand(
+		newDeploymentsListRepositoryDeployKeysCmd(),
+		newDeploymentsAddARepositoryDeployKeyCmd(),
+		newDeploymentsGetARepositoryDeployKeyCmd(),
+		newDeploymentsUpdateARepositoryDeployKeyCmd(),
+		newDeploymentsDeleteARepositoryDeployKeyCmd(),
+		newDeploymentsGetDeploymentsForRepositoryCmd(),
+		newDeploymentsGetDeploymentForRepositoryCmd(),
+		newDeploymentsGetEnvironmentsForRepositoryCmd(),
+		newDeploymentsCreateEnvironmentCmd(),
+		newDeploymentsGetEnvironmentForRepositoryCmd(),
+		newDeploymentsDeleteEnvironmentForRepositoryCmd(),
+		newDeploymentsUpdateEnvironmentForRepositoryCmd(),
+		newDeploymentsListProjectDeployKeysCmd(),
+		newDeploymentsCreateAProjectDeployKeyCmd(),
+		newDeploymentsGetAProjectDeployKeyCmd(),
+		newDeploymentsDeleteADeployKeyFromAProjectCmd(),
+	)
 
-return cmd
+	return cmd
 }
 
 // newDeploymentsListRepositoryDeployKeysCmd returns the "deployments list-repository-deploy-keys" cobra command.
 // operationId: listRepositoryDeployKeys
 func newDeploymentsListRepositoryDeployKeysCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-page int
-pagelen int
-all bool
-)
+	var (
+		repoSlug  string
+		workspace string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "list-repository-deploy-keys",
-Short: `List repository deploy keys`,
-Long:  `Returns all deploy-keys belonging to a repository.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/deploy-keys",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "list-repository-deploy-keys",
+		Short: `List repository deploy keys`,
+		Long:  `Returns all deploy-keys belonging to a repository.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/deploy-keys",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newDeploymentsAddARepositoryDeployKeyCmd returns the "deployments add-a-repository-deploy-key" cobra command.
 // operationId: addARepositoryDeployKey
 func newDeploymentsAddARepositoryDeployKeyCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-)
+	var (
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "add-a-repository-deploy-key",
-Short: `Add a repository deploy key`,
-Long:  "Create a new deploy key in a repository. Note: If authenticating a deploy key\nwith an OAuth consumer, any changes to the OAuth consumer will subsequently\ninvalidate the deploy key.\n\n\nExample:\n```\n$ curl -X POST \\\n-H \"Authorization <auth header>\" \\\n-H \"Content-type: application/json\" \\\nhttps://api.bitbucket.org/2.0/repositories/mleu/test/deploy-keys -d \\\n'{\n    \"key\": \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAK/b1cHHDr/TEV1JGQl+WjCwStKG6Bhrv0rFpEsYlyTBm1fzN0VOJJYn4ZOPCPJwqse6fGbXntEs+BbXiptR+++HycVgl65TMR0b5ul5AgwrVdZdT7qjCOCgaSV74/9xlHDK8oqgGnfA7ZoBBU+qpVyaloSjBdJfLtPY/xqj4yHnXKYzrtn/uFc4Kp9Tb7PUg9Io3qohSTGJGVHnsVblq/rToJG7L5xIo0OxK0SJSQ5vuId93ZuFZrCNMXj8JDHZeSEtjJzpRCBEXHxpOPhAcbm4MzULgkFHhAVgp4JbkrT99/wpvZ7r9AdkTg7HGqL3rlaDrEcWfL7Lu6TnhBdq5 mleu@C02W454JHTD8\",\n    \"label\": \"mydeploykey\"\n}'\n```",
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/deploy-keys",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "add-a-repository-deploy-key",
+		Short: `Add a repository deploy key`,
+		Long:  "Create a new deploy key in a repository. Note: If authenticating a deploy key\nwith an OAuth consumer, any changes to the OAuth consumer will subsequently\ninvalidate the deploy key.\n\n\nExample:\n```\n$ curl -X POST \\\n-H \"Authorization <auth header>\" \\\n-H \"Content-type: application/json\" \\\nhttps://api.bitbucket.org/2.0/repositories/mleu/test/deploy-keys -d \\\n'{\n    \"key\": \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAK/b1cHHDr/TEV1JGQl+WjCwStKG6Bhrv0rFpEsYlyTBm1fzN0VOJJYn4ZOPCPJwqse6fGbXntEs+BbXiptR+++HycVgl65TMR0b5ul5AgwrVdZdT7qjCOCgaSV74/9xlHDK8oqgGnfA7ZoBBU+qpVyaloSjBdJfLtPY/xqj4yHnXKYzrtn/uFc4Kp9Tb7PUg9Io3qohSTGJGVHnsVblq/rToJG7L5xIo0OxK0SJSQ5vuId93ZuFZrCNMXj8JDHZeSEtjJzpRCBEXHxpOPhAcbm4MzULgkFHhAVgp4JbkrT99/wpvZ7r9AdkTg7HGqL3rlaDrEcWfL7Lu6TnhBdq5 mleu@C02W454JHTD8\",\n    \"label\": \"mydeploykey\"\n}'\n```",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/deploy-keys",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newDeploymentsGetARepositoryDeployKeyCmd returns the "deployments get-a-repository-deploy-key" cobra command.
 // operationId: getARepositoryDeployKey
 func newDeploymentsGetARepositoryDeployKeyCmd() *cobra.Command {
-var (
-keyId string
-repoSlug string
-workspace string
-)
+	var (
+		keyId     string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-a-repository-deploy-key",
-Short: `Get a repository deploy key`,
-Long:  `Returns the deploy key belonging to a specific key.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if keyId == "" {
-return fmt.Errorf("--key-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"key_id": keyId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&keyId, "key-id", "", "key_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-a-repository-deploy-key",
+		Short: `Get a repository deploy key`,
+		Long:  `Returns the deploy key belonging to a specific key.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if keyId == "" {
+				return fmt.Errorf("--key-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"key_id":    keyId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&keyId, "key-id", "", "key_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newDeploymentsUpdateARepositoryDeployKeyCmd returns the "deployments update-a-repository-deploy-key" cobra command.
 // operationId: updateARepositoryDeployKey
 func newDeploymentsUpdateARepositoryDeployKeyCmd() *cobra.Command {
-var (
-keyId string
-repoSlug string
-workspace string
-)
+	var (
+		keyId     string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "update-a-repository-deploy-key",
-Short: `Update a repository deploy key`,
-Long:  "Create a new deploy key in a repository.\n\nThe same key needs to be passed in but the comment and label can change.\n\nExample:\n```\n$ curl -X PUT \\\n-H \"Authorization <auth header>\" \\\n-H \"Content-type: application/json\" \\\nhttps://api.bitbucket.org/2.0/repositories/mleu/test/deploy-keys/1234 -d \\\n'{\n    \"label\": \"newlabel\",\n    \"key\": \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAK/b1cHHDr/TEV1JGQl+WjCwStKG6Bhrv0rFpEsYlyTBm1fzN0VOJJYn4ZOPCPJwqse6fGbXntEs+BbXiptR+++HycVgl65TMR0b5ul5AgwrVdZdT7qjCOCgaSV74/9xlHDK8oqgGnfA7ZoBBU+qpVyaloSjBdJfLtPY/xqj4yHnXKYzrtn/uFc4Kp9Tb7PUg9Io3qohSTGJGVHnsVblq/rToJG7L5xIo0OxK0SJSQ5vuId93ZuFZrCNMXj8JDHZeSEtjJzpRCBEXHxpOPhAcbm4MzULgkFHhAVgp4JbkrT99/wpvZ7r9AdkTg7HGqL3rlaDrEcWfL7Lu6TnhBdq5 newcomment\",\n}'\n```",
-RunE: func(cmd *cobra.Command, args []string) error {
-if keyId == "" {
-return fmt.Errorf("--key-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"key_id": keyId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "PUT",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&keyId, "key-id", "", "key_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "update-a-repository-deploy-key",
+		Short: `Update a repository deploy key`,
+		Long:  "Create a new deploy key in a repository.\n\nThe same key needs to be passed in but the comment and label can change.\n\nExample:\n```\n$ curl -X PUT \\\n-H \"Authorization <auth header>\" \\\n-H \"Content-type: application/json\" \\\nhttps://api.bitbucket.org/2.0/repositories/mleu/test/deploy-keys/1234 -d \\\n'{\n    \"label\": \"newlabel\",\n    \"key\": \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAK/b1cHHDr/TEV1JGQl+WjCwStKG6Bhrv0rFpEsYlyTBm1fzN0VOJJYn4ZOPCPJwqse6fGbXntEs+BbXiptR+++HycVgl65TMR0b5ul5AgwrVdZdT7qjCOCgaSV74/9xlHDK8oqgGnfA7ZoBBU+qpVyaloSjBdJfLtPY/xqj4yHnXKYzrtn/uFc4Kp9Tb7PUg9Io3qohSTGJGVHnsVblq/rToJG7L5xIo0OxK0SJSQ5vuId93ZuFZrCNMXj8JDHZeSEtjJzpRCBEXHxpOPhAcbm4MzULgkFHhAVgp4JbkrT99/wpvZ7r9AdkTg7HGqL3rlaDrEcWfL7Lu6TnhBdq5 newcomment\",\n}'\n```",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if keyId == "" {
+				return fmt.Errorf("--key-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"key_id":    keyId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "PUT",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&keyId, "key-id", "", "key_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newDeploymentsDeleteARepositoryDeployKeyCmd returns the "deployments delete-a-repository-deploy-key" cobra command.
 // operationId: deleteARepositoryDeployKey
 func newDeploymentsDeleteARepositoryDeployKeyCmd() *cobra.Command {
-var (
-keyId string
-repoSlug string
-workspace string
-)
+	var (
+		keyId     string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "delete-a-repository-deploy-key",
-Short: `Delete a repository deploy key`,
-Long:  `This deletes a deploy key from a repository.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if keyId == "" {
-return fmt.Errorf("--key-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"key_id": keyId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "DELETE",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&keyId, "key-id", "", "key_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "delete-a-repository-deploy-key",
+		Short: `Delete a repository deploy key`,
+		Long:  `This deletes a deploy key from a repository.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if keyId == "" {
+				return fmt.Errorf("--key-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"key_id":    keyId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "DELETE",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&keyId, "key-id", "", "key_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newDeploymentsGetDeploymentsForRepositoryCmd returns the "deployments get-deployments-for-repository" cobra command.
 // operationId: getDeploymentsForRepository
 func newDeploymentsGetDeploymentsForRepositoryCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-page int
-pagelen int
-all bool
-)
+	var (
+		workspace string
+		repoSlug  string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "get-deployments-for-repository",
-Short: `List deployments`,
-Long:  `Find deployments`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-}
-queryParams := map[string]string{
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/deployments",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-deployments-for-repository",
+		Short: `List deployments`,
+		Long:  `Find deployments`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
+			}
+			queryParams := map[string]string{
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/deployments",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newDeploymentsGetDeploymentForRepositoryCmd returns the "deployments get-deployment-for-repository" cobra command.
 // operationId: getDeploymentForRepository
 func newDeploymentsGetDeploymentForRepositoryCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-deploymentUuid string
-)
+	var (
+		workspace      string
+		repoSlug       string
+		deploymentUuid string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-deployment-for-repository",
-Short: `Get a deployment`,
-Long:  `Retrieve a deployment`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if deploymentUuid == "" {
-return fmt.Errorf("--deployment-uuid is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-"deployment_uuid": deploymentUuid,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/deployments/{deployment_uuid}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&deploymentUuid, "deployment-uuid", "", "deployment_uuid (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-deployment-for-repository",
+		Short: `Get a deployment`,
+		Long:  `Retrieve a deployment`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if deploymentUuid == "" {
+				return fmt.Errorf("--deployment-uuid is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace":       workspace,
+				"repo_slug":       repoSlug,
+				"deployment_uuid": deploymentUuid,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/deployments/{deployment_uuid}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&deploymentUuid, "deployment-uuid", "", "deployment_uuid (path parameter)")
+	return cmd
 }
 
 // newDeploymentsGetEnvironmentsForRepositoryCmd returns the "deployments get-environments-for-repository" cobra command.
 // operationId: getEnvironmentsForRepository
 func newDeploymentsGetEnvironmentsForRepositoryCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-page int
-pagelen int
-all bool
-)
+	var (
+		workspace string
+		repoSlug  string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "get-environments-for-repository",
-Short: `List environments`,
-Long:  `Find environments`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-}
-queryParams := map[string]string{
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/environments",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-environments-for-repository",
+		Short: `List environments`,
+		Long:  `Find environments`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
+			}
+			queryParams := map[string]string{
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/environments",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newDeploymentsCreateEnvironmentCmd returns the "deployments create-environment" cobra command.
 // operationId: createEnvironment
 func newDeploymentsCreateEnvironmentCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-bodyName string
-bodyUuid string
-body string
-)
+	var (
+		workspace string
+		repoSlug  string
+		bodyName  string
+		bodyUuid  string
+		body      string
+	)
 
-cmd := &cobra.Command{
-Use:   "create-environment",
-Short: `Create an environment`,
-Long:  `Create an environment.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-}
-queryParams := map[string]string{
-}
-if body == "" {
-bodyObj := map[string]any{}
-if bodyName != "" {
-handlers.SetNested(bodyObj, "name", bodyName)
-}
-if bodyUuid != "" {
-handlers.SetNested(bodyObj, "uuid", bodyUuid)
-}
-if len(bodyObj) > 0 {
-b, _ := json.Marshal(bodyObj)
-body = string(b)
-}
-}
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/environments",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&bodyName, "name", "", `The name of the environment.`)
-cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID identifying the environment.`)
-cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "create-environment",
+		Short: `Create an environment`,
+		Long:  `Create an environment.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
+			}
+			queryParams := map[string]string{}
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyName != "" {
+					handlers.SetNested(bodyObj, "name", bodyName)
+				}
+				if bodyUuid != "" {
+					handlers.SetNested(bodyObj, "uuid", bodyUuid)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/environments",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&bodyName, "name", "", `The name of the environment.`)
+	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID identifying the environment.`)
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+	return cmd
 }
 
 // newDeploymentsGetEnvironmentForRepositoryCmd returns the "deployments get-environment-for-repository" cobra command.
 // operationId: getEnvironmentForRepository
 func newDeploymentsGetEnvironmentForRepositoryCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-environmentUuid string
-)
+	var (
+		workspace       string
+		repoSlug        string
+		environmentUuid string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-environment-for-repository",
-Short: `Get an environment`,
-Long:  `Retrieve an environment`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if environmentUuid == "" {
-return fmt.Errorf("--environment-uuid is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-"environment_uuid": environmentUuid,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&environmentUuid, "environment-uuid", "", "environment_uuid (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-environment-for-repository",
+		Short: `Get an environment`,
+		Long:  `Retrieve an environment`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if environmentUuid == "" {
+				return fmt.Errorf("--environment-uuid is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace":        workspace,
+				"repo_slug":        repoSlug,
+				"environment_uuid": environmentUuid,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&environmentUuid, "environment-uuid", "", "environment_uuid (path parameter)")
+	return cmd
 }
 
 // newDeploymentsDeleteEnvironmentForRepositoryCmd returns the "deployments delete-environment-for-repository" cobra command.
 // operationId: deleteEnvironmentForRepository
 func newDeploymentsDeleteEnvironmentForRepositoryCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-environmentUuid string
-)
+	var (
+		workspace       string
+		repoSlug        string
+		environmentUuid string
+	)
 
-cmd := &cobra.Command{
-Use:   "delete-environment-for-repository",
-Short: `Delete an environment`,
-Long:  `Delete an environment`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if environmentUuid == "" {
-return fmt.Errorf("--environment-uuid is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-"environment_uuid": environmentUuid,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "DELETE",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&environmentUuid, "environment-uuid", "", "environment_uuid (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "delete-environment-for-repository",
+		Short: `Delete an environment`,
+		Long:  `Delete an environment`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if environmentUuid == "" {
+				return fmt.Errorf("--environment-uuid is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace":        workspace,
+				"repo_slug":        repoSlug,
+				"environment_uuid": environmentUuid,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "DELETE",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&environmentUuid, "environment-uuid", "", "environment_uuid (path parameter)")
+	return cmd
 }
 
 // newDeploymentsUpdateEnvironmentForRepositoryCmd returns the "deployments update-environment-for-repository" cobra command.
 // operationId: updateEnvironmentForRepository
 func newDeploymentsUpdateEnvironmentForRepositoryCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-environmentUuid string
-)
+	var (
+		workspace       string
+		repoSlug        string
+		environmentUuid string
+	)
 
-cmd := &cobra.Command{
-Use:   "update-environment-for-repository",
-Short: `Update an environment`,
-Long:  `Update an environment`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if environmentUuid == "" {
-return fmt.Errorf("--environment-uuid is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-"environment_uuid": environmentUuid,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}/changes",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&environmentUuid, "environment-uuid", "", "environment_uuid (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "update-environment-for-repository",
+		Short: `Update an environment`,
+		Long:  `Update an environment`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if environmentUuid == "" {
+				return fmt.Errorf("--environment-uuid is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace":        workspace,
+				"repo_slug":        repoSlug,
+				"environment_uuid": environmentUuid,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}/changes",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&environmentUuid, "environment-uuid", "", "environment_uuid (path parameter)")
+	return cmd
 }
 
 // newDeploymentsListProjectDeployKeysCmd returns the "deployments list-project-deploy-keys" cobra command.
 // operationId: listProjectDeployKeys
 func newDeploymentsListProjectDeployKeysCmd() *cobra.Command {
-var (
-projectKey string
-workspace string
-page int
-pagelen int
-all bool
-)
+	var (
+		projectKey string
+		workspace  string
+		page       int
+		pagelen    int
+		all        bool
+	)
 
-cmd := &cobra.Command{
-Use:   "list-project-deploy-keys",
-Short: `List project deploy keys`,
-Long:  `Returns all deploy keys belonging to a project.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if projectKey == "" {
-return fmt.Errorf("--project-key is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"project_key": projectKey,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/workspaces/{workspace}/projects/{project_key}/deploy-keys",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&projectKey, "project-key", "", "project_key (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "list-project-deploy-keys",
+		Short: `List project deploy keys`,
+		Long:  `Returns all deploy keys belonging to a project.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if projectKey == "" {
+				return fmt.Errorf("--project-key is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"project_key": projectKey,
+				"workspace":   workspace,
+			}
+			queryParams := map[string]string{
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/workspaces/{workspace}/projects/{project_key}/deploy-keys",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&projectKey, "project-key", "", "project_key (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newDeploymentsCreateAProjectDeployKeyCmd returns the "deployments create-a-project-deploy-key" cobra command.
 // operationId: createAProjectDeployKey
 func newDeploymentsCreateAProjectDeployKeyCmd() *cobra.Command {
-var (
-projectKey string
-workspace string
-)
+	var (
+		projectKey string
+		workspace  string
+	)
 
-cmd := &cobra.Command{
-Use:   "create-a-project-deploy-key",
-Short: `Create a project deploy key`,
-Long:  "Create a new deploy key in a project.\n\nExample:\n```\n$ curl -X POST \\\n-H \"Authorization <auth header>\" \\\n-H \"Content-type: application/json\" \\\nhttps://api.bitbucket.org/2.0/workspaces/standard/projects/TEST_PROJECT/deploy-keys/ -d \\\n'{\n    \"key\": \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAK/b1cHHDr/TEV1JGQl+WjCwStKG6Bhrv0rFpEsYlyTBm1fzN0VOJJYn4ZOPCPJwqse6fGbXntEs+BbXiptR+++HycVgl65TMR0b5ul5AgwrVdZdT7qjCOCgaSV74/9xlHDK8oqgGnfA7ZoBBU+qpVyaloSjBdJfLtPY/xqj4yHnXKYzrtn/uFc4Kp9Tb7PUg9Io3qohSTGJGVHnsVblq/rToJG7L5xIo0OxK0SJSQ5vuId93ZuFZrCNMXj8JDHZeSEtjJzpRCBEXHxpOPhAcbm4MzULgkFHhAVgp4JbkrT99/wpvZ7r9AdkTg7HGqL3rlaDrEcWfL7Lu6TnhBdq5 mleu@C02W454JHTD8\",\n    \"label\": \"mydeploykey\"\n}'\n```",
-RunE: func(cmd *cobra.Command, args []string) error {
-if projectKey == "" {
-return fmt.Errorf("--project-key is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"project_key": projectKey,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/workspaces/{workspace}/projects/{project_key}/deploy-keys",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&projectKey, "project-key", "", "project_key (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "create-a-project-deploy-key",
+		Short: `Create a project deploy key`,
+		Long:  "Create a new deploy key in a project.\n\nExample:\n```\n$ curl -X POST \\\n-H \"Authorization <auth header>\" \\\n-H \"Content-type: application/json\" \\\nhttps://api.bitbucket.org/2.0/workspaces/standard/projects/TEST_PROJECT/deploy-keys/ -d \\\n'{\n    \"key\": \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAK/b1cHHDr/TEV1JGQl+WjCwStKG6Bhrv0rFpEsYlyTBm1fzN0VOJJYn4ZOPCPJwqse6fGbXntEs+BbXiptR+++HycVgl65TMR0b5ul5AgwrVdZdT7qjCOCgaSV74/9xlHDK8oqgGnfA7ZoBBU+qpVyaloSjBdJfLtPY/xqj4yHnXKYzrtn/uFc4Kp9Tb7PUg9Io3qohSTGJGVHnsVblq/rToJG7L5xIo0OxK0SJSQ5vuId93ZuFZrCNMXj8JDHZeSEtjJzpRCBEXHxpOPhAcbm4MzULgkFHhAVgp4JbkrT99/wpvZ7r9AdkTg7HGqL3rlaDrEcWfL7Lu6TnhBdq5 mleu@C02W454JHTD8\",\n    \"label\": \"mydeploykey\"\n}'\n```",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if projectKey == "" {
+				return fmt.Errorf("--project-key is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"project_key": projectKey,
+				"workspace":   workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/workspaces/{workspace}/projects/{project_key}/deploy-keys",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&projectKey, "project-key", "", "project_key (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newDeploymentsGetAProjectDeployKeyCmd returns the "deployments get-a-project-deploy-key" cobra command.
 // operationId: getAProjectDeployKey
 func newDeploymentsGetAProjectDeployKeyCmd() *cobra.Command {
-var (
-keyId string
-projectKey string
-workspace string
-)
+	var (
+		keyId      string
+		projectKey string
+		workspace  string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-a-project-deploy-key",
-Short: `Get a project deploy key`,
-Long:  `Returns the deploy key belonging to a specific key ID.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if keyId == "" {
-return fmt.Errorf("--key-id is required")
-}
-if projectKey == "" {
-return fmt.Errorf("--project-key is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"key_id": keyId,
-"project_key": projectKey,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/workspaces/{workspace}/projects/{project_key}/deploy-keys/{key_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&keyId, "key-id", "", "key_id (path parameter)")
-cmd.Flags().StringVar(&projectKey, "project-key", "", "project_key (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-a-project-deploy-key",
+		Short: `Get a project deploy key`,
+		Long:  `Returns the deploy key belonging to a specific key ID.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if keyId == "" {
+				return fmt.Errorf("--key-id is required")
+			}
+			if projectKey == "" {
+				return fmt.Errorf("--project-key is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"key_id":      keyId,
+				"project_key": projectKey,
+				"workspace":   workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/workspaces/{workspace}/projects/{project_key}/deploy-keys/{key_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&keyId, "key-id", "", "key_id (path parameter)")
+	cmd.Flags().StringVar(&projectKey, "project-key", "", "project_key (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newDeploymentsDeleteADeployKeyFromAProjectCmd returns the "deployments delete-a-deploy-key-from-a-project" cobra command.
 // operationId: deleteADeployKeyFromAProject
 func newDeploymentsDeleteADeployKeyFromAProjectCmd() *cobra.Command {
-var (
-keyId string
-projectKey string
-workspace string
-)
+	var (
+		keyId      string
+		projectKey string
+		workspace  string
+	)
 
-cmd := &cobra.Command{
-Use:   "delete-a-deploy-key-from-a-project",
-Short: `Delete a deploy key from a project`,
-Long:  `This deletes a deploy key from a project.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if keyId == "" {
-return fmt.Errorf("--key-id is required")
+	cmd := &cobra.Command{
+		Use:   "delete-a-deploy-key-from-a-project",
+		Short: `Delete a deploy key from a project`,
+		Long:  `This deletes a deploy key from a project.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if keyId == "" {
+				return fmt.Errorf("--key-id is required")
+			}
+			if projectKey == "" {
+				return fmt.Errorf("--project-key is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"key_id":      keyId,
+				"project_key": projectKey,
+				"workspace":   workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "DELETE",
+				URLTemplate: "/workspaces/{workspace}/projects/{project_key}/deploy-keys/{key_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&keyId, "key-id", "", "key_id (path parameter)")
+	cmd.Flags().StringVar(&projectKey, "project-key", "", "project_key (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
-if projectKey == "" {
-return fmt.Errorf("--project-key is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"key_id": keyId,
-"project_key": projectKey,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "DELETE",
-					URLTemplate: "/workspaces/{workspace}/projects/{project_key}/deploy-keys/{key_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&keyId, "key-id", "", "key_id (path parameter)")
-cmd.Flags().StringVar(&projectKey, "project-key", "", "project_key (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
-}
-

@@ -7,242 +7,237 @@
 package commands
 
 import (
-"context"
-"encoding/json"
-"fmt"
-"strconv"
+	"context"
+	"encoding/json"
+	"fmt"
+	"strconv"
 
-"github.com/spf13/cobra"
+	"github.com/spf13/cobra"
 
-"github.com/FabianSchurig/bitbucket-cli/internal/client"
-"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
-"github.com/FabianSchurig/bitbucket-cli/internal/output"
+	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
+	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
 
 // Ensure imports are used.
 var (
-_ = context.Background
-_ = fmt.Errorf
-_ = json.Marshal
-_ = strconv.Itoa
-_ = client.NewClient
-_ = handlers.Dispatch
-_ = output.Format
+	_ = context.Background
+	_ = fmt.Errorf
+	_ = json.Marshal
+	_ = strconv.Itoa
+	_ = client.NewClient
+	_ = handlers.Dispatch
+	_ = output.Format
 )
 
 // NewDownloadsCommand returns the "downloads" cobra command with all sub-commands registered.
 func NewDownloadsCommand() *cobra.Command {
-cmd := &cobra.Command{
-Use:   "downloads",
-Short: `Manage Bitbucket repository downloads`,
-Long:  `Commands for listing, uploading, and deleting download artifacts in Bitbucket repositories.`,
-}
+	cmd := &cobra.Command{
+		Use:   "downloads",
+		Short: `Manage Bitbucket repository downloads`,
+		Long:  `Commands for listing, uploading, and deleting download artifacts in Bitbucket repositories.`,
+	}
 
-cmd.AddCommand(
-newDownloadsListDownloadArtifactsCmd(),
-newDownloadsUploadADownloadArtifactCmd(),
-newDownloadsGetADownloadArtifactLinkCmd(),
-newDownloadsDeleteADownloadArtifactCmd(),
-)
+	cmd.AddCommand(
+		newDownloadsListDownloadArtifactsCmd(),
+		newDownloadsUploadADownloadArtifactCmd(),
+		newDownloadsGetADownloadArtifactLinkCmd(),
+		newDownloadsDeleteADownloadArtifactCmd(),
+	)
 
-return cmd
+	return cmd
 }
 
 // newDownloadsListDownloadArtifactsCmd returns the "downloads list-download-artifacts" cobra command.
 // operationId: listDownloadArtifacts
 func newDownloadsListDownloadArtifactsCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-)
+	var (
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "list-download-artifacts",
-Short: `List download artifacts`,
-Long:  `Returns a list of download links associated with the repository.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/downloads",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "list-download-artifacts",
+		Short: `List download artifacts`,
+		Long:  `Returns a list of download links associated with the repository.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/downloads",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newDownloadsUploadADownloadArtifactCmd returns the "downloads upload-a-download-artifact" cobra command.
 // operationId: uploadADownloadArtifact
 func newDownloadsUploadADownloadArtifactCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-)
+	var (
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "upload-a-download-artifact",
-Short: `Upload a download artifact`,
-Long:  "Upload new download artifacts.\n\nTo upload files, perform a `multipart/form-data` POST containing one\nor more `files` fields:\n\n    $ echo Hello World > hello.txt\n    $ curl -s -u evzijst -X POST https://api.bitbucket.org/2.0/repositories/evzijst/git-tests/downloads -F files=@hello.txt\n\nWhen a file is uploaded with the same name as an existing artifact,\nthen the existing file will be replaced.",
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/downloads",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "upload-a-download-artifact",
+		Short: `Upload a download artifact`,
+		Long:  "Upload new download artifacts.\n\nTo upload files, perform a `multipart/form-data` POST containing one\nor more `files` fields:\n\n    $ echo Hello World > hello.txt\n    $ curl -s -u evzijst -X POST https://api.bitbucket.org/2.0/repositories/evzijst/git-tests/downloads -F files=@hello.txt\n\nWhen a file is uploaded with the same name as an existing artifact,\nthen the existing file will be replaced.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/downloads",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newDownloadsGetADownloadArtifactLinkCmd returns the "downloads get-a-download-artifact-link" cobra command.
 // operationId: getADownloadArtifactLink
 func newDownloadsGetADownloadArtifactLinkCmd() *cobra.Command {
-var (
-filename string
-repoSlug string
-workspace string
-)
+	var (
+		filename  string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-a-download-artifact-link",
-Short: `Get a download artifact link`,
-Long:  `Return a redirect to the contents of a download artifact.
+	cmd := &cobra.Command{
+		Use:   "get-a-download-artifact-link",
+		Short: `Get a download artifact link`,
+		Long: `Return a redirect to the contents of a download artifact.
 
 This endpoint returns the actual file contents and not the artifact's
 metadata.
 
     $ curl -s -L https://api.bitbucket.org/2.0/repositories/evzijst/git-tests/downloads/hello.txt
     Hello World`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if filename == "" {
-return fmt.Errorf("--filename is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"filename": filename,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/downloads/{filename}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&filename, "filename", "", "filename (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if filename == "" {
+				return fmt.Errorf("--filename is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"filename":  filename,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/downloads/{filename}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&filename, "filename", "", "filename (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newDownloadsDeleteADownloadArtifactCmd returns the "downloads delete-a-download-artifact" cobra command.
 // operationId: deleteADownloadArtifact
 func newDownloadsDeleteADownloadArtifactCmd() *cobra.Command {
-var (
-filename string
-repoSlug string
-workspace string
-)
+	var (
+		filename  string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "delete-a-download-artifact",
-Short: `Delete a download artifact`,
-Long:  `Deletes the specified download artifact from the repository.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if filename == "" {
-return fmt.Errorf("--filename is required")
+	cmd := &cobra.Command{
+		Use:   "delete-a-download-artifact",
+		Short: `Delete a download artifact`,
+		Long:  `Deletes the specified download artifact from the repository.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if filename == "" {
+				return fmt.Errorf("--filename is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"filename":  filename,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "DELETE",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/downloads/{filename}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&filename, "filename", "", "filename (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"filename": filename,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "DELETE",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/downloads/{filename}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&filename, "filename", "", "filename (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
-}
-

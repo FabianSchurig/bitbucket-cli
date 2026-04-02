@@ -7,709 +7,701 @@
 package commands
 
 import (
-"context"
-"encoding/json"
-"fmt"
-"strconv"
+	"context"
+	"encoding/json"
+	"fmt"
+	"strconv"
 
-"github.com/spf13/cobra"
+	"github.com/spf13/cobra"
 
-"github.com/FabianSchurig/bitbucket-cli/internal/client"
-"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
-"github.com/FabianSchurig/bitbucket-cli/internal/output"
+	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
+	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
 
 // Ensure imports are used.
 var (
-_ = context.Background
-_ = fmt.Errorf
-_ = json.Marshal
-_ = strconv.Itoa
-_ = client.NewClient
-_ = handlers.Dispatch
-_ = output.Format
+	_ = context.Background
+	_ = fmt.Errorf
+	_ = json.Marshal
+	_ = strconv.Itoa
+	_ = client.NewClient
+	_ = handlers.Dispatch
+	_ = output.Format
 )
 
 // NewReportsCommand returns the "reports" cobra command with all sub-commands registered.
 func NewReportsCommand() *cobra.Command {
-cmd := &cobra.Command{
-Use:   "reports",
-Short: `Manage Bitbucket commit reports and annotations`,
-Long:  `Commands for listing, creating, updating, and deleting commit reports and annotations in Bitbucket repositories.`,
-}
+	cmd := &cobra.Command{
+		Use:   "reports",
+		Short: `Manage Bitbucket commit reports and annotations`,
+		Long:  `Commands for listing, creating, updating, and deleting commit reports and annotations in Bitbucket repositories.`,
+	}
 
-cmd.AddCommand(
-newReportsGetReportsForCommitCmd(),
-newReportsGetReportCmd(),
-newReportsCreateOrUpdateReportCmd(),
-newReportsDeleteReportCmd(),
-newReportsGetAnnotationsForReportCmd(),
-newReportsBulkCreateOrUpdateAnnotationsCmd(),
-newReportsGetAnnotationCmd(),
-newReportsCreateOrUpdateAnnotationCmd(),
-newReportsDeleteAnnotationCmd(),
-)
+	cmd.AddCommand(
+		newReportsGetReportsForCommitCmd(),
+		newReportsGetReportCmd(),
+		newReportsCreateOrUpdateReportCmd(),
+		newReportsDeleteReportCmd(),
+		newReportsGetAnnotationsForReportCmd(),
+		newReportsBulkCreateOrUpdateAnnotationsCmd(),
+		newReportsGetAnnotationCmd(),
+		newReportsCreateOrUpdateAnnotationCmd(),
+		newReportsDeleteAnnotationCmd(),
+	)
 
-return cmd
+	return cmd
 }
 
 // newReportsGetReportsForCommitCmd returns the "reports get-reports-for-commit" cobra command.
 // operationId: getReportsForCommit
 func newReportsGetReportsForCommitCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-commit string
-page int
-pagelen int
-all bool
-)
+	var (
+		workspace string
+		repoSlug  string
+		commit    string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "get-reports-for-commit",
-Short: `List reports`,
-Long:  `Returns a paginated list of Reports linked to this commit.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if commit == "" {
-return fmt.Errorf("--commit is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-"commit": commit,
-}
-queryParams := map[string]string{
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-reports-for-commit",
+		Short: `List reports`,
+		Long:  `Returns a paginated list of Reports linked to this commit.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if commit == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
+				"commit":    commit,
+			}
+			queryParams := map[string]string{
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newReportsGetReportCmd returns the "reports get-report" cobra command.
 // operationId: getReport
 func newReportsGetReportCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-commit string
-reportId string
-)
+	var (
+		workspace string
+		repoSlug  string
+		commit    string
+		reportId  string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-report",
-Short: `Get a report`,
-Long:  `Returns a single Report matching the provided ID.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if commit == "" {
-return fmt.Errorf("--commit is required")
-}
-if reportId == "" {
-return fmt.Errorf("--reportId is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-"commit": commit,
-"reportId": reportId,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
-cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-report",
+		Short: `Get a report`,
+		Long:  `Returns a single Report matching the provided ID.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if commit == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			if reportId == "" {
+				return fmt.Errorf("--reportId is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
+				"commit":    commit,
+				"reportId":  reportId,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
+	cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
+	return cmd
 }
 
 // newReportsCreateOrUpdateReportCmd returns the "reports create-or-update-report" cobra command.
 // operationId: createOrUpdateReport
 func newReportsCreateOrUpdateReportCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-commit string
-reportId string
-bodyDetails string
-bodyExternalId string
-bodyLink string
-bodyLogoUrl string
-bodyRemoteLinkEnabled bool
-bodyReportType string
-bodyReporter string
-bodyResult string
-bodyTitle string
-bodyUuid string
-body string
-)
+	var (
+		workspace             string
+		repoSlug              string
+		commit                string
+		reportId              string
+		bodyDetails           string
+		bodyExternalId        string
+		bodyLink              string
+		bodyLogoUrl           string
+		bodyRemoteLinkEnabled bool
+		bodyReportType        string
+		bodyReporter          string
+		bodyResult            string
+		bodyTitle             string
+		bodyUuid              string
+		body                  string
+	)
 
-cmd := &cobra.Command{
-Use:   "create-or-update-report",
-Short: `Create or update a report`,
-Long:  "Creates or updates a report for the specified commit.\nTo upload a report, make sure to generate an ID that is unique across all reports for that commit. If you want to use an existing id from your own system, we recommend prefixing it with your system's name to avoid collisions, for example, mySystem-001.\n\n### Sample cURL request:\n```\ncurl --request PUT 'https://api.bitbucket.org/2.0/repositories/<username>/<reposity-name>/commit/<commit-hash>/reports/mysystem-001' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    \"title\": \"Security scan report\",\n    \"details\": \"This pull request introduces 10 new dependency vulnerabilities.\",\n    \"report_type\": \"SECURITY\",\n    \"reporter\": \"mySystem\",\n    \"link\": \"http://www.mysystem.com/reports/001\",\n    \"result\": \"FAILED\",\n    \"data\": [\n        {\n            \"title\": \"Duration (seconds)\",\n            \"type\": \"DURATION\",\n            \"value\": 14\n        },\n        {\n            \"title\": \"Safe to merge?\",\n            \"type\": \"BOOLEAN\",\n            \"value\": false\n        }\n    ]\n}'\n```\n\n### Possible field values:\nreport_type: SECURITY, COVERAGE, TEST, BUG\nresult: PASSED, FAILED, PENDING\ndata.type: BOOLEAN, DATE, DURATION, LINK, NUMBER, PERCENTAGE, TEXT\n\n#### Data field formats\n| Type  Field   | Value Field Type  | Value Field Display |\n|:--------------|:------------------|:--------------------|\n| None/ Omitted | Number, String or Boolean (not an array or object) | Plain text |\n| BOOLEAN\t| Boolean | The value will be read as a JSON boolean and displayed as 'Yes' or 'No'. |\n| DATE  | Number | The value will be read as a JSON number in the form of a Unix timestamp (milliseconds) and will be displayed as a relative date if the date is less than one week ago, otherwise  it will be displayed as an absolute date. |\n| DURATION | Number | The value will be read as a JSON number in milliseconds and will be displayed in a human readable duration format. |\n| LINK | Object: `{\"text\": \"Link text here\", \"href\": \"https://link.to.annotation/in/external/tool\"}` | The value will be read as a JSON object containing the fields \"text\" and \"href\" and will be displayed as a clickable link on the report. |\n| NUMBER | Number | The value will be read as a JSON number and large numbers will be  displayed in a human readable format (e.g. 14.3k). |\n| PERCENTAGE | Number (between 0 and 100) | The value will be read as a JSON number between 0 and 100 and will be displayed with a percentage sign. |\n| TEXT | String | The value will be read as a JSON string and will be displayed as-is |\n\nPlease refer to the [Code Insights documentation](https://confluence.atlassian.com/bitbucket/code-insights-994316785.html) for more information.\n",
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if commit == "" {
-return fmt.Errorf("--commit is required")
-}
-if reportId == "" {
-return fmt.Errorf("--reportId is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-"commit": commit,
-"reportId": reportId,
-}
-queryParams := map[string]string{
-}
-if body == "" {
-bodyObj := map[string]any{}
-if bodyDetails != "" {
-handlers.SetNested(bodyObj, "details", bodyDetails)
-}
-if bodyExternalId != "" {
-handlers.SetNested(bodyObj, "external_id", bodyExternalId)
-}
-if bodyLink != "" {
-handlers.SetNested(bodyObj, "link", bodyLink)
-}
-if bodyLogoUrl != "" {
-handlers.SetNested(bodyObj, "logo_url", bodyLogoUrl)
-}
-if bodyRemoteLinkEnabled {
-handlers.SetNested(bodyObj, "remote_link_enabled", bodyRemoteLinkEnabled)
-}
-if bodyReportType != "" {
-handlers.SetNested(bodyObj, "report_type", bodyReportType)
-}
-if bodyReporter != "" {
-handlers.SetNested(bodyObj, "reporter", bodyReporter)
-}
-if bodyResult != "" {
-handlers.SetNested(bodyObj, "result", bodyResult)
-}
-if bodyTitle != "" {
-handlers.SetNested(bodyObj, "title", bodyTitle)
-}
-if bodyUuid != "" {
-handlers.SetNested(bodyObj, "uuid", bodyUuid)
-}
-if len(bodyObj) > 0 {
-b, _ := json.Marshal(bodyObj)
-body = string(b)
-}
-}
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "PUT",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
-cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
-cmd.Flags().StringVar(&bodyDetails, "details", "", `A string to describe the purpose of the report.`)
-cmd.Flags().StringVar(&bodyExternalId, "external-id", "", `ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique.`)
-cmd.Flags().StringVar(&bodyLink, "link", "", `A URL linking to the results of the report in an external tool.`)
-cmd.Flags().StringVar(&bodyLogoUrl, "logo-url", "", `A URL to the report logo. If none is provided, the default insights logo will be used.`)
-cmd.Flags().BoolVar(&bodyRemoteLinkEnabled, "remote-link-enabled", false, `If enabled, a remote link is created in Jira for the work item associated with the commit the report belongs to.`)
-cmd.Flags().StringVar(&bodyReportType, "report-type", "", `The type of the report. [SECURITY, COVERAGE, TEST, BUG]`)
-cmd.Flags().StringVar(&bodyReporter, "reporter", "", `A string to describe the tool or company who created the report.`)
-cmd.Flags().StringVar(&bodyResult, "result", "", `The state of the report. May be set to PENDING and later updated. [PASSED, FAILED, PENDING]`)
-cmd.Flags().StringVar(&bodyTitle, "title", "", `The title of the report.`)
-cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID that can be used to identify the report.`)
-cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "create-or-update-report",
+		Short: `Create or update a report`,
+		Long:  "Creates or updates a report for the specified commit.\nTo upload a report, make sure to generate an ID that is unique across all reports for that commit. If you want to use an existing id from your own system, we recommend prefixing it with your system's name to avoid collisions, for example, mySystem-001.\n\n### Sample cURL request:\n```\ncurl --request PUT 'https://api.bitbucket.org/2.0/repositories/<username>/<reposity-name>/commit/<commit-hash>/reports/mysystem-001' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    \"title\": \"Security scan report\",\n    \"details\": \"This pull request introduces 10 new dependency vulnerabilities.\",\n    \"report_type\": \"SECURITY\",\n    \"reporter\": \"mySystem\",\n    \"link\": \"http://www.mysystem.com/reports/001\",\n    \"result\": \"FAILED\",\n    \"data\": [\n        {\n            \"title\": \"Duration (seconds)\",\n            \"type\": \"DURATION\",\n            \"value\": 14\n        },\n        {\n            \"title\": \"Safe to merge?\",\n            \"type\": \"BOOLEAN\",\n            \"value\": false\n        }\n    ]\n}'\n```\n\n### Possible field values:\nreport_type: SECURITY, COVERAGE, TEST, BUG\nresult: PASSED, FAILED, PENDING\ndata.type: BOOLEAN, DATE, DURATION, LINK, NUMBER, PERCENTAGE, TEXT\n\n#### Data field formats\n| Type  Field   | Value Field Type  | Value Field Display |\n|:--------------|:------------------|:--------------------|\n| None/ Omitted | Number, String or Boolean (not an array or object) | Plain text |\n| BOOLEAN\t| Boolean | The value will be read as a JSON boolean and displayed as 'Yes' or 'No'. |\n| DATE  | Number | The value will be read as a JSON number in the form of a Unix timestamp (milliseconds) and will be displayed as a relative date if the date is less than one week ago, otherwise  it will be displayed as an absolute date. |\n| DURATION | Number | The value will be read as a JSON number in milliseconds and will be displayed in a human readable duration format. |\n| LINK | Object: `{\"text\": \"Link text here\", \"href\": \"https://link.to.annotation/in/external/tool\"}` | The value will be read as a JSON object containing the fields \"text\" and \"href\" and will be displayed as a clickable link on the report. |\n| NUMBER | Number | The value will be read as a JSON number and large numbers will be  displayed in a human readable format (e.g. 14.3k). |\n| PERCENTAGE | Number (between 0 and 100) | The value will be read as a JSON number between 0 and 100 and will be displayed with a percentage sign. |\n| TEXT | String | The value will be read as a JSON string and will be displayed as-is |\n\nPlease refer to the [Code Insights documentation](https://confluence.atlassian.com/bitbucket/code-insights-994316785.html) for more information.\n",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if commit == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			if reportId == "" {
+				return fmt.Errorf("--reportId is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
+				"commit":    commit,
+				"reportId":  reportId,
+			}
+			queryParams := map[string]string{}
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyDetails != "" {
+					handlers.SetNested(bodyObj, "details", bodyDetails)
+				}
+				if bodyExternalId != "" {
+					handlers.SetNested(bodyObj, "external_id", bodyExternalId)
+				}
+				if bodyLink != "" {
+					handlers.SetNested(bodyObj, "link", bodyLink)
+				}
+				if bodyLogoUrl != "" {
+					handlers.SetNested(bodyObj, "logo_url", bodyLogoUrl)
+				}
+				if bodyRemoteLinkEnabled {
+					handlers.SetNested(bodyObj, "remote_link_enabled", bodyRemoteLinkEnabled)
+				}
+				if bodyReportType != "" {
+					handlers.SetNested(bodyObj, "report_type", bodyReportType)
+				}
+				if bodyReporter != "" {
+					handlers.SetNested(bodyObj, "reporter", bodyReporter)
+				}
+				if bodyResult != "" {
+					handlers.SetNested(bodyObj, "result", bodyResult)
+				}
+				if bodyTitle != "" {
+					handlers.SetNested(bodyObj, "title", bodyTitle)
+				}
+				if bodyUuid != "" {
+					handlers.SetNested(bodyObj, "uuid", bodyUuid)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "PUT",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
+	cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
+	cmd.Flags().StringVar(&bodyDetails, "details", "", `A string to describe the purpose of the report.`)
+	cmd.Flags().StringVar(&bodyExternalId, "external-id", "", `ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique.`)
+	cmd.Flags().StringVar(&bodyLink, "link", "", `A URL linking to the results of the report in an external tool.`)
+	cmd.Flags().StringVar(&bodyLogoUrl, "logo-url", "", `A URL to the report logo. If none is provided, the default insights logo will be used.`)
+	cmd.Flags().BoolVar(&bodyRemoteLinkEnabled, "remote-link-enabled", false, `If enabled, a remote link is created in Jira for the work item associated with the commit the report belongs to.`)
+	cmd.Flags().StringVar(&bodyReportType, "report-type", "", `The type of the report. [SECURITY, COVERAGE, TEST, BUG]`)
+	cmd.Flags().StringVar(&bodyReporter, "reporter", "", `A string to describe the tool or company who created the report.`)
+	cmd.Flags().StringVar(&bodyResult, "result", "", `The state of the report. May be set to PENDING and later updated. [PASSED, FAILED, PENDING]`)
+	cmd.Flags().StringVar(&bodyTitle, "title", "", `The title of the report.`)
+	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID that can be used to identify the report.`)
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+	return cmd
 }
 
 // newReportsDeleteReportCmd returns the "reports delete-report" cobra command.
 // operationId: deleteReport
 func newReportsDeleteReportCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-commit string
-reportId string
-)
+	var (
+		workspace string
+		repoSlug  string
+		commit    string
+		reportId  string
+	)
 
-cmd := &cobra.Command{
-Use:   "delete-report",
-Short: `Delete a report`,
-Long:  `Deletes a single Report matching the provided ID.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if commit == "" {
-return fmt.Errorf("--commit is required")
-}
-if reportId == "" {
-return fmt.Errorf("--reportId is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-"commit": commit,
-"reportId": reportId,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "DELETE",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
-cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "delete-report",
+		Short: `Delete a report`,
+		Long:  `Deletes a single Report matching the provided ID.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if commit == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			if reportId == "" {
+				return fmt.Errorf("--reportId is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
+				"commit":    commit,
+				"reportId":  reportId,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "DELETE",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
+	cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
+	return cmd
 }
 
 // newReportsGetAnnotationsForReportCmd returns the "reports get-annotations-for-report" cobra command.
 // operationId: getAnnotationsForReport
 func newReportsGetAnnotationsForReportCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-commit string
-reportId string
-page int
-pagelen int
-all bool
-)
+	var (
+		workspace string
+		repoSlug  string
+		commit    string
+		reportId  string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "get-annotations-for-report",
-Short: `List annotations`,
-Long:  `Returns a paginated list of Annotations for a specified report.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if commit == "" {
-return fmt.Errorf("--commit is required")
-}
-if reportId == "" {
-return fmt.Errorf("--reportId is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-"commit": commit,
-"reportId": reportId,
-}
-queryParams := map[string]string{
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}/annotations",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
-cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-annotations-for-report",
+		Short: `List annotations`,
+		Long:  `Returns a paginated list of Annotations for a specified report.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if commit == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			if reportId == "" {
+				return fmt.Errorf("--reportId is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
+				"commit":    commit,
+				"reportId":  reportId,
+			}
+			queryParams := map[string]string{
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}/annotations",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
+	cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newReportsBulkCreateOrUpdateAnnotationsCmd returns the "reports bulk-create-or-update-annotations" cobra command.
 // operationId: bulkCreateOrUpdateAnnotations
 func newReportsBulkCreateOrUpdateAnnotationsCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-commit string
-reportId string
-body string
-)
+	var (
+		workspace string
+		repoSlug  string
+		commit    string
+		reportId  string
+		body      string
+	)
 
-cmd := &cobra.Command{
-Use:   "bulk-create-or-update-annotations",
-Short: `Bulk create or update annotations`,
-Long:  "Bulk upload of annotations.\nAnnotations are individual findings that have been identified as part of a report, for example, a line of code that represents a vulnerability. These annotations can be attached to a specific file and even a specific line in that file, however, that is optional. Annotations are not mandatory and a report can contain up to 1000 annotations.\n\nAdd the annotations you want to upload as objects in a JSON array and make sure each annotation has the external_id field set to a unique value. If you want to use an existing id from your own system, we recommend prefixing it with your system's name to avoid collisions, for example, mySystem-annotation001. The external id can later be used to identify the report as an alternative to the generated [UUID](https://developer.atlassian.com/bitbucket/api/2/reference/meta/uri-uuid#uuid). You can upload up to 100 annotations per POST request.\n\n### Sample cURL request:\n```\ncurl --location 'https://api.bitbucket.org/2.0/repositories/<username>/<reposity-name>/commit/<commit-hash>/reports/mysystem-001/annotations' \\\n--header 'Content-Type: application/json' \\\n--data-raw '[\n  {\n        \"external_id\": \"mysystem-annotation001\",\n        \"title\": \"Security scan report\",\n        \"annotation_type\": \"VULNERABILITY\",\n        \"summary\": \"This line represents a security threat.\",\n        \"severity\": \"HIGH\",\n      \"path\": \"my-service/src/main/java/com/myCompany/mysystem/logic/Main.java\",\n        \"line\": 42\n  },\n  {\n        \"external_id\": \"mySystem-annotation002\",\n        \"title\": \"Bug report\",\n        \"annotation_type\": \"BUG\",\n        \"result\": \"FAILED\",\n        \"summary\": \"This line might introduce a bug.\",\n        \"severity\": \"MEDIUM\",\n      \"path\": \"my-service/src/main/java/com/myCompany/mysystem/logic/Helper.java\",\n        \"line\": 13\n  }\n]'\n```\n\n### Possible field values:\nannotation_type: VULNERABILITY, CODE_SMELL, BUG\nresult: PASSED, FAILED, IGNORED, SKIPPED\nseverity: HIGH, MEDIUM, LOW, CRITICAL\n\nPlease refer to the [Code Insights documentation](https://confluence.atlassian.com/bitbucket/code-insights-994316785.html) for more information.\n",
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if commit == "" {
-return fmt.Errorf("--commit is required")
-}
-if reportId == "" {
-return fmt.Errorf("--reportId is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-"commit": commit,
-"reportId": reportId,
-}
-queryParams := map[string]string{
-}
-if body == "" {
-bodyObj := map[string]any{}
-if len(bodyObj) > 0 {
-b, _ := json.Marshal(bodyObj)
-body = string(b)
-}
-}
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}/annotations",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
-cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
-cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "bulk-create-or-update-annotations",
+		Short: `Bulk create or update annotations`,
+		Long:  "Bulk upload of annotations.\nAnnotations are individual findings that have been identified as part of a report, for example, a line of code that represents a vulnerability. These annotations can be attached to a specific file and even a specific line in that file, however, that is optional. Annotations are not mandatory and a report can contain up to 1000 annotations.\n\nAdd the annotations you want to upload as objects in a JSON array and make sure each annotation has the external_id field set to a unique value. If you want to use an existing id from your own system, we recommend prefixing it with your system's name to avoid collisions, for example, mySystem-annotation001. The external id can later be used to identify the report as an alternative to the generated [UUID](https://developer.atlassian.com/bitbucket/api/2/reference/meta/uri-uuid#uuid). You can upload up to 100 annotations per POST request.\n\n### Sample cURL request:\n```\ncurl --location 'https://api.bitbucket.org/2.0/repositories/<username>/<reposity-name>/commit/<commit-hash>/reports/mysystem-001/annotations' \\\n--header 'Content-Type: application/json' \\\n--data-raw '[\n  {\n        \"external_id\": \"mysystem-annotation001\",\n        \"title\": \"Security scan report\",\n        \"annotation_type\": \"VULNERABILITY\",\n        \"summary\": \"This line represents a security threat.\",\n        \"severity\": \"HIGH\",\n      \"path\": \"my-service/src/main/java/com/myCompany/mysystem/logic/Main.java\",\n        \"line\": 42\n  },\n  {\n        \"external_id\": \"mySystem-annotation002\",\n        \"title\": \"Bug report\",\n        \"annotation_type\": \"BUG\",\n        \"result\": \"FAILED\",\n        \"summary\": \"This line might introduce a bug.\",\n        \"severity\": \"MEDIUM\",\n      \"path\": \"my-service/src/main/java/com/myCompany/mysystem/logic/Helper.java\",\n        \"line\": 13\n  }\n]'\n```\n\n### Possible field values:\nannotation_type: VULNERABILITY, CODE_SMELL, BUG\nresult: PASSED, FAILED, IGNORED, SKIPPED\nseverity: HIGH, MEDIUM, LOW, CRITICAL\n\nPlease refer to the [Code Insights documentation](https://confluence.atlassian.com/bitbucket/code-insights-994316785.html) for more information.\n",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if commit == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			if reportId == "" {
+				return fmt.Errorf("--reportId is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
+				"commit":    commit,
+				"reportId":  reportId,
+			}
+			queryParams := map[string]string{}
+			if body == "" {
+				bodyObj := map[string]any{}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}/annotations",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
+	cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+	return cmd
 }
 
 // newReportsGetAnnotationCmd returns the "reports get-annotation" cobra command.
 // operationId: getAnnotation
 func newReportsGetAnnotationCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-commit string
-reportId string
-annotationId string
-)
+	var (
+		workspace    string
+		repoSlug     string
+		commit       string
+		reportId     string
+		annotationId string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-annotation",
-Short: `Get an annotation`,
-Long:  `Returns a single Annotation matching the provided ID.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if commit == "" {
-return fmt.Errorf("--commit is required")
-}
-if reportId == "" {
-return fmt.Errorf("--reportId is required")
-}
-if annotationId == "" {
-return fmt.Errorf("--annotationId is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-"commit": commit,
-"reportId": reportId,
-"annotationId": annotationId,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}/annotations/{annotationId}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
-cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
-cmd.Flags().StringVar(&annotationId, "annotationId", "", "annotationId (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-annotation",
+		Short: `Get an annotation`,
+		Long:  `Returns a single Annotation matching the provided ID.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if commit == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			if reportId == "" {
+				return fmt.Errorf("--reportId is required")
+			}
+			if annotationId == "" {
+				return fmt.Errorf("--annotationId is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace":    workspace,
+				"repo_slug":    repoSlug,
+				"commit":       commit,
+				"reportId":     reportId,
+				"annotationId": annotationId,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}/annotations/{annotationId}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
+	cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
+	cmd.Flags().StringVar(&annotationId, "annotationId", "", "annotationId (path parameter)")
+	return cmd
 }
 
 // newReportsCreateOrUpdateAnnotationCmd returns the "reports create-or-update-annotation" cobra command.
 // operationId: createOrUpdateAnnotation
 func newReportsCreateOrUpdateAnnotationCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-commit string
-reportId string
-annotationId string
-bodyAnnotationType string
-bodyDetails string
-bodyExternalId string
-bodyLine int
-bodyLink string
-bodyPath string
-bodyResult string
-bodySeverity string
-bodyUuid string
-body string
-)
+	var (
+		workspace          string
+		repoSlug           string
+		commit             string
+		reportId           string
+		annotationId       string
+		bodyAnnotationType string
+		bodyDetails        string
+		bodyExternalId     string
+		bodyLine           int
+		bodyLink           string
+		bodyPath           string
+		bodyResult         string
+		bodySeverity       string
+		bodyUuid           string
+		body               string
+	)
 
-cmd := &cobra.Command{
-Use:   "create-or-update-annotation",
-Short: `Create or update an annotation`,
-Long:  "Creates or updates an individual annotation for the specified report.\nAnnotations are individual findings that have been identified as part of a report, for example, a line of code that represents a vulnerability. These annotations can be attached to a specific file and even a specific line in that file, however, that is optional. Annotations are not mandatory and a report can contain up to 1000 annotations.\n\nJust as reports, annotation needs to be uploaded with a unique ID that can later be used to identify the report as an alternative to the generated [UUID](https://developer.atlassian.com/bitbucket/api/2/reference/meta/uri-uuid#uuid). If you want to use an existing id from your own system, we recommend prefixing it with your system's name to avoid collisions, for example, mySystem-annotation001.\n\n### Sample cURL request:\n```\ncurl --request PUT 'https://api.bitbucket.org/2.0/repositories/<username>/<reposity-name>/commit/<commit-hash>/reports/mySystem-001/annotations/mysystem-annotation001' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    \"title\": \"Security scan report\",\n    \"annotation_type\": \"VULNERABILITY\",\n    \"summary\": \"This line represents a security thread.\",\n    \"severity\": \"HIGH\",\n    \"path\": \"my-service/src/main/java/com/myCompany/mysystem/logic/Main.java\",\n    \"line\": 42\n}'\n```\n\n### Possible field values:\nannotation_type: VULNERABILITY, CODE_SMELL, BUG\nresult: PASSED, FAILED, IGNORED, SKIPPED\nseverity: HIGH, MEDIUM, LOW, CRITICAL\n\nPlease refer to the [Code Insights documentation](https://confluence.atlassian.com/bitbucket/code-insights-994316785.html) for more information.\n",
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if commit == "" {
-return fmt.Errorf("--commit is required")
-}
-if reportId == "" {
-return fmt.Errorf("--reportId is required")
-}
-if annotationId == "" {
-return fmt.Errorf("--annotationId is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-"commit": commit,
-"reportId": reportId,
-"annotationId": annotationId,
-}
-queryParams := map[string]string{
-}
-if body == "" {
-bodyObj := map[string]any{}
-if bodyAnnotationType != "" {
-handlers.SetNested(bodyObj, "annotation_type", bodyAnnotationType)
-}
-if bodyDetails != "" {
-handlers.SetNested(bodyObj, "details", bodyDetails)
-}
-if bodyExternalId != "" {
-handlers.SetNested(bodyObj, "external_id", bodyExternalId)
-}
-if bodyLine != 0 {
-handlers.SetNested(bodyObj, "line", bodyLine)
-}
-if bodyLink != "" {
-handlers.SetNested(bodyObj, "link", bodyLink)
-}
-if bodyPath != "" {
-handlers.SetNested(bodyObj, "path", bodyPath)
-}
-if bodyResult != "" {
-handlers.SetNested(bodyObj, "result", bodyResult)
-}
-if bodySeverity != "" {
-handlers.SetNested(bodyObj, "severity", bodySeverity)
-}
-if bodyUuid != "" {
-handlers.SetNested(bodyObj, "uuid", bodyUuid)
-}
-if len(bodyObj) > 0 {
-b, _ := json.Marshal(bodyObj)
-body = string(b)
-}
-}
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "PUT",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}/annotations/{annotationId}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
-cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
-cmd.Flags().StringVar(&annotationId, "annotationId", "", "annotationId (path parameter)")
-cmd.Flags().StringVar(&bodyAnnotationType, "annotation-type", "", `The type of the report. [VULNERABILITY, CODE_SMELL, BUG]`)
-cmd.Flags().StringVar(&bodyDetails, "details", "", `The details to show to users when clicking on the annotation.`)
-cmd.Flags().StringVar(&bodyExternalId, "external-id", "", `ID of the annotation provided by the annotation creator. It can be used to identify the annotation as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the annotation creator for updating or deleting this specific annotation. Needs to be unique.`)
-cmd.Flags().IntVar(&bodyLine, "line", 0, `The line number that the annotation should belong to. If no line number is provided, then it will default to 0 and in a pull request it will appear at the top of the file specified by the path field.`)
-cmd.Flags().StringVar(&bodyLink, "link", "", `A URL linking to the annotation in an external tool.`)
-cmd.Flags().StringVar(&bodyPath, "path", "", `The path of the file on which this annotation should be placed. This is the path of the file relative to the git repository. If no path is provided, then it will appear in the overview modal on all pull requests where the tip of the branch is the given commit, regardless of which files were modified.`)
-cmd.Flags().StringVar(&bodyResult, "result", "", `The state of the report. May be set to PENDING and later updated. [PASSED, FAILED, SKIPPED, IGNORED]`)
-cmd.Flags().StringVar(&bodySeverity, "severity", "", `The severity of the annotation. [CRITICAL, HIGH, MEDIUM, LOW]`)
-cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID that can be used to identify the annotation.`)
-cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "create-or-update-annotation",
+		Short: `Create or update an annotation`,
+		Long:  "Creates or updates an individual annotation for the specified report.\nAnnotations are individual findings that have been identified as part of a report, for example, a line of code that represents a vulnerability. These annotations can be attached to a specific file and even a specific line in that file, however, that is optional. Annotations are not mandatory and a report can contain up to 1000 annotations.\n\nJust as reports, annotation needs to be uploaded with a unique ID that can later be used to identify the report as an alternative to the generated [UUID](https://developer.atlassian.com/bitbucket/api/2/reference/meta/uri-uuid#uuid). If you want to use an existing id from your own system, we recommend prefixing it with your system's name to avoid collisions, for example, mySystem-annotation001.\n\n### Sample cURL request:\n```\ncurl --request PUT 'https://api.bitbucket.org/2.0/repositories/<username>/<reposity-name>/commit/<commit-hash>/reports/mySystem-001/annotations/mysystem-annotation001' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    \"title\": \"Security scan report\",\n    \"annotation_type\": \"VULNERABILITY\",\n    \"summary\": \"This line represents a security thread.\",\n    \"severity\": \"HIGH\",\n    \"path\": \"my-service/src/main/java/com/myCompany/mysystem/logic/Main.java\",\n    \"line\": 42\n}'\n```\n\n### Possible field values:\nannotation_type: VULNERABILITY, CODE_SMELL, BUG\nresult: PASSED, FAILED, IGNORED, SKIPPED\nseverity: HIGH, MEDIUM, LOW, CRITICAL\n\nPlease refer to the [Code Insights documentation](https://confluence.atlassian.com/bitbucket/code-insights-994316785.html) for more information.\n",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if commit == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			if reportId == "" {
+				return fmt.Errorf("--reportId is required")
+			}
+			if annotationId == "" {
+				return fmt.Errorf("--annotationId is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace":    workspace,
+				"repo_slug":    repoSlug,
+				"commit":       commit,
+				"reportId":     reportId,
+				"annotationId": annotationId,
+			}
+			queryParams := map[string]string{}
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyAnnotationType != "" {
+					handlers.SetNested(bodyObj, "annotation_type", bodyAnnotationType)
+				}
+				if bodyDetails != "" {
+					handlers.SetNested(bodyObj, "details", bodyDetails)
+				}
+				if bodyExternalId != "" {
+					handlers.SetNested(bodyObj, "external_id", bodyExternalId)
+				}
+				if bodyLine != 0 {
+					handlers.SetNested(bodyObj, "line", bodyLine)
+				}
+				if bodyLink != "" {
+					handlers.SetNested(bodyObj, "link", bodyLink)
+				}
+				if bodyPath != "" {
+					handlers.SetNested(bodyObj, "path", bodyPath)
+				}
+				if bodyResult != "" {
+					handlers.SetNested(bodyObj, "result", bodyResult)
+				}
+				if bodySeverity != "" {
+					handlers.SetNested(bodyObj, "severity", bodySeverity)
+				}
+				if bodyUuid != "" {
+					handlers.SetNested(bodyObj, "uuid", bodyUuid)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "PUT",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}/annotations/{annotationId}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
+	cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
+	cmd.Flags().StringVar(&annotationId, "annotationId", "", "annotationId (path parameter)")
+	cmd.Flags().StringVar(&bodyAnnotationType, "annotation-type", "", `The type of the report. [VULNERABILITY, CODE_SMELL, BUG]`)
+	cmd.Flags().StringVar(&bodyDetails, "details", "", `The details to show to users when clicking on the annotation.`)
+	cmd.Flags().StringVar(&bodyExternalId, "external-id", "", `ID of the annotation provided by the annotation creator. It can be used to identify the annotation as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the annotation creator for updating or deleting this specific annotation. Needs to be unique.`)
+	cmd.Flags().IntVar(&bodyLine, "line", 0, `The line number that the annotation should belong to. If no line number is provided, then it will default to 0 and in a pull request it will appear at the top of the file specified by the path field.`)
+	cmd.Flags().StringVar(&bodyLink, "link", "", `A URL linking to the annotation in an external tool.`)
+	cmd.Flags().StringVar(&bodyPath, "path", "", `The path of the file on which this annotation should be placed. This is the path of the file relative to the git repository. If no path is provided, then it will appear in the overview modal on all pull requests where the tip of the branch is the given commit, regardless of which files were modified.`)
+	cmd.Flags().StringVar(&bodyResult, "result", "", `The state of the report. May be set to PENDING and later updated. [PASSED, FAILED, SKIPPED, IGNORED]`)
+	cmd.Flags().StringVar(&bodySeverity, "severity", "", `The severity of the annotation. [CRITICAL, HIGH, MEDIUM, LOW]`)
+	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID that can be used to identify the annotation.`)
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+	return cmd
 }
 
 // newReportsDeleteAnnotationCmd returns the "reports delete-annotation" cobra command.
 // operationId: deleteAnnotation
 func newReportsDeleteAnnotationCmd() *cobra.Command {
-var (
-workspace string
-repoSlug string
-commit string
-reportId string
-annotationId string
-)
+	var (
+		workspace    string
+		repoSlug     string
+		commit       string
+		reportId     string
+		annotationId string
+	)
 
-cmd := &cobra.Command{
-Use:   "delete-annotation",
-Short: `Delete an annotation`,
-Long:  `Deletes a single Annotation matching the provided ID.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
+	cmd := &cobra.Command{
+		Use:   "delete-annotation",
+		Short: `Delete an annotation`,
+		Long:  `Deletes a single Annotation matching the provided ID.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if commit == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			if reportId == "" {
+				return fmt.Errorf("--reportId is required")
+			}
+			if annotationId == "" {
+				return fmt.Errorf("--annotationId is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace":    workspace,
+				"repo_slug":    repoSlug,
+				"commit":       commit,
+				"reportId":     reportId,
+				"annotationId": annotationId,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "DELETE",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}/annotations/{annotationId}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
+	cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
+	cmd.Flags().StringVar(&annotationId, "annotationId", "", "annotationId (path parameter)")
+	return cmd
 }
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if commit == "" {
-return fmt.Errorf("--commit is required")
-}
-if reportId == "" {
-return fmt.Errorf("--reportId is required")
-}
-if annotationId == "" {
-return fmt.Errorf("--annotationId is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"workspace": workspace,
-"repo_slug": repoSlug,
-"commit": commit,
-"reportId": reportId,
-"annotationId": annotationId,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "DELETE",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/commit/{commit}/reports/{reportId}/annotations/{annotationId}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
-cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
-cmd.Flags().StringVar(&annotationId, "annotationId", "", "annotationId (path parameter)")
-return cmd
-}
-

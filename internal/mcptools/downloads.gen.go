@@ -8,7 +8,7 @@ package mcptools
 
 // DownloadsToolGroup contains the MCP tool definition for the "bitbucket_downloads" tool group.
 var DownloadsToolGroup = ToolGroup{
-	Name:        `bitbucket_downloads`,
+	Name: `bitbucket_downloads`,
 	Description: `Manage Bitbucket repository downloads
 
 Available operations:
@@ -28,10 +28,9 @@ Available operations:
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `uploadADownloadArtifact`,
@@ -43,10 +42,9 @@ Available operations:
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getADownloadArtifactLink`,
@@ -65,10 +63,9 @@ metadata.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteADownloadArtifact`,
@@ -81,10 +78,9 @@ metadata.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 	},
 }

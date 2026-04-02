@@ -8,7 +8,7 @@ package mcptools
 
 // PropertiesToolGroup contains the MCP tool definition for the "bitbucket_properties" tool group.
 var PropertiesToolGroup = ToolGroup{
-	Name:        `bitbucket_properties`,
+	Name: `bitbucket_properties`,
 	Description: `Manage Bitbucket application properties
 
 Available operations:
@@ -39,10 +39,9 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateCommitHostedPropertyValue`,
@@ -57,10 +56,9 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    true,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteCommitHostedPropertyValue`,
@@ -75,10 +73,9 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getRepositoryHostedPropertyValue`,
@@ -92,10 +89,9 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateRepositoryHostedPropertyValue`,
@@ -109,10 +105,9 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    true,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteRepositoryHostedPropertyValue`,
@@ -126,10 +121,9 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getPullRequestHostedPropertyValue`,
@@ -144,10 +138,9 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updatePullRequestHostedPropertyValue`,
@@ -162,10 +155,9 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    true,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deletePullRequestHostedPropertyValue`,
@@ -180,10 +172,9 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `retrieveUserHostedPropertyValue`,
@@ -196,10 +187,9 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateUserHostedPropertyValue`,
@@ -212,10 +202,9 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    true,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteUserHostedPropertyValue`,
@@ -228,10 +217,9 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 	},
 }

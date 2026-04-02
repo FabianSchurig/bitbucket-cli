@@ -7,855 +7,845 @@
 package commands
 
 import (
-"context"
-"encoding/json"
-"fmt"
-"strconv"
+	"context"
+	"encoding/json"
+	"fmt"
+	"strconv"
 
-"github.com/spf13/cobra"
+	"github.com/spf13/cobra"
 
-"github.com/FabianSchurig/bitbucket-cli/internal/client"
-"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
-"github.com/FabianSchurig/bitbucket-cli/internal/output"
+	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
+	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
 
 // Ensure imports are used.
 var (
-_ = context.Background
-_ = fmt.Errorf
-_ = json.Marshal
-_ = strconv.Itoa
-_ = client.NewClient
-_ = handlers.Dispatch
-_ = output.Format
+	_ = context.Background
+	_ = fmt.Errorf
+	_ = json.Marshal
+	_ = strconv.Itoa
+	_ = client.NewClient
+	_ = handlers.Dispatch
+	_ = output.Format
 )
 
 // NewIssuesCommand returns the "issues" cobra command with all sub-commands registered.
 func NewIssuesCommand() *cobra.Command {
-cmd := &cobra.Command{
-Use:   "issues",
-Short: `Manage Bitbucket issues`,
-Long:  `Commands for listing, creating, updating, and managing issues, comments, attachments, components, milestones, and versions.`,
-}
+	cmd := &cobra.Command{
+		Use:   "issues",
+		Short: `Manage Bitbucket issues`,
+		Long:  `Commands for listing, creating, updating, and managing issues, comments, attachments, components, milestones, and versions.`,
+	}
 
-cmd.AddCommand(
-newIssuesListComponentsCmd(),
-newIssuesGetAComponentForIssuesCmd(),
-newIssuesListIssuesCmd(),
-newIssuesCreateAnIssueCmd(),
-newIssuesExportIssuesCmd(),
-newIssuesCheckIssueExportStatusCmd(),
-newIssuesCheckIssueImportStatusCmd(),
-newIssuesImportIssuesCmd(),
-newIssuesGetAnIssueCmd(),
-newIssuesUpdateAnIssueCmd(),
-newIssuesDeleteAnIssueCmd(),
-newIssuesListAttachmentsForAnIssueCmd(),
-newIssuesUploadAnAttachmentToAnIssueCmd(),
-newIssuesGetAttachmentForAnIssueCmd(),
-newIssuesDeleteAnAttachmentForAnIssueCmd(),
-newIssuesListChangesOnAnIssueCmd(),
-newIssuesModifyTheStateOfAnIssueCmd(),
-newIssuesGetIssueChangeObjectCmd(),
-newIssuesListCommentsOnAnIssueCmd(),
-newIssuesCreateACommentOnAnIssueCmd(),
-newIssuesGetACommentOnAnIssueCmd(),
-newIssuesUpdateACommentOnAnIssueCmd(),
-newIssuesDeleteACommentOnAnIssueCmd(),
-newIssuesCheckIfCurrentUserVotedForAnIssueCmd(),
-newIssuesVoteForAnIssueCmd(),
-newIssuesRemoveVoteForAnIssueCmd(),
-newIssuesCheckIfCurrentUserIsWatchingAIssueCmd(),
-newIssuesWatchAnIssueCmd(),
-newIssuesStopWatchingAnIssueCmd(),
-newIssuesListMilestonesCmd(),
-newIssuesGetAMilestoneCmd(),
-newIssuesListDefinedVersionsForIssuesCmd(),
-newIssuesGetADefinedVersionForIssuesCmd(),
-)
+	cmd.AddCommand(
+		newIssuesListComponentsCmd(),
+		newIssuesGetAComponentForIssuesCmd(),
+		newIssuesListIssuesCmd(),
+		newIssuesCreateAnIssueCmd(),
+		newIssuesExportIssuesCmd(),
+		newIssuesCheckIssueExportStatusCmd(),
+		newIssuesCheckIssueImportStatusCmd(),
+		newIssuesImportIssuesCmd(),
+		newIssuesGetAnIssueCmd(),
+		newIssuesUpdateAnIssueCmd(),
+		newIssuesDeleteAnIssueCmd(),
+		newIssuesListAttachmentsForAnIssueCmd(),
+		newIssuesUploadAnAttachmentToAnIssueCmd(),
+		newIssuesGetAttachmentForAnIssueCmd(),
+		newIssuesDeleteAnAttachmentForAnIssueCmd(),
+		newIssuesListChangesOnAnIssueCmd(),
+		newIssuesModifyTheStateOfAnIssueCmd(),
+		newIssuesGetIssueChangeObjectCmd(),
+		newIssuesListCommentsOnAnIssueCmd(),
+		newIssuesCreateACommentOnAnIssueCmd(),
+		newIssuesGetACommentOnAnIssueCmd(),
+		newIssuesUpdateACommentOnAnIssueCmd(),
+		newIssuesDeleteACommentOnAnIssueCmd(),
+		newIssuesCheckIfCurrentUserVotedForAnIssueCmd(),
+		newIssuesVoteForAnIssueCmd(),
+		newIssuesRemoveVoteForAnIssueCmd(),
+		newIssuesCheckIfCurrentUserIsWatchingAIssueCmd(),
+		newIssuesWatchAnIssueCmd(),
+		newIssuesStopWatchingAnIssueCmd(),
+		newIssuesListMilestonesCmd(),
+		newIssuesGetAMilestoneCmd(),
+		newIssuesListDefinedVersionsForIssuesCmd(),
+		newIssuesGetADefinedVersionForIssuesCmd(),
+	)
 
-return cmd
+	return cmd
 }
 
 // newIssuesListComponentsCmd returns the "issues list-components" cobra command.
 // operationId: listComponents
 func newIssuesListComponentsCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-page int
-pagelen int
-all bool
-)
+	var (
+		repoSlug  string
+		workspace string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "list-components",
-Short: `List components`,
-Long:  `Returns the components that have been defined in the issue tracker.
+	cmd := &cobra.Command{
+		Use:   "list-components",
+		Short: `List components`,
+		Long: `Returns the components that have been defined in the issue tracker.
 
 This resource is only available on repositories that have the issue
 tracker enabled.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/components",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/components",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newIssuesGetAComponentForIssuesCmd returns the "issues get-a-component-for-issues" cobra command.
 // operationId: getAComponentForIssues
 func newIssuesGetAComponentForIssuesCmd() *cobra.Command {
-var (
-componentId int
-repoSlug string
-workspace string
-)
+	var (
+		componentId int
+		repoSlug    string
+		workspace   string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-a-component-for-issues",
-Short: `Get a component for issues`,
-Long:  `Returns the specified issue tracker component object.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if componentId == 0 {
-return fmt.Errorf("--component-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"component_id": strconv.Itoa(componentId),
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/components/{component_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().IntVar(&componentId, "component-id", 0, "component_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-a-component-for-issues",
+		Short: `Get a component for issues`,
+		Long:  `Returns the specified issue tracker component object.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if componentId == 0 {
+				return fmt.Errorf("--component-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"component_id": strconv.Itoa(componentId),
+				"repo_slug":    repoSlug,
+				"workspace":    workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/components/{component_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().IntVar(&componentId, "component-id", 0, "component_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesListIssuesCmd returns the "issues list-issues" cobra command.
 // operationId: listIssues
 func newIssuesListIssuesCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-page int
-pagelen int
-all bool
-)
+	var (
+		repoSlug  string
+		workspace string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "list-issues",
-Short: `List issues`,
-Long:  `Returns the issues in the issue tracker.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "list-issues",
+		Short: `List issues`,
+		Long:  `Returns the issues in the issue tracker.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newIssuesCreateAnIssueCmd returns the "issues create-an-issue" cobra command.
 // operationId: createAnIssue
 func newIssuesCreateAnIssueCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-bodyComponentName string
-bodyContentMarkup string
-bodyContentRaw string
-bodyEditedOn string
-bodyKind string
-bodyMilestoneName string
-bodyPriority string
-bodyState string
-bodyTitle string
-bodyVersionName string
-bodyVotes int
-body string
-)
+	var (
+		repoSlug          string
+		workspace         string
+		bodyComponentName string
+		bodyContentMarkup string
+		bodyContentRaw    string
+		bodyEditedOn      string
+		bodyKind          string
+		bodyMilestoneName string
+		bodyPriority      string
+		bodyState         string
+		bodyTitle         string
+		bodyVersionName   string
+		bodyVotes         int
+		body              string
+	)
 
-cmd := &cobra.Command{
-Use:   "create-an-issue",
-Short: `Create an issue`,
-Long:  "Creates a new issue.\n\nThis call requires authentication. Private repositories or private\nissue trackers require the caller to authenticate with an account that\nhas appropriate authorization.\n\nThe authenticated user is used for the issue's `reporter` field.",
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-if body == "" {
-bodyObj := map[string]any{}
-if bodyComponentName != "" {
-handlers.SetNested(bodyObj, "component.name", bodyComponentName)
-}
-if bodyContentMarkup != "" {
-handlers.SetNested(bodyObj, "content.markup", bodyContentMarkup)
-}
-if bodyContentRaw != "" {
-handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
-}
-if bodyEditedOn != "" {
-handlers.SetNested(bodyObj, "edited_on", bodyEditedOn)
-}
-if bodyKind != "" {
-handlers.SetNested(bodyObj, "kind", bodyKind)
-}
-if bodyMilestoneName != "" {
-handlers.SetNested(bodyObj, "milestone.name", bodyMilestoneName)
-}
-if bodyPriority != "" {
-handlers.SetNested(bodyObj, "priority", bodyPriority)
-}
-if bodyState != "" {
-handlers.SetNested(bodyObj, "state", bodyState)
-}
-if bodyTitle != "" {
-handlers.SetNested(bodyObj, "title", bodyTitle)
-}
-if bodyVersionName != "" {
-handlers.SetNested(bodyObj, "version.name", bodyVersionName)
-}
-if bodyVotes != 0 {
-handlers.SetNested(bodyObj, "votes", bodyVotes)
-}
-if len(bodyObj) > 0 {
-b, _ := json.Marshal(bodyObj)
-body = string(b)
-}
-}
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&bodyComponentName, "component-name", "", `component.name`)
-cmd.Flags().StringVar(&bodyContentMarkup, "content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
-cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
-cmd.Flags().StringVar(&bodyEditedOn, "edited-on", "", `edited_on`)
-cmd.Flags().StringVar(&bodyKind, "kind", "", `[bug, enhancement, proposal, task]`)
-cmd.Flags().StringVar(&bodyMilestoneName, "milestone-name", "", `milestone.name`)
-cmd.Flags().StringVar(&bodyPriority, "priority", "", `[trivial, minor, major, critical, blocker]`)
-cmd.Flags().StringVar(&bodyState, "state", "", `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`)
-cmd.Flags().StringVar(&bodyTitle, "title", "", `title`)
-cmd.Flags().StringVar(&bodyVersionName, "version-name", "", `version.name`)
-cmd.Flags().IntVar(&bodyVotes, "votes", 0, `votes`)
-cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "create-an-issue",
+		Short: `Create an issue`,
+		Long:  "Creates a new issue.\n\nThis call requires authentication. Private repositories or private\nissue trackers require the caller to authenticate with an account that\nhas appropriate authorization.\n\nThe authenticated user is used for the issue's `reporter` field.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyComponentName != "" {
+					handlers.SetNested(bodyObj, "component.name", bodyComponentName)
+				}
+				if bodyContentMarkup != "" {
+					handlers.SetNested(bodyObj, "content.markup", bodyContentMarkup)
+				}
+				if bodyContentRaw != "" {
+					handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
+				}
+				if bodyEditedOn != "" {
+					handlers.SetNested(bodyObj, "edited_on", bodyEditedOn)
+				}
+				if bodyKind != "" {
+					handlers.SetNested(bodyObj, "kind", bodyKind)
+				}
+				if bodyMilestoneName != "" {
+					handlers.SetNested(bodyObj, "milestone.name", bodyMilestoneName)
+				}
+				if bodyPriority != "" {
+					handlers.SetNested(bodyObj, "priority", bodyPriority)
+				}
+				if bodyState != "" {
+					handlers.SetNested(bodyObj, "state", bodyState)
+				}
+				if bodyTitle != "" {
+					handlers.SetNested(bodyObj, "title", bodyTitle)
+				}
+				if bodyVersionName != "" {
+					handlers.SetNested(bodyObj, "version.name", bodyVersionName)
+				}
+				if bodyVotes != 0 {
+					handlers.SetNested(bodyObj, "votes", bodyVotes)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyComponentName, "component-name", "", `component.name`)
+	cmd.Flags().StringVar(&bodyContentMarkup, "content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
+	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
+	cmd.Flags().StringVar(&bodyEditedOn, "edited-on", "", `edited_on`)
+	cmd.Flags().StringVar(&bodyKind, "kind", "", `[bug, enhancement, proposal, task]`)
+	cmd.Flags().StringVar(&bodyMilestoneName, "milestone-name", "", `milestone.name`)
+	cmd.Flags().StringVar(&bodyPriority, "priority", "", `[trivial, minor, major, critical, blocker]`)
+	cmd.Flags().StringVar(&bodyState, "state", "", `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`)
+	cmd.Flags().StringVar(&bodyTitle, "title", "", `title`)
+	cmd.Flags().StringVar(&bodyVersionName, "version-name", "", `version.name`)
+	cmd.Flags().IntVar(&bodyVotes, "votes", 0, `votes`)
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+	return cmd
 }
 
 // newIssuesExportIssuesCmd returns the "issues export-issues" cobra command.
 // operationId: exportIssues
 func newIssuesExportIssuesCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-bodyIncludeAttachments bool
-bodyProjectKey string
-bodyProjectName string
-bodySendEmail bool
-bodyType string
-body string
-)
+	var (
+		repoSlug               string
+		workspace              string
+		bodyIncludeAttachments bool
+		bodyProjectKey         string
+		bodyProjectName        string
+		bodySendEmail          bool
+		bodyType               string
+		body                   string
+	)
 
-cmd := &cobra.Command{
-Use:   "export-issues",
-Short: `Export issues`,
-Long:  `A POST request to this endpoint initiates a new background celery task that archives the repo's issues.
+	cmd := &cobra.Command{
+		Use:   "export-issues",
+		Short: `Export issues`,
+		Long: `A POST request to this endpoint initiates a new background celery task that archives the repo's issues.
 
 When the job has been accepted, it will return a 202 (Accepted) along with a unique url to this job in the
 'Location' response header. This url is the endpoint for where the user can obtain their zip files."`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-if body == "" {
-bodyObj := map[string]any{}
-if bodyIncludeAttachments {
-handlers.SetNested(bodyObj, "include_attachments", bodyIncludeAttachments)
-}
-if bodyProjectKey != "" {
-handlers.SetNested(bodyObj, "project_key", bodyProjectKey)
-}
-if bodyProjectName != "" {
-handlers.SetNested(bodyObj, "project_name", bodyProjectName)
-}
-if bodySendEmail {
-handlers.SetNested(bodyObj, "send_email", bodySendEmail)
-}
-if bodyType != "" {
-handlers.SetNested(bodyObj, "type", bodyType)
-}
-if len(bodyObj) > 0 {
-b, _ := json.Marshal(bodyObj)
-body = string(b)
-}
-}
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/export",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().BoolVar(&bodyIncludeAttachments, "include-attachments", false, `include_attachments`)
-cmd.Flags().StringVar(&bodyProjectKey, "project-key", "", `project_key`)
-cmd.Flags().StringVar(&bodyProjectName, "project-name", "", `project_name`)
-cmd.Flags().BoolVar(&bodySendEmail, "send-email", false, `send_email`)
-cmd.Flags().StringVar(&bodyType, "type", "", `type`)
-cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyIncludeAttachments {
+					handlers.SetNested(bodyObj, "include_attachments", bodyIncludeAttachments)
+				}
+				if bodyProjectKey != "" {
+					handlers.SetNested(bodyObj, "project_key", bodyProjectKey)
+				}
+				if bodyProjectName != "" {
+					handlers.SetNested(bodyObj, "project_name", bodyProjectName)
+				}
+				if bodySendEmail {
+					handlers.SetNested(bodyObj, "send_email", bodySendEmail)
+				}
+				if bodyType != "" {
+					handlers.SetNested(bodyObj, "type", bodyType)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/export",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().BoolVar(&bodyIncludeAttachments, "include-attachments", false, `include_attachments`)
+	cmd.Flags().StringVar(&bodyProjectKey, "project-key", "", `project_key`)
+	cmd.Flags().StringVar(&bodyProjectName, "project-name", "", `project_name`)
+	cmd.Flags().BoolVar(&bodySendEmail, "send-email", false, `send_email`)
+	cmd.Flags().StringVar(&bodyType, "type", "", `type`)
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+	return cmd
 }
 
 // newIssuesCheckIssueExportStatusCmd returns the "issues check-issue-export-status" cobra command.
 // operationId: checkIssueExportStatus
 func newIssuesCheckIssueExportStatusCmd() *cobra.Command {
-var (
-repoName string
-repoSlug string
-taskId string
-workspace string
-)
+	var (
+		repoName  string
+		repoSlug  string
+		taskId    string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "check-issue-export-status",
-Short: `Check issue export status`,
-Long:  "This endpoint is used to poll for the progress of an issue export\njob and return the zip file after the job is complete.\nAs long as the job is running, this will return a 202 response\nwith in the response body a description of the current status.\n\nAfter the job has been scheduled, but before it starts executing, the endpoint\nreturns a 202 response with status `ACCEPTED`.\n\nOnce it starts running, it is a 202 response with status `STARTED` and progress filled.\n\nAfter it is finished, it becomes a 200 response with status `SUCCESS` or `FAILURE`.",
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoName == "" {
-return fmt.Errorf("--repo-name is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if taskId == "" {
-return fmt.Errorf("--task-id is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_name": repoName,
-"repo_slug": repoSlug,
-"task_id": taskId,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/export/{repo_name}-issues-{task_id}.zip",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&repoName, "repo-name", "", "repo_name (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&taskId, "task-id", "", "task_id (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "check-issue-export-status",
+		Short: `Check issue export status`,
+		Long:  "This endpoint is used to poll for the progress of an issue export\njob and return the zip file after the job is complete.\nAs long as the job is running, this will return a 202 response\nwith in the response body a description of the current status.\n\nAfter the job has been scheduled, but before it starts executing, the endpoint\nreturns a 202 response with status `ACCEPTED`.\n\nOnce it starts running, it is a 202 response with status `STARTED` and progress filled.\n\nAfter it is finished, it becomes a 200 response with status `SUCCESS` or `FAILURE`.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoName == "" {
+				return fmt.Errorf("--repo-name is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if taskId == "" {
+				return fmt.Errorf("--task-id is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_name": repoName,
+				"repo_slug": repoSlug,
+				"task_id":   taskId,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/export/{repo_name}-issues-{task_id}.zip",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoName, "repo-name", "", "repo_name (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&taskId, "task-id", "", "task_id (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesCheckIssueImportStatusCmd returns the "issues check-issue-import-status" cobra command.
 // operationId: checkIssueImportStatus
 func newIssuesCheckIssueImportStatusCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-)
+	var (
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "check-issue-import-status",
-Short: `Check issue import status`,
-Long:  "When using GET, this endpoint reports the status of the current import task.\n\nAfter the job has been scheduled, but before it starts executing, the endpoint\nreturns a 202 response with status `ACCEPTED`.\n\nOnce it starts running, it is a 202 response with status `STARTED` and progress filled.\n\nAfter it is finished, it becomes a 200 response with status `SUCCESS` or `FAILURE`.",
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/import",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "check-issue-import-status",
+		Short: `Check issue import status`,
+		Long:  "When using GET, this endpoint reports the status of the current import task.\n\nAfter the job has been scheduled, but before it starts executing, the endpoint\nreturns a 202 response with status `ACCEPTED`.\n\nOnce it starts running, it is a 202 response with status `STARTED` and progress filled.\n\nAfter it is finished, it becomes a 200 response with status `SUCCESS` or `FAILURE`.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/import",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesImportIssuesCmd returns the "issues import-issues" cobra command.
 // operationId: importIssues
 func newIssuesImportIssuesCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-)
+	var (
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "import-issues",
-Short: `Import issues`,
-Long:  "A POST request to this endpoint will import the zip file given by the archive parameter into the repository. All\nexisting issues will be deleted and replaced by the contents of the imported zip file.\n\nImports are done through a multipart/form-data POST. There is one valid and required form field, with the name\n\"archive,\" which needs to be a file field:\n\n```\n$ curl -u <username> -X POST -F archive=@/path/to/file.zip https://api.bitbucket.org/2.0/repositories/<owner_username>/<repo_slug>/issues/import\n```",
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/import",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "import-issues",
+		Short: `Import issues`,
+		Long:  "A POST request to this endpoint will import the zip file given by the archive parameter into the repository. All\nexisting issues will be deleted and replaced by the contents of the imported zip file.\n\nImports are done through a multipart/form-data POST. There is one valid and required form field, with the name\n\"archive,\" which needs to be a file field:\n\n```\n$ curl -u <username> -X POST -F archive=@/path/to/file.zip https://api.bitbucket.org/2.0/repositories/<owner_username>/<repo_slug>/issues/import\n```",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/import",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesGetAnIssueCmd returns the "issues get-an-issue" cobra command.
 // operationId: getAnIssue
 func newIssuesGetAnIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-)
+	var (
+		issueId   string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-an-issue",
-Short: `Get an issue`,
-Long:  `Returns the specified issue.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-an-issue",
+		Short: `Get an issue`,
+		Long:  `Returns the specified issue.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesUpdateAnIssueCmd returns the "issues update-an-issue" cobra command.
 // operationId: updateAnIssue
 func newIssuesUpdateAnIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-)
+	var (
+		issueId   string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "update-an-issue",
-Short: `Update an issue`,
-Long:  "Modifies the issue.\n\n```\n$ curl https://api.bitbucket.org/2.0/repostories/evzijst/dogslow/issues/123 \\\n  -u evzijst -s -X PUT -H 'Content-Type: application/json' \\\n  -d '{\n  \"title\": \"Updated title\",\n  \"assignee\": {\n    \"account_id\": \"5d5355e8c6b9320d9ea5b28d\"\n  },\n  \"priority\": \"minor\",\n  \"version\": {\n    \"name\": \"1.0\"\n  },\n  \"component\": null\n}'\n```\n\nThis example changes the `title`, `assignee`, `priority` and the\n`version`. It also removes the value of the `component` from the issue\nby setting the field to `null`. Any field not present keeps its existing\nvalue.\n\nEach time an issue is edited in the UI or through the API, an immutable\nchange record is created under the `/issues/123/changes` endpoint. It\nalso has a comment associated with the change.",
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "PUT",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "update-an-issue",
+		Short: `Update an issue`,
+		Long:  "Modifies the issue.\n\n```\n$ curl https://api.bitbucket.org/2.0/repostories/evzijst/dogslow/issues/123 \\\n  -u evzijst -s -X PUT -H 'Content-Type: application/json' \\\n  -d '{\n  \"title\": \"Updated title\",\n  \"assignee\": {\n    \"account_id\": \"5d5355e8c6b9320d9ea5b28d\"\n  },\n  \"priority\": \"minor\",\n  \"version\": {\n    \"name\": \"1.0\"\n  },\n  \"component\": null\n}'\n```\n\nThis example changes the `title`, `assignee`, `priority` and the\n`version`. It also removes the value of the `component` from the issue\nby setting the field to `null`. Any field not present keeps its existing\nvalue.\n\nEach time an issue is edited in the UI or through the API, an immutable\nchange record is created under the `/issues/123/changes` endpoint. It\nalso has a comment associated with the change.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "PUT",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesDeleteAnIssueCmd returns the "issues delete-an-issue" cobra command.
 // operationId: deleteAnIssue
 func newIssuesDeleteAnIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-)
+	var (
+		issueId   string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "delete-an-issue",
-Short: `Delete an issue`,
-Long:  `Deletes the specified issue. This requires write access to the
+	cmd := &cobra.Command{
+		Use:   "delete-an-issue",
+		Short: `Delete an issue`,
+		Long: `Deletes the specified issue. This requires write access to the
 repository.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "DELETE",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "DELETE",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesListAttachmentsForAnIssueCmd returns the "issues list-attachments-for-an-issue" cobra command.
 // operationId: listAttachmentsForAnIssue
 func newIssuesListAttachmentsForAnIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-page int
-pagelen int
-all bool
-)
+	var (
+		issueId   string
+		repoSlug  string
+		workspace string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "list-attachments-for-an-issue",
-Short: `List attachments for an issue`,
-Long:  `Returns all attachments for this issue.
+	cmd := &cobra.Command{
+		Use:   "list-attachments-for-an-issue",
+		Short: `List attachments for an issue`,
+		Long: `Returns all attachments for this issue.
 
 This returns the files' meta data. This does not return the files'
 actual contents.
 
 The files are always ordered by their upload date.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/attachments",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/attachments",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newIssuesUploadAnAttachmentToAnIssueCmd returns the "issues upload-an-attachment-to-an-issue" cobra command.
 // operationId: uploadAnAttachmentToAnIssue
 func newIssuesUploadAnAttachmentToAnIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-)
+	var (
+		issueId   string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "upload-an-attachment-to-an-issue",
-Short: `Upload an attachment to an issue`,
-Long:  "Upload new issue attachments.\n\nTo upload files, perform a `multipart/form-data` POST containing one\nor more file fields.\n\nWhen a file is uploaded with the same name as an existing attachment,\nthen the existing file will be replaced.",
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/attachments",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "upload-an-attachment-to-an-issue",
+		Short: `Upload an attachment to an issue`,
+		Long:  "Upload new issue attachments.\n\nTo upload files, perform a `multipart/form-data` POST containing one\nor more file fields.\n\nWhen a file is uploaded with the same name as an existing attachment,\nthen the existing file will be replaced.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/attachments",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesGetAttachmentForAnIssueCmd returns the "issues get-attachment-for-an-issue" cobra command.
 // operationId: getAttachmentForAnIssue
 func newIssuesGetAttachmentForAnIssueCmd() *cobra.Command {
-var (
-issueId string
-path string
-repoSlug string
-workspace string
-)
+	var (
+		issueId   string
+		path      string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-attachment-for-an-issue",
-Short: `Get attachment for an issue`,
-Long:  `Returns the contents of the specified file attachment.
+	cmd := &cobra.Command{
+		Use:   "get-attachment-for-an-issue",
+		Short: `Get attachment for an issue`,
+		Long: `Returns the contents of the specified file attachment.
 
 Note that this endpoint does not return a JSON response, but instead
 returns a redirect pointing to the actual file that in turn will return
@@ -863,1471 +853,1454 @@ the raw contents.
 
 The redirect URL contains a one-time token that has a limited lifetime.
 As a result, the link should not be persisted, stored, or shared.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if path == "" {
-return fmt.Errorf("--path is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"path": path,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/attachments/{path}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&path, "path", "", "path (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if path == "" {
+				return fmt.Errorf("--path is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"path":      path,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/attachments/{path}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&path, "path", "", "path (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesDeleteAnAttachmentForAnIssueCmd returns the "issues delete-an-attachment-for-an-issue" cobra command.
 // operationId: deleteAnAttachmentForAnIssue
 func newIssuesDeleteAnAttachmentForAnIssueCmd() *cobra.Command {
-var (
-issueId string
-path string
-repoSlug string
-workspace string
-)
+	var (
+		issueId   string
+		path      string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "delete-an-attachment-for-an-issue",
-Short: `Delete an attachment for an issue`,
-Long:  `Deletes an attachment.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if path == "" {
-return fmt.Errorf("--path is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"path": path,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "DELETE",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/attachments/{path}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&path, "path", "", "path (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "delete-an-attachment-for-an-issue",
+		Short: `Delete an attachment for an issue`,
+		Long:  `Deletes an attachment.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if path == "" {
+				return fmt.Errorf("--path is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"path":      path,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "DELETE",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/attachments/{path}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&path, "path", "", "path (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesListChangesOnAnIssueCmd returns the "issues list-changes-on-an-issue" cobra command.
 // operationId: listChangesOnAnIssue
 func newIssuesListChangesOnAnIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-q string
-sort string
-page int
-pagelen int
-all bool
-)
+	var (
+		issueId   string
+		repoSlug  string
+		workspace string
+		q         string
+		sort      string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "list-changes-on-an-issue",
-Short: `List changes on an issue`,
-Long:  "Returns the list of all changes that have been made to the specified\nissue. Changes are returned in chronological order with the oldest\nchange first.\n\nEach time an issue is edited in the UI or through the API, an immutable\nchange record is created under the `/issues/123/changes` endpoint. It\nalso has a comment associated with the change.\n\nNote that this operation is changing significantly, due to privacy changes.\nSee the [announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-changes-gdpr/#changes-to-the-issue-changes-api)\nfor details.\n\nChanges support [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) that\ncan be used to search for specific changes. For instance, to see\nwhen an issue transitioned to \"resolved\":\n\n```\n$ curl -s https://api.bitbucket.org/2.0/repositories/site/master/issues/1/changes \\\n   -G --data-urlencode='q=changes.state.new = \"resolved\"'\n```\n\nThis resource is only available on repositories that have the issue\ntracker enabled.\n\nN.B.\n\nThe `changes.assignee` and `changes.assignee_account_id` fields are not\na `user` object. Instead, they contain the raw `username` and\n`account_id` of the user. This is to protect the integrity of the audit\nlog even after a user account gets deleted.\n\nThe `changes.assignee` field is deprecated will disappear in the\nfuture. Use `changes.assignee_account_id` instead.",
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-"q": q,
-"sort": sort,
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/changes",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
-cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "list-changes-on-an-issue",
+		Short: `List changes on an issue`,
+		Long:  "Returns the list of all changes that have been made to the specified\nissue. Changes are returned in chronological order with the oldest\nchange first.\n\nEach time an issue is edited in the UI or through the API, an immutable\nchange record is created under the `/issues/123/changes` endpoint. It\nalso has a comment associated with the change.\n\nNote that this operation is changing significantly, due to privacy changes.\nSee the [announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-changes-gdpr/#changes-to-the-issue-changes-api)\nfor details.\n\nChanges support [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) that\ncan be used to search for specific changes. For instance, to see\nwhen an issue transitioned to \"resolved\":\n\n```\n$ curl -s https://api.bitbucket.org/2.0/repositories/site/master/issues/1/changes \\\n   -G --data-urlencode='q=changes.state.new = \"resolved\"'\n```\n\nThis resource is only available on repositories that have the issue\ntracker enabled.\n\nN.B.\n\nThe `changes.assignee` and `changes.assignee_account_id` fields are not\na `user` object. Instead, they contain the raw `username` and\n`account_id` of the user. This is to protect the integrity of the audit\nlog even after a user account gets deleted.\n\nThe `changes.assignee` field is deprecated will disappear in the\nfuture. Use `changes.assignee_account_id` instead.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{
+				"q":       q,
+				"sort":    sort,
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/changes",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
+	cmd.Flags().StringVar(&sort, "sort", "", "sort (query parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newIssuesModifyTheStateOfAnIssueCmd returns the "issues modify-the-state-of-an-issue" cobra command.
 // operationId: modifyTheStateOfAnIssue
 func newIssuesModifyTheStateOfAnIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-bodyChangesAssigneeNew string
-bodyChangesAssigneeOld string
-bodyChangesComponentNew string
-bodyChangesComponentOld string
-bodyChangesContentNew string
-bodyChangesContentOld string
-bodyChangesKindNew string
-bodyChangesKindOld string
-bodyChangesMilestoneNew string
-bodyChangesMilestoneOld string
-bodyChangesPriorityNew string
-bodyChangesPriorityOld string
-bodyChangesStateNew string
-bodyChangesStateOld string
-bodyChangesTitleNew string
-bodyChangesTitleOld string
-bodyChangesVersionNew string
-bodyChangesVersionOld string
-bodyIssueComponentName string
-bodyIssueContentMarkup string
-bodyIssueContentRaw string
-bodyIssueEditedOn string
-bodyIssueKind string
-bodyIssueMilestoneName string
-bodyIssuePriority string
-bodyIssueState string
-bodyIssueTitle string
-bodyIssueVersionName string
-bodyIssueVotes int
-bodyMessageMarkup string
-bodyMessageRaw string
-bodyName string
-bodyType string
-body string
-)
+	var (
+		issueId                 string
+		repoSlug                string
+		workspace               string
+		bodyChangesAssigneeNew  string
+		bodyChangesAssigneeOld  string
+		bodyChangesComponentNew string
+		bodyChangesComponentOld string
+		bodyChangesContentNew   string
+		bodyChangesContentOld   string
+		bodyChangesKindNew      string
+		bodyChangesKindOld      string
+		bodyChangesMilestoneNew string
+		bodyChangesMilestoneOld string
+		bodyChangesPriorityNew  string
+		bodyChangesPriorityOld  string
+		bodyChangesStateNew     string
+		bodyChangesStateOld     string
+		bodyChangesTitleNew     string
+		bodyChangesTitleOld     string
+		bodyChangesVersionNew   string
+		bodyChangesVersionOld   string
+		bodyIssueComponentName  string
+		bodyIssueContentMarkup  string
+		bodyIssueContentRaw     string
+		bodyIssueEditedOn       string
+		bodyIssueKind           string
+		bodyIssueMilestoneName  string
+		bodyIssuePriority       string
+		bodyIssueState          string
+		bodyIssueTitle          string
+		bodyIssueVersionName    string
+		bodyIssueVotes          int
+		bodyMessageMarkup       string
+		bodyMessageRaw          string
+		bodyName                string
+		bodyType                string
+		body                    string
+	)
 
-cmd := &cobra.Command{
-Use:   "modify-the-state-of-an-issue",
-Short: `Modify the state of an issue`,
-Long:  "Makes a change to the specified issue.\n\nFor example, to change an issue's state and assignee, create a new\nchange object that modifies these fields:\n\n```\ncurl https://api.bitbucket.org/2.0/site/master/issues/1234/changes \\\n  -s -u evzijst -X POST -H \"Content-Type: application/json\" \\\n  -d '{\n    \"changes\": {\n      \"assignee_account_id\": {\n        \"new\": \"557058:c0b72ad0-1cb5-4018-9cdc-0cde8492c443\"\n      },\n      \"state\": {\n        \"new\": 'resolved\"\n      }\n    }\n    \"message\": {\n      \"raw\": \"This is now resolved.\"\n    }\n  }'\n```\n\nThe above example also includes a custom comment to go alongside the\nchange. This comment will also be visible on the issue page in the UI.\n\nThe fields of the `changes` object are strings, not objects. This\nallows for immutable change log records, even after user accounts,\nmilestones, or other objects recorded in a change entry, get renamed or\ndeleted.\n\nThe `assignee_account_id` field stores the account id. When POSTing a\nnew change and changing the assignee, the client should therefore use\nthe user's account_id in the `changes.assignee_account_id.new` field.\n\nThis call requires authentication. Private repositories or private\nissue trackers require the caller to authenticate with an account that\nhas appropriate authorization.",
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-if body == "" {
-bodyObj := map[string]any{}
-if bodyChangesAssigneeNew != "" {
-handlers.SetNested(bodyObj, "changes.assignee.new", bodyChangesAssigneeNew)
-}
-if bodyChangesAssigneeOld != "" {
-handlers.SetNested(bodyObj, "changes.assignee.old", bodyChangesAssigneeOld)
-}
-if bodyChangesComponentNew != "" {
-handlers.SetNested(bodyObj, "changes.component.new", bodyChangesComponentNew)
-}
-if bodyChangesComponentOld != "" {
-handlers.SetNested(bodyObj, "changes.component.old", bodyChangesComponentOld)
-}
-if bodyChangesContentNew != "" {
-handlers.SetNested(bodyObj, "changes.content.new", bodyChangesContentNew)
-}
-if bodyChangesContentOld != "" {
-handlers.SetNested(bodyObj, "changes.content.old", bodyChangesContentOld)
-}
-if bodyChangesKindNew != "" {
-handlers.SetNested(bodyObj, "changes.kind.new", bodyChangesKindNew)
-}
-if bodyChangesKindOld != "" {
-handlers.SetNested(bodyObj, "changes.kind.old", bodyChangesKindOld)
-}
-if bodyChangesMilestoneNew != "" {
-handlers.SetNested(bodyObj, "changes.milestone.new", bodyChangesMilestoneNew)
-}
-if bodyChangesMilestoneOld != "" {
-handlers.SetNested(bodyObj, "changes.milestone.old", bodyChangesMilestoneOld)
-}
-if bodyChangesPriorityNew != "" {
-handlers.SetNested(bodyObj, "changes.priority.new", bodyChangesPriorityNew)
-}
-if bodyChangesPriorityOld != "" {
-handlers.SetNested(bodyObj, "changes.priority.old", bodyChangesPriorityOld)
-}
-if bodyChangesStateNew != "" {
-handlers.SetNested(bodyObj, "changes.state.new", bodyChangesStateNew)
-}
-if bodyChangesStateOld != "" {
-handlers.SetNested(bodyObj, "changes.state.old", bodyChangesStateOld)
-}
-if bodyChangesTitleNew != "" {
-handlers.SetNested(bodyObj, "changes.title.new", bodyChangesTitleNew)
-}
-if bodyChangesTitleOld != "" {
-handlers.SetNested(bodyObj, "changes.title.old", bodyChangesTitleOld)
-}
-if bodyChangesVersionNew != "" {
-handlers.SetNested(bodyObj, "changes.version.new", bodyChangesVersionNew)
-}
-if bodyChangesVersionOld != "" {
-handlers.SetNested(bodyObj, "changes.version.old", bodyChangesVersionOld)
-}
-if bodyIssueComponentName != "" {
-handlers.SetNested(bodyObj, "issue.component.name", bodyIssueComponentName)
-}
-if bodyIssueContentMarkup != "" {
-handlers.SetNested(bodyObj, "issue.content.markup", bodyIssueContentMarkup)
-}
-if bodyIssueContentRaw != "" {
-handlers.SetNested(bodyObj, "issue.content.raw", bodyIssueContentRaw)
-}
-if bodyIssueEditedOn != "" {
-handlers.SetNested(bodyObj, "issue.edited_on", bodyIssueEditedOn)
-}
-if bodyIssueKind != "" {
-handlers.SetNested(bodyObj, "issue.kind", bodyIssueKind)
-}
-if bodyIssueMilestoneName != "" {
-handlers.SetNested(bodyObj, "issue.milestone.name", bodyIssueMilestoneName)
-}
-if bodyIssuePriority != "" {
-handlers.SetNested(bodyObj, "issue.priority", bodyIssuePriority)
-}
-if bodyIssueState != "" {
-handlers.SetNested(bodyObj, "issue.state", bodyIssueState)
-}
-if bodyIssueTitle != "" {
-handlers.SetNested(bodyObj, "issue.title", bodyIssueTitle)
-}
-if bodyIssueVersionName != "" {
-handlers.SetNested(bodyObj, "issue.version.name", bodyIssueVersionName)
-}
-if bodyIssueVotes != 0 {
-handlers.SetNested(bodyObj, "issue.votes", bodyIssueVotes)
-}
-if bodyMessageMarkup != "" {
-handlers.SetNested(bodyObj, "message.markup", bodyMessageMarkup)
-}
-if bodyMessageRaw != "" {
-handlers.SetNested(bodyObj, "message.raw", bodyMessageRaw)
-}
-if bodyName != "" {
-handlers.SetNested(bodyObj, "name", bodyName)
-}
-if bodyType != "" {
-handlers.SetNested(bodyObj, "type", bodyType)
-}
-if len(bodyObj) > 0 {
-b, _ := json.Marshal(bodyObj)
-body = string(b)
-}
-}
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/changes",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&bodyChangesAssigneeNew, "changes-assignee-new", "", `changes.assignee.new`)
-cmd.Flags().StringVar(&bodyChangesAssigneeOld, "changes-assignee-old", "", `changes.assignee.old`)
-cmd.Flags().StringVar(&bodyChangesComponentNew, "changes-component-new", "", `changes.component.new`)
-cmd.Flags().StringVar(&bodyChangesComponentOld, "changes-component-old", "", `changes.component.old`)
-cmd.Flags().StringVar(&bodyChangesContentNew, "changes-content-new", "", `changes.content.new`)
-cmd.Flags().StringVar(&bodyChangesContentOld, "changes-content-old", "", `changes.content.old`)
-cmd.Flags().StringVar(&bodyChangesKindNew, "changes-kind-new", "", `changes.kind.new`)
-cmd.Flags().StringVar(&bodyChangesKindOld, "changes-kind-old", "", `changes.kind.old`)
-cmd.Flags().StringVar(&bodyChangesMilestoneNew, "changes-milestone-new", "", `changes.milestone.new`)
-cmd.Flags().StringVar(&bodyChangesMilestoneOld, "changes-milestone-old", "", `changes.milestone.old`)
-cmd.Flags().StringVar(&bodyChangesPriorityNew, "changes-priority-new", "", `changes.priority.new`)
-cmd.Flags().StringVar(&bodyChangesPriorityOld, "changes-priority-old", "", `changes.priority.old`)
-cmd.Flags().StringVar(&bodyChangesStateNew, "changes-state-new", "", `changes.state.new`)
-cmd.Flags().StringVar(&bodyChangesStateOld, "changes-state-old", "", `changes.state.old`)
-cmd.Flags().StringVar(&bodyChangesTitleNew, "changes-title-new", "", `changes.title.new`)
-cmd.Flags().StringVar(&bodyChangesTitleOld, "changes-title-old", "", `changes.title.old`)
-cmd.Flags().StringVar(&bodyChangesVersionNew, "changes-version-new", "", `changes.version.new`)
-cmd.Flags().StringVar(&bodyChangesVersionOld, "changes-version-old", "", `changes.version.old`)
-cmd.Flags().StringVar(&bodyIssueComponentName, "issue-component-name", "", `issue.component.name`)
-cmd.Flags().StringVar(&bodyIssueContentMarkup, "issue-content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
-cmd.Flags().StringVar(&bodyIssueContentRaw, "issue-content-raw", "", `The text as it was typed by a user.`)
-cmd.Flags().StringVar(&bodyIssueEditedOn, "issue-edited-on", "", `issue.edited_on`)
-cmd.Flags().StringVar(&bodyIssueKind, "issue-kind", "", `[bug, enhancement, proposal, task]`)
-cmd.Flags().StringVar(&bodyIssueMilestoneName, "issue-milestone-name", "", `issue.milestone.name`)
-cmd.Flags().StringVar(&bodyIssuePriority, "issue-priority", "", `[trivial, minor, major, critical, blocker]`)
-cmd.Flags().StringVar(&bodyIssueState, "issue-state", "", `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`)
-cmd.Flags().StringVar(&bodyIssueTitle, "issue-title", "", `issue.title`)
-cmd.Flags().StringVar(&bodyIssueVersionName, "issue-version-name", "", `issue.version.name`)
-cmd.Flags().IntVar(&bodyIssueVotes, "issue-votes", 0, `issue.votes`)
-cmd.Flags().StringVar(&bodyMessageMarkup, "message-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
-cmd.Flags().StringVar(&bodyMessageRaw, "message-raw", "", `The text as it was typed by a user.`)
-cmd.Flags().StringVar(&bodyName, "name", "", `name`)
-cmd.Flags().StringVar(&bodyType, "type", "", `type`)
-cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "modify-the-state-of-an-issue",
+		Short: `Modify the state of an issue`,
+		Long:  "Makes a change to the specified issue.\n\nFor example, to change an issue's state and assignee, create a new\nchange object that modifies these fields:\n\n```\ncurl https://api.bitbucket.org/2.0/site/master/issues/1234/changes \\\n  -s -u evzijst -X POST -H \"Content-Type: application/json\" \\\n  -d '{\n    \"changes\": {\n      \"assignee_account_id\": {\n        \"new\": \"557058:c0b72ad0-1cb5-4018-9cdc-0cde8492c443\"\n      },\n      \"state\": {\n        \"new\": 'resolved\"\n      }\n    }\n    \"message\": {\n      \"raw\": \"This is now resolved.\"\n    }\n  }'\n```\n\nThe above example also includes a custom comment to go alongside the\nchange. This comment will also be visible on the issue page in the UI.\n\nThe fields of the `changes` object are strings, not objects. This\nallows for immutable change log records, even after user accounts,\nmilestones, or other objects recorded in a change entry, get renamed or\ndeleted.\n\nThe `assignee_account_id` field stores the account id. When POSTing a\nnew change and changing the assignee, the client should therefore use\nthe user's account_id in the `changes.assignee_account_id.new` field.\n\nThis call requires authentication. Private repositories or private\nissue trackers require the caller to authenticate with an account that\nhas appropriate authorization.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyChangesAssigneeNew != "" {
+					handlers.SetNested(bodyObj, "changes.assignee.new", bodyChangesAssigneeNew)
+				}
+				if bodyChangesAssigneeOld != "" {
+					handlers.SetNested(bodyObj, "changes.assignee.old", bodyChangesAssigneeOld)
+				}
+				if bodyChangesComponentNew != "" {
+					handlers.SetNested(bodyObj, "changes.component.new", bodyChangesComponentNew)
+				}
+				if bodyChangesComponentOld != "" {
+					handlers.SetNested(bodyObj, "changes.component.old", bodyChangesComponentOld)
+				}
+				if bodyChangesContentNew != "" {
+					handlers.SetNested(bodyObj, "changes.content.new", bodyChangesContentNew)
+				}
+				if bodyChangesContentOld != "" {
+					handlers.SetNested(bodyObj, "changes.content.old", bodyChangesContentOld)
+				}
+				if bodyChangesKindNew != "" {
+					handlers.SetNested(bodyObj, "changes.kind.new", bodyChangesKindNew)
+				}
+				if bodyChangesKindOld != "" {
+					handlers.SetNested(bodyObj, "changes.kind.old", bodyChangesKindOld)
+				}
+				if bodyChangesMilestoneNew != "" {
+					handlers.SetNested(bodyObj, "changes.milestone.new", bodyChangesMilestoneNew)
+				}
+				if bodyChangesMilestoneOld != "" {
+					handlers.SetNested(bodyObj, "changes.milestone.old", bodyChangesMilestoneOld)
+				}
+				if bodyChangesPriorityNew != "" {
+					handlers.SetNested(bodyObj, "changes.priority.new", bodyChangesPriorityNew)
+				}
+				if bodyChangesPriorityOld != "" {
+					handlers.SetNested(bodyObj, "changes.priority.old", bodyChangesPriorityOld)
+				}
+				if bodyChangesStateNew != "" {
+					handlers.SetNested(bodyObj, "changes.state.new", bodyChangesStateNew)
+				}
+				if bodyChangesStateOld != "" {
+					handlers.SetNested(bodyObj, "changes.state.old", bodyChangesStateOld)
+				}
+				if bodyChangesTitleNew != "" {
+					handlers.SetNested(bodyObj, "changes.title.new", bodyChangesTitleNew)
+				}
+				if bodyChangesTitleOld != "" {
+					handlers.SetNested(bodyObj, "changes.title.old", bodyChangesTitleOld)
+				}
+				if bodyChangesVersionNew != "" {
+					handlers.SetNested(bodyObj, "changes.version.new", bodyChangesVersionNew)
+				}
+				if bodyChangesVersionOld != "" {
+					handlers.SetNested(bodyObj, "changes.version.old", bodyChangesVersionOld)
+				}
+				if bodyIssueComponentName != "" {
+					handlers.SetNested(bodyObj, "issue.component.name", bodyIssueComponentName)
+				}
+				if bodyIssueContentMarkup != "" {
+					handlers.SetNested(bodyObj, "issue.content.markup", bodyIssueContentMarkup)
+				}
+				if bodyIssueContentRaw != "" {
+					handlers.SetNested(bodyObj, "issue.content.raw", bodyIssueContentRaw)
+				}
+				if bodyIssueEditedOn != "" {
+					handlers.SetNested(bodyObj, "issue.edited_on", bodyIssueEditedOn)
+				}
+				if bodyIssueKind != "" {
+					handlers.SetNested(bodyObj, "issue.kind", bodyIssueKind)
+				}
+				if bodyIssueMilestoneName != "" {
+					handlers.SetNested(bodyObj, "issue.milestone.name", bodyIssueMilestoneName)
+				}
+				if bodyIssuePriority != "" {
+					handlers.SetNested(bodyObj, "issue.priority", bodyIssuePriority)
+				}
+				if bodyIssueState != "" {
+					handlers.SetNested(bodyObj, "issue.state", bodyIssueState)
+				}
+				if bodyIssueTitle != "" {
+					handlers.SetNested(bodyObj, "issue.title", bodyIssueTitle)
+				}
+				if bodyIssueVersionName != "" {
+					handlers.SetNested(bodyObj, "issue.version.name", bodyIssueVersionName)
+				}
+				if bodyIssueVotes != 0 {
+					handlers.SetNested(bodyObj, "issue.votes", bodyIssueVotes)
+				}
+				if bodyMessageMarkup != "" {
+					handlers.SetNested(bodyObj, "message.markup", bodyMessageMarkup)
+				}
+				if bodyMessageRaw != "" {
+					handlers.SetNested(bodyObj, "message.raw", bodyMessageRaw)
+				}
+				if bodyName != "" {
+					handlers.SetNested(bodyObj, "name", bodyName)
+				}
+				if bodyType != "" {
+					handlers.SetNested(bodyObj, "type", bodyType)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/changes",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyChangesAssigneeNew, "changes-assignee-new", "", `changes.assignee.new`)
+	cmd.Flags().StringVar(&bodyChangesAssigneeOld, "changes-assignee-old", "", `changes.assignee.old`)
+	cmd.Flags().StringVar(&bodyChangesComponentNew, "changes-component-new", "", `changes.component.new`)
+	cmd.Flags().StringVar(&bodyChangesComponentOld, "changes-component-old", "", `changes.component.old`)
+	cmd.Flags().StringVar(&bodyChangesContentNew, "changes-content-new", "", `changes.content.new`)
+	cmd.Flags().StringVar(&bodyChangesContentOld, "changes-content-old", "", `changes.content.old`)
+	cmd.Flags().StringVar(&bodyChangesKindNew, "changes-kind-new", "", `changes.kind.new`)
+	cmd.Flags().StringVar(&bodyChangesKindOld, "changes-kind-old", "", `changes.kind.old`)
+	cmd.Flags().StringVar(&bodyChangesMilestoneNew, "changes-milestone-new", "", `changes.milestone.new`)
+	cmd.Flags().StringVar(&bodyChangesMilestoneOld, "changes-milestone-old", "", `changes.milestone.old`)
+	cmd.Flags().StringVar(&bodyChangesPriorityNew, "changes-priority-new", "", `changes.priority.new`)
+	cmd.Flags().StringVar(&bodyChangesPriorityOld, "changes-priority-old", "", `changes.priority.old`)
+	cmd.Flags().StringVar(&bodyChangesStateNew, "changes-state-new", "", `changes.state.new`)
+	cmd.Flags().StringVar(&bodyChangesStateOld, "changes-state-old", "", `changes.state.old`)
+	cmd.Flags().StringVar(&bodyChangesTitleNew, "changes-title-new", "", `changes.title.new`)
+	cmd.Flags().StringVar(&bodyChangesTitleOld, "changes-title-old", "", `changes.title.old`)
+	cmd.Flags().StringVar(&bodyChangesVersionNew, "changes-version-new", "", `changes.version.new`)
+	cmd.Flags().StringVar(&bodyChangesVersionOld, "changes-version-old", "", `changes.version.old`)
+	cmd.Flags().StringVar(&bodyIssueComponentName, "issue-component-name", "", `issue.component.name`)
+	cmd.Flags().StringVar(&bodyIssueContentMarkup, "issue-content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
+	cmd.Flags().StringVar(&bodyIssueContentRaw, "issue-content-raw", "", `The text as it was typed by a user.`)
+	cmd.Flags().StringVar(&bodyIssueEditedOn, "issue-edited-on", "", `issue.edited_on`)
+	cmd.Flags().StringVar(&bodyIssueKind, "issue-kind", "", `[bug, enhancement, proposal, task]`)
+	cmd.Flags().StringVar(&bodyIssueMilestoneName, "issue-milestone-name", "", `issue.milestone.name`)
+	cmd.Flags().StringVar(&bodyIssuePriority, "issue-priority", "", `[trivial, minor, major, critical, blocker]`)
+	cmd.Flags().StringVar(&bodyIssueState, "issue-state", "", `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`)
+	cmd.Flags().StringVar(&bodyIssueTitle, "issue-title", "", `issue.title`)
+	cmd.Flags().StringVar(&bodyIssueVersionName, "issue-version-name", "", `issue.version.name`)
+	cmd.Flags().IntVar(&bodyIssueVotes, "issue-votes", 0, `issue.votes`)
+	cmd.Flags().StringVar(&bodyMessageMarkup, "message-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
+	cmd.Flags().StringVar(&bodyMessageRaw, "message-raw", "", `The text as it was typed by a user.`)
+	cmd.Flags().StringVar(&bodyName, "name", "", `name`)
+	cmd.Flags().StringVar(&bodyType, "type", "", `type`)
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+	return cmd
 }
 
 // newIssuesGetIssueChangeObjectCmd returns the "issues get-issue-change-object" cobra command.
 // operationId: getIssueChangeObject
 func newIssuesGetIssueChangeObjectCmd() *cobra.Command {
-var (
-changeId string
-issueId string
-repoSlug string
-workspace string
-)
+	var (
+		changeId  string
+		issueId   string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-issue-change-object",
-Short: `Get issue change object`,
-Long:  `Returns the specified issue change object.
+	cmd := &cobra.Command{
+		Use:   "get-issue-change-object",
+		Short: `Get issue change object`,
+		Long: `Returns the specified issue change object.
 
 This resource is only available on repositories that have the issue
 tracker enabled.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if changeId == "" {
-return fmt.Errorf("--change-id is required")
-}
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"change_id": changeId,
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/changes/{change_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&changeId, "change-id", "", "change_id (path parameter)")
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if changeId == "" {
+				return fmt.Errorf("--change-id is required")
+			}
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"change_id": changeId,
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/changes/{change_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&changeId, "change-id", "", "change_id (path parameter)")
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesListCommentsOnAnIssueCmd returns the "issues list-comments-on-an-issue" cobra command.
 // operationId: listCommentsOnAnIssue
 func newIssuesListCommentsOnAnIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-q string
-page int
-pagelen int
-all bool
-)
+	var (
+		issueId   string
+		repoSlug  string
+		workspace string
+		q         string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "list-comments-on-an-issue",
-Short: `List comments on an issue`,
-Long:  "Returns a paginated list of all comments that were made on the\nspecified issue.\n\nThe default sorting is oldest to newest and can be overridden with\nthe `sort` query parameter.\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.",
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-"q": q,
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "list-comments-on-an-issue",
+		Short: `List comments on an issue`,
+		Long:  "Returns a paginated list of all comments that were made on the\nspecified issue.\n\nThe default sorting is oldest to newest and can be overridden with\nthe `sort` query parameter.\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{
+				"q":       q,
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newIssuesCreateACommentOnAnIssueCmd returns the "issues create-a-comment-on-an-issue" cobra command.
 // operationId: createACommentOnAnIssue
 func newIssuesCreateACommentOnAnIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-bodyContentMarkup string
-bodyContentRaw string
-bodyInlineFrom int
-bodyInlinePath string
-bodyInlineStartFrom int
-bodyInlineStartTo int
-bodyInlineTo int
-bodyIssueComponentName string
-bodyIssueContentMarkup string
-bodyIssueContentRaw string
-bodyIssueEditedOn string
-bodyIssueKind string
-bodyIssueMilestoneName string
-bodyIssuePriority string
-bodyIssueState string
-bodyIssueTitle string
-bodyIssueVersionName string
-bodyIssueVotes int
-bodyParentId int
-body string
-)
+	var (
+		issueId                string
+		repoSlug               string
+		workspace              string
+		bodyContentMarkup      string
+		bodyContentRaw         string
+		bodyInlineFrom         int
+		bodyInlinePath         string
+		bodyInlineStartFrom    int
+		bodyInlineStartTo      int
+		bodyInlineTo           int
+		bodyIssueComponentName string
+		bodyIssueContentMarkup string
+		bodyIssueContentRaw    string
+		bodyIssueEditedOn      string
+		bodyIssueKind          string
+		bodyIssueMilestoneName string
+		bodyIssuePriority      string
+		bodyIssueState         string
+		bodyIssueTitle         string
+		bodyIssueVersionName   string
+		bodyIssueVotes         int
+		bodyParentId           int
+		body                   string
+	)
 
-cmd := &cobra.Command{
-Use:   "create-a-comment-on-an-issue",
-Short: `Create a comment on an issue`,
-Long:  "Creates a new issue comment.\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/prlinks/issues/42/comments/ \\\n  -X POST -u evzijst \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"content\": {\"raw\": \"Lorem ipsum.\"}}'\n```",
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-if body == "" {
-bodyObj := map[string]any{}
-if bodyContentMarkup != "" {
-handlers.SetNested(bodyObj, "content.markup", bodyContentMarkup)
-}
-if bodyContentRaw != "" {
-handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
-}
-if bodyInlineFrom != 0 {
-handlers.SetNested(bodyObj, "inline.from", bodyInlineFrom)
-}
-if bodyInlinePath != "" {
-handlers.SetNested(bodyObj, "inline.path", bodyInlinePath)
-}
-if bodyInlineStartFrom != 0 {
-handlers.SetNested(bodyObj, "inline.start_from", bodyInlineStartFrom)
-}
-if bodyInlineStartTo != 0 {
-handlers.SetNested(bodyObj, "inline.start_to", bodyInlineStartTo)
-}
-if bodyInlineTo != 0 {
-handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
-}
-if bodyIssueComponentName != "" {
-handlers.SetNested(bodyObj, "issue.component.name", bodyIssueComponentName)
-}
-if bodyIssueContentMarkup != "" {
-handlers.SetNested(bodyObj, "issue.content.markup", bodyIssueContentMarkup)
-}
-if bodyIssueContentRaw != "" {
-handlers.SetNested(bodyObj, "issue.content.raw", bodyIssueContentRaw)
-}
-if bodyIssueEditedOn != "" {
-handlers.SetNested(bodyObj, "issue.edited_on", bodyIssueEditedOn)
-}
-if bodyIssueKind != "" {
-handlers.SetNested(bodyObj, "issue.kind", bodyIssueKind)
-}
-if bodyIssueMilestoneName != "" {
-handlers.SetNested(bodyObj, "issue.milestone.name", bodyIssueMilestoneName)
-}
-if bodyIssuePriority != "" {
-handlers.SetNested(bodyObj, "issue.priority", bodyIssuePriority)
-}
-if bodyIssueState != "" {
-handlers.SetNested(bodyObj, "issue.state", bodyIssueState)
-}
-if bodyIssueTitle != "" {
-handlers.SetNested(bodyObj, "issue.title", bodyIssueTitle)
-}
-if bodyIssueVersionName != "" {
-handlers.SetNested(bodyObj, "issue.version.name", bodyIssueVersionName)
-}
-if bodyIssueVotes != 0 {
-handlers.SetNested(bodyObj, "issue.votes", bodyIssueVotes)
-}
-if bodyParentId != 0 {
-handlers.SetNested(bodyObj, "parent.id", bodyParentId)
-}
-if len(bodyObj) > 0 {
-b, _ := json.Marshal(bodyObj)
-body = string(b)
-}
-}
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "POST",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&bodyContentMarkup, "content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
-cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
-cmd.Flags().IntVar(&bodyInlineFrom, "inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
-cmd.Flags().StringVar(&bodyInlinePath, "inline-path", "", `The path of the file this comment is anchored to.`)
-cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
-cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
-cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
-cmd.Flags().StringVar(&bodyIssueComponentName, "issue-component-name", "", `issue.component.name`)
-cmd.Flags().StringVar(&bodyIssueContentMarkup, "issue-content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
-cmd.Flags().StringVar(&bodyIssueContentRaw, "issue-content-raw", "", `The text as it was typed by a user.`)
-cmd.Flags().StringVar(&bodyIssueEditedOn, "issue-edited-on", "", `issue.edited_on`)
-cmd.Flags().StringVar(&bodyIssueKind, "issue-kind", "", `[bug, enhancement, proposal, task]`)
-cmd.Flags().StringVar(&bodyIssueMilestoneName, "issue-milestone-name", "", `issue.milestone.name`)
-cmd.Flags().StringVar(&bodyIssuePriority, "issue-priority", "", `[trivial, minor, major, critical, blocker]`)
-cmd.Flags().StringVar(&bodyIssueState, "issue-state", "", `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`)
-cmd.Flags().StringVar(&bodyIssueTitle, "issue-title", "", `issue.title`)
-cmd.Flags().StringVar(&bodyIssueVersionName, "issue-version-name", "", `issue.version.name`)
-cmd.Flags().IntVar(&bodyIssueVotes, "issue-votes", 0, `issue.votes`)
-cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `ID of referenced parent`)
-cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "create-a-comment-on-an-issue",
+		Short: `Create a comment on an issue`,
+		Long:  "Creates a new issue comment.\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/prlinks/issues/42/comments/ \\\n  -X POST -u evzijst \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"content\": {\"raw\": \"Lorem ipsum.\"}}'\n```",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyContentMarkup != "" {
+					handlers.SetNested(bodyObj, "content.markup", bodyContentMarkup)
+				}
+				if bodyContentRaw != "" {
+					handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
+				}
+				if bodyInlineFrom != 0 {
+					handlers.SetNested(bodyObj, "inline.from", bodyInlineFrom)
+				}
+				if bodyInlinePath != "" {
+					handlers.SetNested(bodyObj, "inline.path", bodyInlinePath)
+				}
+				if bodyInlineStartFrom != 0 {
+					handlers.SetNested(bodyObj, "inline.start_from", bodyInlineStartFrom)
+				}
+				if bodyInlineStartTo != 0 {
+					handlers.SetNested(bodyObj, "inline.start_to", bodyInlineStartTo)
+				}
+				if bodyInlineTo != 0 {
+					handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
+				}
+				if bodyIssueComponentName != "" {
+					handlers.SetNested(bodyObj, "issue.component.name", bodyIssueComponentName)
+				}
+				if bodyIssueContentMarkup != "" {
+					handlers.SetNested(bodyObj, "issue.content.markup", bodyIssueContentMarkup)
+				}
+				if bodyIssueContentRaw != "" {
+					handlers.SetNested(bodyObj, "issue.content.raw", bodyIssueContentRaw)
+				}
+				if bodyIssueEditedOn != "" {
+					handlers.SetNested(bodyObj, "issue.edited_on", bodyIssueEditedOn)
+				}
+				if bodyIssueKind != "" {
+					handlers.SetNested(bodyObj, "issue.kind", bodyIssueKind)
+				}
+				if bodyIssueMilestoneName != "" {
+					handlers.SetNested(bodyObj, "issue.milestone.name", bodyIssueMilestoneName)
+				}
+				if bodyIssuePriority != "" {
+					handlers.SetNested(bodyObj, "issue.priority", bodyIssuePriority)
+				}
+				if bodyIssueState != "" {
+					handlers.SetNested(bodyObj, "issue.state", bodyIssueState)
+				}
+				if bodyIssueTitle != "" {
+					handlers.SetNested(bodyObj, "issue.title", bodyIssueTitle)
+				}
+				if bodyIssueVersionName != "" {
+					handlers.SetNested(bodyObj, "issue.version.name", bodyIssueVersionName)
+				}
+				if bodyIssueVotes != 0 {
+					handlers.SetNested(bodyObj, "issue.votes", bodyIssueVotes)
+				}
+				if bodyParentId != 0 {
+					handlers.SetNested(bodyObj, "parent.id", bodyParentId)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "POST",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyContentMarkup, "content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
+	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
+	cmd.Flags().IntVar(&bodyInlineFrom, "inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
+	cmd.Flags().StringVar(&bodyInlinePath, "inline-path", "", `The path of the file this comment is anchored to.`)
+	cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
+	cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
+	cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
+	cmd.Flags().StringVar(&bodyIssueComponentName, "issue-component-name", "", `issue.component.name`)
+	cmd.Flags().StringVar(&bodyIssueContentMarkup, "issue-content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
+	cmd.Flags().StringVar(&bodyIssueContentRaw, "issue-content-raw", "", `The text as it was typed by a user.`)
+	cmd.Flags().StringVar(&bodyIssueEditedOn, "issue-edited-on", "", `issue.edited_on`)
+	cmd.Flags().StringVar(&bodyIssueKind, "issue-kind", "", `[bug, enhancement, proposal, task]`)
+	cmd.Flags().StringVar(&bodyIssueMilestoneName, "issue-milestone-name", "", `issue.milestone.name`)
+	cmd.Flags().StringVar(&bodyIssuePriority, "issue-priority", "", `[trivial, minor, major, critical, blocker]`)
+	cmd.Flags().StringVar(&bodyIssueState, "issue-state", "", `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`)
+	cmd.Flags().StringVar(&bodyIssueTitle, "issue-title", "", `issue.title`)
+	cmd.Flags().StringVar(&bodyIssueVersionName, "issue-version-name", "", `issue.version.name`)
+	cmd.Flags().IntVar(&bodyIssueVotes, "issue-votes", 0, `issue.votes`)
+	cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `ID of referenced parent`)
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+	return cmd
 }
 
 // newIssuesGetACommentOnAnIssueCmd returns the "issues get-a-comment-on-an-issue" cobra command.
 // operationId: getACommentOnAnIssue
 func newIssuesGetACommentOnAnIssueCmd() *cobra.Command {
-var (
-commentId int
-issueId string
-repoSlug string
-workspace string
-)
+	var (
+		commentId int
+		issueId   string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-a-comment-on-an-issue",
-Short: `Get a comment on an issue`,
-Long:  `Returns the specified issue comment object.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if commentId == 0 {
-return fmt.Errorf("--comment-id is required")
-}
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"comment_id": strconv.Itoa(commentId),
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments/{comment_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-a-comment-on-an-issue",
+		Short: `Get a comment on an issue`,
+		Long:  `Returns the specified issue comment object.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if commentId == 0 {
+				return fmt.Errorf("--comment-id is required")
+			}
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"comment_id": strconv.Itoa(commentId),
+				"issue_id":   issueId,
+				"repo_slug":  repoSlug,
+				"workspace":  workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments/{comment_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesUpdateACommentOnAnIssueCmd returns the "issues update-a-comment-on-an-issue" cobra command.
 // operationId: updateACommentOnAnIssue
 func newIssuesUpdateACommentOnAnIssueCmd() *cobra.Command {
-var (
-commentId int
-issueId string
-repoSlug string
-workspace string
-bodyContentMarkup string
-bodyContentRaw string
-bodyInlineFrom int
-bodyInlinePath string
-bodyInlineStartFrom int
-bodyInlineStartTo int
-bodyInlineTo int
-bodyIssueComponentName string
-bodyIssueContentMarkup string
-bodyIssueContentRaw string
-bodyIssueEditedOn string
-bodyIssueKind string
-bodyIssueMilestoneName string
-bodyIssuePriority string
-bodyIssueState string
-bodyIssueTitle string
-bodyIssueVersionName string
-bodyIssueVotes int
-bodyParentId int
-body string
-)
+	var (
+		commentId              int
+		issueId                string
+		repoSlug               string
+		workspace              string
+		bodyContentMarkup      string
+		bodyContentRaw         string
+		bodyInlineFrom         int
+		bodyInlinePath         string
+		bodyInlineStartFrom    int
+		bodyInlineStartTo      int
+		bodyInlineTo           int
+		bodyIssueComponentName string
+		bodyIssueContentMarkup string
+		bodyIssueContentRaw    string
+		bodyIssueEditedOn      string
+		bodyIssueKind          string
+		bodyIssueMilestoneName string
+		bodyIssuePriority      string
+		bodyIssueState         string
+		bodyIssueTitle         string
+		bodyIssueVersionName   string
+		bodyIssueVotes         int
+		bodyParentId           int
+		body                   string
+	)
 
-cmd := &cobra.Command{
-Use:   "update-a-comment-on-an-issue",
-Short: `Update a comment on an issue`,
-Long:  "Updates the content of the specified issue comment. Note that only\nthe `content.raw` field can be modified.\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/prlinks/issues/42/comments/5728901 \\\n  -X PUT -u evzijst \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"content\": {\"raw\": \"Lorem ipsum.\"}'\n```",
-RunE: func(cmd *cobra.Command, args []string) error {
-if commentId == 0 {
-return fmt.Errorf("--comment-id is required")
-}
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"comment_id": strconv.Itoa(commentId),
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-if body == "" {
-bodyObj := map[string]any{}
-if bodyContentMarkup != "" {
-handlers.SetNested(bodyObj, "content.markup", bodyContentMarkup)
-}
-if bodyContentRaw != "" {
-handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
-}
-if bodyInlineFrom != 0 {
-handlers.SetNested(bodyObj, "inline.from", bodyInlineFrom)
-}
-if bodyInlinePath != "" {
-handlers.SetNested(bodyObj, "inline.path", bodyInlinePath)
-}
-if bodyInlineStartFrom != 0 {
-handlers.SetNested(bodyObj, "inline.start_from", bodyInlineStartFrom)
-}
-if bodyInlineStartTo != 0 {
-handlers.SetNested(bodyObj, "inline.start_to", bodyInlineStartTo)
-}
-if bodyInlineTo != 0 {
-handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
-}
-if bodyIssueComponentName != "" {
-handlers.SetNested(bodyObj, "issue.component.name", bodyIssueComponentName)
-}
-if bodyIssueContentMarkup != "" {
-handlers.SetNested(bodyObj, "issue.content.markup", bodyIssueContentMarkup)
-}
-if bodyIssueContentRaw != "" {
-handlers.SetNested(bodyObj, "issue.content.raw", bodyIssueContentRaw)
-}
-if bodyIssueEditedOn != "" {
-handlers.SetNested(bodyObj, "issue.edited_on", bodyIssueEditedOn)
-}
-if bodyIssueKind != "" {
-handlers.SetNested(bodyObj, "issue.kind", bodyIssueKind)
-}
-if bodyIssueMilestoneName != "" {
-handlers.SetNested(bodyObj, "issue.milestone.name", bodyIssueMilestoneName)
-}
-if bodyIssuePriority != "" {
-handlers.SetNested(bodyObj, "issue.priority", bodyIssuePriority)
-}
-if bodyIssueState != "" {
-handlers.SetNested(bodyObj, "issue.state", bodyIssueState)
-}
-if bodyIssueTitle != "" {
-handlers.SetNested(bodyObj, "issue.title", bodyIssueTitle)
-}
-if bodyIssueVersionName != "" {
-handlers.SetNested(bodyObj, "issue.version.name", bodyIssueVersionName)
-}
-if bodyIssueVotes != 0 {
-handlers.SetNested(bodyObj, "issue.votes", bodyIssueVotes)
-}
-if bodyParentId != 0 {
-handlers.SetNested(bodyObj, "parent.id", bodyParentId)
-}
-if len(bodyObj) > 0 {
-b, _ := json.Marshal(bodyObj)
-body = string(b)
-}
-}
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "PUT",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments/{comment_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().StringVar(&bodyContentMarkup, "content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
-cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
-cmd.Flags().IntVar(&bodyInlineFrom, "inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
-cmd.Flags().StringVar(&bodyInlinePath, "inline-path", "", `The path of the file this comment is anchored to.`)
-cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
-cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
-cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
-cmd.Flags().StringVar(&bodyIssueComponentName, "issue-component-name", "", `issue.component.name`)
-cmd.Flags().StringVar(&bodyIssueContentMarkup, "issue-content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
-cmd.Flags().StringVar(&bodyIssueContentRaw, "issue-content-raw", "", `The text as it was typed by a user.`)
-cmd.Flags().StringVar(&bodyIssueEditedOn, "issue-edited-on", "", `issue.edited_on`)
-cmd.Flags().StringVar(&bodyIssueKind, "issue-kind", "", `[bug, enhancement, proposal, task]`)
-cmd.Flags().StringVar(&bodyIssueMilestoneName, "issue-milestone-name", "", `issue.milestone.name`)
-cmd.Flags().StringVar(&bodyIssuePriority, "issue-priority", "", `[trivial, minor, major, critical, blocker]`)
-cmd.Flags().StringVar(&bodyIssueState, "issue-state", "", `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`)
-cmd.Flags().StringVar(&bodyIssueTitle, "issue-title", "", `issue.title`)
-cmd.Flags().StringVar(&bodyIssueVersionName, "issue-version-name", "", `issue.version.name`)
-cmd.Flags().IntVar(&bodyIssueVotes, "issue-votes", 0, `issue.votes`)
-cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `ID of referenced parent`)
-cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "update-a-comment-on-an-issue",
+		Short: `Update a comment on an issue`,
+		Long:  "Updates the content of the specified issue comment. Note that only\nthe `content.raw` field can be modified.\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/prlinks/issues/42/comments/5728901 \\\n  -X PUT -u evzijst \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"content\": {\"raw\": \"Lorem ipsum.\"}'\n```",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if commentId == 0 {
+				return fmt.Errorf("--comment-id is required")
+			}
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"comment_id": strconv.Itoa(commentId),
+				"issue_id":   issueId,
+				"repo_slug":  repoSlug,
+				"workspace":  workspace,
+			}
+			queryParams := map[string]string{}
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyContentMarkup != "" {
+					handlers.SetNested(bodyObj, "content.markup", bodyContentMarkup)
+				}
+				if bodyContentRaw != "" {
+					handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
+				}
+				if bodyInlineFrom != 0 {
+					handlers.SetNested(bodyObj, "inline.from", bodyInlineFrom)
+				}
+				if bodyInlinePath != "" {
+					handlers.SetNested(bodyObj, "inline.path", bodyInlinePath)
+				}
+				if bodyInlineStartFrom != 0 {
+					handlers.SetNested(bodyObj, "inline.start_from", bodyInlineStartFrom)
+				}
+				if bodyInlineStartTo != 0 {
+					handlers.SetNested(bodyObj, "inline.start_to", bodyInlineStartTo)
+				}
+				if bodyInlineTo != 0 {
+					handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
+				}
+				if bodyIssueComponentName != "" {
+					handlers.SetNested(bodyObj, "issue.component.name", bodyIssueComponentName)
+				}
+				if bodyIssueContentMarkup != "" {
+					handlers.SetNested(bodyObj, "issue.content.markup", bodyIssueContentMarkup)
+				}
+				if bodyIssueContentRaw != "" {
+					handlers.SetNested(bodyObj, "issue.content.raw", bodyIssueContentRaw)
+				}
+				if bodyIssueEditedOn != "" {
+					handlers.SetNested(bodyObj, "issue.edited_on", bodyIssueEditedOn)
+				}
+				if bodyIssueKind != "" {
+					handlers.SetNested(bodyObj, "issue.kind", bodyIssueKind)
+				}
+				if bodyIssueMilestoneName != "" {
+					handlers.SetNested(bodyObj, "issue.milestone.name", bodyIssueMilestoneName)
+				}
+				if bodyIssuePriority != "" {
+					handlers.SetNested(bodyObj, "issue.priority", bodyIssuePriority)
+				}
+				if bodyIssueState != "" {
+					handlers.SetNested(bodyObj, "issue.state", bodyIssueState)
+				}
+				if bodyIssueTitle != "" {
+					handlers.SetNested(bodyObj, "issue.title", bodyIssueTitle)
+				}
+				if bodyIssueVersionName != "" {
+					handlers.SetNested(bodyObj, "issue.version.name", bodyIssueVersionName)
+				}
+				if bodyIssueVotes != 0 {
+					handlers.SetNested(bodyObj, "issue.votes", bodyIssueVotes)
+				}
+				if bodyParentId != 0 {
+					handlers.SetNested(bodyObj, "parent.id", bodyParentId)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "PUT",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments/{comment_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyContentMarkup, "content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
+	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
+	cmd.Flags().IntVar(&bodyInlineFrom, "inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
+	cmd.Flags().StringVar(&bodyInlinePath, "inline-path", "", `The path of the file this comment is anchored to.`)
+	cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
+	cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
+	cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
+	cmd.Flags().StringVar(&bodyIssueComponentName, "issue-component-name", "", `issue.component.name`)
+	cmd.Flags().StringVar(&bodyIssueContentMarkup, "issue-content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
+	cmd.Flags().StringVar(&bodyIssueContentRaw, "issue-content-raw", "", `The text as it was typed by a user.`)
+	cmd.Flags().StringVar(&bodyIssueEditedOn, "issue-edited-on", "", `issue.edited_on`)
+	cmd.Flags().StringVar(&bodyIssueKind, "issue-kind", "", `[bug, enhancement, proposal, task]`)
+	cmd.Flags().StringVar(&bodyIssueMilestoneName, "issue-milestone-name", "", `issue.milestone.name`)
+	cmd.Flags().StringVar(&bodyIssuePriority, "issue-priority", "", `[trivial, minor, major, critical, blocker]`)
+	cmd.Flags().StringVar(&bodyIssueState, "issue-state", "", `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`)
+	cmd.Flags().StringVar(&bodyIssueTitle, "issue-title", "", `issue.title`)
+	cmd.Flags().StringVar(&bodyIssueVersionName, "issue-version-name", "", `issue.version.name`)
+	cmd.Flags().IntVar(&bodyIssueVotes, "issue-votes", 0, `issue.votes`)
+	cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `ID of referenced parent`)
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
+	return cmd
 }
 
 // newIssuesDeleteACommentOnAnIssueCmd returns the "issues delete-a-comment-on-an-issue" cobra command.
 // operationId: deleteACommentOnAnIssue
 func newIssuesDeleteACommentOnAnIssueCmd() *cobra.Command {
-var (
-commentId int
-issueId string
-repoSlug string
-workspace string
-)
+	var (
+		commentId int
+		issueId   string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "delete-a-comment-on-an-issue",
-Short: `Delete a comment on an issue`,
-Long:  `Deletes the specified comment.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if commentId == 0 {
-return fmt.Errorf("--comment-id is required")
-}
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"comment_id": strconv.Itoa(commentId),
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "DELETE",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments/{comment_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "delete-a-comment-on-an-issue",
+		Short: `Delete a comment on an issue`,
+		Long:  `Deletes the specified comment.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if commentId == 0 {
+				return fmt.Errorf("--comment-id is required")
+			}
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"comment_id": strconv.Itoa(commentId),
+				"issue_id":   issueId,
+				"repo_slug":  repoSlug,
+				"workspace":  workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "DELETE",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments/{comment_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesCheckIfCurrentUserVotedForAnIssueCmd returns the "issues check-if-current-user-voted-for-an-issue" cobra command.
 // operationId: checkIfCurrentUserVotedForAnIssue
 func newIssuesCheckIfCurrentUserVotedForAnIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-)
+	var (
+		issueId   string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "check-if-current-user-voted-for-an-issue",
-Short: `Check if current user voted for an issue`,
-Long:  `Check whether the authenticated user has voted for this issue.
+	cmd := &cobra.Command{
+		Use:   "check-if-current-user-voted-for-an-issue",
+		Short: `Check if current user voted for an issue`,
+		Long: `Check whether the authenticated user has voted for this issue.
 A 204 status code indicates that the user has voted, while a 404
 implies they haven't.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/vote",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/vote",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesVoteForAnIssueCmd returns the "issues vote-for-an-issue" cobra command.
 // operationId: voteForAnIssue
 func newIssuesVoteForAnIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-)
+	var (
+		issueId   string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "vote-for-an-issue",
-Short: `Vote for an issue`,
-Long:  `Vote for this issue.
+	cmd := &cobra.Command{
+		Use:   "vote-for-an-issue",
+		Short: `Vote for an issue`,
+		Long: `Vote for this issue.
 
 To cast your vote, do an empty PUT. The 204 status code indicates that
 the operation was successful.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "PUT",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/vote",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "PUT",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/vote",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesRemoveVoteForAnIssueCmd returns the "issues remove-vote-for-an-issue" cobra command.
 // operationId: removeVoteForAnIssue
 func newIssuesRemoveVoteForAnIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-)
+	var (
+		issueId   string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "remove-vote-for-an-issue",
-Short: `Remove vote for an issue`,
-Long:  `Retract your vote.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "DELETE",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/vote",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "remove-vote-for-an-issue",
+		Short: `Remove vote for an issue`,
+		Long:  `Retract your vote.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "DELETE",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/vote",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesCheckIfCurrentUserIsWatchingAIssueCmd returns the "issues check-if-current-user-is-watching-a-issue" cobra command.
 // operationId: checkIfCurrentUserIsWatchingAIssue
 func newIssuesCheckIfCurrentUserIsWatchingAIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-)
+	var (
+		issueId   string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "check-if-current-user-is-watching-a-issue",
-Short: `Check if current user is watching a issue`,
-Long:  `Indicated whether or not the authenticated user is watching this
+	cmd := &cobra.Command{
+		Use:   "check-if-current-user-is-watching-a-issue",
+		Short: `Check if current user is watching a issue`,
+		Long: `Indicated whether or not the authenticated user is watching this
 issue.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/watch",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/watch",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesWatchAnIssueCmd returns the "issues watch-an-issue" cobra command.
 // operationId: watchAnIssue
 func newIssuesWatchAnIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-)
+	var (
+		issueId   string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "watch-an-issue",
-Short: `Watch an issue`,
-Long:  `Start watching this issue.
+	cmd := &cobra.Command{
+		Use:   "watch-an-issue",
+		Short: `Watch an issue`,
+		Long: `Start watching this issue.
 
 To start watching this issue, do an empty PUT. The 204 status code
 indicates that the operation was successful.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "PUT",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/watch",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "PUT",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/watch",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesStopWatchingAnIssueCmd returns the "issues stop-watching-an-issue" cobra command.
 // operationId: stopWatchingAnIssue
 func newIssuesStopWatchingAnIssueCmd() *cobra.Command {
-var (
-issueId string
-repoSlug string
-workspace string
-)
+	var (
+		issueId   string
+		repoSlug  string
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "stop-watching-an-issue",
-Short: `Stop watching an issue`,
-Long:  `Stop watching this issue.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if issueId == "" {
-return fmt.Errorf("--issue-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"issue_id": issueId,
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "DELETE",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/watch",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "stop-watching-an-issue",
+		Short: `Stop watching an issue`,
+		Long:  `Stop watching this issue.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if issueId == "" {
+				return fmt.Errorf("--issue-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"issue_id":  issueId,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "DELETE",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/watch",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&issueId, "issue-id", "", "issue_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesListMilestonesCmd returns the "issues list-milestones" cobra command.
 // operationId: listMilestones
 func newIssuesListMilestonesCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-page int
-pagelen int
-all bool
-)
+	var (
+		repoSlug  string
+		workspace string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "list-milestones",
-Short: `List milestones`,
-Long:  `Returns the milestones that have been defined in the issue tracker.
+	cmd := &cobra.Command{
+		Use:   "list-milestones",
+		Short: `List milestones`,
+		Long: `Returns the milestones that have been defined in the issue tracker.
 
 This resource is only available on repositories that have the issue
 tracker enabled.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/milestones",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/milestones",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newIssuesGetAMilestoneCmd returns the "issues get-a-milestone" cobra command.
 // operationId: getAMilestone
 func newIssuesGetAMilestoneCmd() *cobra.Command {
-var (
-milestoneId int
-repoSlug string
-workspace string
-)
+	var (
+		milestoneId int
+		repoSlug    string
+		workspace   string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-a-milestone",
-Short: `Get a milestone`,
-Long:  `Returns the specified issue tracker milestone object.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if milestoneId == 0 {
-return fmt.Errorf("--milestone-id is required")
-}
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"milestone_id": strconv.Itoa(milestoneId),
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/milestones/{milestone_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().IntVar(&milestoneId, "milestone-id", 0, "milestone_id (path parameter)")
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
+	cmd := &cobra.Command{
+		Use:   "get-a-milestone",
+		Short: `Get a milestone`,
+		Long:  `Returns the specified issue tracker milestone object.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if milestoneId == 0 {
+				return fmt.Errorf("--milestone-id is required")
+			}
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"milestone_id": strconv.Itoa(milestoneId),
+				"repo_slug":    repoSlug,
+				"workspace":    workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/milestones/{milestone_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().IntVar(&milestoneId, "milestone-id", 0, "milestone_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
 
 // newIssuesListDefinedVersionsForIssuesCmd returns the "issues list-defined-versions-for-issues" cobra command.
 // operationId: listDefinedVersionsForIssues
 func newIssuesListDefinedVersionsForIssuesCmd() *cobra.Command {
-var (
-repoSlug string
-workspace string
-page int
-pagelen int
-all bool
-)
+	var (
+		repoSlug  string
+		workspace string
+		page      int
+		pagelen   int
+		all       bool
+	)
 
-cmd := &cobra.Command{
-Use:   "list-defined-versions-for-issues",
-Short: `List defined versions for issues`,
-Long:  `Returns the versions that have been defined in the issue tracker.
+	cmd := &cobra.Command{
+		Use:   "list-defined-versions-for-issues",
+		Short: `List defined versions for issues`,
+		Long: `Returns the versions that have been defined in the issue tracker.
 
 This resource is only available on repositories that have the issue
 tracker enabled.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"workspace": workspace,
-}
-queryParams := map[string]string{
-"page": strconv.Itoa(page),
-"pagelen": strconv.Itoa(pagelen),
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/versions",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         all,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
-cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
-cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
-return cmd
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{
+				"page":    strconv.Itoa(page),
+				"pagelen": strconv.Itoa(pagelen),
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/versions",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         all,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
+	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
+	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
 }
 
 // newIssuesGetADefinedVersionForIssuesCmd returns the "issues get-a-defined-version-for-issues" cobra command.
 // operationId: getADefinedVersionForIssues
 func newIssuesGetADefinedVersionForIssuesCmd() *cobra.Command {
-var (
-repoSlug string
-versionId int
-workspace string
-)
+	var (
+		repoSlug  string
+		versionId int
+		workspace string
+	)
 
-cmd := &cobra.Command{
-Use:   "get-a-defined-version-for-issues",
-Short: `Get a defined version for issues`,
-Long:  `Returns the specified issue tracker version object.`,
-RunE: func(cmd *cobra.Command, args []string) error {
-if repoSlug == "" {
-return fmt.Errorf("--repo-slug is required")
+	cmd := &cobra.Command{
+		Use:   "get-a-defined-version-for-issues",
+		Short: `Get a defined version for issues`,
+		Long:  `Returns the specified issue tracker version object.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if repoSlug == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if versionId == 0 {
+				return fmt.Errorf("--version-id is required")
+			}
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"repo_slug":  repoSlug,
+				"version_id": strconv.Itoa(versionId),
+				"workspace":  workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/versions/{version_id}",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().IntVar(&versionId, "version-id", 0, "version_id (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
 }
-if versionId == 0 {
-return fmt.Errorf("--version-id is required")
-}
-if workspace == "" {
-return fmt.Errorf("--workspace is required")
-}
-c, err := client.NewClient()
-if err != nil {
-return err
-}
-pathParams := map[string]string{
-"repo_slug": repoSlug,
-"version_id": strconv.Itoa(versionId),
-"workspace": workspace,
-}
-queryParams := map[string]string{
-}
-body := ""
-return handlers.Dispatch(context.Background(), c, handlers.Request{
-					Method:      "GET",
-					URLTemplate: "/repositories/{workspace}/{repo_slug}/versions/{version_id}",
-					PathParams:  pathParams,
-					QueryParams: queryParams,
-					Body:        body,
-					All:         false,
-				})
-},
-}
-cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
-cmd.Flags().IntVar(&versionId, "version-id", 0, "version_id (path parameter)")
-cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-return cmd
-}
-

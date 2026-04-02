@@ -8,7 +8,7 @@ package mcptools
 
 // ReportsToolGroup contains the MCP tool definition for the "bitbucket_reports" tool group.
 var ReportsToolGroup = ToolGroup{
-	Name:        `bitbucket_reports`,
+	Name: `bitbucket_reports`,
 	Description: `Manage Bitbucket commit reports and annotations
 
 Available operations:
@@ -36,10 +36,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `getReport`,
@@ -53,10 +52,9 @@ Available operations:
 				{Name: `commit`, In: `path`, Type: `string`, Required: true},
 				{Name: `reportId`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `createOrUpdateReport`,
@@ -97,10 +95,9 @@ Available operations:
 				{Name: `commit`, In: `path`, Type: `string`, Required: true},
 				{Name: `reportId`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getAnnotationsForReport`,
@@ -116,10 +113,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `bulkCreateOrUpdateAnnotations`,
@@ -133,10 +129,9 @@ Available operations:
 				{Name: `commit`, In: `path`, Type: `string`, Required: true},
 				{Name: `reportId`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    true,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getAnnotation`,
@@ -151,10 +146,9 @@ Available operations:
 				{Name: `reportId`, In: `path`, Type: `string`, Required: true},
 				{Name: `annotationId`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `createOrUpdateAnnotation`,
@@ -196,10 +190,9 @@ Available operations:
 				{Name: `reportId`, In: `path`, Type: `string`, Required: true},
 				{Name: `annotationId`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 	},
 }

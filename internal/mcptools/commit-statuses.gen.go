@@ -8,7 +8,7 @@ package mcptools
 
 // CommitStatusesToolGroup contains the MCP tool definition for the "bitbucket_commit-statuses" tool group.
 var CommitStatusesToolGroup = ToolGroup{
-	Name:        `bitbucket_commit-statuses`,
+	Name: `bitbucket_commit-statuses`,
 	Description: `Manage Bitbucket commit statuses
 
 Available operations:
@@ -35,10 +35,9 @@ Available operations:
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 		{
 			OperationID: `createABuildStatusForACommit`,
@@ -83,10 +82,9 @@ static linting job).`},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateABuildStatusForACommit`,
@@ -136,10 +134,9 @@ request.`,
 				{Name: `page`, In: `query`, Type: `integer`, Required: false},
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: true,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  true,
 		},
 	},
 }

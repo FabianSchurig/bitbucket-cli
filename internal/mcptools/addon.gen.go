@@ -8,7 +8,7 @@ package mcptools
 
 // AddonToolGroup contains the MCP tool definition for the "bitbucket_addon" tool group.
 var AddonToolGroup = ToolGroup{
-	Name:        `bitbucket_addon`,
+	Name: `bitbucket_addon`,
 	Description: `Manage Bitbucket Connect addons
 
 Available operations:
@@ -30,12 +30,10 @@ Available operations:
 			Path:        `/addon`,
 			Summary:     `Update an installed app`,
 			Description: "Updates the application installation for the user.\n\nThis endpoint is intended to be used by Bitbucket Connect apps\nand only supports JWT authentication -- that is how Bitbucket\nidentifies the particular installation of the app. Developers\nwith applications registered in the \"Develop Apps\" section\nof Bitbucket need not use this endpoint as updates for those\napplications can be sent out via the UI of that section.\n\nPassing an empty body will update the installation using the\nexisting descriptor URL.\n\n```\n$ curl -X PUT https://api.bitbucket.org/2.0/addon \\\n  -H \"Authorization: JWT <JWT Token>\" \\\n  --header \"Content-Type: application/json\" \\\n  --data '{}'\n```\n\nThe new `descriptor` for the installation can be also provided\nin the body directly.\n\n```\n$ curl -X PUT https://api.bitbucket.org/2.0/addon \\\n  -H \"Authorization: JWT <JWT Token>\" \\\n  --header \"Content-Type: application/json\" \\\n  --data '{\"descriptor\": $NEW_DESCRIPTOR}'\n```\n\nIn both these modes the URL of the descriptor cannot be changed. To\nchange the descriptor location and upgrade an installation\nthe request must be made exclusively with a `descriptor_url`.\n\n ```\n$ curl -X PUT https://api.bitbucket.org/2.0/addon \\\n  -H \"Authorization: JWT <JWT Token>\" \\\n  --header \"Content-Type: application/json\" \\\n  --data '{\"descriptor_url\": $NEW_URL}'\n```\n\nThe `descriptor_url` must exactly match the marketplace registration\nthat Atlassian has for the application. Contact your Atlassian\ndeveloper advocate to update this registration. Once the registration\nhas been updated you may call this resource for each installation.\n\nNote that the scopes of the application cannot be increased\nin the new descriptor nor reduced to none.",
-			Params: []ParamDef{
-			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			Params:      []ParamDef{},
+			BodyFields:  []BodyFieldDef{},
+			HasBody:     false,
+			Paginated:   false,
 		},
 		{
 			OperationID: `deleteAnApp`,
@@ -43,12 +41,10 @@ Available operations:
 			Path:        `/addon`,
 			Summary:     `Delete an app`,
 			Description: "Deletes the application for the user.\n\nThis endpoint is intended to be used by Bitbucket Connect apps\nand only supports JWT authentication -- that is how Bitbucket\nidentifies the particular installation of the app. Developers\nwith applications registered in the \"Develop Apps\" section\nof Bitbucket Marketplace need not use this endpoint as\nupdates for those applications can be sent out via the\nUI of that section.\n\n```\n$ curl -X DELETE https://api.bitbucket.org/2.0/addon \\\n  -H \"Authorization: JWT <JWT Token>\"\n```",
-			Params: []ParamDef{
-			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			Params:      []ParamDef{},
+			BodyFields:  []BodyFieldDef{},
+			HasBody:     false,
+			Paginated:   false,
 		},
 		{
 			OperationID: `listLinkersForAnApp`,
@@ -59,12 +55,10 @@ Available operations:
 for the authenticated application.
 
 This endpoint is deprecated and will be removed by May 2026.`,
-			Params: []ParamDef{
-			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			Params:     []ParamDef{},
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getALinkerForAnApp`,
@@ -75,10 +69,9 @@ This endpoint is deprecated and will be removed by May 2026.`,
 			Params: []ParamDef{
 				{Name: `linker_key`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `listLinkerValuesForALinker`,
@@ -89,10 +82,9 @@ This endpoint is deprecated and will be removed by May 2026.`,
 			Params: []ParamDef{
 				{Name: `linker_key`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `createALinkerValue`,
@@ -103,10 +95,9 @@ This endpoint is deprecated and will be removed by May 2026.`,
 			Params: []ParamDef{
 				{Name: `linker_key`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `updateALinkerValue`,
@@ -117,10 +108,9 @@ This endpoint is deprecated and will be removed by May 2026.`,
 			Params: []ParamDef{
 				{Name: `linker_key`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteAllLinkerValues`,
@@ -134,10 +124,9 @@ This endpoint is deprecated and will be removed by May 2026.`,
 			Params: []ParamDef{
 				{Name: `linker_key`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getALinkerValue`,
@@ -152,10 +141,9 @@ This endpoint is deprecated and will be removed by May 2026.`,
 				{Name: `linker_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `value_id`, In: `path`, Type: `integer`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteALinkerValue`,
@@ -170,10 +158,9 @@ This endpoint is deprecated and will be removed by May 2026.`,
 				{Name: `linker_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `value_id`, In: `path`, Type: `integer`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-			},
-			HasBody:   false,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 	},
 }
