@@ -39,26 +39,26 @@ Long:  `Commands for listing, creating, updating, and deleting Bitbucket webhook
 }
 
 cmd.AddCommand(
-newGetAWebhookResourceCmd(),
-newListSubscribableWebhookTypesCmd(),
-newListWebhooksForARepositoryCmd(),
-newCreateAWebhookForARepositoryCmd(),
-newGetAWebhookForARepositoryCmd(),
-newUpdateAWebhookForARepositoryCmd(),
-newDeleteAWebhookForARepositoryCmd(),
-newListWebhooksForAWorkspaceCmd(),
-newCreateAWebhookForAWorkspaceCmd(),
-newGetAWebhookForAWorkspaceCmd(),
-newUpdateAWebhookForAWorkspaceCmd(),
-newDeleteAWebhookForAWorkspaceCmd(),
+newHooksGetAWebhookResourceCmd(),
+newHooksListSubscribableWebhookTypesCmd(),
+newHooksListWebhooksForARepositoryCmd(),
+newHooksCreateAWebhookForARepositoryCmd(),
+newHooksGetAWebhookForARepositoryCmd(),
+newHooksUpdateAWebhookForARepositoryCmd(),
+newHooksDeleteAWebhookForARepositoryCmd(),
+newHooksListWebhooksForAWorkspaceCmd(),
+newHooksCreateAWebhookForAWorkspaceCmd(),
+newHooksGetAWebhookForAWorkspaceCmd(),
+newHooksUpdateAWebhookForAWorkspaceCmd(),
+newHooksDeleteAWebhookForAWorkspaceCmd(),
 )
 
 return cmd
 }
 
-// newGetAWebhookResourceCmd returns the "hooks get-a-webhook-resource" cobra command.
+// newHooksGetAWebhookResourceCmd returns the "hooks get-a-webhook-resource" cobra command.
 // operationId: getAWebhookResource
-func newGetAWebhookResourceCmd() *cobra.Command {
+func newHooksGetAWebhookResourceCmd() *cobra.Command {
 var (
 )
 
@@ -89,9 +89,9 @@ return handlers.Dispatch(context.Background(), c, handlers.Request{
 return cmd
 }
 
-// newListSubscribableWebhookTypesCmd returns the "hooks list-subscribable-webhook-types" cobra command.
+// newHooksListSubscribableWebhookTypesCmd returns the "hooks list-subscribable-webhook-types" cobra command.
 // operationId: listSubscribableWebhookTypes
-func newListSubscribableWebhookTypesCmd() *cobra.Command {
+func newHooksListSubscribableWebhookTypesCmd() *cobra.Command {
 var (
 subjectType string
 page int
@@ -136,9 +136,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newListWebhooksForARepositoryCmd returns the "hooks list-webhooks-for-a-repository" cobra command.
+// newHooksListWebhooksForARepositoryCmd returns the "hooks list-webhooks-for-a-repository" cobra command.
 // operationId: listWebhooksForARepository
-func newListWebhooksForARepositoryCmd() *cobra.Command {
+func newHooksListWebhooksForARepositoryCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
@@ -189,9 +189,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newCreateAWebhookForARepositoryCmd returns the "hooks create-a-webhook-for-a-repository" cobra command.
+// newHooksCreateAWebhookForARepositoryCmd returns the "hooks create-a-webhook-for-a-repository" cobra command.
 // operationId: createAWebhookForARepository
-func newCreateAWebhookForARepositoryCmd() *cobra.Command {
+func newHooksCreateAWebhookForARepositoryCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
@@ -234,9 +234,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newGetAWebhookForARepositoryCmd returns the "hooks get-a-webhook-for-a-repository" cobra command.
+// newHooksGetAWebhookForARepositoryCmd returns the "hooks get-a-webhook-for-a-repository" cobra command.
 // operationId: getAWebhookForARepository
-func newGetAWebhookForARepositoryCmd() *cobra.Command {
+func newHooksGetAWebhookForARepositoryCmd() *cobra.Command {
 var (
 repoSlug string
 uid string
@@ -286,9 +286,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newUpdateAWebhookForARepositoryCmd returns the "hooks update-a-webhook-for-a-repository" cobra command.
+// newHooksUpdateAWebhookForARepositoryCmd returns the "hooks update-a-webhook-for-a-repository" cobra command.
 // operationId: updateAWebhookForARepository
-func newUpdateAWebhookForARepositoryCmd() *cobra.Command {
+func newHooksUpdateAWebhookForARepositoryCmd() *cobra.Command {
 var (
 repoSlug string
 uid string
@@ -337,9 +337,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newDeleteAWebhookForARepositoryCmd returns the "hooks delete-a-webhook-for-a-repository" cobra command.
+// newHooksDeleteAWebhookForARepositoryCmd returns the "hooks delete-a-webhook-for-a-repository" cobra command.
 // operationId: deleteAWebhookForARepository
-func newDeleteAWebhookForARepositoryCmd() *cobra.Command {
+func newHooksDeleteAWebhookForARepositoryCmd() *cobra.Command {
 var (
 repoSlug string
 uid string
@@ -389,9 +389,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newListWebhooksForAWorkspaceCmd returns the "hooks list-webhooks-for-a-workspace" cobra command.
+// newHooksListWebhooksForAWorkspaceCmd returns the "hooks list-webhooks-for-a-workspace" cobra command.
 // operationId: listWebhooksForAWorkspace
-func newListWebhooksForAWorkspaceCmd() *cobra.Command {
+func newHooksListWebhooksForAWorkspaceCmd() *cobra.Command {
 var (
 workspace string
 page int
@@ -436,9 +436,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newCreateAWebhookForAWorkspaceCmd returns the "hooks create-a-webhook-for-a-workspace" cobra command.
+// newHooksCreateAWebhookForAWorkspaceCmd returns the "hooks create-a-webhook-for-a-workspace" cobra command.
 // operationId: createAWebhookForAWorkspace
-func newCreateAWebhookForAWorkspaceCmd() *cobra.Command {
+func newHooksCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 var (
 workspace string
 )
@@ -475,9 +475,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newGetAWebhookForAWorkspaceCmd returns the "hooks get-a-webhook-for-a-workspace" cobra command.
+// newHooksGetAWebhookForAWorkspaceCmd returns the "hooks get-a-webhook-for-a-workspace" cobra command.
 // operationId: getAWebhookForAWorkspace
-func newGetAWebhookForAWorkspaceCmd() *cobra.Command {
+func newHooksGetAWebhookForAWorkspaceCmd() *cobra.Command {
 var (
 uid string
 workspace string
@@ -521,9 +521,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newUpdateAWebhookForAWorkspaceCmd returns the "hooks update-a-webhook-for-a-workspace" cobra command.
+// newHooksUpdateAWebhookForAWorkspaceCmd returns the "hooks update-a-webhook-for-a-workspace" cobra command.
 // operationId: updateAWebhookForAWorkspace
-func newUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
+func newHooksUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 var (
 uid string
 workspace string
@@ -566,9 +566,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newDeleteAWebhookForAWorkspaceCmd returns the "hooks delete-a-webhook-for-a-workspace" cobra command.
+// newHooksDeleteAWebhookForAWorkspaceCmd returns the "hooks delete-a-webhook-for-a-workspace" cobra command.
 // operationId: deleteAWebhookForAWorkspace
-func newDeleteAWebhookForAWorkspaceCmd() *cobra.Command {
+func newHooksDeleteAWebhookForAWorkspaceCmd() *cobra.Command {
 var (
 uid string
 workspace string

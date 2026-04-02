@@ -1,0 +1,459 @@
+openapi: 3.0.0
+info:
+  title: Bitbucket Addon CLI
+  version: '2.0'
+  x-cli-command-name: Addon
+  x-cli-command-use: addon
+  x-cli-command-short: Manage Bitbucket Connect addons
+  x-cli-command-long: Commands for managing Bitbucket Connect addon installations
+    and linker values.
+paths:
+  /addon:
+    delete:
+      tags:
+      - Addon
+      description: "Deletes the application for the user.\n\nThis endpoint is intended\
+        \ to be used by Bitbucket Connect apps\nand only supports JWT authentication\
+        \ -- that is how Bitbucket\nidentifies the particular installation of the\
+        \ app. Developers\nwith applications registered in the \"Develop Apps\" section\n\
+        of Bitbucket Marketplace need not use this endpoint as\nupdates for those\
+        \ applications can be sent out via the\nUI of that section.\n\n```\n$ curl\
+        \ -X DELETE https://api.bitbucket.org/2.0/addon \\\n  -H \"Authorization:\
+        \ JWT <JWT Token>\"\n```"
+      summary: Delete an app
+      responses:
+        '204':
+          description: Request has succeeded. The application has been deleted for
+            the user.
+        '401':
+          description: No authorization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: Improper authentication.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+      operationId: deleteAnApp
+    put:
+      tags:
+      - Addon
+      description: "Updates the application installation for the user.\n\nThis endpoint\
+        \ is intended to be used by Bitbucket Connect apps\nand only supports JWT\
+        \ authentication -- that is how Bitbucket\nidentifies the particular installation\
+        \ of the app. Developers\nwith applications registered in the \"Develop Apps\"\
+        \ section\nof Bitbucket need not use this endpoint as updates for those\n\
+        applications can be sent out via the UI of that section.\n\nPassing an empty\
+        \ body will update the installation using the\nexisting descriptor URL.\n\n\
+        ```\n$ curl -X PUT https://api.bitbucket.org/2.0/addon \\\n  -H \"Authorization:\
+        \ JWT <JWT Token>\" \\\n  --header \"Content-Type: application/json\" \\\n\
+        \  --data '{}'\n```\n\nThe new `descriptor` for the installation can be also\
+        \ provided\nin the body directly.\n\n```\n$ curl -X PUT https://api.bitbucket.org/2.0/addon\
+        \ \\\n  -H \"Authorization: JWT <JWT Token>\" \\\n  --header \"Content-Type:\
+        \ application/json\" \\\n  --data '{\"descriptor\": $NEW_DESCRIPTOR}'\n```\n\
+        \nIn both these modes the URL of the descriptor cannot be changed. To\nchange\
+        \ the descriptor location and upgrade an installation\nthe request must be\
+        \ made exclusively with a `descriptor_url`.\n\n ```\n$ curl -X PUT https://api.bitbucket.org/2.0/addon\
+        \ \\\n  -H \"Authorization: JWT <JWT Token>\" \\\n  --header \"Content-Type:\
+        \ application/json\" \\\n  --data '{\"descriptor_url\": $NEW_URL}'\n```\n\n\
+        The `descriptor_url` must exactly match the marketplace registration\nthat\
+        \ Atlassian has for the application. Contact your Atlassian\ndeveloper advocate\
+        \ to update this registration. Once the registration\nhas been updated you\
+        \ may call this resource for each installation.\n\nNote that the scopes of\
+        \ the application cannot be increased\nin the new descriptor nor reduced to\
+        \ none."
+      summary: Update an installed app
+      responses:
+        '204':
+          description: Request has succeeded. The installation has been updated to
+            the new descriptor.
+        '400':
+          description: Scopes have increased or decreased to none.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: No authorization.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: Improper authentication.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+      operationId: updateAnInstalledApp
+    parameters: []
+  /addon/linkers:
+    get:
+      tags:
+      - Addon
+      description: 'Gets a list of all [linkers](/cloud/bitbucket/modules/linker/)
+
+        for the authenticated application.
+
+
+        This endpoint is deprecated and will be removed by May 2026.'
+      summary: List linkers for an app
+      responses:
+        '200':
+          description: Successful.
+        '401':
+          description: Authentication must use app JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+      deprecated: true
+      operationId: listLinkersForAnApp
+    parameters: []
+  /addon/linkers/{linker_key}:
+    get:
+      tags:
+      - Addon
+      description: 'Gets a [linker](/cloud/bitbucket/modules/linker/) specified by
+        `linker_key`
+
+        for the authenticated application.
+
+
+        This endpoint is deprecated and will be removed by May 2026.'
+      summary: Get a linker for an app
+      responses:
+        '200':
+          description: Successful.
+        '401':
+          description: Authentication must use app JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The linker does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+      deprecated: true
+      operationId: getALinkerForAnApp
+    parameters:
+    - name: linker_key
+      in: path
+      description: 'The unique key of a [linker module](/cloud/bitbucket/modules/linker/)
+
+        as defined in an application descriptor.'
+      required: true
+      schema:
+        type: string
+  /addon/linkers/{linker_key}/values:
+    delete:
+      tags:
+      - Addon
+      description: 'Delete all [linker](/cloud/bitbucket/modules/linker/) values for
+        the
+
+        specified linker of the authenticated application.
+
+
+        This endpoint is deprecated and will be removed by May 2026.'
+      summary: Delete all linker values
+      responses:
+        '204':
+          description: Successfully deleted the linker values.
+        '401':
+          description: Authentication must use app JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The linker does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+      deprecated: true
+      operationId: deleteAllLinkerValues
+    get:
+      tags:
+      - Addon
+      description: 'Gets a list of all [linker](/cloud/bitbucket/modules/linker/)
+        values for the
+
+        specified linker of the authenticated application.
+
+
+        A linker value lets applications supply values to modify its regular expression.
+
+
+        The base regular expression must use a Bitbucket-specific match group `(?K)`
+
+        which will be translated to `([\w\-]+)`. A value must match this pattern.
+
+
+        [Read more about linker values](/cloud/bitbucket/modules/linker/#usingthebitbucketapitosupplyvalues)
+
+
+        This endpoint is deprecated and will be removed by May 2026.'
+      summary: List linker values for a linker
+      responses:
+        '200':
+          description: Successful.
+        '401':
+          description: Authentication must use app JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The linker does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+      deprecated: true
+      operationId: listLinkerValuesForALinker
+    post:
+      tags:
+      - Addon
+      description: 'Creates a [linker](/cloud/bitbucket/modules/linker/) value for
+        the specified
+
+        linker of authenticated application.
+
+
+        A linker value lets applications supply values to modify its regular expression.
+
+
+        The base regular expression must use a Bitbucket-specific match group `(?K)`
+
+        which will be translated to `([\w\-]+)`. A value must match this pattern.
+
+
+        [Read more about linker values](/cloud/bitbucket/modules/linker/#usingthebitbucketapitosupplyvalues)
+
+
+        This endpoint is deprecated and will be removed by May 2026.'
+      summary: Create a linker value
+      responses:
+        '201':
+          description: Successfully created the linker value.
+        '401':
+          description: Authentication must use app JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The linker does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: The linker already has the value being added.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+      deprecated: true
+      operationId: createALinkerValue
+    put:
+      tags:
+      - Addon
+      description: 'Bulk update [linker](/cloud/bitbucket/modules/linker/) values
+        for the specified
+
+        linker of the authenticated application.
+
+
+        A linker value lets applications supply values to modify its regular expression.
+
+
+        The base regular expression must use a Bitbucket-specific match group `(?K)`
+
+        which will be translated to `([\w\-]+)`. A value must match this pattern.
+
+
+        [Read more about linker values](/cloud/bitbucket/modules/linker/#usingthebitbucketapitosupplyvalues)
+
+
+        This endpoint is deprecated and will be removed by May 2026.'
+      summary: Update a linker value
+      responses:
+        '204':
+          description: Successfully updated the linker values.
+        '400':
+          description: Invalid input.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: Authentication must use app JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The linker does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+      deprecated: true
+      operationId: updateALinkerValue
+    parameters:
+    - name: linker_key
+      in: path
+      description: 'The unique key of a [linker module](/cloud/bitbucket/modules/linker/)
+
+        as defined in an application descriptor.'
+      required: true
+      schema:
+        type: string
+  /addon/linkers/{linker_key}/values/{value_id}:
+    delete:
+      tags:
+      - Addon
+      description: 'Delete a single [linker](/cloud/bitbucket/modules/linker/) value
+
+        of the authenticated application.
+
+
+        This endpoint is deprecated and will be removed by May 2026.'
+      summary: Delete a linker value
+      responses:
+        '204':
+          description: Successfully deleted the linker value.
+        '401':
+          description: Authentication must use app JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The linker value does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+      deprecated: true
+      operationId: deleteALinkerValue
+    get:
+      tags:
+      - Addon
+      description: 'Get a single [linker](/cloud/bitbucket/modules/linker/) value
+
+        of the authenticated application.
+
+
+        This endpoint is deprecated and will be removed by May 2026.'
+      summary: Get a linker value
+      responses:
+        '200':
+          description: Successful.
+        '401':
+          description: Authentication must use app JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The linker value does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+      deprecated: true
+      operationId: getALinkerValue
+    parameters:
+    - name: linker_key
+      in: path
+      description: 'The unique key of a [linker module](/cloud/bitbucket/modules/linker/)
+
+        as defined in an application descriptor.'
+      required: true
+      schema:
+        type: string
+    - name: value_id
+      in: path
+      description: The numeric ID of the linker value.
+      required: true
+      schema:
+        type: integer
+components:
+  schemas:
+    error:
+      type: object
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true

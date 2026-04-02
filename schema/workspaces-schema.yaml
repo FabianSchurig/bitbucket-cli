@@ -1,0 +1,3291 @@
+openapi: 3.0.0
+info:
+  title: Bitbucket Workspaces CLI
+  version: '2.0'
+  x-cli-command-name: Workspaces
+  x-cli-command-use: workspaces
+  x-cli-command-short: Manage Bitbucket workspaces
+  x-cli-command-long: Commands for listing workspaces and managing workspace members
+    and permissions.
+paths:
+  /user/permissions/workspaces:
+    get:
+      tags:
+      - Workspaces
+      description: '**This endpoint is deprecated. Please use the supported alternatives:**
+
+        * [List workspaces for user](/cloud/bitbucket/rest/api-group-workspaces/#api-user-workspaces-get)
+
+        * [Get user permission on a workspace](/cloud/bitbucket/rest/api-group-workspaces/#api-user-workspaces-workspace-permission-get)
+
+
+        Returns an object for each workspace the caller is a member of, and
+
+        their effective role - the highest level of privilege the caller has.
+
+        If a user is a member of multiple groups with distinct roles, only the
+
+        highest level is returned.
+
+
+        Permissions can be:
+
+
+        * `owner`
+
+        * `collaborator`
+
+        * `member`
+
+
+        **The `collaborator` role is being removed from the Bitbucket Cloud API. For
+        more information,
+
+        see the [deprecation announcement](/cloud/bitbucket/deprecation-notice-collaborator-role/).**
+
+
+        **When you move your administration from Bitbucket Cloud to admin.atlassian.com,
+        the following fields on
+
+        `workspace_membership` will no longer be present: `last_accessed` and `added_on`.
+        See the
+
+        [deprecation announcement](/cloud/bitbucket/announcement-breaking-change-workspace-membership/).**
+
+
+        Results may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering)
+        by
+
+        workspace or permission by adding the following query string parameters:
+
+
+        * `q=workspace.slug="bbworkspace1"` or `q=permission="owner"`
+
+        * `sort=workspace.slug`
+
+
+        Note that the query parameter values need to be URL escaped so that `=`
+
+        would become `%3D`.'
+      summary: List workspaces for the current user
+      responses:
+        '200':
+          description: All of the workspace memberships for the authenticated user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_workspace_memberships'
+              examples:
+                response:
+                  value:
+                    pagelen: 10
+                    page: 1
+                    size: 1
+                    values:
+                    - type: workspace_membership
+                      permission: owner
+                      last_accessed: '2019-03-07T12:35:02.900024+00:00'
+                      added_on: '2018-10-11T17:42:02.961424+00:00'
+                      user:
+                        type: user
+                        uuid: '{470c176d-3574-44ea-bb41-89e8638bcca4}'
+                        nickname: evzijst
+                        display_name: Erik van Zijst
+                      workspace:
+                        type: workspace
+                        uuid: '{a15fb181-db1f-48f7-b41f-e1eff06929d6}'
+                        slug: bbworkspace1
+                        name: Atlassian Bitbucket
+        '401':
+          description: The request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      parameters:
+      - name: q
+        in: query
+        description: '
+
+          Query string to narrow down the response. See
+
+          [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for details.'
+        required: false
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: '
+
+          Name of a response property to sort results. See
+
+          [filtering and sorting](/cloud/bitbucket/rest/intro/#sorting-query-results)
+
+          for details.
+
+          '
+        required: false
+        schema:
+          type: string
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:workspace:bitbucket
+        - read:user:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listWorkspacesForTheCurrentUser
+    parameters: []
+  /user/workspaces:
+    get:
+      tags:
+      - Workspaces
+      description: 'Returns an object for each workspace accessible to the caller.
+        This object
+
+        also contains details on whether the caller has admin permissions on the workspace
+
+        (`"administrator" = true`) or not (`"administrator" = false`).
+
+
+        Queries support filtering based on administrator permissions,
+
+        [sorting](/cloud/bitbucket/rest/intro/#sorting-query-results) or
+
+        [filtering](/cloud/bitbucket/rest/intro/#filtering) by `slug`. Results can
+
+        be [paginated](/cloud/bitbucket/rest/intro/#pagination).'
+      summary: List workspaces for the current user
+      responses:
+        '200':
+          description: The list of workspaces accessible by the authenticated user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_workspace_access'
+              examples:
+                response:
+                  value:
+                    pagelen: 25
+                    page: 1
+                    size: 1
+                    values:
+                    - administrator: true
+                      type: workspace_access
+                      workspace:
+                        links:
+                          avatar:
+                            href: https://api.bitbucket.org/workspaces/bbworkspace1/avatar/
+                          self:
+                            href: https://api.bitbucket.org/2.0/workspaces/bbworkspace1
+                        slug: bbworkspace1
+                        type: workspace_base
+                        uuid: '{470c176d-3574-44ea-bb41-89e8638bcca4}'
+        '400':
+          description: The request was invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: The request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      parameters:
+      - name: sort
+        in: query
+        description: Name of a response property to sort results (only slug is supported).
+        required: false
+        schema:
+          type: string
+      - name: administrator
+        in: query
+        description: Filter workspaces based on which ones the caller has admin permissions
+          or not.
+        required: false
+        schema:
+          type: boolean
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:workspace:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: getUserWorkspaces
+    parameters: []
+  /user/workspaces/{workspace}/permission:
+    get:
+      tags:
+      - Workspaces
+      description: 'Returns the caller''s effective role; as in, the highest level
+        of privilege
+
+        the caller has for the workspace.
+
+        If the calling user is a member of multiple groups with distinct roles, only
+        the
+
+        highest level is returned.
+
+
+        Permissions can be:
+
+
+        * `owner`
+
+        * `create-project`
+
+        * `collaborator` (deprecated; see this
+
+        [deprecation announcement](/cloud/bitbucket/deprecation-notice-collaborator-role/)
+        for more details)
+
+        * `member`'
+      summary: Get user permission on a workspace
+      responses:
+        '200':
+          description: The user that is part of a workspace.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspace_membership'
+        '401':
+          description: The request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: The requesting user does not have access to the workspace.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:workspace:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: getUserPermissionOnAWorkspace
+    parameters:
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /workspaces:
+    get:
+      tags:
+      - Workspaces
+      description: '**This endpoint is deprecated. Please use the
+
+        [supported alternative](/cloud/bitbucket/rest/api-group-workspaces/#api-user-workspaces-get).**
+
+
+        Returns a list of workspaces accessible by the authenticated user.
+
+
+        Results may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering)
+        by
+
+        workspace or permission by adding the following query string parameters:
+
+
+        * `q=slug="bbworkspace1"` or `q=is_private=true`
+
+        * `sort=created_on`
+
+
+        Note that the query parameter values need to be URL escaped so that `=`
+
+        would become `%3D`.
+
+
+        **The `collaborator` role is being removed from the Bitbucket Cloud API. For
+        more information,
+
+        see the [deprecation announcement](/cloud/bitbucket/deprecation-notice-collaborator-role/).**'
+      summary: List workspaces for user
+      responses:
+        '200':
+          description: The list of workspaces accessible by the authenticated user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_workspaces'
+              examples:
+                response:
+                  value:
+                    pagelen: 10
+                    page: 1
+                    size: 1
+                    values:
+                    - uuid: '{a15fb181-db1f-48f7-b41f-e1eff06929d6}'
+                      links:
+                        owners:
+                          href: https://api.bitbucket.org/2.0/workspaces/bbworkspace1/members?q=permission%3D%22owner%22
+                        self:
+                          href: https://api.bitbucket.org/2.0/workspaces/bbworkspace1
+                        repositories:
+                          href: https://api.bitbucket.org/2.0/repositories/bbworkspace1
+                        snippets:
+                          href: https://api.bitbucket.org/2.0/snippets/bbworkspace1
+                        html:
+                          href: https://bitbucket.org/bbworkspace1/
+                        avatar:
+                          href: https://bitbucket.org/workspaces/bbworkspace1/avatar/?ts=1543465801
+                        members:
+                          href: https://api.bitbucket.org/2.0/workspaces/bbworkspace1/members
+                        projects:
+                          href: https://api.bitbucket.org/2.0/workspaces/bbworkspace1/projects
+                      created_on: '2018-11-14T19:15:05.058566+00:00'
+                      type: workspace
+                      slug: bbworkspace1
+                      is_private: true
+                      name: Atlassian Bitbucket
+        '401':
+          description: The request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      parameters:
+      - name: role
+        in: query
+        description: "\n            Filters the workspaces based on the authenticated\
+          \ user's role on each workspace.\n\n            * **member**: returns a\
+          \ list of all the workspaces which the caller is a member of\n         \
+          \       at least one workspace group or repository\n            * **collaborator**:\
+          \ returns a list of workspaces which the caller has write access\n     \
+          \           to at least one repository in the workspace\n            * **owner**:\
+          \ returns a list of workspaces which the caller has administrator access\n\
+          \            "
+        required: false
+        schema:
+          type: string
+          enum:
+          - owner
+          - collaborator
+          - member
+      - name: q
+        in: query
+        description: '
+
+          Query string to narrow down the response. See
+
+          [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for details.'
+        required: false
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: '
+
+          Name of a response property to sort results. See
+
+          [filtering and sorting](/cloud/bitbucket/rest/intro/#sorting-query-results)
+
+          for details.
+
+          '
+        required: false
+        schema:
+          type: string
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:user:bitbucket
+        - read:workspace:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listWorkspacesForUser
+    parameters: []
+  /workspaces/{workspace}:
+    get:
+      tags:
+      - Workspaces
+      description: Returns the requested workspace.
+      summary: Get a workspace
+      responses:
+        '200':
+          description: The workspace.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspace'
+        '404':
+          description: If no workspace exists for the specified name or UUID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:workspace:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: getAWorkspace
+    parameters:
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /workspaces/{workspace}/members:
+    get:
+      tags:
+      - Workspaces
+      description: 'Returns all members of the requested workspace.
+
+
+        This endpoint additionally supports [filtering](/cloud/bitbucket/rest/intro/#filtering)
+        by
+
+        email address, if called by a workspace administrator, integration or workspace
+        access
+
+        token. This is done by adding the following query string parameter:
+
+
+        * `q=user.email IN ("user1@org.com","user2@org.com")`
+
+
+        When filtering by email, you can query up to 90 addresses at a time.
+
+        Note that the query parameter values need to be URL escaped, so the final
+        query string
+
+        should be:
+
+
+        * `q=user.email%20IN%20(%22user1@org.com%22,%22user2@org.com%22)`
+
+
+        Email addresses that you filter by (and only these email addresses) can be
+        included in the
+
+        response using the `fields` query parameter:
+
+
+        * `&fields=+values.user.email` - add the `email` field to the default `user`
+        response object
+
+        * `&fields=values.user.email,values.user.account_id` - only return user email
+        addresses and
+
+        account IDs
+
+
+        Once again, all query parameter values must be URL escaped.'
+      summary: List users in a workspace
+      responses:
+        '200':
+          description: The list of users that are part of a workspace.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_workspace_memberships'
+        '400':
+          description: When more than 90 emails were provided when querying by email.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: The request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:workspace:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: listUsersInAWorkspace
+    parameters:
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /workspaces/{workspace}/members/{member}:
+    get:
+      tags:
+      - Workspaces
+      description: 'Returns the workspace membership, which includes
+
+        a `User` object for the member and a `Workspace` object
+
+        for the requested workspace.'
+      summary: Get user membership for a workspace
+      responses:
+        '200':
+          description: The user that is part of a workspace.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workspace_membership'
+        '401':
+          description: The request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: A workspace cannot be found, or a user cannot be found, or
+            the user is not a a member of the workspace.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:workspace:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: getUserMembershipForAWorkspace
+    parameters:
+    - name: member
+      in: path
+      description: Member's UUID or Atlassian ID.
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /workspaces/{workspace}/permissions:
+    get:
+      tags:
+      - Workspaces
+      description: 'Returns the list of members in a workspace
+
+        and their permission levels.
+
+        Permission can be:
+
+        * `owner`
+
+        * `collaborator`
+
+        * `member`
+
+
+        **The `collaborator` role is being removed from the Bitbucket Cloud API. For
+        more information,
+
+        see the [deprecation announcement](/cloud/bitbucket/deprecation-notice-collaborator-role/).**
+
+
+        **When you move your administration from Bitbucket Cloud to admin.atlassian.com,
+        the following fields on
+
+        `workspace_membership` will no longer be present: `last_accessed` and `added_on`.
+        See the
+
+        [deprecation announcement](/cloud/bitbucket/announcement-breaking-change-workspace-membership/).**
+
+
+        Results may be further [filtered](/cloud/bitbucket/rest/intro/#filtering)
+        by
+
+        permission by adding the following query string parameters:
+
+
+        * `q=permission="owner"`'
+      summary: List user permissions in a workspace
+      responses:
+        '200':
+          description: The list of users that are part of a workspace, along with
+            their permission.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_workspace_memberships'
+              examples:
+                response:
+                  value:
+                    pagelen: 10
+                    values:
+                    - permission: owner
+                      type: workspace_membership
+                      user:
+                        type: user
+                        uuid: '{470c176d-3574-44ea-bb41-89e8638bcca4}'
+                        display_name: Erik van Zijst
+                      workspace:
+                        type: workspace
+                        uuid: '{a15fb181-db1f-48f7-b41f-e1eff06929d6}'
+                        slug: bbworkspace1
+                        name: Atlassian Bitbucket
+                    - permission: member
+                      type: workspace_membership
+                      user:
+                        type: user
+                        nickname: seanaty
+                        display_name: Sean Conaty
+                        uuid: '{504c3b62-8120-4f0c-a7bc-87800b9d6f70}'
+                      workspace:
+                        type: workspace
+                        uuid: '{a15fb181-db1f-48f7-b41f-e1eff06929d6}'
+                        slug: bbworkspace1
+                        name: Atlassian Bitbucket
+                    page: 1
+                    size: 2
+        '401':
+          description: The request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      parameters:
+      - name: q
+        in: query
+        description: '
+
+          Query string to narrow down the response as per
+
+          [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering).'
+        required: false
+        schema:
+          type: string
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:workspace:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: listUserPermissionsInAWorkspace
+    parameters:
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /workspaces/{workspace}/permissions/repositories:
+    get:
+      tags:
+      - Workspaces
+      description: 'Returns an object for each repository permission for all of a
+
+        workspace''s repositories.
+
+
+        Permissions returned are effective permissions: the highest level of
+
+        permission the user has. This does not distinguish between direct and
+
+        indirect (group) privileges.
+
+
+        Only users with admin permission for the team may access this resource.
+
+
+        Permissions can be:
+
+
+        * `admin`
+
+        * `write`
+
+        * `read`
+
+
+        Results may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering)
+
+        by repository, user, or permission by adding the following query string
+
+        parameters:
+
+
+        * `q=repository.name="geordi"` or `q=permission>"read"`
+
+        * `sort=user.display_name`
+
+
+        Note that the query parameter values need to be URL escaped so that `=`
+
+        would become `%3D`.'
+      summary: List all repository permissions for a workspace
+      responses:
+        '200':
+          description: List of workspace's repository permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_repository_permissions'
+              examples:
+                response:
+                  value:
+                    pagelen: 10
+                    values:
+                    - type: repository_permission
+                      user:
+                        type: user
+                        display_name: Erik van Zijst
+                        uuid: '{d301aafa-d676-4ee0-88be-962be7417567}'
+                      repository:
+                        type: repository
+                        name: geordi
+                        full_name: atlassian_tutorial/geordi
+                        uuid: '{85d08b4e-571d-44e9-a507-fa476535aa98}'
+                      permission: admin
+                    - type: repository_permission
+                      user:
+                        type: user
+                        display_name: Sean Conaty
+                        uuid: '{504c3b62-8120-4f0c-a7bc-87800b9d6f70}'
+                      repository:
+                        type: repository
+                        name: geordi
+                        full_name: atlassian_tutorial/geordi
+                        uuid: '{85d08b4e-571d-44e9-a507-fa476535aa98}'
+                      permission: write
+                    - type: repository_permission
+                      user:
+                        type: user
+                        display_name: Jeff Zeng
+                        uuid: '{47f92a9a-c3a3-4d0b-bc4e-782a969c5c72}'
+                      repository:
+                        type: repository
+                        name: whee
+                        full_name: atlassian_tutorial/whee
+                        uuid: '{30ba25e9-51ff-4555-8dd0-fc7ee2fa0895}'
+                      permission: admin
+                    page: 1
+                    size: 3
+        '403':
+          description: The requesting user isn't an admin of the workspace.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      parameters:
+      - name: q
+        in: query
+        description: '
+
+          Query string to narrow down the response as per
+
+          [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering).'
+        required: false
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: '
+
+          Name of a response property sort the result by as per
+
+          [filtering and sorting](/cloud/bitbucket/rest/intro/#sorting-query-results).
+
+          '
+        required: false
+        schema:
+          type: string
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:repository:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: listAllRepositoryPermissionsForAWorkspace
+    parameters:
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /workspaces/{workspace}/permissions/repositories/{repo_slug}:
+    get:
+      tags:
+      - Workspaces
+      description: 'Returns an object for the repository permission of each user in
+        the
+
+        requested repository.
+
+
+        Permissions returned are effective permissions: the highest level of
+
+        permission the user has. This does not distinguish between direct and
+
+        indirect (group) privileges.
+
+
+        Only users with admin permission for the repository may access this resource.
+
+
+        Permissions can be:
+
+
+        * `admin`
+
+        * `write`
+
+        * `read`
+
+
+        Results may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering)
+
+        by user, or permission by adding the following query string parameters:
+
+
+        * `q=permission>"read"`
+
+        * `sort=user.display_name`
+
+
+        Note that the query parameter values need to be URL escaped so that `=`
+
+        would become `%3D`.'
+      summary: List a repository permissions for a workspace
+      responses:
+        '200':
+          description: The repository permission for all users in this repository.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_repository_permissions'
+              examples:
+                response:
+                  value:
+                    pagelen: 10
+                    values:
+                    - type: repository_permission
+                      user:
+                        type: user
+                        display_name: Erik van Zijst
+                        uuid: '{d301aafa-d676-4ee0-88be-962be7417567}'
+                      repository:
+                        type: repository
+                        name: geordi
+                        full_name: atlassian_tutorial/geordi
+                        uuid: '{85d08b4e-571d-44e9-a507-fa476535aa98}'
+                      permission: admin
+                    - type: repository_permission
+                      user:
+                        type: user
+                        display_name: Sean Conaty
+                        uuid: '{504c3b62-8120-4f0c-a7bc-87800b9d6f70}'
+                      repository:
+                        type: repository
+                        name: geordi
+                        full_name: atlassian_tutorial/geordi
+                        uuid: '{85d08b4e-571d-44e9-a507-fa476535aa98}'
+                      permission: write
+                    page: 1
+                    size: 2
+        '403':
+          description: The requesting user isn't an admin of the repository.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      parameters:
+      - name: q
+        in: query
+        description: '
+
+          Query string to narrow down the response as per
+
+          [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering).'
+        required: false
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: '
+
+          Name of a response property sort the result by as per
+
+          [filtering and sorting](/cloud/bitbucket/rest/intro/#sorting-query-results).
+
+          '
+        required: false
+        schema:
+          type: string
+      security:
+      - oauth2:
+        - repository
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:repository:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: listARepositoryPermissionsForAWorkspace
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /workspaces/{workspace}/hooks:
+    get:
+      tags:
+      - Workspaces
+      - Webhooks
+      description: Returns a paginated list of webhooks installed on this workspace.
+      summary: List webhooks for a workspace
+      responses:
+        '200':
+          description: The paginated list of installed webhooks.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_webhook_subscriptions'
+        '403':
+          description: If the authenticated user is not an owner on the specified
+            workspace.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the specified workspace does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - webhook
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:webhook:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listWebhooksForAWorkspace
+    post:
+      tags:
+      - Workspaces
+      - Webhooks
+      description: "Creates a new webhook on the specified workspace.\n\nWorkspace\
+        \ webhooks are fired for events from all repositories contained\nby that workspace.\n\
+        \nExample:\n\n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n\
+        \  https://api.bitbucket.org/2.0/workspaces/my-workspace/hooks\n  -d '\n \
+        \   {\n      \"description\": \"Webhook Description\",\n      \"url\": \"\
+        https://example.com/\",\n      \"active\": true,\n      \"secret\": \"this\
+        \ is a really bad secret\",\n      \"events\": [\n        \"repo:push\",\n\
+        \        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n\
+        ```\n\nWhen the `secret` is provided it will be used as the key to generate\
+        \ a HMAC\ndigest value sent in the `X-Hub-Signature` header at delivery time.\
+        \ Passing\na `null` or empty `secret` or not passing a `secret` will leave\
+        \ the webhook's\nsecret unset. Bitbucket only generates the `X-Hub-Signature`\
+        \ when the webhook's\nsecret is set.\n\nThis call requires the webhook scope,\
+        \ as well as any scope\nthat applies to the events that the webhook subscribes\
+        \ to. In the\nexample above that means: `webhook`, `repository` and `issue`.\n\
+        \nThe `url` must properly resolve and cannot be an internal, non-routed address.\n\
+        \nOnly workspace owners can install webhooks on workspaces."
+      summary: Create a webhook for a workspace
+      responses:
+        '201':
+          description: If the webhook was registered successfully.
+          headers:
+            Location:
+              description: The URL of new newly created webhook.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook_subscription'
+        '403':
+          description: If the authenticated user does not have permission to install
+            webhooks on the specified workspace.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the specified workspace does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - webhook
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:webhook:bitbucket
+        - write:webhook:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: createAWebhookForAWorkspace
+    parameters:
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /workspaces/{workspace}/hooks/{uid}:
+    delete:
+      tags:
+      - Workspaces
+      - Webhooks
+      description: Deletes the specified webhook subscription from the given workspace.
+      summary: Delete a webhook for a workspace
+      responses:
+        '204':
+          description: When the webhook was deleted successfully
+        '403':
+          description: If the authenticated user does not have permission to delete
+            the webhook.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the webhook or workspace does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - webhook
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - delete:webhook:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: deleteAWebhookForAWorkspace
+    get:
+      tags:
+      - Workspaces
+      - Webhooks
+      description: 'Returns the webhook with the specified id installed on the given
+
+        workspace.'
+      summary: Get a webhook for a workspace
+      responses:
+        '200':
+          description: The webhook subscription object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook_subscription'
+        '404':
+          description: If the webhook or workspace does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - webhook
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:webhook:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getAWebhookForAWorkspace
+    put:
+      tags:
+      - Workspaces
+      - Webhooks
+      description: 'Updates the specified webhook subscription.
+
+
+        The following properties can be mutated:
+
+
+        * `description`
+
+        * `url`
+
+        * `secret`
+
+        * `active`
+
+        * `events`
+
+
+        The hook''s secret is used as a key to generate the HMAC hex digest sent in
+        the
+
+        `X-Hub-Signature` header at delivery time. This signature is only generated
+
+        when the hook has a secret.
+
+
+        Set the hook''s secret by passing the new value in the `secret` field. Passing
+        a
+
+        `null` value in the `secret` field will remove the secret from the hook. The
+
+        hook''s secret can be left unchanged by not passing the `secret` field in
+        the
+
+        request.'
+      summary: Update a webhook for a workspace
+      responses:
+        '200':
+          description: The webhook subscription object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook_subscription'
+        '403':
+          description: If the authenticated user does not have permission to update
+            the webhook.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the webhook or workspace does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - webhook
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:webhook:bitbucket
+        - write:webhook:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: updateAWebhookForAWorkspace
+    parameters:
+    - name: uid
+      in: path
+      description: Installed webhook's ID
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /workspaces/{workspace}/projects:
+    get:
+      tags:
+      - Workspaces
+      description: Returns the list of projects in this workspace.
+      summary: List projects in a workspace
+      responses:
+        '200':
+          description: The list of projects in this workspace.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_projects'
+        '404':
+          description: A workspace doesn't exist at this location.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - project
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:project:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: listProjectsInAWorkspace
+    post:
+      tags:
+      - Projects
+      description: "Creates a new project.\n\nNote that the avatar has to be embedded\
+        \ as either a data-url\nor a URL to an external image as shown in the examples\
+        \ below:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\": \"Mars Project\",\n\
+        \    \"key\": \"MARS\",\n    \"description\": \"Software for colonizing mars.\"\
+        ,\n    \"links\": {\n        \"avatar\": {\n            \"href\": \"data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/...\"\
+        \n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type:\
+        \ application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n     \
+        \  https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq\
+        \ .\n{\n  // Serialized project document\n}\n```\n\nor even:\n\n```\n$ body=$(cat\
+        \ << EOF\n{\n    \"name\": \"Mars Project\",\n    \"key\": \"MARS\",\n   \
+        \ \"description\": \"Software for colonizing mars.\",\n    \"links\": {\n\
+        \        \"avatar\": {\n            \"href\": \"http://i.imgur.com/72tRx4w.gif\"\
+        \n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type:\
+        \ application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n     \
+        \  https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq\
+        \ .\n{\n  // Serialized project document\n}\n```"
+      summary: Create a project in a workspace
+      responses:
+        '201':
+          description: A new project has been created.
+          headers:
+            Location:
+              description: The location of the newly created project
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/project'
+        '403':
+          description: The user requesting to create a project does not have the necessary
+            permissions.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: A workspace doesn't exist at this location.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      requestBody:
+        $ref: '#/components/requestBodies/project'
+      security:
+      - oauth2:
+        - project:admin
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - admin:project:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: createAProjectInAWorkspace
+    parameters:
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /workspaces/{workspace}/projects/{project_key}:
+    delete:
+      tags:
+      - Projects
+      description: 'Deletes this project. This is an irreversible operation.
+
+
+        You cannot delete a project that still contains repositories.
+
+        To delete the project, [delete](/cloud/bitbucket/rest/api-group-repositories/#api-repositories-workspace-repo-slug-delete)
+
+        or transfer the repositories first.
+
+
+        Example:
+
+        ```
+
+        $ curl -X DELETE https://api.bitbucket.org/2.0/workspaces/bbworkspace1/projects/PROJ
+
+        ```'
+      summary: Delete a project for a workspace
+      responses:
+        '204':
+          description: Successful deletion.
+        '403':
+          description: The requesting user isn't authorized to delete the project
+            or the project isn't empty.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: A project isn't hosted at this location.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - project:admin
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - admin:project:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: deleteAProjectForAWorkspace
+    get:
+      tags:
+      - Projects
+      - Workspaces
+      description: Returns the requested project.
+      summary: Get a project for a workspace
+      responses:
+        '200':
+          description: The project that is part of a workspace.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/project'
+        '401':
+          description: The request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: The requesting user isn't authorized to access the project.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: A project isn't hosted at this location.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - project
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:project:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: getAProjectForAWorkspace
+    put:
+      tags:
+      - Projects
+      description: 'Since this endpoint can be used to both update and to create a
+
+        project, the request body depends on the intent.
+
+
+        #### Creation
+
+
+        See the POST documentation for the project collection for an
+
+        example of the request body.
+
+
+        Note: The `key` should not be specified in the body of request
+
+        (since it is already present in the URL). The `name` is required,
+
+        everything else is optional.
+
+
+        #### Update
+
+
+        See the POST documentation for the project collection for an
+
+        example of the request body.
+
+
+        Note: The key is not required in the body (since it is already in
+
+        the URL). The key may be specified in the body, if the intent is
+
+        to change the key itself. In such a scenario, the location of the
+
+        project is changed and is returned in the `Location` header of the
+
+        response.'
+      summary: Update a project for a workspace
+      responses:
+        '200':
+          description: The existing project is has been updated.
+          headers:
+            Location:
+              description: 'The location of the project. This header is only provided
+
+                when the project key is updated.'
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/project'
+        '201':
+          description: A new project has been created.
+          headers:
+            Location:
+              description: The location of the newly created project
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/project'
+        '403':
+          description: The requesting user isn't authorized to update or create the
+            project.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: A workspace doesn't exist at the location. Note that the project's
+            absence from this location doesn't raise a 404, since a PUT at a non-existent
+            location can be used to create a new project.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      requestBody:
+        $ref: '#/components/requestBodies/project'
+      security:
+      - oauth2:
+        - project:admin
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - admin:project:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: updateAProjectForAWorkspace
+    parameters:
+    - name: project_key
+      in: path
+      description: 'The project in question. This is the actual `key` assigned
+
+        to the project.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /workspaces/{workspace}/pullrequests/{selected_user}:
+    get:
+      tags:
+      - Workspaces
+      - Pullrequests
+      description: 'Returns all workspace pull requests authored by the specified
+        user.
+
+
+        By default only open pull requests are returned. This can be controlled
+
+        using the `state` query parameter. To retrieve pull requests that are
+
+        in one of multiple states, repeat the `state` parameter for each
+
+        individual state.
+
+
+        This endpoint also supports filtering and sorting of the results. See
+
+        [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.'
+      summary: List workspace pull requests for a user
+      responses:
+        '200':
+          description: All pull requests authored by the specified user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_pullrequests'
+        '404':
+          description: If the specified user does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      parameters:
+      - name: state
+        in: query
+        description: Only return pull requests that are in this state. This parameter
+          can be repeated.
+        schema:
+          type: string
+          enum:
+          - OPEN
+          - MERGED
+          - DECLINED
+          - SUPERSEDED
+      security:
+      - oauth2:
+        - pullrequest
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:pullrequest:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listWorkspacePullRequestsForAUser
+    parameters:
+    - name: selected_user
+      in: path
+      description: 'This can either be the username of the pull request author, the
+        author''s UUID
+
+        surrounded by curly-braces, for example: `{account UUID}`, or the author''s
+        Atlassian ID.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+components:
+  schemas:
+    paginated_workspace_memberships:
+      type: object
+      title: Paginated Workspace Memberships
+      description: A paginated list of workspace memberships.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/workspace_membership'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_workspaces:
+      type: object
+      title: Paginated Workspaces
+      description: A paginated list of workspaces.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/workspace'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    team:
+      allOf:
+      - $ref: '#/components/schemas/account'
+      - type: object
+        title: Team
+        description: A team object.
+        properties:
+          links:
+            $ref: '#/components/schemas/team_links'
+        additionalProperties: true
+    pullrequest:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Pull Request
+        description: A pull request object.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              commits:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              approve:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              diff:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              diffstat:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              comments:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              activity:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              merge:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              decline:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          id:
+            type: integer
+            description: The pull request's unique ID. Note that pull request IDs
+              are only unique within their associated repository.
+          title:
+            type: string
+            description: Title of the pull request.
+          rendered:
+            type: object
+            title: Rendered Pull Request Markup
+            description: User provided pull request text, interpreted in a markup
+              language and rendered in HTML
+            properties:
+              title:
+                type: object
+                properties:
+                  raw:
+                    type: string
+                    description: The text as it was typed by a user.
+                  markup:
+                    type: string
+                    description: The type of markup language the raw content is to
+                      be interpreted in.
+                    enum:
+                    - markdown
+                    - creole
+                    - plaintext
+                  html:
+                    type: string
+                    description: The user's content rendered as HTML.
+                additionalProperties: false
+              description:
+                type: object
+                properties:
+                  raw:
+                    type: string
+                    description: The text as it was typed by a user.
+                  markup:
+                    type: string
+                    description: The type of markup language the raw content is to
+                      be interpreted in.
+                    enum:
+                    - markdown
+                    - creole
+                    - plaintext
+                  html:
+                    type: string
+                    description: The user's content rendered as HTML.
+                additionalProperties: false
+              reason:
+                type: object
+                properties:
+                  raw:
+                    type: string
+                    description: The text as it was typed by a user.
+                  markup:
+                    type: string
+                    description: The type of markup language the raw content is to
+                      be interpreted in.
+                    enum:
+                    - markdown
+                    - creole
+                    - plaintext
+                  html:
+                    type: string
+                    description: The user's content rendered as HTML.
+                additionalProperties: false
+            additionalProperties: false
+          summary:
+            type: object
+            properties:
+              raw:
+                type: string
+                description: The text as it was typed by a user.
+              markup:
+                type: string
+                description: The type of markup language the raw content is to be
+                  interpreted in.
+                enum:
+                - markdown
+                - creole
+                - plaintext
+              html:
+                type: string
+                description: The user's content rendered as HTML.
+            additionalProperties: false
+          state:
+            type: string
+            description: The pull request's current status.
+            enum:
+            - OPEN
+            - DRAFT
+            - QUEUED
+            - MERGED
+            - DECLINED
+            - SUPERSEDED
+          author:
+            $ref: '#/components/schemas/account'
+          source:
+            $ref: '#/components/schemas/pullrequest_endpoint'
+          destination:
+            $ref: '#/components/schemas/pullrequest_endpoint'
+          merge_commit:
+            type: object
+            title: Pull Request Commit
+            properties:
+              hash:
+                type: string
+                pattern: '[0-9a-f]{7,}?'
+            additionalProperties: false
+          comment_count:
+            type: integer
+            description: The number of comments for a specific pull request.
+            minimum: 0
+          task_count:
+            type: integer
+            description: The number of open tasks for a specific pull request.
+            minimum: 0
+          close_source_branch:
+            type: boolean
+            description: A boolean flag indicating if merging the pull request closes
+              the source branch.
+          closed_by:
+            $ref: '#/components/schemas/account'
+          reason:
+            type: string
+            description: Explains why a pull request was declined. This field is only
+              applicable to pull requests in rejected state.
+          created_on:
+            type: string
+            description: The ISO8601 timestamp the request was created.
+            format: date-time
+          updated_on:
+            type: string
+            description: The ISO8601 timestamp the request was last updated.
+            format: date-time
+          reviewers:
+            type: array
+            description: The list of users that were added as reviewers on this pull
+              request when it was created. For performance reasons, the API only includes
+              this list on a pull request's `self` URL.
+            items:
+              $ref: '#/components/schemas/account'
+          participants:
+            type: array
+            description: "        The list of users that are collaborating on this\
+              \ pull request.\n        Collaborators are user that:\n\n        * are\
+              \ added to the pull request as a reviewer (part of the reviewers\n \
+              \         list)\n        * are not explicit reviewers, but have commented\
+              \ on the pull request\n        * are not explicit reviewers, but have\
+              \ approved the pull request\n\n        Each user is wrapped in an object\
+              \ that indicates the user's role and\n        whether they have approved\
+              \ the pull request. For performance reasons,\n        the API only returns\
+              \ this list when an API requests a pull request by\n        id.\n  \
+              \      "
+            items:
+              $ref: '#/components/schemas/participant'
+          draft:
+            type: boolean
+            description: A boolean flag indicating whether the pull request is a draft.
+          queued:
+            type: boolean
+            description: A boolean flag indicating whether the pull request is queued
+          description:
+            type: string
+            description: Explains what the pull request does.
+        additionalProperties: true
+    pullrequest_endpoint:
+      type: object
+      title: Pull Request Endpoint
+      properties:
+        repository:
+          $ref: '#/components/schemas/repository'
+        branch:
+          $ref: '#/components/schemas/pullrequest_endpoint_branch'
+        commit:
+          type: object
+          title: Pull Request Commit
+          properties:
+            hash:
+              type: string
+              pattern: '[0-9a-f]{7,}?'
+          additionalProperties: false
+      additionalProperties: false
+    workspace_access:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Workspace Permission
+        description: A Bitbucket workspace permission for a user.
+        properties:
+          administrator:
+            type: boolean
+            description: The permission level the user has for the workspace. True
+              if the user is an administrator, otherwise False.
+          workspace:
+            $ref: '#/components/schemas/workspace_base'
+        additionalProperties: true
+    author:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Author
+        description: The author of a change in a repository
+        properties:
+          raw:
+            type: string
+            description: The raw author value from the repository. This may be the
+              only value available if the author does not match a user in Bitbucket.
+          user:
+            $ref: '#/components/schemas/account'
+        additionalProperties: true
+    workspace_membership:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Workspace Membership
+        description: "A Bitbucket workspace membership.\n            Links a user\
+          \ to a workspace."
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          user:
+            $ref: '#/components/schemas/account'
+          workspace:
+            $ref: '#/components/schemas/workspace'
+        additionalProperties: true
+    paginated_repository_permissions:
+      type: object
+      title: Paginated Repository Permissions
+      description: A paginated list of repository permissions.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/repository_permission'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_workspace_access:
+      type: object
+      title: Paginated Workspace Permissions
+      description: A paginated list of workspace permissions.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/workspace_access'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    account_links:
+      type: object
+      title: Account Links
+      description: Links related to an Account.
+      properties:
+        avatar:
+          $ref: '#/components/schemas/link'
+      additionalProperties: true
+    repository:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Repository
+        description: A Bitbucket repository.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              avatar:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              pullrequests:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              commits:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              forks:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              watchers:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              downloads:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              clone:
+                type: array
+                items:
+                  type: object
+                  title: Link
+                  description: A link to a resource related to this object.
+                  properties:
+                    href:
+                      type: string
+                      format: uri
+                    name:
+                      type: string
+                  additionalProperties: false
+              hooks:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          uuid:
+            type: string
+            description: The repository's immutable id. This can be used as a substitute
+              for the slug segment in URLs. Doing this guarantees your URLs will survive
+              renaming of the repository by its owner, or even transfer of the repository
+              to a different user.
+          full_name:
+            type: string
+            description: The concatenation of the repository owner's username and
+              the slugified name, e.g. "evzijst/interruptingcow". This is the same
+              string used in Bitbucket URLs.
+          is_private:
+            type: boolean
+          parent:
+            $ref: '#/components/schemas/repository'
+          scm:
+            type: string
+            enum:
+            - git
+          owner:
+            $ref: '#/components/schemas/account'
+          name:
+            type: string
+          description:
+            type: string
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+          size:
+            type: integer
+          language:
+            type: string
+          has_issues:
+            type: boolean
+            description: '
+
+              The issue tracker for this repository is enabled. Issue Tracker
+
+              features are not supported for repositories in workspaces
+
+              administered through admin.atlassian.com.
+
+              '
+          has_wiki:
+            type: boolean
+            description: '
+
+              The wiki for this repository is enabled. Wiki
+
+              features are not supported for repositories in workspaces
+
+              administered through admin.atlassian.com.
+
+              '
+          fork_policy:
+            type: string
+            description: "\nControls the rules for forking this repository.\n\n* **allow_forks**:\
+              \ unrestricted forking\n* **no_public_forks**: restrict forking to private\
+              \ forks (forks cannot\n  be made public later)\n* **no_forks**: deny\
+              \ all forking\n"
+            enum:
+            - allow_forks
+            - no_public_forks
+            - no_forks
+          project:
+            $ref: '#/components/schemas/project'
+          mainbranch:
+            $ref: '#/components/schemas/branch'
+        additionalProperties: true
+    workspace_base:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Workspace Base
+        description: "A Bitbucket workspace.\n            Workspaces are used to organize\
+          \ repositories."
+        properties:
+          links:
+            type: object
+            properties:
+              avatar:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          uuid:
+            type: string
+            description: The workspace's immutable id.
+          slug:
+            type: string
+            description: The short label that identifies this workspace.
+        additionalProperties: true
+    user:
+      allOf:
+      - $ref: '#/components/schemas/account'
+      - type: object
+        title: User
+        description: A user object.
+        properties:
+          links:
+            $ref: '#/components/schemas/user_links'
+          account_id:
+            type: string
+            description: The user's Atlassian account ID.
+          account_status:
+            type: string
+            description: The status of the account. Currently the only possible value
+              is "active", but more values may be added in the future.
+          has_2fa_enabled:
+            type: boolean
+          nickname:
+            type: string
+            description: Account name defined by the owner. Should be used instead
+              of the "username" field. Note that "nickname" cannot be used in place
+              of "username" in URLs and queries, as "nickname" is not guaranteed to
+              be unique.
+          is_staff:
+            type: boolean
+        additionalProperties: true
+    account:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Account
+        description: An account object.
+        properties:
+          links:
+            $ref: '#/components/schemas/account_links'
+          created_on:
+            type: string
+            format: date-time
+          display_name:
+            type: string
+          uuid:
+            type: string
+        additionalProperties: true
+    project:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Project
+        description: "A Bitbucket project.\n            Projects are used by teams\
+          \ to organize repositories."
+        properties:
+          links:
+            type: object
+            properties:
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              avatar:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          uuid:
+            type: string
+            description: The project's immutable id.
+          key:
+            type: string
+            description: The project's key.
+          owner:
+            $ref: '#/components/schemas/team'
+          name:
+            type: string
+            description: The name of the project.
+          description:
+            type: string
+          is_private:
+            type: boolean
+            description: '
+
+              Indicates whether the project is publicly accessible, or whether it
+              is
+
+              private to the team and consequently only visible to team members.
+
+              Note that private projects cannot contain public repositories.'
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+          has_publicly_visible_repos:
+            type: boolean
+            description: '
+
+              Indicates whether the project contains publicly visible repositories.
+
+              Note that private projects cannot contain public repositories.'
+        additionalProperties: true
+    object:
+      type: object
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+      required:
+      - type
+      additionalProperties: true
+      discriminator:
+        propertyName: type
+    base_commit:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Base Commit
+        description: The common base type for both repository and snippet commits.
+        properties:
+          hash:
+            type: string
+            pattern: '[0-9a-f]{7,}?'
+          date:
+            type: string
+            format: date-time
+          author:
+            $ref: '#/components/schemas/author'
+          committer:
+            $ref: '#/components/schemas/committer'
+          message:
+            type: string
+          summary:
+            type: object
+            properties:
+              raw:
+                type: string
+                description: The text as it was typed by a user.
+              markup:
+                type: string
+                description: The type of markup language the raw content is to be
+                  interpreted in.
+                enum:
+                - markdown
+                - creole
+                - plaintext
+              html:
+                type: string
+                description: The user's content rendered as HTML.
+            additionalProperties: false
+          parents:
+            type: array
+            items:
+              $ref: '#/components/schemas/base_commit'
+            minItems: 0
+        additionalProperties: true
+    error:
+      type: object
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
+    commit:
+      allOf:
+      - $ref: '#/components/schemas/base_commit'
+      - type: object
+        title: Commit
+        description: A repository commit object.
+        properties:
+          repository:
+            $ref: '#/components/schemas/repository'
+          participants:
+            type: array
+            items:
+              $ref: '#/components/schemas/participant'
+            minItems: 0
+        additionalProperties: true
+    webhook_subscription:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Webhook Subscription
+        description: A Webhook subscription.
+        properties:
+          uuid:
+            type: string
+            description: The webhook's id
+          url:
+            type: string
+            description: The URL events get delivered to.
+            format: uri
+          description:
+            type: string
+            description: A user-defined description of the webhook.
+          subject_type:
+            type: string
+            description: The type of entity. Set to either `repository` or `workspace`
+              based on where the subscription is defined.
+            enum:
+            - repository
+            - workspace
+          subject:
+            $ref: '#/components/schemas/object'
+          active:
+            type: boolean
+          created_at:
+            type: string
+            format: date-time
+          events:
+            type: array
+            description: The events this webhook is subscribed to.
+            items:
+              type: string
+              enum:
+              - issue:comment_created
+              - issue:created
+              - issue:updated
+              - pipeline:span_created
+              - project:updated
+              - pullrequest:approved
+              - pullrequest:changes_request_created
+              - pullrequest:changes_request_removed
+              - pullrequest:comment_created
+              - pullrequest:comment_deleted
+              - pullrequest:comment_reopened
+              - pullrequest:comment_resolved
+              - pullrequest:comment_updated
+              - pullrequest:created
+              - pullrequest:fulfilled
+              - pullrequest:push
+              - pullrequest:rejected
+              - pullrequest:unapproved
+              - pullrequest:updated
+              - repo:commit_comment_created
+              - repo:commit_status_created
+              - repo:commit_status_updated
+              - repo:created
+              - repo:deleted
+              - repo:fork
+              - repo:imported
+              - repo:push
+              - repo:transfer
+              - repo:updated
+            minItems: 1
+            uniqueItems: true
+          secret_set:
+            type: boolean
+            description: Indicates whether or not the hook has an associated secret.
+              It is not possible to see the hook's secret. This field is ignored during
+              updates.
+          secret:
+            type: string
+            description: The secret to associate with the hook. The secret is never
+              returned via the API. As such, this field is only used during updates.
+              The secret can be set to `null` or "" to remove the secret (or create
+              a hook with no secret). Leaving out the secret field during updates
+              will leave the secret unchanged. Leaving out the secret during creation
+              will create a hook with no secret.
+            minLength: 0
+            maxLength: 128
+        additionalProperties: true
+    committer:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Committer
+        description: The committer of a change in a repository
+        properties:
+          raw:
+            type: string
+            description: The raw committer value from the repository. This may be
+              the only value available if the committer does not match a user in Bitbucket.
+          user:
+            $ref: '#/components/schemas/account'
+        additionalProperties: true
+    workspace:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Workspace
+        description: "A Bitbucket workspace.\n            Workspaces are used to organize\
+          \ repositories."
+        properties:
+          links:
+            type: object
+            properties:
+              avatar:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              members:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              owners:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              projects:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              repositories:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              snippets:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          uuid:
+            type: string
+            description: The workspace's immutable id.
+          name:
+            type: string
+            description: The name of the workspace.
+          slug:
+            type: string
+            description: The short label that identifies this workspace.
+          is_private:
+            type: boolean
+            description: 'Indicates whether the workspace is publicly accessible,
+              or whether it is
+
+              private to the members and consequently only visible to members.'
+          is_privacy_enforced:
+            type: boolean
+            description: Indicates whether the workspace enforces private content,
+              or whether it allows public content.
+          forking_mode:
+            type: string
+            description: 'Controls the rules for forking repositories within this
+              workspace.
+
+
+              * **allow_forks**: unrestricted forking
+
+              * **internal_only**: prevents forking of private repositories outside
+              the workspace or to public repositories
+
+              '
+            enum:
+            - allow_forks
+            - internal_only
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+        additionalProperties: true
+    paginated_webhook_subscriptions:
+      type: object
+      title: Paginated Webhook Subscriptions
+      description: A paginated list of webhook subscriptions
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/webhook_subscription'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_pullrequests:
+      type: object
+      title: Paginated Pull Requests
+      description: A paginated list of pullrequests.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/pullrequest'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_projects:
+      type: object
+      title: Paginated Projects
+      description: A paginated list of projects
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/project'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    user_links:
+      allOf:
+      - $ref: '#/components/schemas/account_links'
+      - type: object
+        title: User Links
+        description: Links related to a User.
+        properties:
+          self:
+            $ref: '#/components/schemas/link'
+          html:
+            $ref: '#/components/schemas/link'
+          repositories:
+            $ref: '#/components/schemas/link'
+        additionalProperties: true
+    ref:
+      type: object
+      title: Ref
+      description: A ref object, representing a branch or tag in a repository.
+      properties:
+        type:
+          type: string
+        links:
+          type: object
+          properties:
+            self:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+            commits:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+            html:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+          additionalProperties: false
+        name:
+          type: string
+          description: The name of the ref.
+        target:
+          $ref: '#/components/schemas/commit'
+      required:
+      - type
+      additionalProperties: true
+    repository_permission:
+      type: object
+      title: Repository Permission
+      description: A user's permission for a given repository.
+      properties:
+        type:
+          type: string
+        permission:
+          type: string
+          enum:
+          - read
+          - write
+          - admin
+          - none
+        user:
+          $ref: '#/components/schemas/user'
+        repository:
+          $ref: '#/components/schemas/repository'
+      required:
+      - type
+      additionalProperties: true
+    participant:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Participant
+        description: Object describing a user's role on resources like commits or
+          pull requests.
+        properties:
+          user:
+            $ref: '#/components/schemas/account'
+          role:
+            type: string
+            enum:
+            - PARTICIPANT
+            - REVIEWER
+          approved:
+            type: boolean
+          state:
+            type: string
+            enum:
+            - approved
+            - changes_requested
+            - null
+          participated_on:
+            type: string
+            description: The ISO8601 timestamp of the participant's action. For approvers,
+              this is the time of their approval. For commenters and pull request
+              reviewers who are not approvers, this is the time they last commented,
+              or null if they have not commented.
+            format: date-time
+        additionalProperties: true
+    link:
+      type: object
+      title: Link
+      description: A link to a resource related to this object.
+      properties:
+        href:
+          type: string
+          format: uri
+        name:
+          type: string
+      additionalProperties: false
+    team_links:
+      allOf:
+      - $ref: '#/components/schemas/account_links'
+      - type: object
+        title: Team Links
+        description: Links related to a Team.
+        properties:
+          self:
+            $ref: '#/components/schemas/link'
+          html:
+            $ref: '#/components/schemas/link'
+          members:
+            $ref: '#/components/schemas/link'
+          projects:
+            $ref: '#/components/schemas/link'
+          repositories:
+            $ref: '#/components/schemas/link'
+        additionalProperties: true
+    branch:
+      allOf:
+      - $ref: '#/components/schemas/ref'
+      - type: object
+        title: Branch
+        description: A branch object, representing a branch in a repository.
+        properties:
+          merge_strategies:
+            type: array
+            description: Available merge strategies for pull requests targeting this
+              branch.
+            items:
+              type: string
+              enum:
+              - merge_commit
+              - squash
+              - fast_forward
+              - squash_fast_forward
+              - rebase_fast_forward
+              - rebase_merge
+          default_merge_strategy:
+            type: string
+            description: The default merge strategy for pull requests targeting this
+              branch.
+        additionalProperties: true
+    pullrequest_endpoint_branch:
+      type: object
+      title: Pull Request Branch
+      properties:
+        name:
+          type: string
+        merge_strategies:
+          type: array
+          description: Available merge strategies, when this endpoint is the destination
+            of the pull request.
+          items:
+            type: string
+            enum:
+            - merge_commit
+            - squash
+            - fast_forward
+            - squash_fast_forward
+            - rebase_fast_forward
+            - rebase_merge
+        default_merge_strategy:
+          type: string
+          description: The default merge strategy, when this endpoint is the destination
+            of the pull request.
+      additionalProperties: false

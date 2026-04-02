@@ -163,6 +163,353 @@ COMMAND_GROUPS = {
                                   "in Bitbucket repositories.",
         },
     },
+    "repositories": {
+        "filename": "repositories-schema.yaml",
+        "title": "Bitbucket Repositories CLI",
+        "tags": {"Repositories", "Source"},
+        "paths": [
+            "/repositories",
+            "/repositories/{workspace}",
+            "/repositories/{workspace}/{repo_slug}",
+            "/repositories/{workspace}/{repo_slug}/filehistory/{commit}/{path}",
+            "/repositories/{workspace}/{repo_slug}/forks",
+            "/repositories/{workspace}/{repo_slug}/override-settings",
+            "/repositories/{workspace}/{repo_slug}/permissions-config/groups",
+            "/repositories/{workspace}/{repo_slug}/permissions-config/groups/{group_slug}",
+            "/repositories/{workspace}/{repo_slug}/permissions-config/users",
+            "/repositories/{workspace}/{repo_slug}/permissions-config/users/{selected_user_id}",
+            "/repositories/{workspace}/{repo_slug}/src",
+            "/repositories/{workspace}/{repo_slug}/src/{commit}/{path}",
+            "/repositories/{workspace}/{repo_slug}/watchers",
+            "/user/permissions/repositories",
+            "/user/workspaces/{workspace}/permissions/repositories",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Repos",
+            "x-cli-command-use": "repos",
+            "x-cli-command-short": "Manage Bitbucket repositories",
+            "x-cli-command-long": "Commands for listing, creating, updating, "
+                                  "and managing Bitbucket repositories, "
+                                  "including forks, permissions, and source files.",
+        },
+    },
+    "workspaces": {
+        "filename": "workspaces-schema.yaml",
+        "title": "Bitbucket Workspaces CLI",
+        "tags": {"Workspaces"},
+        "paths": [
+            "/user/permissions/workspaces",
+            "/user/workspaces",
+            "/user/workspaces/{workspace}/permission",
+            "/workspaces",
+            "/workspaces/{workspace}",
+            "/workspaces/{workspace}/members",
+            "/workspaces/{workspace}/members/{member}",
+            "/workspaces/{workspace}/permissions",
+            "/workspaces/{workspace}/permissions/repositories",
+            "/workspaces/{workspace}/permissions/repositories/{repo_slug}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Workspaces",
+            "x-cli-command-use": "workspaces",
+            "x-cli-command-short": "Manage Bitbucket workspaces",
+            "x-cli-command-long": "Commands for listing workspaces and managing "
+                                  "workspace members and permissions.",
+        },
+    },
+    "projects": {
+        "filename": "projects-schema.yaml",
+        "title": "Bitbucket Projects CLI",
+        "tags": {"Projects"},
+        "paths": [
+            "/workspaces/{workspace}/projects",
+            "/workspaces/{workspace}/projects/{project_key}",
+            "/workspaces/{workspace}/projects/{project_key}/default-reviewers",
+            "/workspaces/{workspace}/projects/{project_key}/default-reviewers/{selected_user}",
+            "/workspaces/{workspace}/projects/{project_key}/permissions-config/groups",
+            "/workspaces/{workspace}/projects/{project_key}/permissions-config/groups/{group_slug}",
+            "/workspaces/{workspace}/projects/{project_key}/permissions-config/users",
+            "/workspaces/{workspace}/projects/{project_key}/permissions-config/users/{selected_user_id}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Projects",
+            "x-cli-command-use": "projects",
+            "x-cli-command-short": "Manage Bitbucket projects",
+            "x-cli-command-long": "Commands for listing, creating, updating, "
+                                  "and deleting projects and managing project "
+                                  "default reviewers and permissions.",
+        },
+    },
+    "pipelines": {
+        "filename": "pipelines-schema.yaml",
+        "title": "Bitbucket Pipelines CLI",
+        "tags": {"Pipelines"},
+        "paths": [
+            "/repositories/{workspace}/{repo_slug}/pipelines",
+            "/repositories/{workspace}/{repo_slug}/pipelines/{pipeline_uuid}",
+            "/repositories/{workspace}/{repo_slug}/pipelines/{pipeline_uuid}/steps",
+            "/repositories/{workspace}/{repo_slug}/pipelines/{pipeline_uuid}/steps/{step_uuid}",
+            "/repositories/{workspace}/{repo_slug}/pipelines/{pipeline_uuid}/steps/{step_uuid}/log",
+            "/repositories/{workspace}/{repo_slug}/pipelines/{pipeline_uuid}/steps/{step_uuid}/logs/{log_uuid}",
+            "/repositories/{workspace}/{repo_slug}/pipelines/{pipeline_uuid}/steps/{step_uuid}/test_reports",
+            "/repositories/{workspace}/{repo_slug}/pipelines/{pipeline_uuid}/steps/{step_uuid}/test_reports/test_cases",
+            "/repositories/{workspace}/{repo_slug}/pipelines/{pipeline_uuid}/steps/{step_uuid}/test_reports/test_cases/{test_case_uuid}/test_case_reasons",
+            "/repositories/{workspace}/{repo_slug}/pipelines/{pipeline_uuid}/stopPipeline",
+            "/repositories/{workspace}/{repo_slug}/pipelines_config",
+            "/repositories/{workspace}/{repo_slug}/pipelines_config/build_number",
+            "/repositories/{workspace}/{repo_slug}/pipelines_config/schedules",
+            "/repositories/{workspace}/{repo_slug}/pipelines_config/schedules/{schedule_uuid}",
+            "/repositories/{workspace}/{repo_slug}/pipelines_config/schedules/{schedule_uuid}/executions",
+            "/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair",
+            "/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/known_hosts",
+            "/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/known_hosts/{known_host_uuid}",
+            "/repositories/{workspace}/{repo_slug}/pipelines_config/variables",
+            "/repositories/{workspace}/{repo_slug}/pipelines_config/variables/{variable_uuid}",
+            "/repositories/{workspace}/{repo_slug}/pipelines-config/caches",
+            "/repositories/{workspace}/{repo_slug}/pipelines-config/caches/{cache_uuid}",
+            "/repositories/{workspace}/{repo_slug}/pipelines-config/caches/{cache_uuid}/content-uri",
+            "/repositories/{workspace}/{repo_slug}/pipelines-config/runners",
+            "/repositories/{workspace}/{repo_slug}/pipelines-config/runners/{runner_uuid}",
+            "/repositories/{workspace}/{repo_slug}/deployments_config/environments/{environment_uuid}/variables",
+            "/repositories/{workspace}/{repo_slug}/deployments_config/environments/{environment_uuid}/variables/{variable_uuid}",
+            "/teams/{username}/pipelines_config/variables",
+            "/teams/{username}/pipelines_config/variables/{variable_uuid}",
+            "/users/{selected_user}/pipelines_config/variables",
+            "/users/{selected_user}/pipelines_config/variables/{variable_uuid}",
+            "/workspaces/{workspace}/pipelines-config/identity/oidc/.well-known/openid-configuration",
+            "/workspaces/{workspace}/pipelines-config/identity/oidc/keys.json",
+            "/workspaces/{workspace}/pipelines-config/runners",
+            "/workspaces/{workspace}/pipelines-config/runners/{runner_uuid}",
+            "/workspaces/{workspace}/pipelines-config/variables",
+            "/workspaces/{workspace}/pipelines-config/variables/{variable_uuid}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Pipelines",
+            "x-cli-command-use": "pipelines",
+            "x-cli-command-short": "Manage Bitbucket Pipelines",
+            "x-cli-command-long": "Commands for listing, triggering, and managing "
+                                  "Bitbucket Pipelines, including steps, logs, "
+                                  "variables, runners, caches, and schedules.",
+        },
+    },
+    "issues": {
+        "filename": "issues-schema.yaml",
+        "title": "Bitbucket Issues CLI",
+        "tags": {"Issue tracker"},
+        "paths": [
+            "/repositories/{workspace}/{repo_slug}/issues",
+            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}",
+            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/attachments",
+            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/attachments/{path}",
+            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/changes",
+            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/changes/{change_id}",
+            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments",
+            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments/{comment_id}",
+            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/vote",
+            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/watch",
+            "/repositories/{workspace}/{repo_slug}/issues/export",
+            "/repositories/{workspace}/{repo_slug}/issues/export/{repo_name}-issues-{task_id}.zip",
+            "/repositories/{workspace}/{repo_slug}/issues/import",
+            "/repositories/{workspace}/{repo_slug}/components",
+            "/repositories/{workspace}/{repo_slug}/components/{component_id}",
+            "/repositories/{workspace}/{repo_slug}/milestones",
+            "/repositories/{workspace}/{repo_slug}/milestones/{milestone_id}",
+            "/repositories/{workspace}/{repo_slug}/versions",
+            "/repositories/{workspace}/{repo_slug}/versions/{version_id}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Issues",
+            "x-cli-command-use": "issues",
+            "x-cli-command-short": "Manage Bitbucket issues",
+            "x-cli-command-long": "Commands for listing, creating, updating, "
+                                  "and managing issues, comments, attachments, "
+                                  "components, milestones, and versions.",
+        },
+    },
+    "snippets": {
+        "filename": "snippets-schema.yaml",
+        "title": "Bitbucket Snippets CLI",
+        "tags": {"Snippets"},
+        "paths": [
+            "/snippets",
+            "/snippets/{workspace}",
+            "/snippets/{workspace}/{encoded_id}",
+            "/snippets/{workspace}/{encoded_id}/comments",
+            "/snippets/{workspace}/{encoded_id}/comments/{comment_id}",
+            "/snippets/{workspace}/{encoded_id}/commits",
+            "/snippets/{workspace}/{encoded_id}/commits/{revision}",
+            "/snippets/{workspace}/{encoded_id}/files/{path}",
+            "/snippets/{workspace}/{encoded_id}/watch",
+            "/snippets/{workspace}/{encoded_id}/watchers",
+            "/snippets/{workspace}/{encoded_id}/{node_id}",
+            "/snippets/{workspace}/{encoded_id}/{node_id}/files/{path}",
+            "/snippets/{workspace}/{encoded_id}/{revision}/diff",
+            "/snippets/{workspace}/{encoded_id}/{revision}/patch",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Snippets",
+            "x-cli-command-use": "snippets",
+            "x-cli-command-short": "Manage Bitbucket snippets",
+            "x-cli-command-long": "Commands for listing, creating, updating, "
+                                  "and deleting snippets, including comments, "
+                                  "commits, and file operations.",
+        },
+    },
+    "deployments": {
+        "filename": "deployments-schema.yaml",
+        "title": "Bitbucket Deployments CLI",
+        "tags": {"Deployments"},
+        "paths": [
+            "/repositories/{workspace}/{repo_slug}/deploy-keys",
+            "/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}",
+            "/repositories/{workspace}/{repo_slug}/deployments",
+            "/repositories/{workspace}/{repo_slug}/deployments/{deployment_uuid}",
+            "/repositories/{workspace}/{repo_slug}/environments",
+            "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}",
+            "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}/changes",
+            "/workspaces/{workspace}/projects/{project_key}/deploy-keys",
+            "/workspaces/{workspace}/projects/{project_key}/deploy-keys/{key_id}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Deployments",
+            "x-cli-command-use": "deployments",
+            "x-cli-command-short": "Manage Bitbucket deployments",
+            "x-cli-command-long": "Commands for managing deploy keys, "
+                                  "deployments, and environments in "
+                                  "Bitbucket repositories and projects.",
+        },
+    },
+    "branch-restrictions": {
+        "filename": "branch-restrictions-schema.yaml",
+        "title": "Bitbucket Branch Restrictions CLI",
+        "tags": {"Branch restrictions"},
+        "paths": [
+            "/repositories/{workspace}/{repo_slug}/branch-restrictions",
+            "/repositories/{workspace}/{repo_slug}/branch-restrictions/{id}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "BranchRestrictions",
+            "x-cli-command-use": "branch-restrictions",
+            "x-cli-command-short": "Manage Bitbucket branch restrictions",
+            "x-cli-command-long": "Commands for listing, creating, updating, "
+                                  "and deleting branch restriction rules in "
+                                  "Bitbucket repositories.",
+        },
+    },
+    "branching-model": {
+        "filename": "branching-model-schema.yaml",
+        "title": "Bitbucket Branching Model CLI",
+        "tags": {"Branching model"},
+        "paths": [
+            "/repositories/{workspace}/{repo_slug}/branching-model",
+            "/repositories/{workspace}/{repo_slug}/branching-model/settings",
+            "/repositories/{workspace}/{repo_slug}/effective-branching-model",
+            "/workspaces/{workspace}/projects/{project_key}/branching-model",
+            "/workspaces/{workspace}/projects/{project_key}/branching-model/settings",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "BranchingModel",
+            "x-cli-command-use": "branching-model",
+            "x-cli-command-short": "Manage Bitbucket branching models",
+            "x-cli-command-long": "Commands for viewing and updating branching "
+                                  "model settings for repositories and projects.",
+        },
+    },
+    "commit-statuses": {
+        "filename": "commit-statuses-schema.yaml",
+        "title": "Bitbucket Commit Statuses CLI",
+        "tags": {"Commit statuses"},
+        "paths": [
+            "/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses",
+            "/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses/build",
+            "/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses/build/{key}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "CommitStatuses",
+            "x-cli-command-use": "commit-statuses",
+            "x-cli-command-short": "Manage Bitbucket commit statuses",
+            "x-cli-command-long": "Commands for listing, creating, and updating "
+                                  "build statuses on commits in Bitbucket "
+                                  "repositories.",
+        },
+    },
+    "downloads": {
+        "filename": "downloads-schema.yaml",
+        "title": "Bitbucket Downloads CLI",
+        "tags": {"Downloads"},
+        "paths": [
+            "/repositories/{workspace}/{repo_slug}/downloads",
+            "/repositories/{workspace}/{repo_slug}/downloads/{filename}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Downloads",
+            "x-cli-command-use": "downloads",
+            "x-cli-command-short": "Manage Bitbucket repository downloads",
+            "x-cli-command-long": "Commands for listing, uploading, and deleting "
+                                  "download artifacts in Bitbucket repositories.",
+        },
+    },
+    "users": {
+        "filename": "users-schema.yaml",
+        "title": "Bitbucket Users CLI",
+        "tags": {"Users", "SSH", "GPG"},
+        "paths": [
+            "/user",
+            "/user/emails",
+            "/user/emails/{email}",
+            "/users/{selected_user}",
+            "/users/{selected_user}/ssh-keys",
+            "/users/{selected_user}/ssh-keys/{key_id}",
+            "/users/{selected_user}/gpg-keys",
+            "/users/{selected_user}/gpg-keys/{fingerprint}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Users",
+            "x-cli-command-use": "users",
+            "x-cli-command-short": "Manage Bitbucket users",
+            "x-cli-command-long": "Commands for viewing user profiles, "
+                                  "managing email addresses, SSH keys, "
+                                  "and GPG keys.",
+        },
+    },
+    "properties": {
+        "filename": "properties-schema.yaml",
+        "title": "Bitbucket Properties CLI",
+        "tags": {"properties"},
+        "paths": [
+            "/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}",
+            "/repositories/{workspace}/{repo_slug}/commit/{commit}/properties/{app_key}/{property_name}",
+            "/repositories/{workspace}/{repo_slug}/pullrequests/{pullrequest_id}/properties/{app_key}/{property_name}",
+            "/users/{selected_user}/properties/{app_key}/{property_name}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Properties",
+            "x-cli-command-use": "properties",
+            "x-cli-command-short": "Manage Bitbucket application properties",
+            "x-cli-command-long": "Commands for getting, updating, and deleting "
+                                  "application properties on repositories, "
+                                  "commits, pull requests, and users.",
+        },
+    },
+    "addon": {
+        "filename": "addon-schema.yaml",
+        "title": "Bitbucket Addon CLI",
+        "tags": {"Addon"},
+        "paths": [
+            "/addon",
+            "/addon/linkers",
+            "/addon/linkers/{linker_key}",
+            "/addon/linkers/{linker_key}/values",
+            "/addon/linkers/{linker_key}/values/{value_id}",
+        ],
+        "cli_meta": {
+            "x-cli-command-name": "Addon",
+            "x-cli-command-use": "addon",
+            "x-cli-command-short": "Manage Bitbucket Connect addons",
+            "x-cli-command-long": "Commands for managing Bitbucket Connect "
+                                  "addon installations and linker values.",
+        },
+    },
 }
 
 HTTP_METHODS = {"get", "post", "put", "patch", "delete"}

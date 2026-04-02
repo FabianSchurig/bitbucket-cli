@@ -1,0 +1,3568 @@
+openapi: 3.0.0
+info:
+  title: Bitbucket Issues CLI
+  version: '2.0'
+  x-cli-command-name: Issues
+  x-cli-command-use: issues
+  x-cli-command-short: Manage Bitbucket issues
+  x-cli-command-long: Commands for listing, creating, updating, and managing issues,
+    comments, attachments, components, milestones, and versions.
+paths:
+  /repositories/{workspace}/{repo_slug}/issues:
+    get:
+      tags:
+      - Issue tracker
+      description: Returns the issues in the issue tracker.
+      summary: List issues
+      responses:
+        '200':
+          description: A paginated list of the issues matching any filter criteria
+            that were provided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_issues'
+        '404':
+          description: The specified repository does not exist or does not have the
+            issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listIssues
+    post:
+      tags:
+      - Issue tracker
+      description: 'Creates a new issue.
+
+
+        This call requires authentication. Private repositories or private
+
+        issue trackers require the caller to authenticate with an account that
+
+        has appropriate authorization.
+
+
+        The authenticated user is used for the issue''s `reporter` field.'
+      summary: Create an issue
+      responses:
+        '201':
+          description: The newly created issue.
+          headers:
+            Location:
+              description: The (absolute) URL of the newly created issue.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue'
+        '401':
+          description: When the request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: When the authenticated user isn't authorized to create the
+            issue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The specified repository does not exist or does not have the
+            issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/issue'
+        description: The new issue. The only required element is `title`. All other
+          elements can be omitted from the body.
+        required: true
+      security:
+      - oauth2:
+        - issue:write
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+        - write:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: createAnIssue
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/{issue_id}:
+    delete:
+      tags:
+      - Issue tracker
+      description: 'Deletes the specified issue. This requires write access to the
+
+        repository.'
+      summary: Delete an issue
+      responses:
+        '204':
+          description: Indicates the issue was deleted successfully.
+        '403':
+          description: When the authenticated user isn't authorized to delete the
+            issue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The specified repository or issue does not exist or does not
+            have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue:write
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - delete:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: deleteAnIssue
+    get:
+      tags:
+      - Issue tracker
+      description: Returns the specified issue.
+      summary: Get an issue
+      responses:
+        '200':
+          description: The issue object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue'
+        '403':
+          description: When the authenticated user isn't authorized to access the
+            issue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The specified repository or issue does not exist or does not
+            have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '410':
+          description: The specified issue is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getAnIssue
+    put:
+      tags:
+      - Issue tracker
+      description: "Modifies the issue.\n\n```\n$ curl https://api.bitbucket.org/2.0/repostories/evzijst/dogslow/issues/123\
+        \ \\\n  -u evzijst -s -X PUT -H 'Content-Type: application/json' \\\n  -d\
+        \ '{\n  \"title\": \"Updated title\",\n  \"assignee\": {\n    \"account_id\"\
+        : \"5d5355e8c6b9320d9ea5b28d\"\n  },\n  \"priority\": \"minor\",\n  \"version\"\
+        : {\n    \"name\": \"1.0\"\n  },\n  \"component\": null\n}'\n```\n\nThis example\
+        \ changes the `title`, `assignee`, `priority` and the\n`version`. It also\
+        \ removes the value of the `component` from the issue\nby setting the field\
+        \ to `null`. Any field not present keeps its existing\nvalue.\n\nEach time\
+        \ an issue is edited in the UI or through the API, an immutable\nchange record\
+        \ is created under the `/issues/123/changes` endpoint. It\nalso has a comment\
+        \ associated with the change."
+      summary: Update an issue
+      responses:
+        '200':
+          description: The updated issue object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue'
+        '403':
+          description: When the authenticated user isn't authorized to access the
+            issue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The specified repository or issue does not exist or does not
+            have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue:write
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+        - write:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: updateAnIssue
+    parameters:
+    - name: issue_id
+      in: path
+      description: The issue id
+      required: true
+      schema:
+        type: string
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/{issue_id}/attachments:
+    get:
+      tags:
+      - Issue tracker
+      description: 'Returns all attachments for this issue.
+
+
+        This returns the files'' meta data. This does not return the files''
+
+        actual contents.
+
+
+        The files are always ordered by their upload date.'
+      summary: List attachments for an issue
+      responses:
+        '200':
+          description: A paginated list of all attachments for this issue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_issue_attachments'
+        '401':
+          description: If the issue tracker is private and the request was not authenticated.
+        '404':
+          description: The specified repository or issue does not exist or does not
+            have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listAttachmentsForAnIssue
+    post:
+      tags:
+      - Issue tracker
+      description: 'Upload new issue attachments.
+
+
+        To upload files, perform a `multipart/form-data` POST containing one
+
+        or more file fields.
+
+
+        When a file is uploaded with the same name as an existing attachment,
+
+        then the existing file will be replaced.'
+      summary: Upload an attachment to an issue
+      responses:
+        '201':
+          description: An empty response document.
+          headers:
+            Location:
+              description: The URL to the issue's collection of attachments.
+              schema:
+                type: string
+        '400':
+          description: If no files were uploaded, or if the wrong `Content-Type` was
+            used.
+        '401':
+          description: If the issue tracker is private and the request was not authenticated.
+        '404':
+          description: The specified repository or issue does not exist or does not
+            have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue:write
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - write:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: uploadAnAttachmentToAnIssue
+    parameters:
+    - name: issue_id
+      in: path
+      description: The issue id
+      required: true
+      schema:
+        type: string
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/{issue_id}/attachments/{path}:
+    delete:
+      tags:
+      - Issue tracker
+      description: Deletes an attachment.
+      summary: Delete an attachment for an issue
+      responses:
+        '204':
+          description: Indicates that the deletion was successful
+        '401':
+          description: If the issue tracker is private and the request was not authenticated.
+        '404':
+          description: The specified repository or issue does not exist or does not
+            have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue:write
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - write:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: deleteAnAttachmentForAnIssue
+    get:
+      tags:
+      - Issue tracker
+      description: 'Returns the contents of the specified file attachment.
+
+
+        Note that this endpoint does not return a JSON response, but instead
+
+        returns a redirect pointing to the actual file that in turn will return
+
+        the raw contents.
+
+
+        The redirect URL contains a one-time token that has a limited lifetime.
+
+        As a result, the link should not be persisted, stored, or shared.'
+      summary: Get attachment for an issue
+      responses:
+        '302':
+          description: A redirect to the file's contents
+          headers:
+            Location:
+              schema:
+                type: string
+        '401':
+          description: If the issue tracker is private and the request was not authenticated.
+        '404':
+          description: The specified repository or issue does not exist or does not
+            have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getAttachmentForAnIssue
+    parameters:
+    - name: issue_id
+      in: path
+      description: The issue id
+      required: true
+      schema:
+        type: string
+    - name: path
+      in: path
+      description: Path to the file.
+      required: true
+      schema:
+        type: string
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/{issue_id}/changes:
+    get:
+      tags:
+      - Issue tracker
+      description: "Returns the list of all changes that have been made to the specified\n\
+        issue. Changes are returned in chronological order with the oldest\nchange\
+        \ first.\n\nEach time an issue is edited in the UI or through the API, an\
+        \ immutable\nchange record is created under the `/issues/123/changes` endpoint.\
+        \ It\nalso has a comment associated with the change.\n\nNote that this operation\
+        \ is changing significantly, due to privacy changes.\nSee the [announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-changes-gdpr/#changes-to-the-issue-changes-api)\n\
+        for details.\n\nChanges support [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering)\
+        \ that\ncan be used to search for specific changes. For instance, to see\n\
+        when an issue transitioned to \"resolved\":\n\n```\n$ curl -s https://api.bitbucket.org/2.0/repositories/site/master/issues/1/changes\
+        \ \\\n   -G --data-urlencode='q=changes.state.new = \"resolved\"'\n```\n\n\
+        This resource is only available on repositories that have the issue\ntracker\
+        \ enabled.\n\nN.B.\n\nThe `changes.assignee` and `changes.assignee_account_id`\
+        \ fields are not\na `user` object. Instead, they contain the raw `username`\
+        \ and\n`account_id` of the user. This is to protect the integrity of the audit\n\
+        log even after a user account gets deleted.\n\nThe `changes.assignee` field\
+        \ is deprecated will disappear in the\nfuture. Use `changes.assignee_account_id`\
+        \ instead."
+      summary: List changes on an issue
+      responses:
+        '200':
+          description: Returns all the issue changes that were made on the specified
+            issue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_log_entries'
+              examples:
+                response:
+                  value:
+                    pagelen: 20
+                    values:
+                    - changes:
+                        priority:
+                          new: trivial
+                          old: major
+                        assignee:
+                          new: ''
+                          old: evzijst
+                        assignee_account_id:
+                          new: ''
+                          old: 557058:c0b72ad0-1cb5-4018-9cdc-0cde8492c443
+                        kind:
+                          new: enhancement
+                          old: bug
+                      links:
+                        self:
+                          href: https://api.bitbucket.org/2.0/repositories/evzijst/dogslow/issues/1/changes/2
+                        html:
+                          href: https://bitbucket.org/evzijst/dogslow/issues/1#comment-2
+                      issue:
+                        links:
+                          self:
+                            href: https://api.bitbucket.org/2.0/repositories/evzijst/dogslow/issues/1
+                        type: issue
+                        id: 1
+                        repository:
+                          links:
+                            self:
+                              href: https://api.bitbucket.org/2.0/repositories/evzijst/dogslow
+                            html:
+                              href: https://bitbucket.org/evzijst/dogslow
+                            avatar:
+                              href: https://bitbucket.org/evzijst/dogslow/avatar/32/
+                          type: repository
+                          name: dogslow
+                          full_name: evzijst/dogslow
+                          uuid: '{988b17c6-1a47-4e70-84ee-854d5f012bf6}'
+                        title: Updated title
+                      created_on: '2018-03-03T00:35:28.353630+00:00'
+                      user:
+                        username: evzijst
+                        nickname: evzijst
+                        display_name: evzijst
+                        type: user
+                        uuid: '{aaa7972b-38af-4fb1-802d-6e3854c95778}'
+                        links:
+                          self:
+                            href: https://api.bitbucket.org/2.0/users/evzijst
+                          html:
+                            href: https://bitbucket.org/evzijst/
+                          avatar:
+                            href: https://bitbucket.org/account/evzijst/avatar/32/
+                      message:
+                        raw: Removed assignee, changed kind and priority.
+                        markup: markdown
+                        html: <p>Removed assignee, changed kind and priority.</p>
+                        type: rendered
+                      type: issue_change
+                      id: 2
+                    page: 1
+        '404':
+          description: The specified repository or issue does not exist or does not
+            have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      parameters:
+      - name: q
+        in: query
+        description: '
+
+          Query string to narrow down the response. See
+
+          [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for details.'
+        required: false
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: '
+
+          Name of a response property to sort results. See
+
+          [filtering and sorting](/cloud/bitbucket/rest/intro/#sorting-query-results)
+
+          for details.
+
+          '
+        required: false
+        schema:
+          type: string
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listChangesOnAnIssue
+    post:
+      tags:
+      - Issue tracker
+      description: "Makes a change to the specified issue.\n\nFor example, to change\
+        \ an issue's state and assignee, create a new\nchange object that modifies\
+        \ these fields:\n\n```\ncurl https://api.bitbucket.org/2.0/site/master/issues/1234/changes\
+        \ \\\n  -s -u evzijst -X POST -H \"Content-Type: application/json\" \\\n \
+        \ -d '{\n    \"changes\": {\n      \"assignee_account_id\": {\n        \"\
+        new\": \"557058:c0b72ad0-1cb5-4018-9cdc-0cde8492c443\"\n      },\n      \"\
+        state\": {\n        \"new\": 'resolved\"\n      }\n    }\n    \"message\"\
+        : {\n      \"raw\": \"This is now resolved.\"\n    }\n  }'\n```\n\nThe above\
+        \ example also includes a custom comment to go alongside the\nchange. This\
+        \ comment will also be visible on the issue page in the UI.\n\nThe fields\
+        \ of the `changes` object are strings, not objects. This\nallows for immutable\
+        \ change log records, even after user accounts,\nmilestones, or other objects\
+        \ recorded in a change entry, get renamed or\ndeleted.\n\nThe `assignee_account_id`\
+        \ field stores the account id. When POSTing a\nnew change and changing the\
+        \ assignee, the client should therefore use\nthe user's account_id in the\
+        \ `changes.assignee_account_id.new` field.\n\nThis call requires authentication.\
+        \ Private repositories or private\nissue trackers require the caller to authenticate\
+        \ with an account that\nhas appropriate authorization."
+      summary: Modify the state of an issue
+      responses:
+        '201':
+          description: The newly created issue change.
+          headers:
+            Location:
+              description: The (absolute) URL of the newly created issue change.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue_change'
+        '401':
+          description: When the request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: When the authenticated user isn't authorized to modify the
+            issue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The specified repository or issue does not exist or does not
+            have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/issue_change'
+        description: The new issue state change. The only required elements are `changes.[].new`.
+          All other elements can be omitted from the body.
+        required: true
+      security:
+      - oauth2:
+        - issue:write
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+        - write:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: modifyTheStateOfAnIssue
+    parameters:
+    - name: issue_id
+      in: path
+      description: The issue id
+      required: true
+      schema:
+        type: string
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/{issue_id}/changes/{change_id}:
+    get:
+      tags:
+      - Issue tracker
+      description: 'Returns the specified issue change object.
+
+
+        This resource is only available on repositories that have the issue
+
+        tracker enabled.'
+      summary: Get issue change object
+      responses:
+        '200':
+          description: The specified issue change object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue_change'
+        '404':
+          description: The specified repository or issue change does not exist or
+            does not have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getIssueChangeObject
+    parameters:
+    - name: change_id
+      in: path
+      description: The issue change id
+      required: true
+      schema:
+        type: string
+    - name: issue_id
+      in: path
+      description: The issue id
+      required: true
+      schema:
+        type: string
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments:
+    get:
+      tags:
+      - Issue tracker
+      description: 'Returns a paginated list of all comments that were made on the
+
+        specified issue.
+
+
+        The default sorting is oldest to newest and can be overridden with
+
+        the `sort` query parameter.
+
+
+        This endpoint also supports filtering and sorting of the results. See
+
+        [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.'
+      summary: List comments on an issue
+      responses:
+        '200':
+          description: A paginated list of issue comments.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_issue_comments'
+      parameters:
+      - name: q
+        in: query
+        description: '
+
+          Query string to narrow down the response as per
+
+          [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering).'
+        required: false
+        schema:
+          type: string
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listCommentsOnAnIssue
+    post:
+      tags:
+      - Issue tracker
+      description: "Creates a new issue comment.\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/prlinks/issues/42/comments/\
+        \ \\\n  -X POST -u evzijst \\\n  -H 'Content-Type: application/json' \\\n\
+        \  -d '{\"content\": {\"raw\": \"Lorem ipsum.\"}}'\n```"
+      summary: Create a comment on an issue
+      responses:
+        '201':
+          description: The newly created comment.
+          headers:
+            Location:
+              description: The location of the newly issue comment.
+              schema:
+                type: string
+        '400':
+          description: 'If the input was invalid, or if the comment being created
+            is detected as spam '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/issue_comment'
+        description: The new issue comment object.
+        required: true
+      security:
+      - oauth2:
+        - issue:write
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+        - write:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: createACommentOnAnIssue
+    parameters:
+    - name: issue_id
+      in: path
+      description: The issue id
+      required: true
+      schema:
+        type: string
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments/{comment_id}:
+    delete:
+      tags:
+      - Issue tracker
+      description: Deletes the specified comment.
+      summary: Delete a comment on an issue
+      responses:
+        '204':
+          description: Indicates successful deletion.
+      security:
+      - oauth2:
+        - issue:write
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - write:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: deleteACommentOnAnIssue
+    get:
+      tags:
+      - Issue tracker
+      description: Returns the specified issue comment object.
+      summary: Get a comment on an issue
+      responses:
+        '200':
+          description: The issue comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue_comment'
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getACommentOnAnIssue
+    put:
+      tags:
+      - Issue tracker
+      description: "Updates the content of the specified issue comment. Note that\
+        \ only\nthe `content.raw` field can be modified.\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/prlinks/issues/42/comments/5728901\
+        \ \\\n  -X PUT -u evzijst \\\n  -H 'Content-Type: application/json' \\\n \
+        \ -d '{\"content\": {\"raw\": \"Lorem ipsum.\"}'\n```"
+      summary: Update a comment on an issue
+      responses:
+        '200':
+          description: The updated issue comment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue_comment'
+        '400':
+          description: 'If the input was invalid, or if the update to the comment
+            is detected as spam '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/issue_comment'
+        description: The updated comment.
+        required: true
+      security:
+      - oauth2:
+        - issue:write
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+        - write:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: updateACommentOnAnIssue
+    parameters:
+    - name: comment_id
+      in: path
+      description: The id of the comment.
+      required: true
+      schema:
+        type: integer
+        format: int64
+    - name: issue_id
+      in: path
+      description: The issue id
+      required: true
+      schema:
+        type: string
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/{issue_id}/vote:
+    delete:
+      tags:
+      - Issue tracker
+      description: Retract your vote.
+      summary: Remove vote for an issue
+      responses:
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account:write
+        - issue:write
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - write:issue:bitbucket
+        - write:user:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: removeVoteForAnIssue
+    get:
+      tags:
+      - Issue tracker
+      description: 'Check whether the authenticated user has voted for this issue.
+
+        A 204 status code indicates that the user has voted, while a 404
+
+        implies they haven''t.'
+      summary: Check if current user voted for an issue
+      responses:
+        '204':
+          description: If the authenticated user has not voted for this issue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: When the request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the authenticated user has not voted for this issue, or
+            when the repo does not exist, or does not have an issue tracker.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+        - read:user:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: checkIfCurrentUserVotedForAnIssue
+    put:
+      tags:
+      - Issue tracker
+      description: 'Vote for this issue.
+
+
+        To cast your vote, do an empty PUT. The 204 status code indicates that
+
+        the operation was successful.'
+      summary: Vote for an issue
+      responses:
+        '204':
+          description: Indicating the authenticated user has cast their vote successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: When the request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The specified repository or issue does not exist or does not
+            have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account:write
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - write:issue:bitbucket
+        - write:user:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: voteForAnIssue
+    parameters:
+    - name: issue_id
+      in: path
+      description: The issue id
+      required: true
+      schema:
+        type: string
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/{issue_id}/watch:
+    delete:
+      tags:
+      - Issue tracker
+      description: Stop watching this issue.
+      summary: Stop watching an issue
+      responses:
+        '204':
+          description: Indicates that the authenticated user successfully stopped
+            watching this issue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: When the request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The specified repository or issue does not exist or does not
+            have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account:write
+        - issue:write
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - write:issue:bitbucket
+        - write:user:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: stopWatchingAnIssue
+    get:
+      tags:
+      - Issue tracker
+      description: 'Indicated whether or not the authenticated user is watching this
+
+        issue.'
+      summary: Check if current user is watching a issue
+      responses:
+        '204':
+          description: If the authenticated user is watching this issue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: When the request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the authenticated user is not watching this issue, or when
+            the repo does not exist, or does not have an issue tracker.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+        - read:user:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: checkIfCurrentUserIsWatchingAIssue
+    put:
+      tags:
+      - Issue tracker
+      description: 'Start watching this issue.
+
+
+        To start watching this issue, do an empty PUT. The 204 status code
+
+        indicates that the operation was successful.'
+      summary: Watch an issue
+      responses:
+        '204':
+          description: Indicates that the authenticated user successfully started
+            watching this issue.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: When the request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the authenticated user is not watching this issue, or when
+            the repo does not exist, or does not have an issue tracker.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account:write
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - write:issue:bitbucket
+        - write:user:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: watchAnIssue
+    parameters:
+    - name: issue_id
+      in: path
+      description: The issue id
+      required: true
+      schema:
+        type: string
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/export:
+    post:
+      tags:
+      - Issue tracker
+      description: 'A POST request to this endpoint initiates a new background celery
+        task that archives the repo''s issues.
+
+
+        When the job has been accepted, it will return a 202 (Accepted) along with
+        a unique url to this job in the
+
+        ''Location'' response header. This url is the endpoint for where the user
+        can obtain their zip files."'
+      summary: Export issues
+      responses:
+        '202':
+          description: The export job has been accepted
+        '401':
+          description: The request wasn't authenticated properly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: When the authenticated user does not have admin permission
+            on the repo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The repo does not exist or does not have an issue tracker
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/export_options'
+        description: The options to apply to the export. Available options include
+          `project_key` and `project_name` which, if specified, are used as the project
+          key and name in the exported Jira json format. Option `send_email` specifies
+          whether an email should be sent upon export result. Option `include_attachments`
+          specifies whether attachments are included in the export.
+      security:
+      - oauth2:
+        - issue
+        - repository:admin
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: exportIssues
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/export/{repo_name}-issues-{task_id}.zip:
+    get:
+      tags:
+      - Issue tracker
+      description: 'This endpoint is used to poll for the progress of an issue export
+
+        job and return the zip file after the job is complete.
+
+        As long as the job is running, this will return a 202 response
+
+        with in the response body a description of the current status.
+
+
+        After the job has been scheduled, but before it starts executing, the endpoint
+
+        returns a 202 response with status `ACCEPTED`.
+
+
+        Once it starts running, it is a 202 response with status `STARTED` and progress
+        filled.
+
+
+        After it is finished, it becomes a 200 response with status `SUCCESS` or `FAILURE`.'
+      summary: Check issue export status
+      responses:
+        '202':
+          description: Export job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue_job_status'
+              examples:
+                response:
+                  value:
+                    type: issue_job_status
+                    status: ACCEPTED
+                    phase: Initializing
+                    total: 0
+                    count: 0
+                    pct: 0
+        '401':
+          description: The request wasn't authenticated properly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: When the authenticated user does not have admin permission
+            on the repo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: No export job has begun
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+        - repository:admin
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: checkIssueExportStatus
+    parameters:
+    - name: repo_name
+      in: path
+      description: The name of the repo
+      required: true
+      schema:
+        type: string
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: task_id
+      in: path
+      description: The ID of the export task
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/import:
+    get:
+      tags:
+      - Issue tracker
+      description: 'When using GET, this endpoint reports the status of the current
+        import task.
+
+
+        After the job has been scheduled, but before it starts executing, the endpoint
+
+        returns a 202 response with status `ACCEPTED`.
+
+
+        Once it starts running, it is a 202 response with status `STARTED` and progress
+        filled.
+
+
+        After it is finished, it becomes a 200 response with status `SUCCESS` or `FAILURE`.'
+      summary: Check issue import status
+      responses:
+        '200':
+          description: Import job complete with either FAILURE or SUCCESS status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue_job_status'
+        '202':
+          description: Import job started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue_job_status'
+              examples:
+                response:
+                  value:
+                    type: issue_job_status
+                    status: ACCEPTED
+                    phase: Attachments
+                    total: 15
+                    count: 0
+                    percent: 0
+        '401':
+          description: The request wasn't authenticated properly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: When the authenticated user does not have admin permission
+            on the repo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: No export job has begun
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue:write
+        - repository:admin
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - write:issue:bitbucket
+        - admin:repository:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: checkIssueImportStatus
+    post:
+      tags:
+      - Issue tracker
+      description: 'A POST request to this endpoint will import the zip file given
+        by the archive parameter into the repository. All
+
+        existing issues will be deleted and replaced by the contents of the imported
+        zip file.
+
+
+        Imports are done through a multipart/form-data POST. There is one valid and
+        required form field, with the name
+
+        "archive," which needs to be a file field:
+
+
+        ```
+
+        $ curl -u <username> -X POST -F archive=@/path/to/file.zip https://api.bitbucket.org/2.0/repositories/<owner_username>/<repo_slug>/issues/import
+
+        ```'
+      summary: Import issues
+      responses:
+        '202':
+          description: Import job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue_job_status'
+              examples:
+                response:
+                  value:
+                    type: issue_job_status
+                    status: ACCEPTED
+                    phase: Attachments
+                    total: 15
+                    count: 0
+                    percent: 0
+        '401':
+          description: The request wasn't authenticated properly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: When the authenticated user does not have admin permission
+            on the repo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: No export job has begun
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: Import already running
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue:write
+        - repository:admin
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - write:issue:bitbucket
+        - admin:repository:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: importIssues
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/components:
+    get:
+      tags:
+      - Issue tracker
+      description: 'Returns the components that have been defined in the issue tracker.
+
+
+        This resource is only available on repositories that have the issue
+
+        tracker enabled.'
+      summary: List components
+      responses:
+        '200':
+          description: The components that have been defined in the issue tracker.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_components'
+        '404':
+          description: The specified repository does not exist or does not have the
+            issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listComponents
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/components/{component_id}:
+    get:
+      tags:
+      - Issue tracker
+      description: Returns the specified issue tracker component object.
+      summary: Get a component for issues
+      responses:
+        '200':
+          description: The specified component object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/component'
+        '404':
+          description: The specified repository or component does not exist or does
+            not have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getAComponentForIssues
+    parameters:
+    - name: component_id
+      in: path
+      description: The component's id
+      required: true
+      schema:
+        type: integer
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/milestones:
+    get:
+      tags:
+      - Issue tracker
+      description: 'Returns the milestones that have been defined in the issue tracker.
+
+
+        This resource is only available on repositories that have the issue
+
+        tracker enabled.'
+      summary: List milestones
+      responses:
+        '200':
+          description: The milestones that have been defined in the issue tracker.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_milestones'
+        '404':
+          description: The specified repository does not exist or does not have the
+            issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listMilestones
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/milestones/{milestone_id}:
+    get:
+      tags:
+      - Issue tracker
+      description: Returns the specified issue tracker milestone object.
+      summary: Get a milestone
+      responses:
+        '200':
+          description: The specified milestone object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/milestone'
+        '404':
+          description: The specified repository or milestone does not exist or does
+            not have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getAMilestone
+    parameters:
+    - name: milestone_id
+      in: path
+      description: The milestone's id
+      required: true
+      schema:
+        type: integer
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/versions:
+    get:
+      tags:
+      - Issue tracker
+      description: 'Returns the versions that have been defined in the issue tracker.
+
+
+        This resource is only available on repositories that have the issue
+
+        tracker enabled.'
+      summary: List defined versions for issues
+      responses:
+        '200':
+          description: The versions that have been defined in the issue tracker.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_versions'
+        '404':
+          description: The specified repository does not exist or does not have the
+            issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listDefinedVersionsForIssues
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/versions/{version_id}:
+    get:
+      tags:
+      - Issue tracker
+      description: Returns the specified issue tracker version object.
+      summary: Get a defined version for issues
+      responses:
+        '200':
+          description: The specified version object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/version'
+        '404':
+          description: The specified repository or version does not exist or does
+            not have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getADefinedVersionForIssues
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: version_id
+      in: path
+      description: The version's id
+      required: true
+      schema:
+        type: integer
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+components:
+  schemas:
+    team:
+      allOf:
+      - $ref: '#/components/schemas/account'
+      - type: object
+        title: Team
+        description: A team object.
+        properties:
+          links:
+            $ref: '#/components/schemas/team_links'
+        additionalProperties: true
+    paginated_issues:
+      type: object
+      title: Paginated Issues
+      description: A paginated list of issues.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/issue'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_log_entries:
+      type: object
+      title: Paginated Log Entries
+      description: A paginated list of issue changes.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/issue_change'
+          minItems: 0
+      additionalProperties: false
+    issue_job_status:
+      type: object
+      title: Issue Job Status
+      description: The status of an import or export job
+      properties:
+        type:
+          type: string
+        status:
+          type: string
+          description: The status of the import/export job
+          enum:
+          - ACCEPTED
+          - STARTED
+          - RUNNING
+          - FAILURE
+        phase:
+          type: string
+          description: The phase of the import/export job
+        total:
+          type: integer
+          description: The total number of issues being imported/exported
+        count:
+          type: integer
+          description: The total number of issues already imported/exported
+        pct:
+          type: number
+          description: The percentage of issues already imported/exported
+          minimum: 0
+          maximum: 100
+      additionalProperties: false
+    author:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Author
+        description: The author of a change in a repository
+        properties:
+          raw:
+            type: string
+            description: The raw author value from the repository. This may be the
+              only value available if the author does not match a user in Bitbucket.
+          user:
+            $ref: '#/components/schemas/account'
+        additionalProperties: true
+    paginated_versions:
+      type: object
+      title: Paginated Versions
+      description: A paginated list of issue tracker versions.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/version'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    account_links:
+      type: object
+      title: Account Links
+      description: Links related to an Account.
+      properties:
+        avatar:
+          $ref: '#/components/schemas/link'
+      additionalProperties: true
+    repository:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Repository
+        description: A Bitbucket repository.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              avatar:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              pullrequests:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              commits:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              forks:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              watchers:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              downloads:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              clone:
+                type: array
+                items:
+                  type: object
+                  title: Link
+                  description: A link to a resource related to this object.
+                  properties:
+                    href:
+                      type: string
+                      format: uri
+                    name:
+                      type: string
+                  additionalProperties: false
+              hooks:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          uuid:
+            type: string
+            description: The repository's immutable id. This can be used as a substitute
+              for the slug segment in URLs. Doing this guarantees your URLs will survive
+              renaming of the repository by its owner, or even transfer of the repository
+              to a different user.
+          full_name:
+            type: string
+            description: The concatenation of the repository owner's username and
+              the slugified name, e.g. "evzijst/interruptingcow". This is the same
+              string used in Bitbucket URLs.
+          is_private:
+            type: boolean
+          parent:
+            $ref: '#/components/schemas/repository'
+          scm:
+            type: string
+            enum:
+            - git
+          owner:
+            $ref: '#/components/schemas/account'
+          name:
+            type: string
+          description:
+            type: string
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+          size:
+            type: integer
+          language:
+            type: string
+          has_issues:
+            type: boolean
+            description: '
+
+              The issue tracker for this repository is enabled. Issue Tracker
+
+              features are not supported for repositories in workspaces
+
+              administered through admin.atlassian.com.
+
+              '
+          has_wiki:
+            type: boolean
+            description: '
+
+              The wiki for this repository is enabled. Wiki
+
+              features are not supported for repositories in workspaces
+
+              administered through admin.atlassian.com.
+
+              '
+          fork_policy:
+            type: string
+            description: "\nControls the rules for forking this repository.\n\n* **allow_forks**:\
+              \ unrestricted forking\n* **no_public_forks**: restrict forking to private\
+              \ forks (forks cannot\n  be made public later)\n* **no_forks**: deny\
+              \ all forking\n"
+            enum:
+            - allow_forks
+            - no_public_forks
+            - no_forks
+          project:
+            $ref: '#/components/schemas/project'
+          mainbranch:
+            $ref: '#/components/schemas/branch'
+        additionalProperties: true
+    paginated_components:
+      type: object
+      title: Paginated Components
+      description: A paginated list of issue tracker components.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/component'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_issue_attachments:
+      type: object
+      title: Paginated Issue Attachment
+      description: A paginated list of issue attachments.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/issue_attachment'
+          minItems: 0
+      additionalProperties: false
+    component:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Component
+        description: A component as defined in a repository's issue tracker.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          name:
+            type: string
+          id:
+            type: integer
+        additionalProperties: true
+    comment:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Comment
+        description: The base type for all comments. This type should be considered
+          abstract. Each of the "commentable" resources defines its own subtypes (e.g.
+          `issue_comment`).
+        properties:
+          id:
+            type: integer
+            format: int64
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+          content:
+            type: object
+            properties:
+              raw:
+                type: string
+                description: The text as it was typed by a user.
+              markup:
+                type: string
+                description: The type of markup language the raw content is to be
+                  interpreted in.
+                enum:
+                - markdown
+                - creole
+                - plaintext
+              html:
+                type: string
+                description: The user's content rendered as HTML.
+            additionalProperties: false
+          user:
+            $ref: '#/components/schemas/account'
+          deleted:
+            type: boolean
+          parent:
+            $ref: '#/components/schemas/comment'
+          inline:
+            type: object
+            properties:
+              from:
+                type: integer
+                description: The comment's anchor line in the old version of the file.
+                  If the comment is a multi-line comment, this is the ending line
+                  number in the old version of the file.
+                minimum: 1
+              to:
+                type: integer
+                description: The comment's anchor line in the new version of the file.
+                  If the comment is a multi-line comment, this is the ending line
+                  number in the new version of the file.
+                minimum: 1
+              start_from:
+                type: integer
+                description: The starting line number in the old version of the file,
+                  if the comment is a multi-line comment. This is null otherwise.
+                minimum: 1
+              start_to:
+                type: integer
+                description: The starting line number in the new version of the file,
+                  if the comment is a multi-line comment. This is null otherwise.
+                minimum: 1
+              path:
+                type: string
+                description: The path of the file this comment is anchored to.
+            required:
+            - path
+            additionalProperties: false
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              code:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+        additionalProperties: true
+    account:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Account
+        description: An account object.
+        properties:
+          links:
+            $ref: '#/components/schemas/account_links'
+          created_on:
+            type: string
+            format: date-time
+          display_name:
+            type: string
+          uuid:
+            type: string
+        additionalProperties: true
+    version:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Version
+        description: A version as defined in a repository's issue tracker.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          name:
+            type: string
+          id:
+            type: integer
+        additionalProperties: true
+    project:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Project
+        description: "A Bitbucket project.\n            Projects are used by teams\
+          \ to organize repositories."
+        properties:
+          links:
+            type: object
+            properties:
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              avatar:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          uuid:
+            type: string
+            description: The project's immutable id.
+          key:
+            type: string
+            description: The project's key.
+          owner:
+            $ref: '#/components/schemas/team'
+          name:
+            type: string
+            description: The name of the project.
+          description:
+            type: string
+          is_private:
+            type: boolean
+            description: '
+
+              Indicates whether the project is publicly accessible, or whether it
+              is
+
+              private to the team and consequently only visible to team members.
+
+              Note that private projects cannot contain public repositories.'
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+          has_publicly_visible_repos:
+            type: boolean
+            description: '
+
+              Indicates whether the project contains publicly visible repositories.
+
+              Note that private projects cannot contain public repositories.'
+        additionalProperties: true
+    object:
+      type: object
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+      required:
+      - type
+      additionalProperties: true
+      discriminator:
+        propertyName: type
+    paginated_milestones:
+      type: object
+      title: Paginated Milestones
+      description: A paginated list of issue tracker milestones.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/milestone'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    milestone:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Milestone
+        description: A milestone as defined in a repository's issue tracker.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          name:
+            type: string
+          id:
+            type: integer
+        additionalProperties: true
+    base_commit:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Base Commit
+        description: The common base type for both repository and snippet commits.
+        properties:
+          hash:
+            type: string
+            pattern: '[0-9a-f]{7,}?'
+          date:
+            type: string
+            format: date-time
+          author:
+            $ref: '#/components/schemas/author'
+          committer:
+            $ref: '#/components/schemas/committer'
+          message:
+            type: string
+          summary:
+            type: object
+            properties:
+              raw:
+                type: string
+                description: The text as it was typed by a user.
+              markup:
+                type: string
+                description: The type of markup language the raw content is to be
+                  interpreted in.
+                enum:
+                - markdown
+                - creole
+                - plaintext
+              html:
+                type: string
+                description: The user's content rendered as HTML.
+            additionalProperties: false
+          parents:
+            type: array
+            items:
+              $ref: '#/components/schemas/base_commit'
+            minItems: 0
+        additionalProperties: true
+    error:
+      type: object
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
+    commit:
+      allOf:
+      - $ref: '#/components/schemas/base_commit'
+      - type: object
+        title: Commit
+        description: A repository commit object.
+        properties:
+          repository:
+            $ref: '#/components/schemas/repository'
+          participants:
+            type: array
+            items:
+              $ref: '#/components/schemas/participant'
+            minItems: 0
+        additionalProperties: true
+    committer:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Committer
+        description: The committer of a change in a repository
+        properties:
+          raw:
+            type: string
+            description: The raw committer value from the repository. This may be
+              the only value available if the committer does not match a user in Bitbucket.
+          user:
+            $ref: '#/components/schemas/account'
+        additionalProperties: true
+    export_options:
+      type: object
+      title: Export Options
+      description: Options for issue export.
+      properties:
+        type:
+          type: string
+        project_key:
+          type: string
+        project_name:
+          type: string
+        send_email:
+          type: boolean
+        include_attachments:
+          type: boolean
+      required:
+      - type
+      additionalProperties: true
+    issue_comment:
+      allOf:
+      - $ref: '#/components/schemas/comment'
+      - type: object
+        title: Issue Comment
+        description: A issue comment.
+        properties:
+          issue:
+            $ref: '#/components/schemas/issue'
+        additionalProperties: true
+    issue_change:
+      type: object
+      title: Issue Change
+      description: An issue change.
+      properties:
+        type:
+          type: string
+        links:
+          type: object
+          properties:
+            self:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+            issue:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+          additionalProperties: false
+        name:
+          type: string
+        created_on:
+          type: string
+          format: date-time
+        user:
+          $ref: '#/components/schemas/account'
+        issue:
+          $ref: '#/components/schemas/issue'
+        changes:
+          type: object
+          properties:
+            assignee:
+              type: object
+              properties:
+                old:
+                  type: string
+                new:
+                  type: string
+              additionalProperties: false
+            state:
+              type: object
+              properties:
+                old:
+                  type: string
+                new:
+                  type: string
+              additionalProperties: false
+            title:
+              type: object
+              properties:
+                old:
+                  type: string
+                new:
+                  type: string
+              additionalProperties: false
+            kind:
+              type: object
+              properties:
+                old:
+                  type: string
+                new:
+                  type: string
+              additionalProperties: false
+            milestone:
+              type: object
+              properties:
+                old:
+                  type: string
+                new:
+                  type: string
+              additionalProperties: false
+            component:
+              type: object
+              properties:
+                old:
+                  type: string
+                new:
+                  type: string
+              additionalProperties: false
+            priority:
+              type: object
+              properties:
+                old:
+                  type: string
+                new:
+                  type: string
+              additionalProperties: false
+            version:
+              type: object
+              properties:
+                old:
+                  type: string
+                new:
+                  type: string
+              additionalProperties: false
+            content:
+              type: object
+              properties:
+                old:
+                  type: string
+                new:
+                  type: string
+              additionalProperties: false
+          additionalProperties: false
+        message:
+          type: object
+          properties:
+            raw:
+              type: string
+              description: The text as it was typed by a user.
+            markup:
+              type: string
+              description: The type of markup language the raw content is to be interpreted
+                in.
+              enum:
+              - markdown
+              - creole
+              - plaintext
+            html:
+              type: string
+              description: The user's content rendered as HTML.
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
+    issue:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Issue
+        description: An issue.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              comments:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              attachments:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              watch:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              vote:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          id:
+            type: integer
+          repository:
+            $ref: '#/components/schemas/repository'
+          title:
+            type: string
+          reporter:
+            $ref: '#/components/schemas/account'
+          assignee:
+            $ref: '#/components/schemas/account'
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+          edited_on:
+            type: string
+            format: date-time
+          state:
+            type: string
+            enum:
+            - submitted
+            - new
+            - open
+            - resolved
+            - on hold
+            - invalid
+            - duplicate
+            - wontfix
+            - closed
+          kind:
+            type: string
+            enum:
+            - bug
+            - enhancement
+            - proposal
+            - task
+          priority:
+            type: string
+            enum:
+            - trivial
+            - minor
+            - major
+            - critical
+            - blocker
+          milestone:
+            $ref: '#/components/schemas/milestone'
+          version:
+            $ref: '#/components/schemas/version'
+          component:
+            $ref: '#/components/schemas/component'
+          votes:
+            type: integer
+          content:
+            type: object
+            properties:
+              raw:
+                type: string
+                description: The text as it was typed by a user.
+              markup:
+                type: string
+                description: The type of markup language the raw content is to be
+                  interpreted in.
+                enum:
+                - markdown
+                - creole
+                - plaintext
+              html:
+                type: string
+                description: The user's content rendered as HTML.
+            additionalProperties: false
+        additionalProperties: true
+    paginated_issue_comments:
+      type: object
+      title: Paginated Issue Comments
+      description: A paginated list of issue comments.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/issue_comment'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    ref:
+      type: object
+      title: Ref
+      description: A ref object, representing a branch or tag in a repository.
+      properties:
+        type:
+          type: string
+        links:
+          type: object
+          properties:
+            self:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+            commits:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+            html:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+          additionalProperties: false
+        name:
+          type: string
+          description: The name of the ref.
+        target:
+          $ref: '#/components/schemas/commit'
+      required:
+      - type
+      additionalProperties: true
+    participant:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Participant
+        description: Object describing a user's role on resources like commits or
+          pull requests.
+        properties:
+          user:
+            $ref: '#/components/schemas/account'
+          role:
+            type: string
+            enum:
+            - PARTICIPANT
+            - REVIEWER
+          approved:
+            type: boolean
+          state:
+            type: string
+            enum:
+            - approved
+            - changes_requested
+            - null
+          participated_on:
+            type: string
+            description: The ISO8601 timestamp of the participant's action. For approvers,
+              this is the time of their approval. For commenters and pull request
+              reviewers who are not approvers, this is the time they last commented,
+              or null if they have not commented.
+            format: date-time
+        additionalProperties: true
+    link:
+      type: object
+      title: Link
+      description: A link to a resource related to this object.
+      properties:
+        href:
+          type: string
+          format: uri
+        name:
+          type: string
+      additionalProperties: false
+    team_links:
+      allOf:
+      - $ref: '#/components/schemas/account_links'
+      - type: object
+        title: Team Links
+        description: Links related to a Team.
+        properties:
+          self:
+            $ref: '#/components/schemas/link'
+          html:
+            $ref: '#/components/schemas/link'
+          members:
+            $ref: '#/components/schemas/link'
+          projects:
+            $ref: '#/components/schemas/link'
+          repositories:
+            $ref: '#/components/schemas/link'
+        additionalProperties: true
+    branch:
+      allOf:
+      - $ref: '#/components/schemas/ref'
+      - type: object
+        title: Branch
+        description: A branch object, representing a branch in a repository.
+        properties:
+          merge_strategies:
+            type: array
+            description: Available merge strategies for pull requests targeting this
+              branch.
+            items:
+              type: string
+              enum:
+              - merge_commit
+              - squash
+              - fast_forward
+              - squash_fast_forward
+              - rebase_fast_forward
+              - rebase_merge
+          default_merge_strategy:
+            type: string
+            description: The default merge strategy for pull requests targeting this
+              branch.
+        additionalProperties: true
+    issue_attachment:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Issue Attachment
+        description: An issue file attachment's meta data. Note this does not contain
+          the file's actual contents.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          name:
+            type: string
+        additionalProperties: true
