@@ -467,16 +467,16 @@ Long:  {{goStringLit .CommandLong}},
 
 cmd.AddCommand(
 {{- range .Commands}}
-new{{toCamel .OperationID}}Cmd(),
+new{{$.CommandName}}{{toCamel .OperationID}}Cmd(),
 {{- end}}
 )
 
 return cmd
 }
 {{range .Commands}}
-// new{{toCamel .OperationID}}Cmd returns the "{{$.CommandUse}} {{.Use}}" cobra command.
+// new{{$.CommandName}}{{toCamel .OperationID}}Cmd returns the "{{$.CommandUse}} {{.Use}}" cobra command.
 // operationId: {{.OperationID}}
-func new{{toCamel .OperationID}}Cmd() *cobra.Command {
+func new{{$.CommandName}}{{toCamel .OperationID}}Cmd() *cobra.Command {
 var (
 {{- range .Flags}}
 {{.GoName}} {{.GoType}}
@@ -713,6 +713,23 @@ func buildCommand(pe pathEntry, entry methodOp, schema *Schema) CommandData {
 	paginated := isPaginated(op)
 	if paginated {
 		flags = injectPaginationFlags(flags)
+	}
+
+	// Resolve body field flag name collisions with parameter flags.
+	// When a body field produces the same --flag as a path/query parameter,
+	// prefix the body field with "body-" to disambiguate.
+	paramNames := make(map[string]bool, len(flags))
+	for _, f := range flags {
+		paramNames[f.Name] = true
+	}
+	// Also reserve the "body" and "all" flag names.
+	paramNames["body"] = true
+	paramNames["all"] = true
+	for i := range bodyFields {
+		if paramNames[bodyFields[i].FlagName] {
+			bodyFields[i].FlagName = "body-" + bodyFields[i].FlagName
+			bodyFields[i].GoName = "body" + toCamel(bodyFields[i].Path)
+		}
 	}
 
 	// Two-pass camelCase → kebab-case conversion.

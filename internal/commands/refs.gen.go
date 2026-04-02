@@ -39,23 +39,23 @@ Long:  `Commands for listing, creating, and deleting branches and tags in Bitbuc
 }
 
 cmd.AddCommand(
-newListBranchesAndTagsCmd(),
-newListOpenBranchesCmd(),
-newCreateABranchCmd(),
-newGetABranchCmd(),
-newDeleteABranchCmd(),
-newListTagsCmd(),
-newCreateATagCmd(),
-newGetATagCmd(),
-newDeleteATagCmd(),
+newRefsListBranchesAndTagsCmd(),
+newRefsListOpenBranchesCmd(),
+newRefsCreateABranchCmd(),
+newRefsGetABranchCmd(),
+newRefsDeleteABranchCmd(),
+newRefsListTagsCmd(),
+newRefsCreateATagCmd(),
+newRefsGetATagCmd(),
+newRefsDeleteATagCmd(),
 )
 
 return cmd
 }
 
-// newListBranchesAndTagsCmd returns the "refs list-branches-and-tags" cobra command.
+// newRefsListBranchesAndTagsCmd returns the "refs list-branches-and-tags" cobra command.
 // operationId: listBranchesAndTags
-func newListBranchesAndTagsCmd() *cobra.Command {
+func newRefsListBranchesAndTagsCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
@@ -123,9 +123,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newListOpenBranchesCmd returns the "refs list-open-branches" cobra command.
+// newRefsListOpenBranchesCmd returns the "refs list-open-branches" cobra command.
 // operationId: listOpenBranches
-func newListOpenBranchesCmd() *cobra.Command {
+func newRefsListOpenBranchesCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
@@ -182,9 +182,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newCreateABranchCmd returns the "refs create-a-branch" cobra command.
+// newRefsCreateABranchCmd returns the "refs create-a-branch" cobra command.
 // operationId: createABranch
-func newCreateABranchCmd() *cobra.Command {
+func newRefsCreateABranchCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
@@ -227,9 +227,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newGetABranchCmd returns the "refs get-a-branch" cobra command.
+// newRefsGetABranchCmd returns the "refs get-a-branch" cobra command.
 // operationId: getABranch
-func newGetABranchCmd() *cobra.Command {
+func newRefsGetABranchCmd() *cobra.Command {
 var (
 name string
 repoSlug string
@@ -285,9 +285,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newDeleteABranchCmd returns the "refs delete-a-branch" cobra command.
+// newRefsDeleteABranchCmd returns the "refs delete-a-branch" cobra command.
 // operationId: deleteABranch
-func newDeleteABranchCmd() *cobra.Command {
+func newRefsDeleteABranchCmd() *cobra.Command {
 var (
 name string
 repoSlug string
@@ -342,9 +342,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newListTagsCmd returns the "refs list-tags" cobra command.
+// newRefsListTagsCmd returns the "refs list-tags" cobra command.
 // operationId: listTags
-func newListTagsCmd() *cobra.Command {
+func newRefsListTagsCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
@@ -411,9 +411,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newCreateATagCmd returns the "refs create-a-tag" cobra command.
+// newRefsCreateATagCmd returns the "refs create-a-tag" cobra command.
 // operationId: createATag
-func newCreateATagCmd() *cobra.Command {
+func newRefsCreateATagCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
@@ -489,9 +489,9 @@ cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 return cmd
 }
 
-// newGetATagCmd returns the "refs get-a-tag" cobra command.
+// newRefsGetATagCmd returns the "refs get-a-tag" cobra command.
 // operationId: getATag
-func newGetATagCmd() *cobra.Command {
+func newRefsGetATagCmd() *cobra.Command {
 var (
 name string
 repoSlug string
@@ -540,9 +540,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newDeleteATagCmd returns the "refs delete-a-tag" cobra command.
+// newRefsDeleteATagCmd returns the "refs delete-a-tag" cobra command.
 // operationId: deleteATag
-func newDeleteATagCmd() *cobra.Command {
+func newRefsDeleteATagCmd() *cobra.Command {
 var (
 name string
 repoSlug string

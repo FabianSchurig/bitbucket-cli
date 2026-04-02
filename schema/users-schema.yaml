@@ -1,0 +1,1138 @@
+openapi: 3.0.0
+info:
+  title: Bitbucket Users CLI
+  version: '2.0'
+  x-cli-command-name: Users
+  x-cli-command-use: users
+  x-cli-command-short: Manage Bitbucket users
+  x-cli-command-long: Commands for viewing user profiles, managing email addresses,
+    SSH keys, and GPG keys.
+paths:
+  /user:
+    get:
+      tags:
+      - Users
+      description: Returns the currently logged in user.
+      summary: Get current user
+      responses:
+        '200':
+          description: The current user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/account'
+        '401':
+          description: When the request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:user:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getCurrentUser
+    parameters: []
+  /user/emails:
+    get:
+      tags:
+      - Users
+      description: 'Returns all the authenticated user''s email addresses. Both
+
+        confirmed and unconfirmed.'
+      summary: List email addresses for current user
+      responses:
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - email
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:user:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listEmailAddressesForCurrentUser
+    parameters: []
+  /user/emails/{email}:
+    get:
+      tags:
+      - Users
+      description: 'Returns details about a specific one of the authenticated user''s
+
+        email addresses.
+
+
+        Details describe whether the address has been confirmed by the user and
+
+        whether it is the user''s primary address or not.'
+      summary: Get an email address for current user
+      responses:
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - email
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:user:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getAnEmailAddressForCurrentUser
+    parameters:
+    - name: email
+      in: path
+      description: Email address of the user.
+      required: true
+      schema:
+        type: string
+  /users/{selected_user}:
+    get:
+      tags:
+      - Users
+      description: 'Gets the public information associated with a user account.
+
+
+        If the user''s profile is private, `location`, `website` and
+
+        `created_on` elements are omitted.
+
+
+        Note that the user object returned by this operation is changing significantly,
+        due to privacy changes.
+
+        See the [announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-changes-gdpr/#changes-to-bitbucket-user-objects)
+        for details.'
+      summary: Get a user
+      responses:
+        '200':
+          description: The user object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/account'
+        '404':
+          description: If no user exists for the specified UUID, or if the specified
+            account is a team account, not a personal account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:user:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: getAUser
+    parameters:
+    - name: selected_user
+      in: path
+      description: 'This can either be an Atlassian Account ID OR the UUID of the
+        account,
+
+        surrounded by curly-braces, for example: `{account UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /users/{selected_user}/ssh-keys:
+    get:
+      tags:
+      - SSH
+      description: Returns a paginated list of the user's SSH public keys.
+      summary: List SSH keys
+      responses:
+        '200':
+          description: A list of the SSH keys associated with the account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_ssh_user_keys'
+              examples:
+                response:
+                  value:
+                    page: 1
+                    pagelen: 10
+                    size: 1
+                    values:
+                    - comment: user@myhost
+                      created_on: '2018-03-14T13:17:05.196003+00:00'
+                      expires_on: null
+                      fingerprint: w9tZSiFoZ8oXwS4ZSWrJopGxwvnPIewA6Mo4owAHPrI
+                      key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKqP3Cr632C2dNhhgKVcon4ldUSAeKiku2yP9O9/bDtY
+                      label: ''
+                      last_used: '2018-03-20T13:18:05.196003+00:00'
+                      links:
+                        self:
+                          href: https://api.bitbucket.org/2.0/users/{ed08f5e1-605b-4f4a-aee4-6c97628a673e}/ssh-keys/b15b6026-9c02-4626-b4ad-b905f99f763a
+                      owner:
+                        display_name: Mark Adams
+                        links:
+                          avatar:
+                            href: https://bitbucket.org/account/markadams-atl/avatar/32/
+                          html:
+                            href: https://bitbucket.org/markadams-atl/
+                          self:
+                            href: https://api.bitbucket.org/2.0/users/{ed08f5e1-605b-4f4a-aee4-6c97628a673e}
+                        type: user
+                        username: markadams-atl
+                        nickname: markadams-atl
+                        uuid: '{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}'
+                      type: ssh_key
+                      uuid: '{b15b6026-9c02-4626-b4ad-b905f99f763a}'
+        '403':
+          description: If the specified user's keys are not accessible to the current
+            user
+        '404':
+          description: If the specified user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:ssh-key:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listSshKeys
+    post:
+      tags:
+      - SSH
+      description: 'Adds a new SSH public key to the specified user account and returns
+        the resulting key.
+
+
+        Example:
+
+
+        ```
+
+        $ curl -X POST -H "Content-Type: application/json" -d ''{"key": "ssh-ed25519
+        AAAAC3NzaC1lZDI1NTE5AAAAIKqP3Cr632C2dNhhgKVcon4ldUSAeKiku2yP9O9/bDtY user@myhost"}''
+        https://api.bitbucket.org/2.0/users/{ed08f5e1-605b-4f4a-aee4-6c97628a673e}/ssh-keys
+
+        ```'
+      summary: Add a new SSH key
+      responses:
+        '201':
+          description: The newly created SSH key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ssh_account_key'
+              examples:
+                response:
+                  value:
+                    comment: user@myhost
+                    created_on: '2018-03-14T13:17:05.196003+00:00'
+                    expires_on: null
+                    fingerprint: w9tZSiFoZ8oXwS4ZSWrJopGxwvnPIewA6Mo4owAHPrI
+                    key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKqP3Cr632C2dNhhgKVcon4ldUSAeKiku2yP9O9/bDtY
+                    label: ''
+                    last_used: '2018-03-20T13:18:05.196003+00:00'
+                    links:
+                      self:
+                        href: https://api.bitbucket.org/2.0/users/{ed08f5e1-605b-4f4a-aee4-6c97628a673e}/ssh-keys/b15b6026-9c02-4626-b4ad-b905f99f763a
+                    owner:
+                      display_name: Mark Adams
+                      links:
+                        avatar:
+                          href: https://bitbucket.org/account/markadams-atl/avatar/32/
+                        html:
+                          href: https://bitbucket.org/markadams-atl/
+                        self:
+                          href: https://api.bitbucket.org/2.0/users/{ed08f5e1-605b-4f4a-aee4-6c97628a673e}
+                      type: user
+                      username: markadams-atl
+                      nickname: markadams-atl
+                      uuid: '{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}'
+                    type: ssh_key
+                    uuid: '{b15b6026-9c02-4626-b4ad-b905f99f763a}'
+        '400':
+          description: If the submitted key or related value is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: If the current user does not have permission to add a key for
+            the specified user
+        '404':
+          description: If the specified user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      parameters:
+      - name: expires_on
+        in: query
+        description: 'The date or date-time of when the key will expire,
+
+          in [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+
+          Example: `YYYY-MM-DDTHH:mm:ss.sssZ`'
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ssh_account_key'
+        description: The new SSH key object. Note that the username property has been
+          deprecated due to [privacy changes](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-changes-gdpr/#removal-of-usernames-from-user-referencing-apis).
+      security:
+      - oauth2:
+        - account:write
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:ssh-key:bitbucket
+        - write:ssh-key:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: addANewSshKey
+    parameters:
+    - name: selected_user
+      in: path
+      description: 'This can either be an Atlassian Account ID OR the UUID of the
+        account,
+
+        surrounded by curly-braces, for example: `{account UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /users/{selected_user}/ssh-keys/{key_id}:
+    delete:
+      tags:
+      - SSH
+      description: Deletes a specific SSH public key from a user's account.
+      summary: Delete a SSH key
+      responses:
+        '204':
+          description: The key has been deleted
+        '400':
+          description: If the submitted key or related value is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: If the current user does not have permission to add a key for
+            the specified user
+        '404':
+          description: If the specified user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account:write
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - delete:ssh-key:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: deleteASshKey
+    get:
+      tags:
+      - SSH
+      description: Returns a specific SSH public key belonging to a user.
+      summary: Get a SSH key
+      responses:
+        '200':
+          description: The specific SSH key matching the user and UUID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ssh_account_key'
+              examples:
+                response:
+                  value:
+                    comment: user@myhost
+                    created_on: '2018-03-14T13:17:05.196003+00:00'
+                    expires_on: null
+                    fingerprint: w9tZSiFoZ8oXwS4ZSWrJopGxwvnPIewA6Mo4owAHPrI
+                    key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKqP3Cr632C2dNhhgKVcon4ldUSAeKiku2yP9O9/bDtY
+                    label: ''
+                    last_used: '2018-03-20T13:18:05.196003+00:00'
+                    links:
+                      self:
+                        href: https://api.bitbucket.org/2.0/users/{ed08f5e1-605b-4f4a-aee4-6c97628a673e}/ssh-keys/b15b6026-9c02-4626-b4ad-b905f99f763a
+                    owner:
+                      display_name: Mark Adams
+                      links:
+                        avatar:
+                          href: https://bitbucket.org/account/markadams-atl/avatar/32/
+                        html:
+                          href: https://bitbucket.org/markadams-atl/
+                        self:
+                          href: https://api.bitbucket.org/2.0/users/{ed08f5e1-605b-4f4a-aee4-6c97628a673e}
+                      type: user
+                      username: markadams-atl
+                      nickname: markadams-atl
+                      uuid: '{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}'
+                    type: ssh_key
+                    uuid: '{b15b6026-9c02-4626-b4ad-b905f99f763a}'
+        '403':
+          description: If the specified user or key is not accessible to the current
+            user
+        '404':
+          description: If the specified user or key does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:ssh-key:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getASshKey
+    put:
+      tags:
+      - SSH
+      description: 'Updates a specific SSH public key on a user''s account
+
+
+        Note: Only the ''comment'' field can be updated using this API. To modify
+        the key or comment values, you must delete and add the key again.
+
+
+        Example:
+
+
+        ```
+
+        $ curl -X PUT -H "Content-Type: application/json" -d ''{"label": "Work key"}''
+        https://api.bitbucket.org/2.0/users/{ed08f5e1-605b-4f4a-aee4-6c97628a673e}/ssh-keys/{b15b6026-9c02-4626-b4ad-b905f99f763a}
+
+        ```'
+      summary: Update a SSH key
+      responses:
+        '200':
+          description: The newly updated SSH key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ssh_account_key'
+              examples:
+                response:
+                  value:
+                    comment: ''
+                    created_on: '2018-03-14T13:17:05.196003+00:00'
+                    expires_on: null
+                    fingerprint: w9tZSiFoZ8oXwS4ZSWrJopGxwvnPIewA6Mo4owAHPrI
+                    key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKqP3Cr632C2dNhhgKVcon4ldUSAeKiku2yP9O9/bDtY
+                    label: Work key
+                    last_used: '2018-03-20T13:18:05.196003+00:00'
+                    links:
+                      self:
+                        href: https://api.bitbucket.org/2.0/users/{ed08f5e1-605b-4f4a-aee4-6c97628a673e}/ssh-keys/b15b6026-9c02-4626-b4ad-b905f99f763a
+                    owner:
+                      display_name: Mark Adams
+                      links:
+                        avatar:
+                          href: https://bitbucket.org/account/markadams-atl/avatar/32/
+                        html:
+                          href: https://bitbucket.org/markadams-atl/
+                        self:
+                          href: https://api.bitbucket.org/2.0/users/{ed08f5e1-605b-4f4a-aee4-6c97628a673e}
+                      type: user
+                      username: markadams-atl
+                      nickname: markadams-atl
+                      uuid: '{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}'
+                    type: ssh_key
+                    uuid: '{b15b6026-9c02-4626-b4ad-b905f99f763a}'
+        '400':
+          description: If the submitted key or related value is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: If the current user does not have permission to add a key for
+            the specified user
+        '404':
+          description: If the specified user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ssh_account_key'
+        description: The updated SSH key object
+      security:
+      - oauth2:
+        - account:write
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:ssh-key:bitbucket
+        - write:ssh-key:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: updateASshKey
+    parameters:
+    - name: key_id
+      in: path
+      description: The SSH key's UUID value.
+      required: true
+      schema:
+        type: string
+    - name: selected_user
+      in: path
+      description: 'This can either be an Atlassian Account ID OR the UUID of the
+        account,
+
+        surrounded by curly-braces, for example: `{account UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /users/{selected_user}/gpg-keys:
+    get:
+      tags:
+      - GPG
+      description: 'Returns a paginated list of the user''s GPG public keys.
+
+        The `key` and `subkeys` fields can also be requested from the endpoint.
+
+        See [Partial Responses](/cloud/bitbucket/rest/intro/#partial-response) for
+        more details.'
+      summary: List GPG keys
+      responses:
+        '200':
+          description: A list of the GPG keys associated with the account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_gpg_user_keys'
+              examples:
+                response:
+                  value:
+                    page: 1
+                    pagelen: 10
+                    size: 1
+                    values:
+                    - added_on: '2024-09-24T12:09:33.154081+00:00'
+                      created_on: '2018-03-20T13:09:04.207005+00:00'
+                      expires_on: null
+                      fingerprint: h4m26ppxrol7blr7spbc7lhyymokdbnkxd06kzrt
+                      key_id: ymokdbnkxd06kzrt
+                      last_used: '2024-09-25T15:18:05.196003+00:00'
+                      links:
+                        self:
+                          href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}/gpg-keys/H4M26PPXROL7BLR7SPBC7LHYYMOKDBNKXD06KZRT
+                      name: Alice's OpenPGP key
+                      owner:
+                        display_name: Mark Adams
+                        links:
+                          avatar:
+                            href: https://bitbucket.org/account/markadams-atl/avatar/32/
+                          html:
+                            href: https://bitbucket.org/markadams-atl/
+                          self:
+                            href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}
+                        type: user
+                        username: markadams-atl
+                        nickname: markadams-atl
+                        uuid: '{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}'
+                      parent_fingerprint: null
+                      type: gpg_key
+        '403':
+          description: If the specified user's keys are not accessible to the current
+            user
+        '404':
+          description: If the specified user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:gpg-key:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listGpgKeys
+    post:
+      tags:
+      - GPG
+      description: 'Adds a new GPG public key to the specified user account and returns
+        the resulting key.
+
+
+        Example:
+
+
+        ```
+
+        $ curl -X POST -H "Content-Type: application/json" -d
+
+        ''{"key": "<insert GPG Key>"}''
+
+        https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}/gpg-keys
+
+        ```'
+      summary: Add a new GPG key
+      responses:
+        '201':
+          description: The newly created GPG key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPG_account_key'
+              examples:
+                response:
+                  value:
+                    added_on: '2024-09-24T12:09:33.154081+00:00'
+                    created_on: '2018-03-20T13:09:04.207005+00:00'
+                    expires_on: null
+                    fingerprint: h4m26ppxrol7blr7spbc7lhyymokdbnkxd06kzrt
+                    key_id: ymokdbnkxd06kzrt
+                    last_used: '2024-09-25T15:18:05.196003+00:00'
+                    links:
+                      self:
+                        href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}/gpg-keys/H4M26PPXROL7BLR7SPBC7LHYYMOKDBNKXD06KZRT
+                    name: Alice's OpenPGP key
+                    owner:
+                      display_name: Mark Adams
+                      links:
+                        avatar:
+                          href: https://bitbucket.org/account/markadams-atl/avatar/32/
+                        html:
+                          href: https://bitbucket.org/markadams-atl/
+                        self:
+                          href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}
+                      type: user
+                      username: markadams-atl
+                      nickname: markadams-atl
+                      uuid: '{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}'
+                    parent_fingerprint: null
+                    type: gpg_key
+        '400':
+          description: If the submitted key or related value is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: If the current user does not have permission to add a key for
+            the specified user
+        '404':
+          description: If the specified user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GPG_account_key'
+        description: The new GPG key object.
+      security:
+      - oauth2:
+        - account:write
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:gpg-key:bitbucket
+        - write:gpg-key:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: addANewGpgKey
+    parameters:
+    - name: selected_user
+      in: path
+      description: 'This can either be an Atlassian Account ID OR the UUID of the
+        account,
+
+        surrounded by curly-braces, for example: `{account UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /users/{selected_user}/gpg-keys/{fingerprint}:
+    delete:
+      tags:
+      - GPG
+      description: Deletes a specific GPG public key from a user's account.
+      summary: Delete a GPG key
+      responses:
+        '204':
+          description: The key has been deleted
+        '400':
+          description: If the submitted key or related value is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: If the current user does not have permission to delete a key
+            for the specified user, or the submitted key is a subkey
+        '404':
+          description: If the specified key does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account:write
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - delete:gpg-key:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: deleteAGpgKey
+    get:
+      tags:
+      - GPG
+      description: 'Returns a specific GPG public key belonging to a user.
+
+        The `key` and `subkeys` fields can also be requested from the endpoint.
+
+        See [Partial Responses](/cloud/bitbucket/rest/intro/#partial-response) for
+        more details.'
+      summary: Get a GPG key
+      responses:
+        '200':
+          description: The specific GPG key matching the user and fingerprint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPG_account_key'
+              examples:
+                response:
+                  value:
+                    added_on: '2024-09-24T12:09:33.154081+00:00'
+                    created_on: '2018-03-20T13:09:04.207005+00:00'
+                    expires_on: null
+                    fingerprint: h4m26ppxrol7blr7spbc7lhyymokdbnkxd06kzrt
+                    key_id: ymokdbnkxd06kzrt
+                    last_used: '2024-09-25T15:18:05.196003+00:00'
+                    links:
+                      self:
+                        href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}/gpg-keys/H4M26PPXROL7BLR7SPBC7LHYYMOKDBNKXD06KZRT
+                    name: Alice's OpenPGP key
+                    owner:
+                      display_name: Mark Adams
+                      links:
+                        avatar:
+                          href: https://bitbucket.org/account/markadams-atl/avatar/32/
+                        html:
+                          href: https://bitbucket.org/markadams-atl/
+                        self:
+                          href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}
+                      type: user
+                      username: markadams-atl
+                      nickname: markadams-atl
+                      uuid: '{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}'
+                    parent_fingerprint: null
+                    type: gpg_key
+        '403':
+          description: If the specified user's keys are not accessible to the current
+            user
+        '404':
+          description: If the specified user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:gpg-key:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getAGpgKey
+    parameters:
+    - name: fingerprint
+      in: path
+      description: 'A GPG key fingerprint.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: selected_user
+      in: path
+      description: 'This can either be an Atlassian Account ID OR the UUID of the
+        account,
+
+        surrounded by curly-braces, for example: `{account UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+components:
+  schemas:
+    ssh_key:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: SSH Key
+        description: Base type for representing SSH public keys.
+        properties:
+          uuid:
+            type: string
+            description: The SSH key's immutable ID.
+          key:
+            type: string
+            description: The SSH public key value in OpenSSH format.
+          comment:
+            type: string
+            description: The comment parsed from the SSH key (if present)
+          label:
+            type: string
+            description: The user-defined label for the SSH key
+          created_on:
+            type: string
+            format: date-time
+          last_used:
+            type: string
+            format: date-time
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+        additionalProperties: true
+    error:
+      type: object
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
+    GPG_account_key:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: GPG Account Key
+        description: Represents a GPG public key for a user.
+        properties:
+          owner:
+            $ref: '#/components/schemas/account'
+          key:
+            type: string
+            description: The GPG key value in X format.
+          key_id:
+            type: string
+            description: The unique identifier for the GPG key
+          fingerprint:
+            type: string
+            description: The GPG key fingerprint.
+          parent_fingerprint:
+            type: string
+            description: The fingerprint of the parent key. This value is null unless
+              the current key is a subkey.
+          comment:
+            type: string
+            description: The comment parsed from the GPG key (if present)
+          name:
+            type: string
+            description: The user-defined label for the GPG key
+          expires_on:
+            type: string
+            format: date-time
+          created_on:
+            type: string
+            format: date-time
+          added_on:
+            type: string
+            format: date-time
+          last_used:
+            type: string
+            format: date-time
+          subkeys:
+            type: array
+            items:
+              $ref: '#/components/schemas/GPG_account_key'
+            minItems: 0
+            uniqueItems: true
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+        additionalProperties: true
+    link:
+      type: object
+      title: Link
+      description: A link to a resource related to this object.
+      properties:
+        href:
+          type: string
+          format: uri
+        name:
+          type: string
+      additionalProperties: false
+    paginated_gpg_user_keys:
+      type: object
+      title: Paginated GPG User Keys
+      description: A paginated list of GPG keys.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/GPG_account_key'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    account:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Account
+        description: An account object.
+        properties:
+          links:
+            $ref: '#/components/schemas/account_links'
+          created_on:
+            type: string
+            format: date-time
+          display_name:
+            type: string
+          uuid:
+            type: string
+        additionalProperties: true
+    paginated_ssh_user_keys:
+      type: object
+      title: Paginated SSH User Keys
+      description: A paginated list of SSH keys.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/ssh_account_key'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    ssh_account_key:
+      allOf:
+      - $ref: '#/components/schemas/ssh_key'
+      - type: object
+        title: SSH Account Key
+        description: Represents an SSH public key for a user.
+        properties:
+          owner:
+            $ref: '#/components/schemas/account'
+          expires_on:
+            type: string
+            format: date-time
+          fingerprint:
+            type: string
+            description: The SSH key fingerprint in SHA-256 format.
+        additionalProperties: true
+    object:
+      type: object
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+      required:
+      - type
+      additionalProperties: true
+      discriminator:
+        propertyName: type
+    account_links:
+      type: object
+      title: Account Links
+      description: Links related to an Account.
+      properties:
+        avatar:
+          $ref: '#/components/schemas/link'
+      additionalProperties: true

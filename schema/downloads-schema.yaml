@@ -1,0 +1,233 @@
+openapi: 3.0.0
+info:
+  title: Bitbucket Downloads CLI
+  version: '2.0'
+  x-cli-command-name: Downloads
+  x-cli-command-use: downloads
+  x-cli-command-short: Manage Bitbucket repository downloads
+  x-cli-command-long: Commands for listing, uploading, and deleting download artifacts
+    in Bitbucket repositories.
+paths:
+  /repositories/{workspace}/{repo_slug}/downloads:
+    get:
+      tags:
+      - Downloads
+      description: Returns a list of download links associated with the repository.
+      summary: List download artifacts
+      responses:
+        '200':
+          description: Returns a paginated list of the downloads associated with the
+            repository.
+        '403':
+          description: User is not authorized to read from the repository.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - repository
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:repository:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: listDownloadArtifacts
+    post:
+      tags:
+      - Downloads
+      description: "Upload new download artifacts.\n\nTo upload files, perform a `multipart/form-data`\
+        \ POST containing one\nor more `files` fields:\n\n    $ echo Hello World >\
+        \ hello.txt\n    $ curl -s -u evzijst -X POST https://api.bitbucket.org/2.0/repositories/evzijst/git-tests/downloads\
+        \ -F files=@hello.txt\n\nWhen a file is uploaded with the same name as an\
+        \ existing artifact,\nthen the existing file will be replaced."
+      summary: Upload a download artifact
+      responses:
+        '201':
+          description: The artifact was uploaded sucessfully.
+        '400':
+          description: Bad Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: User is not authorized to write to the repository.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '406':
+          description: Unsupported Content-Type. Use multiplart/form-data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - repository:write
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - write:repository:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: uploadADownloadArtifact
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/downloads/{filename}:
+    delete:
+      tags:
+      - Downloads
+      description: Deletes the specified download artifact from the repository.
+      summary: Delete a download artifact
+      responses:
+        '204':
+          description: The specified download artifact was deleted.
+        '403':
+          description: User is not authorized to write to the repository.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The specified download does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - repository:write
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - write:repository:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: deleteADownloadArtifact
+    get:
+      tags:
+      - Downloads
+      description: "Return a redirect to the contents of a download artifact.\n\n\
+        This endpoint returns the actual file contents and not the artifact's\nmetadata.\n\
+        \n    $ curl -s -L https://api.bitbucket.org/2.0/repositories/evzijst/git-tests/downloads/hello.txt\n\
+        \    Hello World"
+      summary: Get a download artifact link
+      responses:
+        '302':
+          description: Redirects to the url of the specified download artifact.
+        '403':
+          description: User is not authorized to read from the repository.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The specified download artifact does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - repository
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:repository:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: getADownloadArtifactLink
+    parameters:
+    - name: filename
+      in: path
+      description: Name of the file.
+      required: true
+      schema:
+        type: string
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+components:
+  schemas:
+    error:
+      type: object
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true

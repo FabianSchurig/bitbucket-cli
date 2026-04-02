@@ -39,51 +39,51 @@ Long:  `Commands for listing, creating, reading, and merging Bitbucket pull requ
 }
 
 cmd.AddCommand(
-newGetPullrequestsForCommitCmd(),
-newListDefaultReviewersCmd(),
-newGetADefaultReviewerCmd(),
-newAddAUserToTheDefaultReviewersCmd(),
-newRemoveAUserFromTheDefaultReviewersCmd(),
-newListEffectiveDefaultReviewersCmd(),
-newListPullRequestsCmd(),
-newCreateAPullRequestCmd(),
-newListAPullRequestActivityLogCmd(),
-newGetAPullRequestCmd(),
-newUpdateAPullRequestCmd(),
-newGetRepositoriesPullrequestsActivityCmd(),
-newApproveAPullRequestCmd(),
-newUnapproveAPullRequestCmd(),
-newListCommentsOnAPullRequestCmd(),
-newCreateACommentOnAPullRequestCmd(),
-newGetACommentOnAPullRequestCmd(),
-newUpdateACommentOnAPullRequestCmd(),
-newDeleteACommentOnAPullRequestCmd(),
-newResolveACommentThreadCmd(),
-newReopenACommentThreadCmd(),
-newListCommitsOnAPullRequestCmd(),
-newDeclineAPullRequestCmd(),
-newListChangesInAPullRequestCmd(),
-newGetTheDiffStatForAPullRequestCmd(),
-newMergeAPullRequestCmd(),
-newGetTheMergeTaskStatusForAPullRequestCmd(),
-newGetThePatchForAPullRequestCmd(),
-newRequestChangesForAPullRequestCmd(),
-newRemoveChangeRequestForAPullRequestCmd(),
-newListCommitStatusesForAPullRequestCmd(),
-newListTasksOnAPullRequestCmd(),
-newCreateATaskOnAPullRequestCmd(),
-newGetATaskOnAPullRequestCmd(),
-newUpdateATaskOnAPullRequestCmd(),
-newDeleteATaskOnAPullRequestCmd(),
-newListWorkspacePullRequestsForAUserCmd(),
+newPRGetPullrequestsForCommitCmd(),
+newPRListDefaultReviewersCmd(),
+newPRGetADefaultReviewerCmd(),
+newPRAddAUserToTheDefaultReviewersCmd(),
+newPRRemoveAUserFromTheDefaultReviewersCmd(),
+newPRListEffectiveDefaultReviewersCmd(),
+newPRListPullRequestsCmd(),
+newPRCreateAPullRequestCmd(),
+newPRListAPullRequestActivityLogCmd(),
+newPRGetAPullRequestCmd(),
+newPRUpdateAPullRequestCmd(),
+newPRGetRepositoriesPullrequestsActivityCmd(),
+newPRApproveAPullRequestCmd(),
+newPRUnapproveAPullRequestCmd(),
+newPRListCommentsOnAPullRequestCmd(),
+newPRCreateACommentOnAPullRequestCmd(),
+newPRGetACommentOnAPullRequestCmd(),
+newPRUpdateACommentOnAPullRequestCmd(),
+newPRDeleteACommentOnAPullRequestCmd(),
+newPRResolveACommentThreadCmd(),
+newPRReopenACommentThreadCmd(),
+newPRListCommitsOnAPullRequestCmd(),
+newPRDeclineAPullRequestCmd(),
+newPRListChangesInAPullRequestCmd(),
+newPRGetTheDiffStatForAPullRequestCmd(),
+newPRMergeAPullRequestCmd(),
+newPRGetTheMergeTaskStatusForAPullRequestCmd(),
+newPRGetThePatchForAPullRequestCmd(),
+newPRRequestChangesForAPullRequestCmd(),
+newPRRemoveChangeRequestForAPullRequestCmd(),
+newPRListCommitStatusesForAPullRequestCmd(),
+newPRListTasksOnAPullRequestCmd(),
+newPRCreateATaskOnAPullRequestCmd(),
+newPRGetATaskOnAPullRequestCmd(),
+newPRUpdateATaskOnAPullRequestCmd(),
+newPRDeleteATaskOnAPullRequestCmd(),
+newPRListWorkspacePullRequestsForAUserCmd(),
 )
 
 return cmd
 }
 
-// newGetPullrequestsForCommitCmd returns the "pr get-pullrequests-for-commit" cobra command.
+// newPRGetPullrequestsForCommitCmd returns the "pr get-pullrequests-for-commit" cobra command.
 // operationId: getPullrequestsForCommit
-func newGetPullrequestsForCommitCmd() *cobra.Command {
+func newPRGetPullrequestsForCommitCmd() *cobra.Command {
 var (
 workspace string
 repoSlug string
@@ -140,9 +140,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newListDefaultReviewersCmd returns the "pr list-default-reviewers" cobra command.
+// newPRListDefaultReviewersCmd returns the "pr list-default-reviewers" cobra command.
 // operationId: listDefaultReviewers
-func newListDefaultReviewersCmd() *cobra.Command {
+func newPRListDefaultReviewersCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
@@ -198,9 +198,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newGetADefaultReviewerCmd returns the "pr get-a-default-reviewer" cobra command.
+// newPRGetADefaultReviewerCmd returns the "pr get-a-default-reviewer" cobra command.
 // operationId: getADefaultReviewer
-func newGetADefaultReviewerCmd() *cobra.Command {
+func newPRGetADefaultReviewerCmd() *cobra.Command {
 var (
 repoSlug string
 targetUsername string
@@ -253,9 +253,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newAddAUserToTheDefaultReviewersCmd returns the "pr add-a-user-to-the-default-reviewers" cobra command.
+// newPRAddAUserToTheDefaultReviewersCmd returns the "pr add-a-user-to-the-default-reviewers" cobra command.
 // operationId: addAUserToTheDefaultReviewers
-func newAddAUserToTheDefaultReviewersCmd() *cobra.Command {
+func newPRAddAUserToTheDefaultReviewersCmd() *cobra.Command {
 var (
 repoSlug string
 targetUsername string
@@ -307,9 +307,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newRemoveAUserFromTheDefaultReviewersCmd returns the "pr remove-a-user-from-the-default-reviewers" cobra command.
+// newPRRemoveAUserFromTheDefaultReviewersCmd returns the "pr remove-a-user-from-the-default-reviewers" cobra command.
 // operationId: removeAUserFromTheDefaultReviewers
-func newRemoveAUserFromTheDefaultReviewersCmd() *cobra.Command {
+func newPRRemoveAUserFromTheDefaultReviewersCmd() *cobra.Command {
 var (
 repoSlug string
 targetUsername string
@@ -358,9 +358,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newListEffectiveDefaultReviewersCmd returns the "pr list-effective-default-reviewers" cobra command.
+// newPRListEffectiveDefaultReviewersCmd returns the "pr list-effective-default-reviewers" cobra command.
 // operationId: listEffectiveDefaultReviewers
-func newListEffectiveDefaultReviewersCmd() *cobra.Command {
+func newPRListEffectiveDefaultReviewersCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
@@ -415,9 +415,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newListPullRequestsCmd returns the "pr list-pull-requests" cobra command.
+// newPRListPullRequestsCmd returns the "pr list-pull-requests" cobra command.
 // operationId: listPullRequests
-func newListPullRequestsCmd() *cobra.Command {
+func newPRListPullRequestsCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
@@ -471,9 +471,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newCreateAPullRequestCmd returns the "pr create-a-pull-request" cobra command.
+// newPRCreateAPullRequestCmd returns the "pr create-a-pull-request" cobra command.
 // operationId: createAPullRequest
-func newCreateAPullRequestCmd() *cobra.Command {
+func newPRCreateAPullRequestCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
@@ -584,9 +584,9 @@ cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 return cmd
 }
 
-// newListAPullRequestActivityLogCmd returns the "pr list-a-pull-request-activity-log" cobra command.
+// newPRListAPullRequestActivityLogCmd returns the "pr list-a-pull-request-activity-log" cobra command.
 // operationId: listAPullRequestActivityLog
-func newListAPullRequestActivityLogCmd() *cobra.Command {
+func newPRListAPullRequestActivityLogCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
@@ -629,9 +629,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newGetAPullRequestCmd returns the "pr get-a-pull-request" cobra command.
+// newPRGetAPullRequestCmd returns the "pr get-a-pull-request" cobra command.
 // operationId: getAPullRequest
-func newGetAPullRequestCmd() *cobra.Command {
+func newPRGetAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -680,9 +680,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newUpdateAPullRequestCmd returns the "pr update-a-pull-request" cobra command.
+// newPRUpdateAPullRequestCmd returns the "pr update-a-pull-request" cobra command.
 // operationId: updateAPullRequest
-func newUpdateAPullRequestCmd() *cobra.Command {
+func newPRUpdateAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -803,9 +803,9 @@ cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 return cmd
 }
 
-// newGetRepositoriesPullrequestsActivityCmd returns the "pr get-repositories-pullrequests-activity" cobra command.
+// newPRGetRepositoriesPullrequestsActivityCmd returns the "pr get-repositories-pullrequests-activity" cobra command.
 // operationId: getRepositoriesPullrequestsActivity
-func newGetRepositoriesPullrequestsActivityCmd() *cobra.Command {
+func newPRGetRepositoriesPullrequestsActivityCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -854,9 +854,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newApproveAPullRequestCmd returns the "pr approve-a-pull-request" cobra command.
+// newPRApproveAPullRequestCmd returns the "pr approve-a-pull-request" cobra command.
 // operationId: approveAPullRequest
-func newApproveAPullRequestCmd() *cobra.Command {
+func newPRApproveAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -905,9 +905,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newUnapproveAPullRequestCmd returns the "pr unapprove-a-pull-request" cobra command.
+// newPRUnapproveAPullRequestCmd returns the "pr unapprove-a-pull-request" cobra command.
 // operationId: unapproveAPullRequest
-func newUnapproveAPullRequestCmd() *cobra.Command {
+func newPRUnapproveAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -957,9 +957,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newListCommentsOnAPullRequestCmd returns the "pr list-comments-on-a-pull-request" cobra command.
+// newPRListCommentsOnAPullRequestCmd returns the "pr list-comments-on-a-pull-request" cobra command.
 // operationId: listCommentsOnAPullRequest
-func newListCommentsOnAPullRequestCmd() *cobra.Command {
+func newPRListCommentsOnAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -1016,9 +1016,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newCreateACommentOnAPullRequestCmd returns the "pr create-a-comment-on-a-pull-request" cobra command.
+// newPRCreateACommentOnAPullRequestCmd returns the "pr create-a-comment-on-a-pull-request" cobra command.
 // operationId: createACommentOnAPullRequest
-func newCreateACommentOnAPullRequestCmd() *cobra.Command {
+func newPRCreateACommentOnAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -1122,9 +1122,9 @@ cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 return cmd
 }
 
-// newGetACommentOnAPullRequestCmd returns the "pr get-a-comment-on-a-pull-request" cobra command.
+// newPRGetACommentOnAPullRequestCmd returns the "pr get-a-comment-on-a-pull-request" cobra command.
 // operationId: getACommentOnAPullRequest
-func newGetACommentOnAPullRequestCmd() *cobra.Command {
+func newPRGetACommentOnAPullRequestCmd() *cobra.Command {
 var (
 commentId int
 pullRequestId int
@@ -1179,9 +1179,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newUpdateACommentOnAPullRequestCmd returns the "pr update-a-comment-on-a-pull-request" cobra command.
+// newPRUpdateACommentOnAPullRequestCmd returns the "pr update-a-comment-on-a-pull-request" cobra command.
 // operationId: updateACommentOnAPullRequest
-func newUpdateACommentOnAPullRequestCmd() *cobra.Command {
+func newPRUpdateACommentOnAPullRequestCmd() *cobra.Command {
 var (
 commentId int
 pullRequestId int
@@ -1289,9 +1289,9 @@ cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 return cmd
 }
 
-// newDeleteACommentOnAPullRequestCmd returns the "pr delete-a-comment-on-a-pull-request" cobra command.
+// newPRDeleteACommentOnAPullRequestCmd returns the "pr delete-a-comment-on-a-pull-request" cobra command.
 // operationId: deleteACommentOnAPullRequest
-func newDeleteACommentOnAPullRequestCmd() *cobra.Command {
+func newPRDeleteACommentOnAPullRequestCmd() *cobra.Command {
 var (
 commentId int
 pullRequestId int
@@ -1346,9 +1346,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newResolveACommentThreadCmd returns the "pr resolve-a-comment-thread" cobra command.
+// newPRResolveACommentThreadCmd returns the "pr resolve-a-comment-thread" cobra command.
 // operationId: resolveACommentThread
-func newResolveACommentThreadCmd() *cobra.Command {
+func newPRResolveACommentThreadCmd() *cobra.Command {
 var (
 commentId int
 pullRequestId int
@@ -1403,9 +1403,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newReopenACommentThreadCmd returns the "pr reopen-a-comment-thread" cobra command.
+// newPRReopenACommentThreadCmd returns the "pr reopen-a-comment-thread" cobra command.
 // operationId: reopenACommentThread
-func newReopenACommentThreadCmd() *cobra.Command {
+func newPRReopenACommentThreadCmd() *cobra.Command {
 var (
 commentId int
 pullRequestId int
@@ -1460,9 +1460,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newListCommitsOnAPullRequestCmd returns the "pr list-commits-on-a-pull-request" cobra command.
+// newPRListCommitsOnAPullRequestCmd returns the "pr list-commits-on-a-pull-request" cobra command.
 // operationId: listCommitsOnAPullRequest
-func newListCommitsOnAPullRequestCmd() *cobra.Command {
+func newPRListCommitsOnAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -1514,9 +1514,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newDeclineAPullRequestCmd returns the "pr decline-a-pull-request" cobra command.
+// newPRDeclineAPullRequestCmd returns the "pr decline-a-pull-request" cobra command.
 // operationId: declineAPullRequest
-func newDeclineAPullRequestCmd() *cobra.Command {
+func newPRDeclineAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -1565,9 +1565,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newListChangesInAPullRequestCmd returns the "pr list-changes-in-a-pull-request" cobra command.
+// newPRListChangesInAPullRequestCmd returns the "pr list-changes-in-a-pull-request" cobra command.
 // operationId: listChangesInAPullRequest
-func newListChangesInAPullRequestCmd() *cobra.Command {
+func newPRListChangesInAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -1617,9 +1617,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newGetTheDiffStatForAPullRequestCmd returns the "pr get-the-diff-stat-for-a-pull-request" cobra command.
+// newPRGetTheDiffStatForAPullRequestCmd returns the "pr get-the-diff-stat-for-a-pull-request" cobra command.
 // operationId: getTheDiffStatForAPullRequest
-func newGetTheDiffStatForAPullRequestCmd() *cobra.Command {
+func newPRGetTheDiffStatForAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -1669,9 +1669,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newMergeAPullRequestCmd returns the "pr merge-a-pull-request" cobra command.
+// newPRMergeAPullRequestCmd returns the "pr merge-a-pull-request" cobra command.
 // operationId: mergeAPullRequest
-func newMergeAPullRequestCmd() *cobra.Command {
+func newPRMergeAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -1751,9 +1751,9 @@ cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 return cmd
 }
 
-// newGetTheMergeTaskStatusForAPullRequestCmd returns the "pr get-the-merge-task-status-for-a-pull-request" cobra command.
+// newPRGetTheMergeTaskStatusForAPullRequestCmd returns the "pr get-the-merge-task-status-for-a-pull-request" cobra command.
 // operationId: getTheMergeTaskStatusForAPullRequest
-func newGetTheMergeTaskStatusForAPullRequestCmd() *cobra.Command {
+func newPRGetTheMergeTaskStatusForAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -1808,9 +1808,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newGetThePatchForAPullRequestCmd returns the "pr get-the-patch-for-a-pull-request" cobra command.
+// newPRGetThePatchForAPullRequestCmd returns the "pr get-the-patch-for-a-pull-request" cobra command.
 // operationId: getThePatchForAPullRequest
-func newGetThePatchForAPullRequestCmd() *cobra.Command {
+func newPRGetThePatchForAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -1860,9 +1860,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newRequestChangesForAPullRequestCmd returns the "pr request-changes-for-a-pull-request" cobra command.
+// newPRRequestChangesForAPullRequestCmd returns the "pr request-changes-for-a-pull-request" cobra command.
 // operationId: requestChangesForAPullRequest
-func newRequestChangesForAPullRequestCmd() *cobra.Command {
+func newPRRequestChangesForAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -1911,9 +1911,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newRemoveChangeRequestForAPullRequestCmd returns the "pr remove-change-request-for-a-pull-request" cobra command.
+// newPRRemoveChangeRequestForAPullRequestCmd returns the "pr remove-change-request-for-a-pull-request" cobra command.
 // operationId: removeChangeRequestForAPullRequest
-func newRemoveChangeRequestForAPullRequestCmd() *cobra.Command {
+func newPRRemoveChangeRequestForAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -1962,9 +1962,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newListCommitStatusesForAPullRequestCmd returns the "pr list-commit-statuses-for-a-pull-request" cobra command.
+// newPRListCommitStatusesForAPullRequestCmd returns the "pr list-commit-statuses-for-a-pull-request" cobra command.
 // operationId: listCommitStatusesForAPullRequest
-func newListCommitStatusesForAPullRequestCmd() *cobra.Command {
+func newPRListCommitStatusesForAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -2028,9 +2028,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newListTasksOnAPullRequestCmd returns the "pr list-tasks-on-a-pull-request" cobra command.
+// newPRListTasksOnAPullRequestCmd returns the "pr list-tasks-on-a-pull-request" cobra command.
 // operationId: listTasksOnAPullRequest
-func newListTasksOnAPullRequestCmd() *cobra.Command {
+func newPRListTasksOnAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -2096,9 +2096,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newCreateATaskOnAPullRequestCmd returns the "pr create-a-task-on-a-pull-request" cobra command.
+// newPRCreateATaskOnAPullRequestCmd returns the "pr create-a-task-on-a-pull-request" cobra command.
 // operationId: createATaskOnAPullRequest
-func newCreateATaskOnAPullRequestCmd() *cobra.Command {
+func newPRCreateATaskOnAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -2175,9 +2175,9 @@ cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 return cmd
 }
 
-// newGetATaskOnAPullRequestCmd returns the "pr get-a-task-on-a-pull-request" cobra command.
+// newPRGetATaskOnAPullRequestCmd returns the "pr get-a-task-on-a-pull-request" cobra command.
 // operationId: getATaskOnAPullRequest
-func newGetATaskOnAPullRequestCmd() *cobra.Command {
+func newPRGetATaskOnAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -2232,9 +2232,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newUpdateATaskOnAPullRequestCmd returns the "pr update-a-task-on-a-pull-request" cobra command.
+// newPRUpdateATaskOnAPullRequestCmd returns the "pr update-a-task-on-a-pull-request" cobra command.
 // operationId: updateATaskOnAPullRequest
-func newUpdateATaskOnAPullRequestCmd() *cobra.Command {
+func newPRUpdateATaskOnAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -2307,9 +2307,9 @@ cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 return cmd
 }
 
-// newDeleteATaskOnAPullRequestCmd returns the "pr delete-a-task-on-a-pull-request" cobra command.
+// newPRDeleteATaskOnAPullRequestCmd returns the "pr delete-a-task-on-a-pull-request" cobra command.
 // operationId: deleteATaskOnAPullRequest
-func newDeleteATaskOnAPullRequestCmd() *cobra.Command {
+func newPRDeleteATaskOnAPullRequestCmd() *cobra.Command {
 var (
 pullRequestId int
 repoSlug string
@@ -2364,9 +2364,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newListWorkspacePullRequestsForAUserCmd returns the "pr list-workspace-pull-requests-for-a-user" cobra command.
+// newPRListWorkspacePullRequestsForAUserCmd returns the "pr list-workspace-pull-requests-for-a-user" cobra command.
 // operationId: listWorkspacePullRequestsForAUser
-func newListWorkspacePullRequestsForAUserCmd() *cobra.Command {
+func newPRListWorkspacePullRequestsForAUserCmd() *cobra.Command {
 var (
 selectedUser string
 workspace string

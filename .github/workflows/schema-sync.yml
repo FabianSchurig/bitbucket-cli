@@ -62,6 +62,20 @@ jobs:
           go run scripts/gen_commands/main.go schema/refs-schema.yaml internal/commands/refs.gen.go
           go run scripts/gen_commands/main.go schema/commits-schema.yaml internal/commands/commits.gen.go
           go run scripts/gen_commands/main.go schema/reports-schema.yaml internal/commands/reports.gen.go
+          go run scripts/gen_commands/main.go schema/repositories-schema.yaml internal/commands/repositories.gen.go
+          go run scripts/gen_commands/main.go schema/workspaces-schema.yaml internal/commands/workspaces.gen.go
+          go run scripts/gen_commands/main.go schema/projects-schema.yaml internal/commands/projects.gen.go
+          go run scripts/gen_commands/main.go schema/pipelines-schema.yaml internal/commands/pipelines.gen.go
+          go run scripts/gen_commands/main.go schema/issues-schema.yaml internal/commands/issues.gen.go
+          go run scripts/gen_commands/main.go schema/snippets-schema.yaml internal/commands/snippets.gen.go
+          go run scripts/gen_commands/main.go schema/deployments-schema.yaml internal/commands/deployments.gen.go
+          go run scripts/gen_commands/main.go schema/branch-restrictions-schema.yaml internal/commands/branch-restrictions.gen.go
+          go run scripts/gen_commands/main.go schema/branching-model-schema.yaml internal/commands/branching-model.gen.go
+          go run scripts/gen_commands/main.go schema/commit-statuses-schema.yaml internal/commands/commit-statuses.gen.go
+          go run scripts/gen_commands/main.go schema/downloads-schema.yaml internal/commands/downloads.gen.go
+          go run scripts/gen_commands/main.go schema/users-schema.yaml internal/commands/users.gen.go
+          go run scripts/gen_commands/main.go schema/properties-schema.yaml internal/commands/properties.gen.go
+          go run scripts/gen_commands/main.go schema/addon-schema.yaml internal/commands/addon.gen.go
 
       - name: Build & test
         if: steps.diff.outputs.changed == 'true'

@@ -39,17 +39,17 @@ Long:  `Commands for searching code across Bitbucket repositories by user, works
 }
 
 cmd.AddCommand(
-newSearchTeamCmd(),
-newSearchAccountCmd(),
-newSearchWorkspaceCmd(),
+newSearchSearchTeamCmd(),
+newSearchSearchAccountCmd(),
+newSearchSearchWorkspaceCmd(),
 )
 
 return cmd
 }
 
-// newSearchTeamCmd returns the "search search-team" cobra command.
+// newSearchSearchTeamCmd returns the "search search-team" cobra command.
 // operationId: searchTeam
-func newSearchTeamCmd() *cobra.Command {
+func newSearchSearchTeamCmd() *cobra.Command {
 var (
 username string
 searchQuery string
@@ -97,9 +97,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newSearchAccountCmd returns the "search search-account" cobra command.
+// newSearchSearchAccountCmd returns the "search search-account" cobra command.
 // operationId: searchAccount
-func newSearchAccountCmd() *cobra.Command {
+func newSearchSearchAccountCmd() *cobra.Command {
 var (
 selectedUser string
 searchQuery string
@@ -147,9 +147,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newSearchWorkspaceCmd returns the "search search-workspace" cobra command.
+// newSearchSearchWorkspaceCmd returns the "search search-workspace" cobra command.
 // operationId: searchWorkspace
-func newSearchWorkspaceCmd() *cobra.Command {
+func newSearchSearchWorkspaceCmd() *cobra.Command {
 var (
 workspace string
 searchQuery string

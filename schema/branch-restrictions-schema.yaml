@@ -1,0 +1,769 @@
+openapi: 3.0.0
+info:
+  title: Bitbucket Branch Restrictions CLI
+  version: '2.0'
+  x-cli-command-name: BranchRestrictions
+  x-cli-command-use: branch-restrictions
+  x-cli-command-short: Manage Bitbucket branch restrictions
+  x-cli-command-long: Commands for listing, creating, updating, and deleting branch
+    restriction rules in Bitbucket repositories.
+paths:
+  /repositories/{workspace}/{repo_slug}/branch-restrictions:
+    get:
+      tags:
+      - Branch restrictions
+      description: 'Returns a paginated list of all branch restrictions on the
+
+        repository.'
+      summary: List branch restrictions
+      responses:
+        '200':
+          description: A paginated list of branch restrictions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_branchrestrictions'
+        '401':
+          description: If the request was not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: If the authenticated user does not have admin access to the
+            repository
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the repository does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      parameters:
+      - name: kind
+        in: query
+        description: Branch restrictions of this type
+        required: false
+        schema:
+          type: string
+      - name: pattern
+        in: query
+        description: Branch restrictions applied to branches of this pattern
+        required: false
+        schema:
+          type: string
+      security:
+      - oauth2:
+        - repository:admin
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - admin:repository:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: listBranchRestrictions
+    post:
+      tags:
+      - Branch restrictions
+      description: "Creates a new branch restriction rule for a repository.\n\n`kind`\
+        \ describes what will be restricted. Allowed values include:\n`push`, `force`,\
+        \ `delete`, `restrict_merges`, `require_tasks_to_be_completed`,\n`require_approvals_to_merge`,\
+        \ `require_default_reviewer_approvals_to_merge`,\n`require_no_changes_requested`,\
+        \ `require_passing_builds_to_merge`, `require_commits_behind`,\n`reset_pullrequest_approvals_on_change`,\
+        \ `smart_reset_pullrequest_approvals`,\n`reset_pullrequest_changes_requested_on_change`,\
+        \ `require_all_dependencies_merged`,\n`enforce_merge_checks`, and `allow_auto_merge_when_builds_pass`.\n\
+        \nDifferent kinds of branch restrictions have different requirements:\n\n\
+        * `push` and `restrict_merges` require `users` and `groups` to be\n  specified.\
+        \ Empty lists are allowed, in which case permission is\n  denied for everybody.\n\
+        \nThe restriction applies to all branches that match. There are\ntwo ways\
+        \ to match a branch. It is configured in `branch_match_kind`:\n\n1. `glob`:\
+        \ Matches a branch against the `pattern`. A `'*'` in\n   `pattern` will expand\
+        \ to match zero or more characters, and every\n   other character matches\
+        \ itself. For example, `'foo*'` will match\n   `'foo'` and `'foobar'`, but\
+        \ not `'barfoo'`. `'*'` will match all\n   branches.\n2. `branching_model`:\
+        \ Matches a branch against the repository's\n   branching model. The `branch_type`\
+        \ controls the type of branch\n   to match. Allowed values include: `production`,\
+        \ `development`,\n   `bugfix`, `release`, `feature` and `hotfix`.\n\nThe combination\
+        \ of `kind` and match must be unique. This means that\ntwo `glob` restrictions\
+        \ in a repository cannot have the same `kind` and\n`pattern`. Additionally,\
+        \ two `branching_model` restrictions in a\nrepository cannot have the same\
+        \ `kind` and `branch_type`.\n\n`users` and `groups` are lists of users and\
+        \ groups that are except from\nthe restriction. They can only be configured\
+        \ in `push` and\n`restrict_merges` restrictions. The `push` restriction stops\
+        \ a user\npushing to matching branches unless that user is in `users` or is\
+        \ a\nmember of a group in `groups`. The `restrict_merges` stops a user\nmerging\
+        \ pull requests to matching branches unless that user is in\n`users` or is\
+        \ a member of a group in `groups`. Adding new users or\ngroups to an existing\
+        \ restriction should be done via `PUT`.\n\nNote that branch restrictions with\
+        \ overlapping matchers is allowed,\nbut the resulting behavior may be surprising."
+      summary: Create a branch restriction rule
+      responses:
+        '201':
+          description: A paginated list of branch restrictions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/branchrestriction'
+        '401':
+          description: If the request was not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: If the authenticated user does not have admin access to the
+            repository
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the repository does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/branchrestriction'
+        description: The new rule
+        required: true
+      security:
+      - oauth2:
+        - repository:admin
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - admin:repository:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: createABranchRestrictionRule
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/branch-restrictions/{id}:
+    delete:
+      tags:
+      - Branch restrictions
+      description: Deletes an existing branch restriction rule.
+      summary: Delete a branch restriction rule
+      responses:
+        '204':
+          description: ''
+        '401':
+          description: If the request was not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: If the authenticated user does not have admin access to the
+            repository
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the repository or branch restriction id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - repository:admin
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - admin:repository:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: deleteABranchRestrictionRule
+    get:
+      tags:
+      - Branch restrictions
+      description: Returns a specific branch restriction rule.
+      summary: Get a branch restriction rule
+      responses:
+        '200':
+          description: The branch restriction rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/branchrestriction'
+        '401':
+          description: If the request was not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: If the authenticated user does not have admin access to the
+            repository
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the repository or branch restriction id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - repository:admin
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - admin:repository:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: getABranchRestrictionRule
+    put:
+      tags:
+      - Branch restrictions
+      description: 'Updates an existing branch restriction rule.
+
+
+        Fields not present in the request body are ignored.
+
+
+        See [`POST`](/cloud/bitbucket/rest/api-group-branch-restrictions/#api-repositories-workspace-repo-slug-branch-restrictions-post)
+        for details.'
+      summary: Update a branch restriction rule
+      responses:
+        '200':
+          description: The updated branch restriction rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/branchrestriction'
+        '401':
+          description: If the request was not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: If the authenticated user does not have admin access to the
+            repository
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the repository or branch restriction id does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/branchrestriction'
+        description: The new version of the existing rule
+        required: true
+      security:
+      - oauth2:
+        - repository:admin
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - admin:repository:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: updateABranchRestrictionRule
+    parameters:
+    - name: id
+      in: path
+      description: The restriction rule's id
+      required: true
+      schema:
+        type: string
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+components:
+  schemas:
+    error:
+      type: object
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
+    link:
+      type: object
+      title: Link
+      description: A link to a resource related to this object.
+      properties:
+        href:
+          type: string
+          format: uri
+        name:
+          type: string
+      additionalProperties: false
+    workspace:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Workspace
+        description: "A Bitbucket workspace.\n            Workspaces are used to organize\
+          \ repositories."
+        properties:
+          links:
+            type: object
+            properties:
+              avatar:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              members:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              owners:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              projects:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              repositories:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              snippets:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          uuid:
+            type: string
+            description: The workspace's immutable id.
+          name:
+            type: string
+            description: The name of the workspace.
+          slug:
+            type: string
+            description: The short label that identifies this workspace.
+          is_private:
+            type: boolean
+            description: 'Indicates whether the workspace is publicly accessible,
+              or whether it is
+
+              private to the members and consequently only visible to members.'
+          is_privacy_enforced:
+            type: boolean
+            description: Indicates whether the workspace enforces private content,
+              or whether it allows public content.
+          forking_mode:
+            type: string
+            description: 'Controls the rules for forking repositories within this
+              workspace.
+
+
+              * **allow_forks**: unrestricted forking
+
+              * **internal_only**: prevents forking of private repositories outside
+              the workspace or to public repositories
+
+              '
+            enum:
+            - allow_forks
+            - internal_only
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+        additionalProperties: true
+    paginated_branchrestrictions:
+      type: object
+      title: Paginated Branch Restrictions
+      description: A paginated list of branch restriction rules.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/branchrestriction'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    account:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Account
+        description: An account object.
+        properties:
+          links:
+            $ref: '#/components/schemas/account_links'
+          created_on:
+            type: string
+            format: date-time
+          display_name:
+            type: string
+          uuid:
+            type: string
+        additionalProperties: true
+    branchrestriction:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Branch Restriction
+        description: A branch restriction rule.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          id:
+            type: integer
+            description: The branch restriction status' id.
+          kind:
+            type: string
+            description: The type of restriction that is being applied.
+            enum:
+            - push
+            - delete
+            - force
+            - restrict_merges
+            - require_tasks_to_be_completed
+            - require_approvals_to_merge
+            - require_review_group_approvals_to_merge
+            - require_default_reviewer_approvals_to_merge
+            - require_no_changes_requested
+            - require_passing_builds_to_merge
+            - require_commits_behind
+            - reset_pullrequest_approvals_on_change
+            - smart_reset_pullrequest_approvals
+            - reset_pullrequest_changes_requested_on_change
+            - require_all_dependencies_merged
+            - enforce_merge_checks
+            - allow_auto_merge_when_builds_pass
+            - require_all_comments_resolved
+          branch_match_kind:
+            type: string
+            description: Indicates how the restriction is matched against a branch.
+              The default is `glob`.
+            enum:
+            - branching_model
+            - glob
+          branch_type:
+            type: string
+            description: Apply the restriction to branches of this type. Active when
+              `branch_match_kind` is `branching_model`. The branch type will be calculated
+              using the branching model configured for the repository.
+            enum:
+            - feature
+            - bugfix
+            - release
+            - hotfix
+            - development
+            - production
+          pattern:
+            type: string
+            description: Apply the restriction to branches that match this pattern.
+              Active when `branch_match_kind` is `glob`. Will be empty when `branch_match_kind`
+              is `branching_model`.
+          value:
+            type: integer
+            description: 'Value with kind-specific semantics:
+
+
+              * `require_approvals_to_merge` uses it to require a minimum number of
+              approvals on a PR.
+
+
+              * `require_default_reviewer_approvals_to_merge` uses it to require a
+              minimum number of approvals from default reviewers on a PR.
+
+
+              * `require_passing_builds_to_merge` uses it to require a minimum number
+              of passing builds.
+
+
+              * `require_commits_behind` uses it to require the current branch is
+              up to a maximum number of commits behind it destination.'
+          users:
+            type: array
+            items:
+              $ref: '#/components/schemas/account'
+            minItems: 0
+          groups:
+            type: array
+            items:
+              $ref: '#/components/schemas/group'
+            minItems: 0
+        required:
+        - kind
+        - branch_match_kind
+        - pattern
+        additionalProperties: true
+    group:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Group
+        description: A group object
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          owner:
+            $ref: '#/components/schemas/account'
+          workspace:
+            $ref: '#/components/schemas/workspace'
+          name:
+            type: string
+          slug:
+            type: string
+            description: 'The "sluggified" version of the group''s name. This contains
+              only ASCII
+
+              characters and can therefore be slightly different than the name'
+          full_slug:
+            type: string
+            description: 'The concatenation of the workspace''s slug and the group''s
+              slug,
+
+              separated with a colon (e.g. `acme:developers`)
+
+              '
+        additionalProperties: true
+    object:
+      type: object
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+      required:
+      - type
+      additionalProperties: true
+      discriminator:
+        propertyName: type
+    account_links:
+      type: object
+      title: Account Links
+      description: Links related to an Account.
+      properties:
+        avatar:
+          $ref: '#/components/schemas/link'
+      additionalProperties: true

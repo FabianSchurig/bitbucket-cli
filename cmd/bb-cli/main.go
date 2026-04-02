@@ -74,7 +74,55 @@ Set authentication environment variables before running:
 	reportsCmd := commands.NewReportsCommand()
 	commands.AddOutputFlag(reportsCmd)
 
-	rootCmd.AddCommand(prCmd, hooksCmd, searchCmd, refsCmd, commitsCmd, reportsCmd)
+	reposCmd := commands.NewReposCommand()
+	commands.AddOutputFlag(reposCmd)
+
+	workspacesCmd := commands.NewWorkspacesCommand()
+	commands.AddOutputFlag(workspacesCmd)
+
+	projectsCmd := commands.NewProjectsCommand()
+	commands.AddOutputFlag(projectsCmd)
+
+	pipelinesCmd := commands.NewPipelinesCommand()
+	commands.AddOutputFlag(pipelinesCmd)
+
+	issuesCmd := commands.NewIssuesCommand()
+	commands.AddOutputFlag(issuesCmd)
+
+	snippetsCmd := commands.NewSnippetsCommand()
+	commands.AddOutputFlag(snippetsCmd)
+
+	deploymentsCmd := commands.NewDeploymentsCommand()
+	commands.AddOutputFlag(deploymentsCmd)
+
+	branchRestrictionsCmd := commands.NewBranchRestrictionsCommand()
+	commands.AddOutputFlag(branchRestrictionsCmd)
+
+	branchingModelCmd := commands.NewBranchingModelCommand()
+	commands.AddOutputFlag(branchingModelCmd)
+
+	commitStatusesCmd := commands.NewCommitStatusesCommand()
+	commands.AddOutputFlag(commitStatusesCmd)
+
+	downloadsCmd := commands.NewDownloadsCommand()
+	commands.AddOutputFlag(downloadsCmd)
+
+	usersCmd := commands.NewUsersCommand()
+	commands.AddOutputFlag(usersCmd)
+
+	propertiesCmd := commands.NewPropertiesCommand()
+	commands.AddOutputFlag(propertiesCmd)
+
+	addonCmd := commands.NewAddonCommand()
+	commands.AddOutputFlag(addonCmd)
+
+	rootCmd.AddCommand(
+		prCmd, hooksCmd, searchCmd, refsCmd, commitsCmd, reportsCmd,
+		reposCmd, workspacesCmd, projectsCmd, pipelinesCmd,
+		issuesCmd, snippetsCmd, deploymentsCmd,
+		branchRestrictionsCmd, branchingModelCmd, commitStatusesCmd,
+		downloadsCmd, usersCmd, propertiesCmd, addonCmd,
+	)
 	return rootCmd
 }
 

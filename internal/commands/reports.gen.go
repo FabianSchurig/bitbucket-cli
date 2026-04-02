@@ -39,23 +39,23 @@ Long:  `Commands for listing, creating, updating, and deleting commit reports an
 }
 
 cmd.AddCommand(
-newGetReportsForCommitCmd(),
-newGetReportCmd(),
-newCreateOrUpdateReportCmd(),
-newDeleteReportCmd(),
-newGetAnnotationsForReportCmd(),
-newBulkCreateOrUpdateAnnotationsCmd(),
-newGetAnnotationCmd(),
-newCreateOrUpdateAnnotationCmd(),
-newDeleteAnnotationCmd(),
+newReportsGetReportsForCommitCmd(),
+newReportsGetReportCmd(),
+newReportsCreateOrUpdateReportCmd(),
+newReportsDeleteReportCmd(),
+newReportsGetAnnotationsForReportCmd(),
+newReportsBulkCreateOrUpdateAnnotationsCmd(),
+newReportsGetAnnotationCmd(),
+newReportsCreateOrUpdateAnnotationCmd(),
+newReportsDeleteAnnotationCmd(),
 )
 
 return cmd
 }
 
-// newGetReportsForCommitCmd returns the "reports get-reports-for-commit" cobra command.
+// newReportsGetReportsForCommitCmd returns the "reports get-reports-for-commit" cobra command.
 // operationId: getReportsForCommit
-func newGetReportsForCommitCmd() *cobra.Command {
+func newReportsGetReportsForCommitCmd() *cobra.Command {
 var (
 workspace string
 repoSlug string
@@ -112,9 +112,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newGetReportCmd returns the "reports get-report" cobra command.
+// newReportsGetReportCmd returns the "reports get-report" cobra command.
 // operationId: getReport
-func newGetReportCmd() *cobra.Command {
+func newReportsGetReportCmd() *cobra.Command {
 var (
 workspace string
 repoSlug string
@@ -169,9 +169,9 @@ cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
 return cmd
 }
 
-// newCreateOrUpdateReportCmd returns the "reports create-or-update-report" cobra command.
+// newReportsCreateOrUpdateReportCmd returns the "reports create-or-update-report" cobra command.
 // operationId: createOrUpdateReport
-func newCreateOrUpdateReportCmd() *cobra.Command {
+func newReportsCreateOrUpdateReportCmd() *cobra.Command {
 var (
 workspace string
 repoSlug string
@@ -284,9 +284,9 @@ cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 return cmd
 }
 
-// newDeleteReportCmd returns the "reports delete-report" cobra command.
+// newReportsDeleteReportCmd returns the "reports delete-report" cobra command.
 // operationId: deleteReport
-func newDeleteReportCmd() *cobra.Command {
+func newReportsDeleteReportCmd() *cobra.Command {
 var (
 workspace string
 repoSlug string
@@ -341,9 +341,9 @@ cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
 return cmd
 }
 
-// newGetAnnotationsForReportCmd returns the "reports get-annotations-for-report" cobra command.
+// newReportsGetAnnotationsForReportCmd returns the "reports get-annotations-for-report" cobra command.
 // operationId: getAnnotationsForReport
-func newGetAnnotationsForReportCmd() *cobra.Command {
+func newReportsGetAnnotationsForReportCmd() *cobra.Command {
 var (
 workspace string
 repoSlug string
@@ -406,9 +406,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newBulkCreateOrUpdateAnnotationsCmd returns the "reports bulk-create-or-update-annotations" cobra command.
+// newReportsBulkCreateOrUpdateAnnotationsCmd returns the "reports bulk-create-or-update-annotations" cobra command.
 // operationId: bulkCreateOrUpdateAnnotations
-func newBulkCreateOrUpdateAnnotationsCmd() *cobra.Command {
+func newReportsBulkCreateOrUpdateAnnotationsCmd() *cobra.Command {
 var (
 workspace string
 repoSlug string
@@ -471,9 +471,9 @@ cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 return cmd
 }
 
-// newGetAnnotationCmd returns the "reports get-annotation" cobra command.
+// newReportsGetAnnotationCmd returns the "reports get-annotation" cobra command.
 // operationId: getAnnotation
-func newGetAnnotationCmd() *cobra.Command {
+func newReportsGetAnnotationCmd() *cobra.Command {
 var (
 workspace string
 repoSlug string
@@ -534,9 +534,9 @@ cmd.Flags().StringVar(&annotationId, "annotationId", "", "annotationId (path par
 return cmd
 }
 
-// newCreateOrUpdateAnnotationCmd returns the "reports create-or-update-annotation" cobra command.
+// newReportsCreateOrUpdateAnnotationCmd returns the "reports create-or-update-annotation" cobra command.
 // operationId: createOrUpdateAnnotation
-func newCreateOrUpdateAnnotationCmd() *cobra.Command {
+func newReportsCreateOrUpdateAnnotationCmd() *cobra.Command {
 var (
 workspace string
 repoSlug string
@@ -650,9 +650,9 @@ cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 return cmd
 }
 
-// newDeleteAnnotationCmd returns the "reports delete-annotation" cobra command.
+// newReportsDeleteAnnotationCmd returns the "reports delete-annotation" cobra command.
 // operationId: deleteAnnotation
-func newDeleteAnnotationCmd() *cobra.Command {
+func newReportsDeleteAnnotationCmd() *cobra.Command {
 var (
 workspace string
 repoSlug string

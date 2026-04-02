@@ -1,0 +1,555 @@
+openapi: 3.0.0
+info:
+  title: Bitbucket Properties CLI
+  version: '2.0'
+  x-cli-command-name: Properties
+  x-cli-command-use: properties
+  x-cli-command-short: Manage Bitbucket application properties
+  x-cli-command-long: Commands for getting, updating, and deleting application properties
+    on repositories, commits, pull requests, and users.
+paths:
+  /repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}:
+    put:
+      responses:
+        '204':
+          description: An empty response.
+      operationId: updateRepositoryHostedPropertyValue
+      summary: Update a repository application property
+      description: Update an [application property](/cloud/bitbucket/application-properties/)
+        value stored against a repository.
+      parameters:
+      - required: true
+        in: path
+        name: workspace
+        description: The repository container; either the workspace slug or the UUID
+          in curly braces.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: repo_slug
+        description: The repository.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: app_key
+        description: The key of the Connect app.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: property_name
+        description: The name of the property.
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/application_property'
+      tags:
+      - properties
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+    delete:
+      responses:
+        '204':
+          description: An empty response.
+      operationId: deleteRepositoryHostedPropertyValue
+      summary: Delete a repository application property
+      description: Delete an [application property](/cloud/bitbucket/application-properties/)
+        value stored against a repository.
+      parameters:
+      - required: true
+        in: path
+        name: workspace
+        description: The repository container; either the workspace slug or the UUID
+          in curly braces.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: repo_slug
+        description: The repository.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: app_key
+        description: The key of the Connect app.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: property_name
+        description: The name of the property.
+        schema:
+          type: string
+      tags:
+      - properties
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+    get:
+      responses:
+        '200':
+          description: The value of the property.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/application_property'
+      operationId: getRepositoryHostedPropertyValue
+      summary: Get a repository application property
+      description: Retrieve an [application property](/cloud/bitbucket/application-properties/)
+        value stored against a repository.
+      parameters:
+      - required: true
+        in: path
+        name: workspace
+        description: The repository container; either the workspace slug or the UUID
+          in curly braces.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: repo_slug
+        description: The repository.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: app_key
+        description: The key of the Connect app.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: property_name
+        description: The name of the property.
+        schema:
+          type: string
+      tags:
+      - properties
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+  /repositories/{workspace}/{repo_slug}/commit/{commit}/properties/{app_key}/{property_name}:
+    put:
+      responses:
+        '204':
+          description: An empty response.
+      operationId: updateCommitHostedPropertyValue
+      summary: Update a commit application property
+      description: Update an [application property](/cloud/bitbucket/application-properties/)
+        value stored against a commit.
+      parameters:
+      - required: true
+        in: path
+        name: workspace
+        description: The repository container; either the workspace slug or the UUID
+          in curly braces.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: repo_slug
+        description: The repository.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: commit
+        description: The commit.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: app_key
+        description: The key of the Connect app.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: property_name
+        description: The name of the property.
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/application_property'
+      tags:
+      - properties
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+    delete:
+      responses:
+        '204':
+          description: An empty response.
+      operationId: deleteCommitHostedPropertyValue
+      summary: Delete a commit application property
+      description: Delete an [application property](/cloud/bitbucket/application-properties/)
+        value stored against a commit.
+      parameters:
+      - required: true
+        in: path
+        name: workspace
+        description: The repository container; either the workspace slug or the UUID
+          in curly braces.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: repo_slug
+        description: The repository.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: commit
+        description: The commit.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: app_key
+        description: The key of the Connect app.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: property_name
+        description: The name of the property.
+        schema:
+          type: string
+      tags:
+      - properties
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+    get:
+      responses:
+        '200':
+          description: The value of the property.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/application_property'
+      operationId: getCommitHostedPropertyValue
+      summary: Get a commit application property
+      description: Retrieve an [application property](/cloud/bitbucket/application-properties/)
+        value stored against a commit.
+      parameters:
+      - required: true
+        in: path
+        name: workspace
+        description: The repository container; either the workspace slug or the UUID
+          in curly braces.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: repo_slug
+        description: The repository.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: commit
+        description: The commit.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: app_key
+        description: The key of the Connect app.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: property_name
+        description: The name of the property.
+        schema:
+          type: string
+      tags:
+      - properties
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+  /repositories/{workspace}/{repo_slug}/pullrequests/{pullrequest_id}/properties/{app_key}/{property_name}:
+    put:
+      responses:
+        '204':
+          description: An empty response.
+      operationId: updatePullRequestHostedPropertyValue
+      summary: Update a pull request application property
+      description: Update an [application property](/cloud/bitbucket/application-properties/)
+        value stored against a pull request.
+      parameters:
+      - required: true
+        in: path
+        name: workspace
+        description: The repository container; either the workspace slug or the UUID
+          in curly braces.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: repo_slug
+        description: The repository.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: pullrequest_id
+        description: The pull request ID.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: app_key
+        description: The key of the Connect app.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: property_name
+        description: The name of the property.
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/application_property'
+      tags:
+      - properties
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+    delete:
+      responses:
+        '204':
+          description: An empty response.
+      operationId: deletePullRequestHostedPropertyValue
+      summary: Delete a pull request application property
+      description: Delete an [application property](/cloud/bitbucket/application-properties/)
+        value stored against a pull request.
+      parameters:
+      - required: true
+        in: path
+        name: workspace
+        description: The repository container; either the workspace slug or the UUID
+          in curly braces.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: repo_slug
+        description: The repository.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: pullrequest_id
+        description: The pull request ID.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: app_key
+        description: The key of the Connect app.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: property_name
+        description: The name of the property.
+        schema:
+          type: string
+      tags:
+      - properties
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+    get:
+      responses:
+        '200':
+          description: The value of the property.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/application_property'
+      operationId: getPullRequestHostedPropertyValue
+      summary: Get a pull request application property
+      description: Retrieve an [application property](/cloud/bitbucket/application-properties/)
+        value stored against a pull request.
+      parameters:
+      - required: true
+        in: path
+        name: workspace
+        description: The repository container; either the workspace slug or the UUID
+          in curly braces.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: repo_slug
+        description: The repository.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: pullrequest_id
+        description: The pull request ID.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: app_key
+        description: The key of the Connect app.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: property_name
+        description: The name of the property.
+        schema:
+          type: string
+      tags:
+      - properties
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+  /users/{selected_user}/properties/{app_key}/{property_name}:
+    put:
+      responses:
+        '204':
+          description: An empty response.
+      operationId: updateUserHostedPropertyValue
+      summary: Update a user application property
+      description: Update an [application property](/cloud/bitbucket/application-properties/)
+        value stored against a user.
+      parameters:
+      - required: true
+        in: path
+        name: selected_user
+        description: Either the UUID of the account surrounded by curly-braces, for
+          example `{account UUID}`, OR an Atlassian Account ID.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: app_key
+        description: The key of the Connect app.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: property_name
+        description: The name of the property.
+        schema:
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/application_property'
+      tags:
+      - properties
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+    delete:
+      responses:
+        '204':
+          description: An empty response.
+      operationId: deleteUserHostedPropertyValue
+      summary: Delete a user application property
+      description: Delete an [application property](/cloud/bitbucket/application-properties/)
+        value stored against a user.
+      parameters:
+      - required: true
+        in: path
+        name: selected_user
+        description: Either the UUID of the account surrounded by curly-braces, for
+          example `{account UUID}`, OR an Atlassian Account ID.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: app_key
+        description: The key of the Connect app.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: property_name
+        description: The name of the property.
+        schema:
+          type: string
+      tags:
+      - properties
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+    get:
+      responses:
+        '200':
+          description: The value of the property.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/application_property'
+      operationId: retrieveUserHostedPropertyValue
+      summary: Get a user application property
+      description: Retrieve an [application property](/cloud/bitbucket/application-properties/)
+        value stored against a user.
+      parameters:
+      - required: true
+        in: path
+        name: selected_user
+        description: Either the UUID of the account surrounded by curly-braces, for
+          example `{account UUID}`, OR an Atlassian Account ID.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: app_key
+        description: The key of the Connect app.
+        schema:
+          type: string
+      - required: true
+        in: path
+        name: property_name
+        description: The name of the property.
+        schema:
+          type: string
+      tags:
+      - properties
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+components:
+  schemas:
+    application_property:
+      additionalProperties: true
+      type: object
+      title: Application Property
+      description: "An application property. It is a caller defined JSON object that\
+        \ Bitbucket will store and return. \nThe `_attributes` field at its top level\
+        \ can be used to control who is allowed to read and update the property. \n\
+        The keys of the JSON object must match an allowed pattern. For details, \n\
+        see [Application properties](/cloud/bitbucket/application-properties/).\n"
+      properties:
+        _attributes:
+          type: array
+          items:
+            type: string
+            enum:
+            - public
+            - read_only

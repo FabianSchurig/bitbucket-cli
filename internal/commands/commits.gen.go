@@ -39,30 +39,30 @@ Long:  `Commands for listing, viewing, approving, and commenting on commits in B
 }
 
 cmd.AddCommand(
-newGetACommitCmd(),
-newApproveACommitCmd(),
-newUnapproveACommitCmd(),
-newListACommitsCommentsCmd(),
-newCreateCommentForACommitCmd(),
-newGetACommitCommentCmd(),
-newUpdateACommitCommentCmd(),
-newDeleteACommitCommentCmd(),
-newListCommitsCmd(),
-newListCommitsWithIncludeexcludeCmd(),
-newListCommitsForRevisionCmd(),
-newListCommitsForRevisionUsingIncludeexcludeCmd(),
-newCompareTwoCommitsCmd(),
-newCompareTwoCommitDiffStatsCmd(),
-newGetTheCommonAncestorBetweenTwoCommitsCmd(),
-newGetAPatchForTwoCommitsCmd(),
+newCommitsGetACommitCmd(),
+newCommitsApproveACommitCmd(),
+newCommitsUnapproveACommitCmd(),
+newCommitsListACommitsCommentsCmd(),
+newCommitsCreateCommentForACommitCmd(),
+newCommitsGetACommitCommentCmd(),
+newCommitsUpdateACommitCommentCmd(),
+newCommitsDeleteACommitCommentCmd(),
+newCommitsListCommitsCmd(),
+newCommitsListCommitsWithIncludeexcludeCmd(),
+newCommitsListCommitsForRevisionCmd(),
+newCommitsListCommitsForRevisionUsingIncludeexcludeCmd(),
+newCommitsCompareTwoCommitsCmd(),
+newCommitsCompareTwoCommitDiffStatsCmd(),
+newCommitsGetTheCommonAncestorBetweenTwoCommitsCmd(),
+newCommitsGetAPatchForTwoCommitsCmd(),
 )
 
 return cmd
 }
 
-// newGetACommitCmd returns the "commits get-a-commit" cobra command.
+// newCommitsGetACommitCmd returns the "commits get-a-commit" cobra command.
 // operationId: getACommit
-func newGetACommitCmd() *cobra.Command {
+func newCommitsGetACommitCmd() *cobra.Command {
 var (
 commit string
 repoSlug string
@@ -111,9 +111,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newApproveACommitCmd returns the "commits approve-a-commit" cobra command.
+// newCommitsApproveACommitCmd returns the "commits approve-a-commit" cobra command.
 // operationId: approveACommit
-func newApproveACommitCmd() *cobra.Command {
+func newCommitsApproveACommitCmd() *cobra.Command {
 var (
 commit string
 repoSlug string
@@ -167,9 +167,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newUnapproveACommitCmd returns the "commits unapprove-a-commit" cobra command.
+// newCommitsUnapproveACommitCmd returns the "commits unapprove-a-commit" cobra command.
 // operationId: unapproveACommit
-func newUnapproveACommitCmd() *cobra.Command {
+func newCommitsUnapproveACommitCmd() *cobra.Command {
 var (
 commit string
 repoSlug string
@@ -223,9 +223,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newListACommitsCommentsCmd returns the "commits list-a-commits-comments" cobra command.
+// newCommitsListACommitsCommentsCmd returns the "commits list-a-commits-comments" cobra command.
 // operationId: listACommitsComments
-func newListACommitsCommentsCmd() *cobra.Command {
+func newCommitsListACommitsCommentsCmd() *cobra.Command {
 var (
 commit string
 repoSlug string
@@ -288,9 +288,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newCreateCommentForACommitCmd returns the "commits create-comment-for-a-commit" cobra command.
+// newCommitsCreateCommentForACommitCmd returns the "commits create-comment-for-a-commit" cobra command.
 // operationId: createCommentForACommit
-func newCreateCommentForACommitCmd() *cobra.Command {
+func newCommitsCreateCommentForACommitCmd() *cobra.Command {
 var (
 commit string
 repoSlug string
@@ -387,9 +387,9 @@ cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 return cmd
 }
 
-// newGetACommitCommentCmd returns the "commits get-a-commit-comment" cobra command.
+// newCommitsGetACommitCommentCmd returns the "commits get-a-commit-comment" cobra command.
 // operationId: getACommitComment
-func newGetACommitCommentCmd() *cobra.Command {
+func newCommitsGetACommitCommentCmd() *cobra.Command {
 var (
 commentId int
 commit string
@@ -444,9 +444,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newUpdateACommitCommentCmd returns the "commits update-a-commit-comment" cobra command.
+// newCommitsUpdateACommitCommentCmd returns the "commits update-a-commit-comment" cobra command.
 // operationId: updateACommitComment
-func newUpdateACommitCommentCmd() *cobra.Command {
+func newCommitsUpdateACommitCommentCmd() *cobra.Command {
 var (
 commentId int
 commit string
@@ -549,9 +549,9 @@ cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 return cmd
 }
 
-// newDeleteACommitCommentCmd returns the "commits delete-a-commit-comment" cobra command.
+// newCommitsDeleteACommitCommentCmd returns the "commits delete-a-commit-comment" cobra command.
 // operationId: deleteACommitComment
-func newDeleteACommitCommentCmd() *cobra.Command {
+func newCommitsDeleteACommitCommentCmd() *cobra.Command {
 var (
 commentId int
 commit string
@@ -606,9 +606,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newListCommitsCmd returns the "commits list-commits" cobra command.
+// newCommitsListCommitsCmd returns the "commits list-commits" cobra command.
 // operationId: listCommits
-func newListCommitsCmd() *cobra.Command {
+func newCommitsListCommitsCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
@@ -659,9 +659,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newListCommitsWithIncludeexcludeCmd returns the "commits list-commits-with-includeexclude" cobra command.
+// newCommitsListCommitsWithIncludeexcludeCmd returns the "commits list-commits-with-includeexclude" cobra command.
 // operationId: listCommitsWithIncludeexclude
-func newListCommitsWithIncludeexcludeCmd() *cobra.Command {
+func newCommitsListCommitsWithIncludeexcludeCmd() *cobra.Command {
 var (
 repoSlug string
 workspace string
@@ -712,9 +712,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newListCommitsForRevisionCmd returns the "commits list-commits-for-revision" cobra command.
+// newCommitsListCommitsForRevisionCmd returns the "commits list-commits-for-revision" cobra command.
 // operationId: listCommitsForRevision
-func newListCommitsForRevisionCmd() *cobra.Command {
+func newCommitsListCommitsForRevisionCmd() *cobra.Command {
 var (
 repoSlug string
 revision string
@@ -771,9 +771,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newListCommitsForRevisionUsingIncludeexcludeCmd returns the "commits list-commits-for-revision-using-includeexclude" cobra command.
+// newCommitsListCommitsForRevisionUsingIncludeexcludeCmd returns the "commits list-commits-for-revision-using-includeexclude" cobra command.
 // operationId: listCommitsForRevisionUsingIncludeexclude
-func newListCommitsForRevisionUsingIncludeexcludeCmd() *cobra.Command {
+func newCommitsListCommitsForRevisionUsingIncludeexcludeCmd() *cobra.Command {
 var (
 repoSlug string
 revision string
@@ -830,9 +830,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newCompareTwoCommitsCmd returns the "commits compare-two-commits" cobra command.
+// newCommitsCompareTwoCommitsCmd returns the "commits compare-two-commits" cobra command.
 // operationId: compareTwoCommits
-func newCompareTwoCommitsCmd() *cobra.Command {
+func newCommitsCompareTwoCommitsCmd() *cobra.Command {
 var (
 repoSlug string
 spec string
@@ -902,9 +902,9 @@ cmd.Flags().BoolVar(&topic, "topic", false, "topic (query parameter)")
 return cmd
 }
 
-// newCompareTwoCommitDiffStatsCmd returns the "commits compare-two-commit-diff-stats" cobra command.
+// newCommitsCompareTwoCommitDiffStatsCmd returns the "commits compare-two-commit-diff-stats" cobra command.
 // operationId: compareTwoCommitDiffStats
-func newCompareTwoCommitDiffStatsCmd() *cobra.Command {
+func newCommitsCompareTwoCommitDiffStatsCmd() *cobra.Command {
 var (
 ignoreWhitespace bool
 merge bool
@@ -976,9 +976,9 @@ cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' curso
 return cmd
 }
 
-// newGetTheCommonAncestorBetweenTwoCommitsCmd returns the "commits get-the-common-ancestor-between-two-commits" cobra command.
+// newCommitsGetTheCommonAncestorBetweenTwoCommitsCmd returns the "commits get-the-common-ancestor-between-two-commits" cobra command.
 // operationId: getTheCommonAncestorBetweenTwoCommits
-func newGetTheCommonAncestorBetweenTwoCommitsCmd() *cobra.Command {
+func newCommitsGetTheCommonAncestorBetweenTwoCommitsCmd() *cobra.Command {
 var (
 repoSlug string
 revspec string
@@ -1031,9 +1031,9 @@ cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 return cmd
 }
 
-// newGetAPatchForTwoCommitsCmd returns the "commits get-a-patch-for-two-commits" cobra command.
+// newCommitsGetAPatchForTwoCommitsCmd returns the "commits get-a-patch-for-two-commits" cobra command.
 // operationId: getAPatchForTwoCommits
-func newGetAPatchForTwoCommitsCmd() *cobra.Command {
+func newCommitsGetAPatchForTwoCommitsCmd() *cobra.Command {
 var (
 repoSlug string
 spec string
