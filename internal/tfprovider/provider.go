@@ -136,7 +136,7 @@ func (p *BitbucketProvider) DataSources(_ context.Context) []func() datasource.D
 // ─── Registration ─────────────────────────────────────────────────────────────
 
 var (
-	registeredResources  []func() resource.Resource
+	registeredResources   []func() resource.Resource
 	registeredDataSources []func() datasource.DataSource
 )
 

@@ -49,7 +49,7 @@ func MapCRUDOps(ops []OperationDef) CRUDOps {
 	// Score operations by how well they match each CRUD slot.
 	// Prefer specific endpoints (with more path params) for single-resource ops.
 	var (
-		bestCreate, bestRead, bestUpdate, bestDelete, bestList *OperationDef
+		bestCreate, bestRead, bestUpdate, bestDelete, bestList      *OperationDef
 		createScore, readScore, updateScore, deleteScore, listScore int
 	)
 

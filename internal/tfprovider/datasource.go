@@ -67,7 +67,7 @@ func (d *GenericDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 		attrs[attrName] = schema.StringAttribute{
 			Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
 			Required:    p.Required && p.In == "path",
-			Optional:    !(p.Required && p.In == "path"),
+			Optional:    !p.Required || p.In != "path",
 		}
 	}
 

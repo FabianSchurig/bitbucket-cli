@@ -110,7 +110,7 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 			attrs[attrName] = schema.StringAttribute{
 				Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
 				Required:    p.Required && p.In == "path",
-				Optional:    !(p.Required && p.In == "path"),
+				Optional:    !p.Required || p.In != "path",
 			}
 		}
 	}

@@ -37,14 +37,16 @@ generate:
 		if [ "$$base" = "pr" ]; then \
 			go run scripts/gen_commands/main.go "$$schema" internal/commands/commands.gen.go; \
 			go run scripts/gen_mcptools/main.go "$$schema" internal/mcptools/pr.gen.go; \
+			go run scripts/gen_terraform/main.go "$$schema" internal/tfprovider/pr.gen.go; \
 		else \
 			go run scripts/gen_commands/main.go "$$schema" "internal/commands/$${base}.gen.go"; \
 			go run scripts/gen_mcptools/main.go "$$schema" "internal/mcptools/$${base}.gen.go"; \
+			go run scripts/gen_terraform/main.go "$$schema" "internal/tfprovider/$${base}.gen.go"; \
 		fi; \
 	done
 	@echo "All code regenerated"
 
 # Clean build artifacts
 clean:
-	rm -f bb-cli bb-mcp gen_commands gen_mcptools main
+	rm -f bb-cli bb-mcp bb-tf gen_commands gen_mcptools gen_terraform main
 	rm -rf dist/

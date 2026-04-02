@@ -24,16 +24,16 @@ import (
 // ─── Template data types ──────────────────────────────────────────────────────
 
 type TFResourceData struct {
-	SchemaPath   string
-	VarName      string // e.g., "PRResourceGroup"
-	TypeName     string // e.g., "pr"
-	Description  string
-	Operations   []TFOpData
-	CRUDCreate   string // OperationID or empty
-	CRUDRead     string
-	CRUDUpdate   string
-	CRUDDelete   string
-	CRUDList     string
+	SchemaPath  string
+	VarName     string // e.g., "PRResourceGroup"
+	TypeName    string // e.g., "pr"
+	Description string
+	Operations  []TFOpData
+	CRUDCreate  string // OperationID or empty
+	CRUDRead    string
+	CRUDUpdate  string
+	CRUDDelete  string
+	CRUDList    string
 }
 
 type TFOpData struct {
