@@ -314,7 +314,11 @@ func (r *GenericResource) buildBody(ctx context.Context, op *OperationDef, sourc
 	if len(bodyObj) == 0 {
 		return ""
 	}
-	b, _ := json.Marshal(bodyObj)
+	b, err := json.Marshal(bodyObj)
+	if err != nil {
+		diags.AddError("Body Error", fmt.Sprintf("Failed to marshal request body: %v", err))
+		return ""
+	}
 	return string(b)
 }
 

@@ -40,9 +40,9 @@ func toSnakeCase(s string) string {
 	return strings.ToLower(result.String())
 }
 
-// mapCRUDOps analyzes a list of operations and assigns them to CRUD slots based
-// on HTTP method heuristics. This is used by the generator to auto-detect
-// create/read/update/delete operations.
+// MapCRUDOps analyzes a list of operations and assigns them to CRUD slots based
+// on HTTP method heuristics. Called at runtime by generated init() functions to
+// map Bitbucket API operations to Terraform CRUD lifecycle methods.
 func MapCRUDOps(ops []OperationDef) CRUDOps {
 	var crud CRUDOps
 
