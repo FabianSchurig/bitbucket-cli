@@ -173,7 +173,7 @@ Two images are published to GHCR on every release:
 | `ghcr.io/fabianschurig/bitbucket-cli` | CLI (`bb-cli`) |
 | `ghcr.io/fabianschurig/bitbucket-mcp` | MCP server (`bb-mcp`) |
 
-Both images use [distroless](https://github.com/GoogleContainerTools/distroless) base images and run as a non-root user.
+Both images use the hardened `dhi.io/golang` base image.
 
 ```bash
 # CLI
@@ -210,12 +210,11 @@ docker build --target bb-mcp -t bb-mcp .
 
 #### Extending the Dockerfile
 
-The `Dockerfile` uses a multi-stage build with a shared builder stage and separate
-minimal final stages for each binary. To add a new binary target:
+Each target is a self-contained stage that installs a binary with `go install`
+on the hardened base image. To add a new binary target:
 
-1. Add a `CGO_ENABLED=0 go build ...` line in the **builder** stage that compiles the new binary into `/out/`.
-2. Add a new final stage that copies the binary from the builder (use the existing `bb-cli` or `bb-mcp` stages as a template).
-3. Add the new target to the build matrix in `.github/workflows/docker.yml` so CI builds and pushes the image automatically.
+1. Add a new stage that installs the binary with `go install` (use the existing `bb-cli` or `bb-mcp` stages as a template).
+2. Add the new target to the build matrix in `.github/workflows/docker.yml` so CI builds and pushes the image automatically.
 
 ### Build from source
 
