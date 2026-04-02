@@ -1,10 +1,15 @@
 # bitbucket-cli
 
-A low-maintenance CLI for [Bitbucket Cloud](https://bitbucket.org/) pull requests. Most code is **auto-generated** from the live Bitbucket OpenAPI spec — only a thin hand-written layer ties it together. A daily CI job fetches the latest spec, regenerates the code, and releases a new version if anything changed.
+A low-maintenance CLI and MCP server for [Bitbucket Cloud](https://bitbucket.org/). Most code is **auto-generated** from the live Bitbucket OpenAPI spec — only a thin hand-written layer ties it together. A daily CI job fetches the latest spec, regenerates the code, and releases a new version if anything changed.
 
 ## Why?
 
-Bitbucket Cloud has no official CLI. Managing pull requests through the web UI is slow when you just want to list, approve, merge, or decline from the terminal. This project fills that gap with a single binary that:
+Bitbucket Cloud has no official CLI. Managing pull requests through the web UI is slow when you just want to list, approve, merge, or decline from the terminal. This project fills that gap with two binaries:
+
+- **`bb-cli`** — A command-line interface for all Bitbucket Cloud API endpoints.
+- **`bb-mcp`** — A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server that exposes all Bitbucket operations as MCP tools.
+
+Both share the same auto-generated foundation:
 
 - **Stays up-to-date automatically** — new API endpoints appear without manual work.
 - **Requires near-zero maintenance** — the generic dispatch layer means no per-endpoint glue code.
@@ -16,13 +21,21 @@ Bitbucket Cloud has no official CLI. Managing pull requests through the web UI i
 ```mermaid
 flowchart LR
     A["Bitbucket OpenAPI spec\n(live)"] --> B["enrich_spec.py\n+ operationIds"]
-    B --> C["partition_spec.py\nextract PR paths"]
-    C --> D["pr-schema.yaml"]
+    B --> C["partition_spec.py\nextract paths by group"]
+    C --> D["schema/*.yaml"]
     D --> E["oapi-codegen\nmodels.gen.go"]
-    D --> F["gen_commands\ncommands.gen.go"]
-    E & F --> G["bb-cli binary"]
-    G --> H["auth · dispatch · output\n(hand-written)"]
+    D --> F["gen_commands\ncommands/*.gen.go"]
+    D --> G["gen_mcptools\nmcptools/*.gen.go"]
+    E & F --> H["bb-cli binary"]
+    E & G --> I["bb-mcp binary"]
+    H --> J["auth · dispatch · output\n(hand-written)"]
+    I --> K["MCP handler · dispatch\n(hand-written)"]
+    J & K --> L["Shared spec parsing\nscripts/internal/spec"]
 ```
+
+The architecture uses a shared intermediate representation (`OperationDef`) that
+both CLI and MCP generators consume. This design supports future extensions
+(e.g., Terraform provider) with minimal additional maintenance.
 
 ## Example Usage
 
@@ -61,12 +74,68 @@ See all available PR commands:
 bb-cli pr --help
 ```
 
+## MCP Server
+
+The `bb-mcp` binary is a Model Context Protocol (MCP) server that exposes all Bitbucket API operations as MCP tools. Each command group (pull requests, repositories, pipelines, etc.) is a single tool with an `operation` parameter — this CRUD-combined design matches how Terraform providers work.
+
+### Quick Start
+
+```bash
+# Install
+go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-mcp@latest
+
+# Set Bitbucket auth
+export BITBUCKET_USERNAME=myuser
+export BITBUCKET_APP_PASSWORD=ATBBxxxxxxxx
+
+# Run as stdio MCP server (default, for MCP clients like Claude Desktop)
+bb-mcp
+
+# Or run as HTTP SSE server
+bb-mcp --transport sse --addr :8080
+```
+
+### Configuration for Claude Desktop
+
+Add to your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "bitbucket": {
+      "command": "bb-mcp",
+      "env": {
+        "BITBUCKET_USERNAME": "myuser",
+        "BITBUCKET_APP_PASSWORD": "ATBBxxxxxxxx"
+      }
+    }
+  }
+}
+```
+
+### Available Tools
+
+Each tool groups related operations with an `operation` parameter:
+
+| Tool | Operations | Description |
+|------|-----------|-------------|
+| `bitbucket_pr` | 37 | Pull requests: list, create, merge, approve, comments |
+| `bitbucket_repos` | 30 | Repositories: list, create, update, permissions |
+| `bitbucket_pipelines` | 68 | Pipelines: runs, steps, variables, caches |
+| `bitbucket_issues` | 33 | Issues: list, create, update, comments, attachments |
+| `bitbucket_workspaces` | 21 | Workspaces: members, permissions, projects |
+| ... | | 20 tool groups total, 352+ operations |
+
 ## Installation
 
 ### Go install (recommended)
 
 ```bash
+# CLI
 go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-cli@latest
+
+# MCP server
+go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-mcp@latest
 ```
 
 Make sure `$(go env GOPATH)/bin` is in your `PATH`:
