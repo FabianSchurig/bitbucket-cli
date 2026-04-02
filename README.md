@@ -166,7 +166,17 @@ Download a pre-built binary from the [GitHub Releases](https://github.com/Fabian
 
 ### Docker
 
+Two images are published to GHCR on every release:
+
+| Image | Description |
+|-------|-------------|
+| `ghcr.io/fabianschurig/bitbucket-cli` | CLI (`bb-cli`) |
+| `ghcr.io/fabianschurig/bitbucket-mcp` | MCP server (`bb-mcp`) |
+
+Both images use [distroless](https://github.com/GoogleContainerTools/distroless) base images and run as a non-root user.
+
 ```bash
+# CLI
 docker pull ghcr.io/fabianschurig/bitbucket-cli:latest
 
 docker run --rm \
@@ -174,7 +184,38 @@ docker run --rm \
   -e BITBUCKET_APP_PASSWORD \
   ghcr.io/fabianschurig/bitbucket-cli pr list-pull-requests \
     --workspace myteam --repo-slug myrepo
+
+# MCP server (stdio, e.g. for Claude Desktop)
+docker run --rm -i \
+  -e BITBUCKET_USERNAME \
+  -e BITBUCKET_APP_PASSWORD \
+  ghcr.io/fabianschurig/bitbucket-mcp
+
+# MCP server (SSE over HTTP)
+docker run --rm -p 8080:8080 \
+  -e BITBUCKET_USERNAME \
+  -e BITBUCKET_APP_PASSWORD \
+  ghcr.io/fabianschurig/bitbucket-mcp --transport sse --addr :8080
 ```
+
+#### Building Docker images locally
+
+```bash
+# Build CLI image
+docker build --target bb-cli -t bb-cli .
+
+# Build MCP server image
+docker build --target bb-mcp -t bb-mcp .
+```
+
+#### Extending the Dockerfile
+
+The `Dockerfile` uses a multi-stage build with a shared builder stage and separate
+minimal final stages for each binary. To add a new binary target:
+
+1. Add a `CGO_ENABLED=0 go build ...` line in the **builder** stage that compiles the new binary into `/out/`.
+2. Add a new final stage that copies the binary from the builder (use the existing `bb-cli` or `bb-mcp` stages as a template).
+3. Add the new target to the build matrix in `.github/workflows/docker.yml` so CI builds and pushes the image automatically.
 
 ### Build from source
 
