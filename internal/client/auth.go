@@ -8,7 +8,7 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-const baseURL = "https://api.bitbucket.org/2.0"
+const defaultBaseURL = "https://api.bitbucket.org/2.0"
 
 // BBClient wraps a resty.Client configured for the Bitbucket API.
 type BBClient struct {
@@ -20,8 +20,15 @@ type BBClient struct {
 // Authentication precedence:
 //  1. BITBUCKET_USERNAME + BITBUCKET_APP_PASSWORD → HTTP Basic Auth (most common)
 //  2. BITBUCKET_TOKEN (alone) → Bearer token (OAuth2)
+//
+// The base URL defaults to https://api.bitbucket.org/2.0 but can be
+// overridden with BITBUCKET_BASE_URL (useful for testing).
 func NewClient() (*BBClient, error) {
-	c := resty.New().SetBaseURL(baseURL)
+	base := os.Getenv("BITBUCKET_BASE_URL")
+	if base == "" {
+		base = defaultBaseURL
+	}
+	c := resty.New().SetBaseURL(base)
 
 	username := os.Getenv("BITBUCKET_USERNAME")
 	password := os.Getenv("BITBUCKET_APP_PASSWORD")

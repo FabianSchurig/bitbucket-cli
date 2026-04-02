@@ -29,30 +29,39 @@ go run ./cmd/bb-cli --help  # run locally
 
 ```
 cmd/bb-cli/main.go          # Entry point, root Cobra command (hand-written)
+cmd/bb-mcp/main.go          # Entry point, MCP server (hand-written)
 internal/client/             # HTTP client + auth (hand-written)
 internal/handlers/           # Generic HTTP dispatcher (hand-written)
 internal/output/             # Table/JSON/ID rendering (hand-written)
-internal/commands/commands.gen.go   # ⚠️ GENERATED — do not edit
+internal/mcptools/handler.go # MCP tool handler (hand-written)
+internal/commands/*.gen.go   # ⚠️ GENERATED — do not edit
+internal/mcptools/*.gen.go   # ⚠️ GENERATED — do not edit
 internal/generated/models.gen.go    # ⚠️ GENERATED — do not edit
-schema/pr-schema.yaml               # ⚠️ GENERATED — do not edit
-scripts/                     # Code generation pipeline (Python + Go)
+schema/*-schema.yaml                # ⚠️ GENERATED — do not edit
+scripts/internal/spec/       # Shared schema parsing (hand-written)
+scripts/gen_commands/         # CLI command generator
+scripts/gen_mcptools/         # MCP tool generator
+scripts/                     # Schema enrichment/partition (Python)
 ```
 
 ## Important: Generated Files
 
 The following files are **auto-generated** and must **never be edited by hand**:
 
-- `internal/commands/commands.gen.go`
+- `internal/commands/*.gen.go`
+- `internal/mcptools/*.gen.go`
 - `internal/generated/models.gen.go`
-- `schema/pr-schema.yaml`
+- `schema/*-schema.yaml`
 
 Changes will be overwritten by the next CI run. Instead, fix the source:
 
 | Problem | Fix in |
 |---------|--------|
 | Wrong command flags/descriptions | `scripts/gen_commands/main.go` |
+| Wrong MCP tool definitions | `scripts/gen_mcptools/main.go` |
 | Wrong model types | `oapi-codegen.yaml` or `scripts/partition_spec.py` |
 | Missing/wrong endpoints | `scripts/enrich_spec.py` or `scripts/partition_spec.py` |
+| Shared schema logic | `scripts/internal/spec/` |
 
 ## Pull Request Guidelines
 
@@ -68,9 +77,14 @@ The full pipeline, typically run by CI:
 
 ```bash
 python3 scripts/enrich_spec.py <raw-spec.json> <enriched.json>
-python3 scripts/partition_spec.py <enriched.json> schema/pr-schema.yaml
+python3 scripts/partition_spec.py <enriched.json> schema/ --all
 oapi-codegen --config oapi-codegen.yaml schema/pr-schema.yaml
+
+# CLI commands
 go run scripts/gen_commands/main.go schema/pr-schema.yaml internal/commands/commands.gen.go
+
+# MCP tools
+go run scripts/gen_mcptools/main.go schema/pr-schema.yaml internal/mcptools/pr.gen.go
 ```
 
 ## Security

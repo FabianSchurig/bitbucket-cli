@@ -1,6 +1,8 @@
 # Binaries
 /bb-cli
+/bb-mcp
 /gen_commands
+/gen_mcptools
 /main
 
 # Build artifacts
