@@ -35,6 +35,22 @@ type pageResult struct {
 // sets query parameters, sends body for POST/PUT/PATCH, and handles
 // Bitbucket's cursor-based pagination when Request.All is true.
 func Dispatch(ctx context.Context, c *client.BBClient, r Request) error {
+	result, err := DispatchRaw(ctx, c, r)
+	if err != nil {
+		return err
+	}
+	if result == nil {
+		fmt.Println("OK")
+		return nil
+	}
+	return output.Render(result)
+}
+
+// DispatchRaw performs a generic Bitbucket API request and returns the raw
+// parsed response (either a single object or a collected []any for paginated
+// responses). Returns nil for empty/non-JSON responses. This is used by both
+// the CLI (via Dispatch) and the MCP server.
+func DispatchRaw(ctx context.Context, c *client.BBClient, r Request) (any, error) {
 	baseURL := buildURL(r.URLTemplate, r.PathParams)
 	var allValues []any
 	fetchURL := baseURL
@@ -42,18 +58,21 @@ func Dispatch(ctx context.Context, c *client.BBClient, r Request) error {
 	for {
 		resp, err := executeRequest(ctx, c, r, fetchURL, baseURL)
 		if err != nil {
-			return fmt.Errorf("%s %s: %w", r.Method, fetchURL, err)
+			return nil, fmt.Errorf("%s %s: %w", r.Method, fetchURL, err)
 		}
 		if resp.IsError() {
-			return client.ParseError(resp)
+			return nil, client.ParseError(resp)
 		}
 
-		result, done, err := parseResponse(resp)
+		result, nonJSON, err := parseResponseRaw(resp)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		if done {
-			return nil
+		if nonJSON {
+			return nil, nil
+		}
+		if result == nil {
+			return nil, nil
 		}
 
 		if page := extractPage(result); page != nil {
@@ -62,10 +81,10 @@ func Dispatch(ctx context.Context, c *client.BBClient, r Request) error {
 				fetchURL = page.nextURL
 				continue
 			}
-			return output.Render(allValues)
+			return allValues, nil
 		}
 
-		return output.Render(result)
+		return result, nil
 	}
 }
 
@@ -98,19 +117,17 @@ func executeRequest(ctx context.Context, c *client.BBClient, r Request, fetchURL
 	return req.Execute(r.Method, fetchURL)
 }
 
-// parseResponse handles empty and non-JSON responses.
-// Returns the parsed result, or done=true if output was already written.
-func parseResponse(resp *resty.Response) (result any, done bool, err error) {
+// parseResponseRaw handles empty and non-JSON responses.
+// Returns the parsed result, or nonJSON=true if the response is not JSON.
+func parseResponseRaw(resp *resty.Response) (result any, nonJSON bool, err error) {
 	respBody := resp.Body()
 	if len(respBody) == 0 {
-		fmt.Println("OK")
-		return nil, true, nil
+		return nil, false, nil
 	}
 
 	ct := resp.Header().Get("Content-Type")
 	if !strings.Contains(ct, "json") {
-		fmt.Print(string(respBody))
-		return nil, true, nil
+		return string(respBody), true, nil
 	}
 
 	var parsed any
