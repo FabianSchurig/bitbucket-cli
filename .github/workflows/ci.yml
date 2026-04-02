@@ -26,8 +26,19 @@ jobs:
       - name: Build
         run: go build ./...
 
-      - name: Test
-        run: go test -coverprofile=coverage.out ./...
+      - name: Lint
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: latest
+
+      - name: Format check
+        run: test -z "$(gofmt -l .)" || (echo "Files not formatted:"; gofmt -l .; exit 1)
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test with race detector
+        run: go test -race -coverprofile=coverage.out ./...
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
