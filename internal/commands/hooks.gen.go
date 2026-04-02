@@ -59,7 +59,6 @@ func NewHooksCommand() *cobra.Command {
 // newHooksGetAWebhookResourceCmd returns the "hooks get-a-webhook-resource" cobra command.
 // operationId: getAWebhookResource
 func newHooksGetAWebhookResourceCmd() *cobra.Command {
-	var ()
 
 	cmd := &cobra.Command{
 		Use:   "get-a-webhook-resource",

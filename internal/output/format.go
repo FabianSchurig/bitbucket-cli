@@ -54,16 +54,23 @@ func padRight(s string, n int) string {
 }
 
 // mdTable writes a markdown-style table to w given headers and rows.
-func mdTable(w io.Writer, headers []string, rows [][]string) {
+func mdTable(w io.Writer, headers []string, rows [][]string) error {
 	if len(headers) == 0 {
-		return
+		return nil
 	}
 	widths := columnWidths(headers, rows)
-	writeMdRow(w, headers, widths)
-	writeMdSeparator(w, widths)
-	for _, row := range rows {
-		writeMdRow(w, row, widths)
+	if err := writeMdRow(w, headers, widths); err != nil {
+		return err
 	}
+	if err := writeMdSeparator(w, widths); err != nil {
+		return err
+	}
+	for _, row := range rows {
+		if err := writeMdRow(w, row, widths); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // columnWidths computes the visual width of each column from headers and rows.
@@ -85,7 +92,7 @@ func columnWidths(headers []string, rows [][]string) []int {
 }
 
 // writeMdRow writes a single markdown table row.
-func writeMdRow(w io.Writer, cells []string, widths []int) {
+func writeMdRow(w io.Writer, cells []string, widths []int) error {
 	padded := make([]string, len(widths))
 	for i := range widths {
 		val := ""
@@ -94,16 +101,18 @@ func writeMdRow(w io.Writer, cells []string, widths []int) {
 		}
 		padded[i] = padWithANSI(val, widths[i])
 	}
-	_, _ = fmt.Fprintf(w, mdRowFormat, strings.Join(padded, " | "))
+	_, err := fmt.Fprintf(w, mdRowFormat, strings.Join(padded, " | "))
+	return err
 }
 
 // writeMdSeparator writes the markdown table separator row.
-func writeMdSeparator(w io.Writer, widths []int) {
+func writeMdSeparator(w io.Writer, widths []int) error {
 	seps := make([]string, len(widths))
 	for i, width := range widths {
 		seps[i] = strings.Repeat("-", width)
 	}
-	_, _ = fmt.Fprintf(w, mdRowFormat, strings.Join(seps, " | "))
+	_, err := fmt.Fprintf(w, mdRowFormat, strings.Join(seps, " | "))
+	return err
 }
 
 // stripANSI removes ANSI escape sequences for width calculation.
@@ -152,26 +161,32 @@ func renderTable(w io.Writer, v any) error {
 	case reflect.Struct:
 		return renderTableStruct(w, val)
 	default:
-		_, _ = fmt.Fprintf(w, "%v\n", v)
+		if _, err := fmt.Fprintf(w, "%v\n", v); err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
 func renderTableSlice(w io.Writer, val reflect.Value) error {
 	if val.Len() == 0 {
-		_, _ = fmt.Fprintln(w, noResults)
-		return nil
+		_, err := fmt.Fprintln(w, noResults)
+		return err
 	}
 	elem := derefValue(val.Index(0))
 	headers, indices := tableRowsFor(elem.Type())
 	for i := range val.Len() {
 		if i > 0 {
-			_, _ = fmt.Fprintln(w)
+			if _, err := fmt.Fprintln(w); err != nil {
+				return err
+			}
 		}
 		item := derefValue(val.Index(i))
-		writeKVBlock(w, headers, func(j int) string {
+		if err := writeKVBlock(w, headers, func(j int) string {
 			return fmt.Sprintf("%v", deref(item.Field(indices[j])))
-		})
+		}); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -184,10 +199,9 @@ func renderTableStruct(w io.Writer, val reflect.Value) error {
 			keys = append(keys, f.Name)
 		}
 	}
-	writeKVBlock(w, keys, func(j int) string {
+	return writeKVBlock(w, keys, func(j int) string {
 		return fmt.Sprintf("%v", deref(val.FieldByName(keys[j])))
 	})
-	return nil
 }
 
 // derefValue dereferences pointer reflect.Values.
@@ -201,28 +215,34 @@ func derefValue(v reflect.Value) reflect.Value {
 // renderMapSliceKV renders a []any (slice of maps) as key-value blocks.
 func renderMapSliceKV(w io.Writer, items []any) error {
 	if len(items) == 0 {
-		_, _ = fmt.Fprintln(w, noResults)
-		return nil
+		_, err := fmt.Fprintln(w, noResults)
+		return err
 	}
 	first, ok := items[0].(map[string]any)
 	if !ok {
 		for _, item := range items {
-			_, _ = fmt.Fprintf(w, "%v\n", item)
+			if _, err := fmt.Fprintf(w, "%v\n", item); err != nil {
+				return err
+			}
 		}
 		return nil
 	}
 	cols := pickMapColumns(first)
 	for i, item := range items {
 		if i > 0 {
-			_, _ = fmt.Fprintln(w)
+			if _, err := fmt.Fprintln(w); err != nil {
+				return err
+			}
 		}
 		m, ok := item.(map[string]any)
 		if !ok {
 			continue
 		}
-		writeKVBlock(w, cols, func(j int) string {
+		if err := writeKVBlock(w, cols, func(j int) string {
 			return colorIfState(cols[j], flatValue(m[cols[j]]))
-		})
+		}); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -230,10 +250,9 @@ func renderMapSliceKV(w io.Writer, items []any) error {
 // renderMapKV renders a single map as key-value pairs.
 func renderMapKV(w io.Writer, m map[string]any) error {
 	cols := pickMapColumns(m)
-	writeKVBlock(w, cols, func(j int) string {
+	return writeKVBlock(w, cols, func(j int) string {
 		return colorIfState(cols[j], flatValue(m[cols[j]]))
 	})
-	return nil
 }
 
 // colorIfState applies state coloring if the key is "state".
@@ -245,7 +264,7 @@ func colorIfState(key, val string) string {
 }
 
 // writeKVBlock writes a block of key-value pairs with aligned keys.
-func writeKVBlock(w io.Writer, keys []string, valueFn func(int) string) {
+func writeKVBlock(w io.Writer, keys []string, valueFn func(int) string) error {
 	bold := color.New(color.Bold)
 	// Find the longest key for alignment.
 	maxLen := 0
@@ -257,8 +276,11 @@ func writeKVBlock(w io.Writer, keys []string, valueFn func(int) string) {
 	}
 	for i, k := range keys {
 		label := strings.ToUpper(k)
-		_, _ = fmt.Fprintf(w, "%s  %s\n", bold.Sprint(padRight(label, maxLen)), valueFn(i))
+		if _, err := fmt.Fprintf(w, "%s  %s\n", bold.Sprint(padRight(label, maxLen)), valueFn(i)); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 // renderMarkdown renders v as a markdown-style table (for machine/AI consumption).
@@ -278,15 +300,17 @@ func renderMarkdown(w io.Writer, v any) error {
 	case reflect.Struct:
 		return renderMarkdownStruct(w, val)
 	default:
-		_, _ = fmt.Fprintf(w, "%v\n", v)
+		if _, err := fmt.Fprintf(w, "%v\n", v); err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
 func renderMarkdownSlice(w io.Writer, val reflect.Value) error {
 	if val.Len() == 0 {
-		_, _ = fmt.Fprintln(w, noResults)
-		return nil
+		_, err := fmt.Fprintln(w, noResults)
+		return err
 	}
 	elem := derefValue(val.Index(0))
 	headers, indices := tableRowsFor(elem.Type())
@@ -304,8 +328,7 @@ func renderMarkdownSlice(w io.Writer, val reflect.Value) error {
 		}
 		rows = append(rows, fields)
 	}
-	mdTable(w, colorHeaders, rows)
-	return nil
+	return mdTable(w, colorHeaders, rows)
 }
 
 func renderMarkdownStruct(w io.Writer, val reflect.Value) error {
@@ -316,7 +339,9 @@ func renderMarkdownStruct(w io.Writer, val reflect.Value) error {
 		if !f.IsExported() {
 			continue
 		}
-		_, _ = fmt.Fprintf(w, "%s: %s\n", bold.Sprint(f.Name), fmt.Sprintf("%v", deref(val.Field(i))))
+		if _, err := fmt.Fprintf(w, "%s: %s\n", bold.Sprint(f.Name), fmt.Sprintf("%v", deref(val.Field(i)))); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -377,19 +402,19 @@ func renderIDs(w io.Writer, v any) error {
 		return renderMapSliceIDs(w, items)
 	}
 	if m, ok := v.(map[string]any); ok {
-		printMapID(w, m)
-		return nil
+		return printMapID(w, m)
 	}
 
 	val := derefValue(reflect.ValueOf(v))
 
 	if val.Kind() != reflect.Slice {
-		printFieldID(w, val)
-		return nil
+		return printFieldID(w, val)
 	}
 
 	for i := range val.Len() {
-		printFieldID(w, derefValue(val.Index(i)))
+		if err := printFieldID(w, derefValue(val.Index(i))); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -397,22 +422,28 @@ func renderIDs(w io.Writer, v any) error {
 func renderMapSliceIDs(w io.Writer, items []any) error {
 	for _, item := range items {
 		if m, ok := item.(map[string]any); ok {
-			printMapID(w, m)
+			if err := printMapID(w, m); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
 }
 
-func printMapID(w io.Writer, m map[string]any) {
+func printMapID(w io.Writer, m map[string]any) error {
 	if id, ok := m["id"]; ok {
-		_, _ = fmt.Fprintln(w, flatValue(id))
+		_, err := fmt.Fprintln(w, flatValue(id))
+		return err
 	}
+	return nil
 }
 
-func printFieldID(w io.Writer, val reflect.Value) {
+func printFieldID(w io.Writer, val reflect.Value) error {
 	if f := val.FieldByName("Id"); f.IsValid() {
-		_, _ = fmt.Fprintln(w, deref(f))
+		_, err := fmt.Fprintln(w, deref(f))
+		return err
 	}
+	return nil
 }
 
 // mapPriorityKeys controls which keys appear in table output for maps.
@@ -421,14 +452,16 @@ var mapPriorityKeys = []string{"id", "title", "state", "name", "display_name", "
 // renderMapSliceTable renders a []any (slice of maps) as a markdown table.
 func renderMapSliceTable(w io.Writer, items []any) error {
 	if len(items) == 0 {
-		_, _ = fmt.Fprintln(w, noResults)
-		return nil
+		_, err := fmt.Fprintln(w, noResults)
+		return err
 	}
 
 	first, ok := items[0].(map[string]any)
 	if !ok {
 		for _, item := range items {
-			_, _ = fmt.Fprintf(w, "%v\n", item)
+			if _, err := fmt.Fprintf(w, "%v\n", item); err != nil {
+				return err
+			}
 		}
 		return nil
 	}
@@ -452,8 +485,7 @@ func renderMapSliceTable(w io.Writer, items []any) error {
 		}
 		rows = append(rows, fields)
 	}
-	mdTable(w, headers, rows)
-	return nil
+	return mdTable(w, headers, rows)
 }
 
 // renderMapTable renders a single map[string]any as key-value pairs.
@@ -465,7 +497,9 @@ func renderMapTable(w io.Writer, m map[string]any) error {
 		if k == "state" {
 			val = colorState(val)
 		}
-		_, _ = fmt.Fprintf(w, "%s: %s\n", bold.Sprint(strings.ToUpper(k)), val)
+		if _, err := fmt.Fprintf(w, "%s: %s\n", bold.Sprint(strings.ToUpper(k)), val); err != nil {
+			return err
+		}
 	}
 	return nil
 }

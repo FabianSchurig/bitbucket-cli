@@ -29,6 +29,9 @@ check: build vet lint fmt-check test
 
 # Regenerate all code from schemas (requires schemas in schema/)
 generate:
+	@if ! ls schema/*-schema.yaml >/dev/null 2>&1; then \
+		echo "Error: no schema files found in schema/"; exit 1; \
+	fi
 	@for schema in schema/*-schema.yaml; do \
 		base=$$(basename "$$schema" -schema.yaml); \
 		if [ "$$base" = "pr" ]; then \

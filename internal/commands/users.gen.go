@@ -60,7 +60,6 @@ func NewUsersCommand() *cobra.Command {
 // newUsersGetCurrentUserCmd returns the "users get-current-user" cobra command.
 // operationId: getCurrentUser
 func newUsersGetCurrentUserCmd() *cobra.Command {
-	var ()
 
 	cmd := &cobra.Command{
 		Use:   "get-current-user",
@@ -90,7 +89,6 @@ func newUsersGetCurrentUserCmd() *cobra.Command {
 // newUsersListEmailAddressesForCurrentUserCmd returns the "users list-email-addresses-for-current-user" cobra command.
 // operationId: listEmailAddressesForCurrentUser
 func newUsersListEmailAddressesForCurrentUserCmd() *cobra.Command {
-	var ()
 
 	cmd := &cobra.Command{
 		Use:   "list-email-addresses-for-current-user",

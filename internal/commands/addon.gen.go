@@ -57,7 +57,6 @@ func NewAddonCommand() *cobra.Command {
 // newAddonUpdateAnInstalledAppCmd returns the "addon update-an-installed-app" cobra command.
 // operationId: updateAnInstalledApp
 func newAddonUpdateAnInstalledAppCmd() *cobra.Command {
-	var ()
 
 	cmd := &cobra.Command{
 		Use:   "update-an-installed-app",
@@ -87,7 +86,6 @@ func newAddonUpdateAnInstalledAppCmd() *cobra.Command {
 // newAddonDeleteAnAppCmd returns the "addon delete-an-app" cobra command.
 // operationId: deleteAnApp
 func newAddonDeleteAnAppCmd() *cobra.Command {
-	var ()
 
 	cmd := &cobra.Command{
 		Use:   "delete-an-app",
@@ -117,7 +115,6 @@ func newAddonDeleteAnAppCmd() *cobra.Command {
 // newAddonListLinkersForAnAppCmd returns the "addon list-linkers-for-an-app" cobra command.
 // operationId: listLinkersForAnApp
 func newAddonListLinkersForAnAppCmd() *cobra.Command {
-	var ()
 
 	cmd := &cobra.Command{
 		Use:   "list-linkers-for-an-app",

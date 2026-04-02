@@ -14,12 +14,12 @@ linters:
     - ineffassign   # Detects unused assignments
     - unused        # Detects unused code
 
+  exclusions:
+    # Exclude generated files from linting
+    paths:
+      - '\.gen\.go$'
+      - 'internal/generated/'
+
 formatters:
   enable:
     - gofmt         # Enforces standard Go formatting
-
-exclusions:
-  # Exclude generated files from linting
-  paths:
-    - '\.gen\.go$'
-    - 'internal/generated/'

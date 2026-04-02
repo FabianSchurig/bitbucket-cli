@@ -169,6 +169,7 @@ return cmd
 // new{{$.CommandName}}{{toCamel .OperationID}}Cmd returns the "{{$.CommandUse}} {{.Use}}" cobra command.
 // operationId: {{.OperationID}}
 func new{{$.CommandName}}{{toCamel .OperationID}}Cmd() *cobra.Command {
+{{- if or .Flags .BodyFields .HasBody .Paginated}}
 var (
 {{- range .Flags}}
 {{.GoName}} {{.GoType}}
@@ -183,6 +184,7 @@ body string
 all bool
 {{- end}}
 )
+{{- end}}
 
 cmd := &cobra.Command{
 Use:   "{{.Use}}",
