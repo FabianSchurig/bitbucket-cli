@@ -31,6 +31,10 @@ var (
 	date    = "unknown"
 )
 
+func fullVersion() string {
+	return fmt.Sprintf("%s (commit: %s, built: %s)", version, commit, date)
+}
+
 func main() {
 	if err := newRootCmd().Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -42,7 +46,7 @@ func newRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:     "bb-cli",
 		Short:   "Bitbucket CLI",
-		Version: version,
+		Version: fullVersion(),
 		Long: `bb-cli is a command-line interface for Bitbucket Cloud.
 
 Set authentication environment variables before running:

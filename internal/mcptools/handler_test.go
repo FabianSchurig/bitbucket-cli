@@ -98,14 +98,14 @@ func callTool(t *testing.T, group mcptools.ToolGroup, args map[string]any) *mcp.
 	if err != nil {
 		t.Fatalf("server connect: %v", err)
 	}
-	defer serverSession.Close()
+	defer func() { _ = serverSession.Close() }()
 
 	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0.0.1"}, nil)
 	clientSession, err := client.Connect(ctx, ct, nil)
 	if err != nil {
 		t.Fatalf("client connect: %v", err)
 	}
-	defer clientSession.Close()
+	defer func() { _ = clientSession.Close() }()
 
 	res, err := clientSession.CallTool(ctx, &mcp.CallToolParams{
 		Name:      group.Name,
@@ -143,14 +143,14 @@ func TestRegisterToolGroup_ToolListedByClient(t *testing.T) {
 	if err != nil {
 		t.Fatalf("server connect: %v", err)
 	}
-	defer serverSession.Close()
+	defer func() { _ = serverSession.Close() }()
 
 	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0.0.1"}, nil)
 	clientSession, err := client.Connect(ctx, ct, nil)
 	if err != nil {
 		t.Fatalf("client connect: %v", err)
 	}
-	defer clientSession.Close()
+	defer func() { _ = clientSession.Close() }()
 
 	// List tools and verify our tool is registered.
 	var tools []*mcp.Tool
@@ -242,7 +242,7 @@ func TestToolHandler_GET_Success(t *testing.T) {
 			t.Errorf("expected path %s, got %s", expected, r.URL.Path)
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]any{"id": 42, "title": "Test Item"})
+		_ = json.NewEncoder(w).Encode(map[string]any{"id": 42, "title": "Test Item"})
 	}))
 	defer srv.Close()
 	t.Setenv("BITBUCKET_BASE_URL", srv.URL+"/2.0")
@@ -277,12 +277,12 @@ func TestToolHandler_GET_PaginatedList(t *testing.T) {
 		switch {
 		case r.URL.Path == "/2.0/repositories/myws/myrepo/items" && callCount == 1:
 			nextURL := "http://" + r.Host + "/page2"
-			json.NewEncoder(w).Encode(map[string]any{
+			_ = json.NewEncoder(w).Encode(map[string]any{
 				"values": []any{map[string]any{"id": 1, "title": "Item 1"}},
 				"next":   nextURL,
 			})
 		case r.URL.Path == "/page2":
-			json.NewEncoder(w).Encode(map[string]any{
+			_ = json.NewEncoder(w).Encode(map[string]any{
 				"values": []any{map[string]any{"id": 2, "title": "Item 2"}},
 			})
 		default:
@@ -322,7 +322,9 @@ func TestToolHandler_POST_WithBodyFields(t *testing.T) {
 			t.Errorf("expected POST, got %s", r.Method)
 		}
 		var body map[string]any
-		json.NewDecoder(r.Body).Decode(&body)
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Errorf("decoding body: %v", err)
+		}
 		if body["title"] != "New Item" {
 			t.Errorf("expected title 'New Item', got %v", body["title"])
 		}
@@ -332,7 +334,7 @@ func TestToolHandler_POST_WithBodyFields(t *testing.T) {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]any{"id": 99, "title": "New Item"})
+		_ = json.NewEncoder(w).Encode(map[string]any{"id": 99, "title": "New Item"})
 	}))
 	defer srv.Close()
 	t.Setenv("BITBUCKET_BASE_URL", srv.URL+"/2.0")
@@ -391,13 +393,15 @@ func TestToolHandler_POST_WithRawBody(t *testing.T) {
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body map[string]any
-		json.NewDecoder(r.Body).Decode(&body)
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Errorf("decoding body: %v", err)
+		}
 		if body["custom"] != "field" {
 			t.Errorf("expected custom field, got %v", body["custom"])
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]any{"id": 1})
+		_ = json.NewEncoder(w).Encode(map[string]any{"id": 1})
 	}))
 	defer srv.Close()
 	t.Setenv("BITBUCKET_BASE_URL", srv.URL+"/2.0")
@@ -431,14 +435,14 @@ func TestToolHandler_MultipleOperationsPerTool(t *testing.T) {
 	if err != nil {
 		t.Fatalf("server connect: %v", err)
 	}
-	defer serverSession.Close()
+	defer func() { _ = serverSession.Close() }()
 
 	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0.0.1"}, nil)
 	clientSession, err := client.Connect(ctx, ct, nil)
 	if err != nil {
 		t.Fatalf("client connect: %v", err)
 	}
-	defer clientSession.Close()
+	defer func() { _ = clientSession.Close() }()
 
 	// List tools - should have exactly one tool with all operations.
 	var tools []*mcp.Tool
@@ -512,14 +516,14 @@ func TestToolHandler_GeneratedPRToolGroup(t *testing.T) {
 	if err != nil {
 		t.Fatalf("server connect: %v", err)
 	}
-	defer serverSession.Close()
+	defer func() { _ = serverSession.Close() }()
 
 	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0.0.1"}, nil)
 	clientSession, err := client.Connect(ctx, ct, nil)
 	if err != nil {
 		t.Fatalf("client connect: %v", err)
 	}
-	defer clientSession.Close()
+	defer func() { _ = clientSession.Close() }()
 
 	var tools []*mcp.Tool
 	for tool, err := range clientSession.Tools(ctx, nil) {
@@ -575,14 +579,14 @@ func TestToolHandler_AllGeneratedToolGroups(t *testing.T) {
 	if err != nil {
 		t.Fatalf("server connect: %v", err)
 	}
-	defer serverSession.Close()
+	defer func() { _ = serverSession.Close() }()
 
 	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0.0.1"}, nil)
 	clientSession, err := client.Connect(ctx, ct, nil)
 	if err != nil {
 		t.Fatalf("client connect: %v", err)
 	}
-	defer clientSession.Close()
+	defer func() { _ = clientSession.Close() }()
 
 	var tools []*mcp.Tool
 	for tool, err := range clientSession.Tools(ctx, nil) {

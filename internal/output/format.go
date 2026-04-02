@@ -94,7 +94,7 @@ func writeMdRow(w io.Writer, cells []string, widths []int) {
 		}
 		padded[i] = padWithANSI(val, widths[i])
 	}
-	fmt.Fprintf(w, mdRowFormat, strings.Join(padded, " | "))
+	_, _ = fmt.Fprintf(w, mdRowFormat, strings.Join(padded, " | "))
 }
 
 // writeMdSeparator writes the markdown table separator row.
@@ -103,7 +103,7 @@ func writeMdSeparator(w io.Writer, widths []int) {
 	for i, width := range widths {
 		seps[i] = strings.Repeat("-", width)
 	}
-	fmt.Fprintf(w, mdRowFormat, strings.Join(seps, " | "))
+	_, _ = fmt.Fprintf(w, mdRowFormat, strings.Join(seps, " | "))
 }
 
 // stripANSI removes ANSI escape sequences for width calculation.
@@ -152,21 +152,21 @@ func renderTable(w io.Writer, v any) error {
 	case reflect.Struct:
 		return renderTableStruct(w, val)
 	default:
-		fmt.Fprintf(w, "%v\n", v)
+		_, _ = fmt.Fprintf(w, "%v\n", v)
 	}
 	return nil
 }
 
 func renderTableSlice(w io.Writer, val reflect.Value) error {
 	if val.Len() == 0 {
-		fmt.Fprintln(w, noResults)
+		_, _ = fmt.Fprintln(w, noResults)
 		return nil
 	}
 	elem := derefValue(val.Index(0))
 	headers, indices := tableRowsFor(elem.Type())
 	for i := range val.Len() {
 		if i > 0 {
-			fmt.Fprintln(w)
+			_, _ = fmt.Fprintln(w)
 		}
 		item := derefValue(val.Index(i))
 		writeKVBlock(w, headers, func(j int) string {
@@ -201,20 +201,20 @@ func derefValue(v reflect.Value) reflect.Value {
 // renderMapSliceKV renders a []any (slice of maps) as key-value blocks.
 func renderMapSliceKV(w io.Writer, items []any) error {
 	if len(items) == 0 {
-		fmt.Fprintln(w, noResults)
+		_, _ = fmt.Fprintln(w, noResults)
 		return nil
 	}
 	first, ok := items[0].(map[string]any)
 	if !ok {
 		for _, item := range items {
-			fmt.Fprintf(w, "%v\n", item)
+			_, _ = fmt.Fprintf(w, "%v\n", item)
 		}
 		return nil
 	}
 	cols := pickMapColumns(first)
 	for i, item := range items {
 		if i > 0 {
-			fmt.Fprintln(w)
+			_, _ = fmt.Fprintln(w)
 		}
 		m, ok := item.(map[string]any)
 		if !ok {
@@ -257,7 +257,7 @@ func writeKVBlock(w io.Writer, keys []string, valueFn func(int) string) {
 	}
 	for i, k := range keys {
 		label := strings.ToUpper(k)
-		fmt.Fprintf(w, "%s  %s\n", bold.Sprint(padRight(label, maxLen)), valueFn(i))
+		_, _ = fmt.Fprintf(w, "%s  %s\n", bold.Sprint(padRight(label, maxLen)), valueFn(i))
 	}
 }
 
@@ -278,14 +278,14 @@ func renderMarkdown(w io.Writer, v any) error {
 	case reflect.Struct:
 		return renderMarkdownStruct(w, val)
 	default:
-		fmt.Fprintf(w, "%v\n", v)
+		_, _ = fmt.Fprintf(w, "%v\n", v)
 	}
 	return nil
 }
 
 func renderMarkdownSlice(w io.Writer, val reflect.Value) error {
 	if val.Len() == 0 {
-		fmt.Fprintln(w, noResults)
+		_, _ = fmt.Fprintln(w, noResults)
 		return nil
 	}
 	elem := derefValue(val.Index(0))
@@ -316,7 +316,7 @@ func renderMarkdownStruct(w io.Writer, val reflect.Value) error {
 		if !f.IsExported() {
 			continue
 		}
-		fmt.Fprintf(w, "%s: %s\n", bold.Sprint(f.Name), fmt.Sprintf("%v", deref(val.Field(i))))
+		_, _ = fmt.Fprintf(w, "%s: %s\n", bold.Sprint(f.Name), fmt.Sprintf("%v", deref(val.Field(i))))
 	}
 	return nil
 }
@@ -405,13 +405,13 @@ func renderMapSliceIDs(w io.Writer, items []any) error {
 
 func printMapID(w io.Writer, m map[string]any) {
 	if id, ok := m["id"]; ok {
-		fmt.Fprintln(w, flatValue(id))
+		_, _ = fmt.Fprintln(w, flatValue(id))
 	}
 }
 
 func printFieldID(w io.Writer, val reflect.Value) {
 	if f := val.FieldByName("Id"); f.IsValid() {
-		fmt.Fprintln(w, deref(f))
+		_, _ = fmt.Fprintln(w, deref(f))
 	}
 }
 
@@ -421,14 +421,14 @@ var mapPriorityKeys = []string{"id", "title", "state", "name", "display_name", "
 // renderMapSliceTable renders a []any (slice of maps) as a markdown table.
 func renderMapSliceTable(w io.Writer, items []any) error {
 	if len(items) == 0 {
-		fmt.Fprintln(w, noResults)
+		_, _ = fmt.Fprintln(w, noResults)
 		return nil
 	}
 
 	first, ok := items[0].(map[string]any)
 	if !ok {
 		for _, item := range items {
-			fmt.Fprintf(w, "%v\n", item)
+			_, _ = fmt.Fprintf(w, "%v\n", item)
 		}
 		return nil
 	}
@@ -465,7 +465,7 @@ func renderMapTable(w io.Writer, m map[string]any) error {
 		if k == "state" {
 			val = colorState(val)
 		}
-		fmt.Fprintf(w, "%s: %s\n", bold.Sprint(strings.ToUpper(k)), val)
+		_, _ = fmt.Fprintf(w, "%s: %s\n", bold.Sprint(strings.ToUpper(k)), val)
 	}
 	return nil
 }
@@ -565,15 +565,6 @@ func extractMapSummary(m map[string]any) string {
 // sanitize replaces newlines with spaces for single-line display.
 func sanitize(s string) string {
 	return strings.ReplaceAll(s, "\n", " ")
-}
-
-// truncate shortens s to maxLen, appending "…" if truncated.
-func truncate(s string, maxLen int) string {
-	s = strings.ReplaceAll(s, "\n", " ")
-	if len(s) <= maxLen {
-		return s
-	}
-	return s[:maxLen-1] + "…"
 }
 
 // formatDate tries to parse s as an ISO 8601 timestamp and returns a

@@ -1,0 +1,47 @@
+.PHONY: build test lint fmt vet check generate clean
+
+# Build all binaries
+build:
+	go build ./...
+
+# Run tests with race detector
+test:
+	go test -race ./...
+
+# Run golangci-lint (install via: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest)
+lint:
+	golangci-lint run ./...
+
+# Format all Go files
+fmt:
+	gofmt -w .
+
+# Run go vet
+vet:
+	go vet ./...
+
+# Check formatting without modifying files (CI-friendly)
+fmt-check:
+	@test -z "$$(gofmt -l .)" || (echo "Files not formatted:"; gofmt -l .; exit 1)
+
+# Run all checks (build + vet + lint + fmt-check + test with race)
+check: build vet lint fmt-check test
+
+# Regenerate all code from schemas (requires schemas in schema/)
+generate:
+	@for schema in schema/*-schema.yaml; do \
+		base=$$(basename "$$schema" -schema.yaml); \
+		if [ "$$base" = "pr" ]; then \
+			go run scripts/gen_commands/main.go "$$schema" internal/commands/commands.gen.go; \
+			go run scripts/gen_mcptools/main.go "$$schema" internal/mcptools/pr.gen.go; \
+		else \
+			go run scripts/gen_commands/main.go "$$schema" "internal/commands/$${base}.gen.go"; \
+			go run scripts/gen_mcptools/main.go "$$schema" "internal/mcptools/$${base}.gen.go"; \
+		fi; \
+	done
+	@echo "All code regenerated"
+
+# Clean build artifacts
+clean:
+	rm -f bb-cli bb-mcp gen_commands gen_mcptools main
+	rm -rf dist/

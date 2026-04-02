@@ -33,7 +33,7 @@ func TestDispatch_GET_SingleResource(t *testing.T) {
 			t.Errorf("expected GET, got %s", r.Method)
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]any{"id": 42, "title": "My PR"})
+		_ = json.NewEncoder(w).Encode(map[string]any{"id": 42, "title": "My PR"})
 	}))
 	defer srv.Close()
 
@@ -59,7 +59,7 @@ func TestDispatch_GET_Paginated_SinglePage(t *testing.T) {
 			t.Errorf("expected state=OPEN query param, got %s", r.URL.Query().Get("state"))
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]any{
+		_ = json.NewEncoder(w).Encode(map[string]any{
 			"values": []any{
 				map[string]any{"id": 1, "title": "First PR"},
 			},
@@ -90,12 +90,12 @@ func TestDispatch_GET_Paginated_AllPages(t *testing.T) {
 		switch r.URL.Path {
 		case "/repositories/myorg/myrepo/pullrequests":
 			nextURL := "http://" + r.Host + "/page2"
-			json.NewEncoder(w).Encode(map[string]any{
+			_ = json.NewEncoder(w).Encode(map[string]any{
 				"values": []any{map[string]any{"id": 1, "title": "PR 1"}},
 				"next":   nextURL,
 			})
 		case "/page2":
-			json.NewEncoder(w).Encode(map[string]any{
+			_ = json.NewEncoder(w).Encode(map[string]any{
 				"values": []any{map[string]any{"id": 2, "title": "PR 2"}},
 			})
 		default:
@@ -127,13 +127,15 @@ func TestDispatch_POST_WithBody(t *testing.T) {
 			t.Errorf("expected POST, got %s", r.Method)
 		}
 		var body map[string]any
-		json.NewDecoder(r.Body).Decode(&body)
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Errorf("decoding body: %v", err)
+		}
 		if body["title"] != "My Feature" {
 			t.Errorf("expected title 'My Feature', got %v", body["title"])
 		}
 		w.WriteHeader(http.StatusCreated)
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]any{"id": 1, "title": "My Feature"})
+		_ = json.NewEncoder(w).Encode(map[string]any{"id": 1, "title": "My Feature"})
 	}))
 	defer srv.Close()
 
@@ -154,7 +156,7 @@ func TestDispatch_APIError(t *testing.T) {
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(`{"error": {"message": "Unauthorized"}}`))
+		_, _ = w.Write([]byte(`{"error": {"message": "Unauthorized"}}`))
 	}))
 	defer srv.Close()
 
