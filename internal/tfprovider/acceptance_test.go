@@ -130,10 +130,10 @@ func startMockServer(t *testing.T) *httptest.Server {
 	mux.HandleFunc("/workspaces/{workspace}", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(map[string]any{
-			"uuid":        "{workspace-uuid-123}",
-			"slug":        "testworkspace",
-			"name":        "Test Workspace",
-			"is_private":  false,
+			"uuid":       "{workspace-uuid-123}",
+			"slug":       "testworkspace",
+			"name":       "Test Workspace",
+			"is_private": false,
 		})
 	})
 

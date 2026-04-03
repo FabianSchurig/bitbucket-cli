@@ -1,0 +1,119 @@
+name: Terraform Acceptance Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # Mock-based tests run on every push/PR (no credentials needed)
+  mock-tests:
+    name: Mock Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Build provider
+        run: go build ./cmd/bb-tf/...
+
+      - name: Run Go acceptance tests (mock server)
+        run: TF_ACC=1 go test -v -timeout 300s ./internal/tfprovider/ -run 'TestAcc'
+
+  # Terraform native tests with mocked provider
+  terraform-tests:
+    name: Terraform Tests (mock)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-group:
+          - repos
+          - pr
+          - projects
+          - workspaces
+          - issues
+          - hooks
+          - snippets
+          - refs
+          - commits
+          - pipelines
+          - deployments
+          - branch-restrictions
+          - branching-model
+          - commit-statuses
+          - downloads
+          - users
+          - reports
+          - search
+          - properties
+          - addon
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build provider
+        run: go build -o terraform-provider-bitbucket ./cmd/bb-tf/...
+
+      - name: Install provider locally
+        run: |
+          PLUGIN_DIR="${HOME}/.terraform.d/plugins/registry.terraform.io/FabianSchurig/bitbucket/0.0.1/linux_amd64"
+          mkdir -p "${PLUGIN_DIR}"
+          cp terraform-provider-bitbucket "${PLUGIN_DIR}/"
+
+      - name: Run terraform test (${{ matrix.test-group }})
+        working-directory: tests/${{ matrix.test-group }}
+        run: terraform test
+
+  # Real API tests run only when credentials are available
+  acceptance-tests:
+    name: Acceptance Tests (real API)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    environment: bitbucket-api
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run real API acceptance tests
+        env:
+          TF_ACC: "1"
+          BITBUCKET_USERNAME: ${{ secrets.BITBUCKET_USERNAME }}
+          BITBUCKET_TOKEN: ${{ secrets.BITBUCKET_TOKEN }}
+          BITBUCKET_TEST_WORKSPACE: ${{ secrets.BITBUCKET_TEST_WORKSPACE }}
+        run: |
+          if [ -z "$BITBUCKET_USERNAME" ] && [ -z "$BITBUCKET_TOKEN" ]; then
+            echo "No Bitbucket credentials configured. Skipping real API tests."
+            echo "Configure BITBUCKET_USERNAME and BITBUCKET_TOKEN in the 'bitbucket-api' environment."
+            exit 0
+          fi
+          go test -v -timeout 600s ./internal/tfprovider/ -run 'TestAccRealAPI'

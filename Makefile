@@ -1,4 +1,4 @@
-.PHONY: build test lint fmt vet check generate clean
+.PHONY: build test lint fmt vet check generate generate-docs clean
 
 # Build all binaries
 build:
@@ -50,3 +50,7 @@ generate:
 clean:
 	rm -f bb-cli bb-mcp bb-tf gen_commands gen_mcptools gen_terraform main
 	rm -rf dist/
+
+# Generate Terraform provider docs, examples, and test files
+generate-docs:
+	go run scripts/gen_tfdocs/main.go

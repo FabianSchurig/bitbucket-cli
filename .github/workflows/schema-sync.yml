@@ -125,6 +125,10 @@ jobs:
           go run scripts/gen_terraform/main.go schema/properties-schema.yaml internal/tfprovider/properties.gen.go
           go run scripts/gen_terraform/main.go schema/addon-schema.yaml internal/tfprovider/addon.gen.go
 
+      - name: Regenerate Terraform docs & tests
+        if: steps.diff.outputs.changed == 'true'
+        run: go run scripts/gen_tfdocs/main.go
+
       - name: Build & test
         if: steps.diff.outputs.changed == 'true'
         run: go build ./... && go test ./...
@@ -134,7 +138,7 @@ jobs:
         run: |
           git config user.name "bb-cli-bot"
           git config user.email "bot@github.com"
-          git add schema/ internal/generated/ internal/commands/ internal/mcptools/ internal/tfprovider/
+          git add schema/ internal/generated/ internal/commands/ internal/mcptools/ internal/tfprovider/ docs/ examples/ tests/
 
           # Determine next semver patch based on latest tag
           LATEST=$(git tag --list 'v*' --sort=-v:refname | head -n1)

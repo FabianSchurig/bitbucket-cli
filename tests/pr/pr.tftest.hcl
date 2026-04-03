@@ -1,0 +1,39 @@
+# Auto-generated Terraform test for bitbucket_pr
+# Run with: terraform test
+#
+# These tests use mocked provider responses. For real API tests,
+# set TF_ACC=1 with BITBUCKET_USERNAME and BITBUCKET_TOKEN.
+
+mock_provider "bitbucket" {}
+
+run "read_pr" {
+  command = plan
+
+  variables {
+    workspace = "my-workspace"
+    repo_slug = "my-repo"
+    pull_request_id = "1"
+  }
+
+  # Data source read should produce a plan without errors
+  assert {
+    condition     = data.bitbucket_pr.test.id != ""
+    error_message = "Expected non-empty id for data source bitbucket_pr"
+  }
+}
+
+run "create_pr" {
+  command = plan
+
+  variables {
+    workspace = "my-workspace"
+    repo_slug = "my-repo"
+    pull_request_id = "1"
+  }
+
+  # Resource create should produce a plan without errors
+  assert {
+    condition     = bitbucket_pr.test.id != ""
+    error_message = "Expected non-empty id for resource bitbucket_pr"
+  }
+}

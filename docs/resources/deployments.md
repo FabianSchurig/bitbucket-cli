@@ -1,0 +1,42 @@
+---
+page_title: "bitbucket_deployments Resource - bitbucket"
+subcategory: ""
+description: |-
+  Manages Bitbucket deployments via the Bitbucket Cloud API.
+---
+
+# bitbucket_deployments (Resource)
+
+Manages Bitbucket deployments via the Bitbucket Cloud API.
+
+## CRUD Operations
+- **Create**: Supported
+- **Read**: Supported
+- **Delete**: Supported
+- **List**: Supported (via data source)
+
+## Example Usage
+
+```hcl
+resource "bitbucket_deployments" "example" {
+  workspace = "my-workspace"
+  repo_slug = "my-repo"
+  environment_uuid = "env-uuid"
+}
+```
+
+## Schema
+
+### Required
+- `workspace` (String) Path parameter.
+- `repo_slug` (String) Path parameter.
+- `environment_uuid` (String) Path parameter.
+
+### Optional
+
+- `operation` (String) Override the default CRUD operation selection.
+
+### Read-Only
+
+- `id` (String) Resource identifier (extracted from API response).
+- `api_response` (String) The raw JSON response from the Bitbucket API.
