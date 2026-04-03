@@ -1495,9 +1495,9 @@ func TestAccRealAPI_DataSource_BranchRestrictions(t *testing.T) {
 	})
 }
 
-// TestAccRealAPI_Resource_SshKeys_List lists SSH keys for the current user.
+// TestAccRealAPI_DataSource_SshKeys lists SSH keys for the current user.
 // SSH keys for the current user are accessible via GET /users/{uuid}/ssh-keys.
-func TestAccRealAPI_Resource_SshKeys_List(t *testing.T) {
+func TestAccRealAPI_DataSource_SshKeys(t *testing.T) {
 	skipIfNoRealAPI(t)
 
 	resource.Test(t, resource.TestCase{
