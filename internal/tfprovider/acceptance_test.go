@@ -419,11 +419,7 @@ func TestAccRealAPI_DataSourceUsers(t *testing.T) {
 	skipIfNoRealAPI(t)
 	selectedUser := os.Getenv("BITBUCKET_TEST_USER")
 	if selectedUser == "" {
-		// Fall back to workspace name as a reasonable default for workspace-scoped tokens.
-		selectedUser = os.Getenv("BITBUCKET_TEST_WORKSPACE")
-	}
-	if selectedUser == "" {
-		t.Skip("BITBUCKET_TEST_USER and BITBUCKET_TEST_WORKSPACE not set, skipping user test")
+		t.Skip("BITBUCKET_TEST_USER not set, skipping user test")
 	}
 
 	resource.Test(t, resource.TestCase{
