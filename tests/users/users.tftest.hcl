@@ -7,13 +7,13 @@
 mock_provider "bitbucket" {}
 
 run "read_users" {
-  command = plan
+  command = apply
 
   variables {
     selected_user = "jdoe"
   }
 
-  # Data source read should produce a plan without errors
+  # Data source read should succeed with mock provider
   assert {
     condition     = data.bitbucket_users.test.id != ""
     error_message = "Expected non-empty id for data source bitbucket_users"

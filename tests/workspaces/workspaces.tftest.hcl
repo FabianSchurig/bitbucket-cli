@@ -7,13 +7,13 @@
 mock_provider "bitbucket" {}
 
 run "read_workspaces" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
   }
 
-  # Data source read should produce a plan without errors
+  # Data source read should succeed with mock provider
   assert {
     condition     = data.bitbucket_workspaces.test.id != ""
     error_message = "Expected non-empty id for data source bitbucket_workspaces"

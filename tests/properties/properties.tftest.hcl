@@ -7,7 +7,7 @@
 mock_provider "bitbucket" {}
 
 run "read_properties" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
@@ -16,7 +16,7 @@ run "read_properties" {
     property_name = "my-property"
   }
 
-  # Data source read should produce a plan without errors
+  # Data source read should succeed with mock provider
   assert {
     condition     = data.bitbucket_properties.test.id != ""
     error_message = "Expected non-empty id for data source bitbucket_properties"

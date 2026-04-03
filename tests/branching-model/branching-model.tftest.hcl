@@ -7,14 +7,14 @@
 mock_provider "bitbucket" {}
 
 run "read_branching_model" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
     repo_slug = "my-repo"
   }
 
-  # Data source read should produce a plan without errors
+  # Data source read should succeed with mock provider
   assert {
     condition     = data.bitbucket_branching_model.test.id != ""
     error_message = "Expected non-empty id for data source bitbucket_branching_model"

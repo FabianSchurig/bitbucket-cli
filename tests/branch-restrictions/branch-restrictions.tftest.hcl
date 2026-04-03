@@ -7,7 +7,7 @@
 mock_provider "bitbucket" {}
 
 run "read_branch_restrictions" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
@@ -15,7 +15,7 @@ run "read_branch_restrictions" {
     id = "1"
   }
 
-  # Data source read should produce a plan without errors
+  # Data source read should succeed with mock provider
   assert {
     condition     = data.bitbucket_branch_restrictions.test.id != ""
     error_message = "Expected non-empty id for data source bitbucket_branch_restrictions"
@@ -23,7 +23,7 @@ run "read_branch_restrictions" {
 }
 
 run "create_branch_restrictions" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
@@ -31,7 +31,7 @@ run "create_branch_restrictions" {
     id = "1"
   }
 
-  # Resource create should produce a plan without errors
+  # Resource create should succeed with mock provider
   assert {
     condition     = bitbucket_branch_restrictions.test.id != ""
     error_message = "Expected non-empty id for resource bitbucket_branch_restrictions"

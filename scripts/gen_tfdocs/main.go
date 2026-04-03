@@ -517,7 +517,7 @@ mock_provider "bitbucket" {}
 {{- if .HasRead}}
 
 run "read_{{snakeCase .Name}}" {
-  command = plan
+  command = apply
 
   variables {
 {{- range .Params}}
@@ -525,7 +525,7 @@ run "read_{{snakeCase .Name}}" {
 {{- end}}
   }
 
-  # Data source read should produce a plan without errors
+  # Data source read should succeed with mock provider
   assert {
     condition     = data.{{.TFName}}.test.id != ""
     error_message = "Expected non-empty id for data source {{.TFName}}"
@@ -536,7 +536,7 @@ run "read_{{snakeCase .Name}}" {
 {{- if .HasCreate}}
 
 run "create_{{snakeCase .Name}}" {
-  command = plan
+  command = apply
 
   variables {
 {{- range .Params}}
@@ -544,7 +544,7 @@ run "create_{{snakeCase .Name}}" {
 {{- end}}
   }
 
-  # Resource create should produce a plan without errors
+  # Resource create should succeed with mock provider
   assert {
     condition     = {{.TFName}}.test.id != ""
     error_message = "Expected non-empty id for resource {{.TFName}}"

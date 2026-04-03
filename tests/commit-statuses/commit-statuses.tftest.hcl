@@ -7,7 +7,7 @@
 mock_provider "bitbucket" {}
 
 run "read_commit_statuses" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
@@ -16,7 +16,7 @@ run "read_commit_statuses" {
     key = "build-key"
   }
 
-  # Data source read should produce a plan without errors
+  # Data source read should succeed with mock provider
   assert {
     condition     = data.bitbucket_commit_statuses.test.id != ""
     error_message = "Expected non-empty id for data source bitbucket_commit_statuses"
@@ -24,7 +24,7 @@ run "read_commit_statuses" {
 }
 
 run "create_commit_statuses" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
@@ -33,7 +33,7 @@ run "create_commit_statuses" {
     key = "build-key"
   }
 
-  # Resource create should produce a plan without errors
+  # Resource create should succeed with mock provider
   assert {
     condition     = bitbucket_commit_statuses.test.id != ""
     error_message = "Expected non-empty id for resource bitbucket_commit_statuses"

@@ -7,7 +7,7 @@
 mock_provider "bitbucket" {}
 
 run "read_commits" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
@@ -15,7 +15,7 @@ run "read_commits" {
     commit = "abc123def"
   }
 
-  # Data source read should produce a plan without errors
+  # Data source read should succeed with mock provider
   assert {
     condition     = data.bitbucket_commits.test.id != ""
     error_message = "Expected non-empty id for data source bitbucket_commits"

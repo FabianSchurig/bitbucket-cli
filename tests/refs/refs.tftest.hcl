@@ -7,7 +7,7 @@
 mock_provider "bitbucket" {}
 
 run "read_refs" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
@@ -15,7 +15,7 @@ run "read_refs" {
     name = "main"
   }
 
-  # Data source read should produce a plan without errors
+  # Data source read should succeed with mock provider
   assert {
     condition     = data.bitbucket_refs.test.id != ""
     error_message = "Expected non-empty id for data source bitbucket_refs"
@@ -23,7 +23,7 @@ run "read_refs" {
 }
 
 run "create_refs" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
@@ -31,7 +31,7 @@ run "create_refs" {
     name = "main"
   }
 
-  # Resource create should produce a plan without errors
+  # Resource create should succeed with mock provider
   assert {
     condition     = bitbucket_refs.test.id != ""
     error_message = "Expected non-empty id for resource bitbucket_refs"

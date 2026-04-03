@@ -7,7 +7,7 @@
 mock_provider "bitbucket" {}
 
 run "read_deployments" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
@@ -15,7 +15,7 @@ run "read_deployments" {
     environment_uuid = "env-uuid"
   }
 
-  # Data source read should produce a plan without errors
+  # Data source read should succeed with mock provider
   assert {
     condition     = data.bitbucket_deployments.test.id != ""
     error_message = "Expected non-empty id for data source bitbucket_deployments"
@@ -23,7 +23,7 @@ run "read_deployments" {
 }
 
 run "create_deployments" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
@@ -31,7 +31,7 @@ run "create_deployments" {
     environment_uuid = "env-uuid"
   }
 
-  # Resource create should produce a plan without errors
+  # Resource create should succeed with mock provider
   assert {
     condition     = bitbucket_deployments.test.id != ""
     error_message = "Expected non-empty id for resource bitbucket_deployments"

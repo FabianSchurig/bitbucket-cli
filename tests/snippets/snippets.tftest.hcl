@@ -7,14 +7,14 @@
 mock_provider "bitbucket" {}
 
 run "read_snippets" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
     encoded_id = "snippet-id"
   }
 
-  # Data source read should produce a plan without errors
+  # Data source read should succeed with mock provider
   assert {
     condition     = data.bitbucket_snippets.test.id != ""
     error_message = "Expected non-empty id for data source bitbucket_snippets"
@@ -22,14 +22,14 @@ run "read_snippets" {
 }
 
 run "create_snippets" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
     encoded_id = "snippet-id"
   }
 
-  # Resource create should produce a plan without errors
+  # Resource create should succeed with mock provider
   assert {
     condition     = bitbucket_snippets.test.id != ""
     error_message = "Expected non-empty id for resource bitbucket_snippets"

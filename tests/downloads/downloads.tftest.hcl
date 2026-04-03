@@ -7,7 +7,7 @@
 mock_provider "bitbucket" {}
 
 run "read_downloads" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
@@ -15,7 +15,7 @@ run "read_downloads" {
     filename = "artifact.zip"
   }
 
-  # Data source read should produce a plan without errors
+  # Data source read should succeed with mock provider
   assert {
     condition     = data.bitbucket_downloads.test.id != ""
     error_message = "Expected non-empty id for data source bitbucket_downloads"
@@ -23,7 +23,7 @@ run "read_downloads" {
 }
 
 run "create_downloads" {
-  command = plan
+  command = apply
 
   variables {
     workspace = "my-workspace"
@@ -31,7 +31,7 @@ run "create_downloads" {
     filename = "artifact.zip"
   }
 
-  # Resource create should produce a plan without errors
+  # Resource create should succeed with mock provider
   assert {
     condition     = bitbucket_downloads.test.id != ""
     error_message = "Expected non-empty id for resource bitbucket_downloads"
