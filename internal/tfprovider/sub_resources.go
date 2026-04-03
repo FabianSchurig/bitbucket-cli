@@ -161,6 +161,47 @@ var subResources = []subResource{
 		Description: "Manage comments on a Bitbucket issue",
 		sourceOps:   func() []OperationDef { return IssuesResourceGroup.AllOps },
 	},
+	// ─── Wave 3: DevSecOps-focused sub-resources ────────────────────────────
+	{
+		TypeName:    "repo-runners",
+		Description: "Manage pipeline runners for a Bitbucket repository",
+		sourceOps:   func() []OperationDef { return PipelinesResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "workspace-runners",
+		Description: "Manage pipeline runners for a Bitbucket workspace",
+		sourceOps:   func() []OperationDef { return PipelinesResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "pipeline-caches",
+		Description: "Manage pipeline caches for a Bitbucket repository",
+		sourceOps:   func() []OperationDef { return PipelinesResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "gpg-keys",
+		Description: "Manage GPG keys for a Bitbucket user",
+		sourceOps:   func() []OperationDef { return UsersResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "user-emails",
+		Description: "Read email addresses for the current Bitbucket user",
+		sourceOps:   func() []OperationDef { return UsersResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "hook-types",
+		Description: "Read subscribable webhook event types in Bitbucket",
+		sourceOps:   func() []OperationDef { return HooksResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "workspace-permissions",
+		Description: "Read user permissions for a Bitbucket workspace",
+		sourceOps:   func() []OperationDef { return WorkspacesResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "repo-settings",
+		Description: "Manage repository settings inheritance in Bitbucket",
+		sourceOps:   func() []OperationDef { return ReposResourceGroup.AllOps },
+	},
 }
 
 func init() {

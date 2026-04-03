@@ -283,6 +283,48 @@ var CRUDConfig = map[string]CRUDMapping{
 		Delete: "deleteACommentOnAnIssue",
 		List:   "listCommentsOnAnIssue",
 	},
+	// ─── Wave 3: DevSecOps-focused sub-resource CRUD mappings ────────────────
+	"repo-runners": {
+		Create: "createRepositoryRunner",
+		Read:   "getRepositoryRunner",
+		Update: "updateRepositoryRunner",
+		Delete: "deleteRepositoryRunner",
+		List:   "getRepositoryRunners",
+	},
+	"workspace-runners": {
+		Create: "createWorkspaceRunner",
+		Read:   "getWorkspaceRunner",
+		Update: "updateWorkspaceRunner",
+		Delete: "deleteWorkspaceRunner",
+		List:   "getWorkspaceRunners",
+	},
+	"pipeline-caches": {
+		Read:   "getRepositoryPipelineCacheContentURI",
+		Delete: "deleteRepositoryPipelineCache",
+		List:   "getRepositoryPipelineCaches",
+	},
+	"gpg-keys": {
+		Create: "addANewGpgKey",
+		Read:   "getAGpgKey",
+		Delete: "deleteAGpgKey",
+		List:   "listGpgKeys",
+	},
+	"user-emails": {
+		Read: "getAnEmailAddressForCurrentUser",
+		List: "listEmailAddressesForCurrentUser",
+	},
+	"hook-types": {
+		Read: "getAWebhookResource",
+		List: "listSubscribableWebhookTypes",
+	},
+	"workspace-permissions": {
+		Read: "getUserPermissionOnAWorkspace",
+		List: "listUserPermissionsInAWorkspace",
+	},
+	"repo-settings": {
+		Read:   "retrieveTheInheritanceStateForRepositorySettings",
+		Update: "setTheInheritanceStateForRepositorySettings",
+	},
 }
 
 // CRUDMapping holds operation IDs for each CRUD slot.

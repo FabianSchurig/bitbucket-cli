@@ -96,9 +96,12 @@ operation groups. Each resource group maps to a set of CRUD operations.
 | `bitbucket_deployments` | `bitbucket_deployments` | CRDL |
 | `bitbucket_downloads` | `bitbucket_downloads` | CRDL |
 | `bitbucket_forked_repository` | `bitbucket_forked_repository` | CL |
+| `bitbucket_gpg_keys` | `bitbucket_gpg_keys` | CRDL |
+| `bitbucket_hook_types` | `bitbucket_hook_types` | RL |
 | `bitbucket_hooks` | `bitbucket_hooks` | CRUDL |
 | `bitbucket_issue_comments` | `bitbucket_issue_comments` | CRUDL |
 | `bitbucket_issues` | `bitbucket_issues` | CRUDL |
+| `bitbucket_pipeline_caches` | `bitbucket_pipeline_caches` | RDL |
 | `bitbucket_pipeline_config` | `bitbucket_pipeline_config` | RU |
 | `bitbucket_pipeline_known_hosts` | `bitbucket_pipeline_known_hosts` | CRUDL |
 | `bitbucket_pipeline_oidc` | `bitbucket_pipeline_oidc` | R |
@@ -119,6 +122,8 @@ operation groups. Each resource group maps to a set of CRUD operations.
 | `bitbucket_refs` | `bitbucket_refs` | CRDL |
 | `bitbucket_repo_deploy_keys` | `bitbucket_repo_deploy_keys` | CRUDL |
 | `bitbucket_repo_group_permissions` | `bitbucket_repo_group_permissions` | RUDL |
+| `bitbucket_repo_runners` | `bitbucket_repo_runners` | CRUDL |
+| `bitbucket_repo_settings` | `bitbucket_repo_settings` | RU |
 | `bitbucket_repo_user_permissions` | `bitbucket_repo_user_permissions` | RUDL |
 | `bitbucket_reports` | `bitbucket_reports` | CRDL |
 | `bitbucket_repos` | `bitbucket_repos` | CRUDL |
@@ -126,10 +131,13 @@ operation groups. Each resource group maps to a set of CRUD operations.
 | `bitbucket_snippets` | `bitbucket_snippets` | CRUDL |
 | `bitbucket_ssh_keys` | `bitbucket_ssh_keys` | CRUDL |
 | `bitbucket_tags` | `bitbucket_tags` | CRDL |
+| `bitbucket_user_emails` | `bitbucket_user_emails` | RL |
 | `bitbucket_users` | `bitbucket_users` | RL |
 | `bitbucket_workspace_hooks` | `bitbucket_workspace_hooks` | CRUDL |
 | `bitbucket_workspace_members` | `bitbucket_workspace_members` | RL |
+| `bitbucket_workspace_permissions` | `bitbucket_workspace_permissions` | RL |
 | `bitbucket_workspace_pipeline_variables` | `bitbucket_workspace_pipeline_variables` | CRUDL |
+| `bitbucket_workspace_runners` | `bitbucket_workspace_runners` | CRUDL |
 | `bitbucket_workspaces` | `bitbucket_workspaces` | RL |
 
 All resources share the same generic schema pattern:

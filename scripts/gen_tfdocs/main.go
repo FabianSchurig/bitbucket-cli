@@ -104,6 +104,16 @@ func exampleValue(param string) string {
 		return "README.md"
 	case "comment_id":
 		return "1"
+	case "runner_uuid":
+		return "{runner-uuid}"
+	case "cache_uuid":
+		return "{cache-uuid}"
+	case "fingerprint":
+		return "AA:BB:CC:DD"
+	case "email":
+		return "user@example.com"
+	case "subject_type":
+		return "repository"
 	default:
 		return "example-value"
 	}
