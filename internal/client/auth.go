@@ -17,8 +17,9 @@ type BBClient struct {
 
 // NewClient creates an authenticated Bitbucket API client.
 //
-// Authentication: BITBUCKET_TOKEN is used as a Bearer token.
-// BITBUCKET_USERNAME is optional metadata (not used for auth).
+// Authentication: BITBUCKET_TOKEN is used with HTTP Basic Auth
+// (x-token-auth:{token}), the standard method for Bitbucket
+// workspace and repository access tokens.
 //
 // The base URL defaults to https://api.bitbucket.org/2.0 but can be
 // overridden with BITBUCKET_BASE_URL (useful for testing).
@@ -34,8 +35,8 @@ func NewClient() (*BBClient, error) {
 // explicit configuration values. Empty strings are treated as unset.
 // This avoids mutating global environment variables.
 //
-// Authentication: token is always used as Bearer (OAuth2/API token).
-// Username is optional metadata and not used for authentication.
+// Authentication: uses the API token with HTTP Basic Auth (x-token-auth).
+// This is the standard method for Bitbucket workspace and repository access tokens.
 func NewClientWithConfig(username, token, baseURL string) (*BBClient, error) {
 	base := baseURL
 	if base == "" {
@@ -43,16 +44,16 @@ func NewClientWithConfig(username, token, baseURL string) (*BBClient, error) {
 	}
 	c := resty.New().SetBaseURL(base)
 
-	switch {
-	case token != "":
-		c.SetAuthToken(token) // Bearer
-	default:
+	if token == "" {
 		return nil, fmt.Errorf(
-			"auth required: set BITBUCKET_TOKEN (API token or OAuth2 access token)",
+			"auth required: set BITBUCKET_TOKEN (workspace or repository access token)",
 		)
 	}
+	// Bitbucket access tokens authenticate via Basic Auth with the
+	// fixed username "x-token-auth" and the token as the password.
+	c.SetBasicAuth("x-token-auth", token)
 
-	// Store username as metadata (not used for auth).
+	// Username is stored for identification purposes only.
 	_ = username
 
 	return &BBClient{c}, nil
