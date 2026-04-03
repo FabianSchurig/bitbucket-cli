@@ -34,6 +34,10 @@ resource "bitbucket_commit_statuses" "example" {
 - `commit` (String) Path parameter.
 - `key` (String) Path parameter.
 
+### Optional
+
+- `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
+
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).

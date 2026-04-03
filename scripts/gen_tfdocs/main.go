@@ -347,8 +347,8 @@ output "repo_info" {
 
 ### Optional
 
-- ` + "`username`" + ` (String) Bitbucket username. Can also be set via ` + "`BITBUCKET_USERNAME`" + ` environment variable.
-- ` + "`token`" + ` (String, Sensitive) Bitbucket API token. Can also be set via ` + "`BITBUCKET_TOKEN`" + ` environment variable.
+- ` + "`username`" + ` (String) Bitbucket username (Atlassian account email for API tokens). Can also be set via ` + "`BITBUCKET_USERNAME`" + ` environment variable.
+- ` + "`token`" + ` (String, Sensitive) Bitbucket API token (Atlassian API token or workspace access token). Can also be set via ` + "`BITBUCKET_TOKEN`" + ` environment variable.
 - ` + "`base_url`" + ` (String) Base URL for the Bitbucket API. Defaults to ` + "`https://api.bitbucket.org/2.0`" + `.
 
 ## Resources and Data Sources
@@ -416,6 +416,10 @@ resource "{{.TFName}}" "example" {
 {{- range .Params}}
 - ` + "`" + `{{.}}` + "`" + ` (String) Path parameter.
 {{- end}}
+
+### Optional
+
+- ` + "`" + `request_body` + "`" + ` (String) Raw JSON request body for create/update operations. Use ` + "`" + `jsonencode({...})` + "`" + ` to pass fields not exposed as individual attributes.
 
 ### Read-Only
 {{- if not .HasIDParam}}

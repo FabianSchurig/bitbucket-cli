@@ -131,7 +131,11 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 
 	// Collect body fields from create/update ops.
 	bodyFieldSeen := map[string]bool{}
+	hasBody := false
 	for _, op := range r.crudOps() {
+		if op.HasBody {
+			hasBody = true
+		}
 		for _, bf := range op.BodyFields {
 			key := toSnakeCase(strings.ReplaceAll(bf.Path, ".", "_"))
 			if bodyFieldSeen[key] {
@@ -146,6 +150,16 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				Description: desc,
 				Optional:    true,
 			}
+		}
+	}
+
+	// Add request_body attribute for operations that accept a JSON body.
+	// This allows users to pass arbitrary JSON for create/update operations,
+	// which is especially useful when BodyFields are not explicitly declared.
+	if hasBody {
+		attrs["request_body"] = schema.StringAttribute{
+			Description: "Raw JSON request body for create/update operations. Use this to pass fields not exposed as individual attributes.",
+			Optional:    true,
 		}
 	}
 
@@ -328,31 +342,42 @@ func (r *GenericResource) extractParams(ctx context.Context, op *OperationDef, s
 
 // buildBody constructs the JSON request body from plan/state attributes.
 func (r *GenericResource) buildBody(ctx context.Context, op *OperationDef, source stateAccessor, diags *diag.Diagnostics) string {
-	if !op.HasBody || len(op.BodyFields) == 0 {
+	if !op.HasBody {
 		return ""
 	}
 
-	bodyObj := map[string]any{}
-	for _, bf := range op.BodyFields {
-		attrName := toSnakeCase(strings.ReplaceAll(bf.Path, ".", "_"))
-		var val types.String
-		d := source.GetAttribute(ctx, attrPath(attrName), &val)
-		diags.Append(d...)
-		if d.HasError() || val.IsNull() || val.IsUnknown() || val.ValueString() == "" {
-			continue
+	// If explicit body fields are defined, build from those.
+	if len(op.BodyFields) > 0 {
+		bodyObj := map[string]any{}
+		for _, bf := range op.BodyFields {
+			attrName := toSnakeCase(strings.ReplaceAll(bf.Path, ".", "_"))
+			var val types.String
+			d := source.GetAttribute(ctx, attrPath(attrName), &val)
+			diags.Append(d...)
+			if d.HasError() || val.IsNull() || val.IsUnknown() || val.ValueString() == "" {
+				continue
+			}
+			handlers.SetNested(bodyObj, bf.Path, val.ValueString())
 		}
-		handlers.SetNested(bodyObj, bf.Path, val.ValueString())
+		if len(bodyObj) == 0 {
+			return ""
+		}
+		b, err := json.Marshal(bodyObj)
+		if err != nil {
+			diags.AddError("Body Error", fmt.Sprintf("Failed to marshal request body: %v", err))
+			return ""
+		}
+		return string(b)
 	}
 
-	if len(bodyObj) == 0 {
+	// Fall back to request_body attribute for raw JSON.
+	var rawBody types.String
+	d := source.GetAttribute(ctx, attrPath("request_body"), &rawBody)
+	diags.Append(d...)
+	if d.HasError() || rawBody.IsNull() || rawBody.IsUnknown() || rawBody.ValueString() == "" {
 		return ""
 	}
-	b, err := json.Marshal(bodyObj)
-	if err != nil {
-		diags.AddError("Body Error", fmt.Sprintf("Failed to marshal request body: %v", err))
-		return ""
-	}
-	return string(b)
+	return rawBody.ValueString()
 }
 
 // copyAttributes copies all param and body field values from source to target state.
@@ -360,7 +385,11 @@ func (r *GenericResource) buildBody(ctx context.Context, op *OperationDef, sourc
 // (e.g., Read's path params) are preserved when another operation (e.g., Create) runs.
 func (r *GenericResource) copyAttributes(ctx context.Context, _ *OperationDef, source, target stateAccessor, diags *diag.Diagnostics) {
 	seen := map[string]bool{}
+	hasBody := false
 	for _, op := range r.crudOps() {
+		if op.HasBody {
+			hasBody = true
+		}
 		for _, p := range op.Params {
 			attrName := ParamAttrName(p.Name)
 			if seen[attrName] {
@@ -386,6 +415,15 @@ func (r *GenericResource) copyAttributes(ctx context.Context, _ *OperationDef, s
 			if !d.HasError() && !val.IsNull() && !val.IsUnknown() {
 				diags.Append(target.SetAttribute(ctx, attrPath(attrName), val)...)
 			}
+		}
+	}
+	// Copy request_body if present.
+	if hasBody {
+		var val types.String
+		d := source.GetAttribute(ctx, attrPath("request_body"), &val)
+		diags.Append(d...)
+		if !d.HasError() && !val.IsNull() && !val.IsUnknown() {
+			diags.Append(target.SetAttribute(ctx, attrPath("request_body"), val)...)
 		}
 	}
 }

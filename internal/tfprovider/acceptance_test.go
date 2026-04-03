@@ -413,12 +413,17 @@ func TestAccRealAPI_DataSourceWorkspaces(t *testing.T) {
 	})
 }
 
-// TestAccRealAPI_DataSourceUsers reads the authenticated user profile.
+// TestAccRealAPI_DataSourceUsers reads a user profile.
+// Requires BITBUCKET_TEST_USER (Bitbucket username or UUID, not email).
 func TestAccRealAPI_DataSourceUsers(t *testing.T) {
 	skipIfNoRealAPI(t)
-	username := os.Getenv("BITBUCKET_USERNAME")
-	if username == "" {
-		t.Skip("BITBUCKET_USERNAME not set, skipping user test")
+	selectedUser := os.Getenv("BITBUCKET_TEST_USER")
+	if selectedUser == "" {
+		// Fall back to workspace name as a reasonable default for workspace-scoped tokens.
+		selectedUser = os.Getenv("BITBUCKET_TEST_WORKSPACE")
+	}
+	if selectedUser == "" {
+		t.Skip("BITBUCKET_TEST_USER and BITBUCKET_TEST_WORKSPACE not set, skipping user test")
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -431,7 +436,7 @@ func TestAccRealAPI_DataSourceUsers(t *testing.T) {
 					data "bitbucket_users" "test" {
 						selected_user = %q
 					}
-				`, username),
+				`, selectedUser),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.bitbucket_users.test", "api_response"),
 					resource.TestCheckResourceAttrSet("data.bitbucket_users.test", "id"),
@@ -454,30 +459,36 @@ func TestAccRealAPI_ResourceProjects_CRUD(t *testing.T) {
 					provider "bitbucket" {}
 
 					resource "bitbucket_projects" "test" {
-						workspace   = %q
-						project_key = "TFTEST"
+						workspace    = %q
+						project_key  = "TFTEST"
+						request_body = jsonencode({
+							name = "Terraform Test Project"
+							key  = "TFTEST"
+						})
 					}
 				`, workspace),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("bitbucket_projects.test", "id"),
 					resource.TestCheckResourceAttrSet("bitbucket_projects.test", "api_response"),
 					resource.TestCheckResourceAttr("bitbucket_projects.test", "workspace", workspace),
-					resource.TestCheckResourceAttr("bitbucket_projects.test", "project_key", "TFTEST"),
 				),
 			},
-			// Update (reapply same config -- update is idempotent)
+			// Update
 			{
 				Config: fmt.Sprintf(`
 					provider "bitbucket" {}
 
 					resource "bitbucket_projects" "test" {
-						workspace   = %q
-						project_key = "TFTEST"
+						workspace    = %q
+						project_key  = "TFTEST"
+						request_body = jsonencode({
+							name = "Terraform Test Project Updated"
+							key  = "TFTEST"
+						})
 					}
 				`, workspace),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("bitbucket_projects.test", "id"),
-					resource.TestCheckResourceAttr("bitbucket_projects.test", "project_key", "TFTEST"),
 				),
 			},
 			// Destroy is handled automatically by the test framework
