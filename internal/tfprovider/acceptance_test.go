@@ -372,7 +372,10 @@ func TestAccProvider_ConfigureWithToken(t *testing.T) {
 
 // ─── Real API acceptance tests (run when TF_ACC=1 and credentials are set) ──
 
-func TestAccRealAPI_DataSourceRepos(t *testing.T) {
+// skipIfNoRealAPI skips the test if real API credentials are not configured.
+// Returns the workspace name when credentials are available.
+func skipIfNoRealAPI(t *testing.T) string {
+	t.Helper()
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("TF_ACC not set, skipping real API acceptance test")
 	}
@@ -383,6 +386,12 @@ func TestAccRealAPI_DataSourceRepos(t *testing.T) {
 	if workspace == "" {
 		t.Skip("BITBUCKET_TEST_WORKSPACE not set, skipping real API test")
 	}
+	return workspace
+}
+
+// TestAccRealAPI_DataSourceWorkspaces reads a workspace and verifies the response.
+func TestAccRealAPI_DataSourceWorkspaces(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
@@ -395,6 +404,134 @@ func TestAccRealAPI_DataSourceRepos(t *testing.T) {
 						workspace = %q
 					}
 				`, workspace),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_workspaces.test", "api_response"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_workspaces.test", "id"),
+				),
+			},
+		},
+	})
+}
+
+// TestAccRealAPI_DataSourceUsers reads the authenticated user profile.
+func TestAccRealAPI_DataSourceUsers(t *testing.T) {
+	skipIfNoRealAPI(t)
+	username := os.Getenv("BITBUCKET_USERNAME")
+	if username == "" {
+		t.Skip("BITBUCKET_USERNAME not set, skipping user test")
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {}
+
+					data "bitbucket_users" "test" {
+						selected_user = %q
+					}
+				`, username),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_users.test", "api_response"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_users.test", "id"),
+				),
+			},
+		},
+	})
+}
+
+// TestAccRealAPI_ResourceProjects_CRUD creates, reads, updates, and deletes a project.
+func TestAccRealAPI_ResourceProjects_CRUD(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			// Create
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {}
+
+					resource "bitbucket_projects" "test" {
+						workspace   = %q
+						project_key = "TFTEST"
+					}
+				`, workspace),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_projects.test", "id"),
+					resource.TestCheckResourceAttrSet("bitbucket_projects.test", "api_response"),
+					resource.TestCheckResourceAttr("bitbucket_projects.test", "workspace", workspace),
+					resource.TestCheckResourceAttr("bitbucket_projects.test", "project_key", "TFTEST"),
+				),
+			},
+			// Update (reapply same config -- update is idempotent)
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {}
+
+					resource "bitbucket_projects" "test" {
+						workspace   = %q
+						project_key = "TFTEST"
+					}
+				`, workspace),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_projects.test", "id"),
+					resource.TestCheckResourceAttr("bitbucket_projects.test", "project_key", "TFTEST"),
+				),
+			},
+			// Destroy is handled automatically by the test framework
+		},
+	})
+}
+
+// TestAccRealAPI_DataSourceRepos lists repositories in the test workspace.
+func TestAccRealAPI_DataSourceRepos(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {}
+
+					data "bitbucket_repos" "test" {
+						workspace = %q
+					}
+				`, workspace),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_repos.test", "api_response"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_repos.test", "id"),
+				),
+			},
+		},
+	})
+}
+
+// TestAccRealAPI_ProviderAuth verifies the provider works with explicit auth config.
+func TestAccRealAPI_ProviderAuth(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+	username := os.Getenv("BITBUCKET_USERNAME")
+	token := os.Getenv("BITBUCKET_TOKEN")
+	if username == "" || token == "" {
+		t.Skip("BITBUCKET_USERNAME or BITBUCKET_TOKEN not set")
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						username = %q
+						token    = %q
+					}
+
+					data "bitbucket_workspaces" "test" {
+						workspace = %q
+					}
+				`, username, token, workspace),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.bitbucket_workspaces.test", "api_response"),
 					resource.TestCheckResourceAttrSet("data.bitbucket_workspaces.test", "id"),

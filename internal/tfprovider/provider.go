@@ -90,7 +90,7 @@ func (p *BitbucketProvider) Configure(ctx context.Context, req provider.Configur
 		baseURL = config.BaseURL.ValueString()
 	}
 
-	c, err := client.NewClientWithConfig(username, "", token, baseURL)
+	c, err := client.NewClientWithConfig(username, token, baseURL)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to create Bitbucket client",

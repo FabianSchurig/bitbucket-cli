@@ -9,9 +9,9 @@
 //
 // Authentication:
 //
-//	App password (most common):
+//	API token (recommended):
 //	  export BITBUCKET_USERNAME=myuser
-//	  export BITBUCKET_APP_PASSWORD=ATBBxxxxxxxx
+//	  export BITBUCKET_TOKEN=<token>
 //
 //	OAuth2 access token:
 //	  export BITBUCKET_TOKEN=<token>
@@ -27,8 +27,8 @@
 //	}
 //
 //	provider "bitbucket" {
-//	  username     = "myuser"
-//	  app_password = "ATBBxxxxxxxx"
+//	  username = "myuser"
+//	  token    = "<token>"
 //	}
 package main
 

@@ -94,11 +94,10 @@ jobs:
         working-directory: tests/${{ matrix.test-group }}
         run: terraform test
 
-  # Real API tests run only on push to main or manual dispatch (when credentials are available)
+  # Real API tests run when credentials are available (push, PR, or manual dispatch)
   acceptance-tests:
     name: Acceptance Tests (real API)
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
 

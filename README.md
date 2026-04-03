@@ -90,7 +90,7 @@ go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-mcp@latest
 
 # Set Bitbucket auth
 export BITBUCKET_USERNAME=myuser
-export BITBUCKET_APP_PASSWORD=ATBBxxxxxxxx
+export BITBUCKET_TOKEN=<your-api-token>
 
 # Run as stdio MCP server (default, for MCP clients like Claude Desktop)
 bb-mcp
@@ -110,7 +110,7 @@ Add to your `claude_desktop_config.json`:
       "command": "bb-mcp",
       "env": {
         "BITBUCKET_USERNAME": "myuser",
-        "BITBUCKET_APP_PASSWORD": "ATBBxxxxxxxx"
+        "BITBUCKET_TOKEN": "<your-api-token>"
       }
     }
   }
@@ -153,8 +153,8 @@ terraform {
 }
 
 provider "bitbucket" {
-  username     = "myuser"
-  app_password = "ATBBxxxxxxxx"
+  username = "myuser"
+  token    = "<your-api-token>"
 }
 ```
 
@@ -162,7 +162,7 @@ Or use environment variables:
 
 ```bash
 export BITBUCKET_USERNAME=myuser
-export BITBUCKET_APP_PASSWORD=ATBBxxxxxxxx
+export BITBUCKET_TOKEN=<your-api-token>
 ```
 
 ### Example Usage
@@ -274,7 +274,7 @@ docker pull ghcr.io/fabianschurig/bitbucket-cli:latest
 
 docker run --rm \
   -e BITBUCKET_USERNAME \
-  -e BITBUCKET_APP_PASSWORD \
+  -e BITBUCKET_TOKEN \
   ghcr.io/fabianschurig/bitbucket-cli pr list-pull-requests \
     --workspace myteam --repo-slug myrepo
 ```
