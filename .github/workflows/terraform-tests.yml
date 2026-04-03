@@ -113,10 +113,14 @@ jobs:
           BITBUCKET_USERNAME: ${{ secrets.BITBUCKET_USERNAME }}
           BITBUCKET_TOKEN: ${{ secrets.BITBUCKET_TOKEN }}
           BITBUCKET_TEST_WORKSPACE: ${{ secrets.BITBUCKET_TEST_WORKSPACE }}
+          BITBUCKET_TEST_USER: ${{ secrets.BITBUCKET_TEST_USER || vars.BITBUCKET_TEST_USER }}
+          BITBUCKET_TEST_REPO: ${{ secrets.BITBUCKET_TEST_REPO || vars.BITBUCKET_TEST_REPO }}
         run: |
           if [ -z "$BITBUCKET_USERNAME" ] && [ -z "$BITBUCKET_TOKEN" ]; then
             echo "No Bitbucket credentials configured. Skipping real API tests."
             echo "Configure BITBUCKET_USERNAME and BITBUCKET_TOKEN as repository secrets."
             exit 0
           fi
+          echo "BITBUCKET_TEST_USER set: $([ -n "$BITBUCKET_TEST_USER" ] && echo yes || echo no)"
+          echo "BITBUCKET_TEST_REPO set: $([ -n "$BITBUCKET_TEST_REPO" ] && echo yes || echo no)"
           go test -v -timeout 600s ./internal/tfprovider/ -run 'TestAccRealAPI'
