@@ -17,9 +17,9 @@ type BBClient struct {
 
 // NewClient creates an authenticated Bitbucket API client.
 //
-// Authentication: BITBUCKET_TOKEN is used with HTTP Basic Auth
-// (x-token-auth:{token}), the standard method for Bitbucket
-// workspace and repository access tokens.
+// Authentication: BITBUCKET_USERNAME + BITBUCKET_TOKEN → HTTP Basic Auth.
+// If only BITBUCKET_TOKEN is set, "x-token-auth" is used as the username
+// (standard for Bitbucket workspace/repository access tokens).
 //
 // The base URL defaults to https://api.bitbucket.org/2.0 but can be
 // overridden with BITBUCKET_BASE_URL (useful for testing).
@@ -35,8 +35,10 @@ func NewClient() (*BBClient, error) {
 // explicit configuration values. Empty strings are treated as unset.
 // This avoids mutating global environment variables.
 //
-// Authentication: uses the API token with HTTP Basic Auth (x-token-auth).
-// This is the standard method for Bitbucket workspace and repository access tokens.
+// Authentication precedence:
+//   - username + token → HTTP Basic Auth (works for app passwords and personal tokens)
+//   - token alone → HTTP Basic Auth with "x-token-auth" as the username
+//     (standard method for Bitbucket workspace and repository access tokens)
 func NewClientWithConfig(username, token, baseURL string) (*BBClient, error) {
 	base := baseURL
 	if base == "" {
@@ -46,15 +48,17 @@ func NewClientWithConfig(username, token, baseURL string) (*BBClient, error) {
 
 	if token == "" {
 		return nil, fmt.Errorf(
-			"auth required: set BITBUCKET_TOKEN (workspace or repository access token)",
+			"auth required: set BITBUCKET_TOKEN",
 		)
 	}
-	// Bitbucket access tokens authenticate via Basic Auth with the
-	// fixed username "x-token-auth" and the token as the password.
-	c.SetBasicAuth("x-token-auth", token)
 
-	// Username is stored for identification purposes only.
-	_ = username
+	// When a username is provided, use it directly (app passwords, personal tokens).
+	// Otherwise fall back to "x-token-auth" (workspace/repository access tokens).
+	authUser := username
+	if authUser == "" {
+		authUser = "x-token-auth"
+	}
+	c.SetBasicAuth(authUser, token)
 
 	return &BBClient{c}, nil
 }

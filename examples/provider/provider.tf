@@ -7,6 +7,6 @@ terraform {
 }
 
 # Configure via environment variables:
-#   BITBUCKET_USERNAME + BITBUCKET_TOKEN (Bearer token)
-#   or BITBUCKET_TOKEN (OAuth2)
+#   BITBUCKET_USERNAME (email) + BITBUCKET_TOKEN (Atlassian API token)
+#   or BITBUCKET_TOKEN alone (workspace/repository access token)
 provider "bitbucket" {}

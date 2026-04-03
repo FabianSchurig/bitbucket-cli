@@ -52,11 +52,11 @@ func (p *BitbucketProvider) Schema(_ context.Context, _ provider.SchemaRequest, 
 		Description: "Terraform provider for Bitbucket Cloud. Auto-generated from the Bitbucket OpenAPI spec.",
 		Attributes: map[string]schema.Attribute{
 			"username": schema.StringAttribute{
-				Description: "Bitbucket username. Can also be set via BITBUCKET_USERNAME environment variable.",
+				Description: "Bitbucket username (Atlassian account email). Can also be set via BITBUCKET_USERNAME environment variable. Required for Atlassian API tokens; not needed for workspace access tokens.",
 				Optional:    true,
 			},
 			"token": schema.StringAttribute{
-				Description: "Bitbucket API token. Can also be set via BITBUCKET_TOKEN environment variable.",
+				Description: "Bitbucket API token (Atlassian API token or workspace access token). Can also be set via BITBUCKET_TOKEN environment variable.",
 				Optional:    true,
 				Sensitive:   true,
 			},

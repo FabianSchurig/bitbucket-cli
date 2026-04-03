@@ -287,13 +287,14 @@ generic resources and data sources. Auto-generated from the Bitbucket OpenAPI sp
 
 ## Authentication
 
-The provider supports authentication via API token:
+The provider authenticates via HTTP Basic Auth using an Atlassian API token.
+Create a token at [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens).
 
-### API Token (recommended)
+### Atlassian API Token (recommended)
 
 ` + "```" + `hcl
 provider "bitbucket" {
-  username = "your-username"
+  username = "your-email@example.com"  # Atlassian account email
   token    = "your-api-token"
 }
 ` + "```" + `
@@ -301,22 +302,18 @@ provider "bitbucket" {
 Or via environment variables:
 
 ` + "```" + `bash
-export BITBUCKET_USERNAME="your-username"
+export BITBUCKET_USERNAME="your-email@example.com"
 export BITBUCKET_TOKEN="your-api-token"
 ` + "```" + `
 
-### OAuth2 Token
+### Workspace Access Token
+
+For workspace/repository access tokens, only the token is needed:
 
 ` + "```" + `hcl
 provider "bitbucket" {
-  token = "your-oauth2-token"
+  token = "your-workspace-access-token"
 }
-` + "```" + `
-
-Or via environment variable:
-
-` + "```" + `bash
-export BITBUCKET_TOKEN="your-oauth2-token"
 ` + "```" + `
 
 ## Example Usage
@@ -476,8 +473,8 @@ const exampleProviderTemplate = `terraform {
 }
 
 # Configure via environment variables:
-#   BITBUCKET_USERNAME + BITBUCKET_TOKEN (Bearer token)
-#   or BITBUCKET_TOKEN (OAuth2)
+#   BITBUCKET_USERNAME (email) + BITBUCKET_TOKEN (Atlassian API token)
+#   or BITBUCKET_TOKEN alone (workspace/repository access token)
 provider "bitbucket" {}
 `
 
