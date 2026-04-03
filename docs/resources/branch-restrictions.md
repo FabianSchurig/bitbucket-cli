@@ -22,7 +22,7 @@ Manages Bitbucket branch-restrictions via the Bitbucket Cloud API.
 resource "bitbucket_branch_restrictions" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
-  id = "1"
+  param_id = "1"
 }
 ```
 
@@ -31,11 +31,7 @@ resource "bitbucket_branch_restrictions" "example" {
 ### Required
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
-- `id` (String) Path parameter.
-
-### Optional
-
-- `operation` (String) Override the default CRUD operation selection.
+- `param_id` (String) Path parameter.
 
 ### Read-Only
 - `api_response` (String) The raw JSON response from the Bitbucket API.

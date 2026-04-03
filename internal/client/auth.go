@@ -24,24 +24,39 @@ type BBClient struct {
 // The base URL defaults to https://api.bitbucket.org/2.0 but can be
 // overridden with BITBUCKET_BASE_URL (useful for testing).
 func NewClient() (*BBClient, error) {
-	base := os.Getenv("BITBUCKET_BASE_URL")
+	return NewClientWithConfig(
+		os.Getenv("BITBUCKET_USERNAME"),
+		os.Getenv("BITBUCKET_APP_PASSWORD"),
+		os.Getenv("BITBUCKET_TOKEN"),
+		os.Getenv("BITBUCKET_BASE_URL"),
+	)
+}
+
+// NewClientWithConfig creates an authenticated Bitbucket API client from
+// explicit configuration values. Empty strings are treated as unset.
+// This avoids mutating global environment variables.
+//
+// Authentication precedence:
+//  1. username + appPassword → HTTP Basic Auth (legacy app passwords)
+//  2. username + token → HTTP Basic Auth (API tokens)
+//  3. token alone → Bearer token (OAuth2)
+func NewClientWithConfig(username, appPassword, token, baseURL string) (*BBClient, error) {
+	base := baseURL
 	if base == "" {
 		base = defaultBaseURL
 	}
 	c := resty.New().SetBaseURL(base)
 
-	username := os.Getenv("BITBUCKET_USERNAME")
-	password := os.Getenv("BITBUCKET_APP_PASSWORD")
-	token := os.Getenv("BITBUCKET_TOKEN")
-
 	switch {
-	case username != "" && password != "":
-		c.SetBasicAuth(username, password)
+	case username != "" && appPassword != "":
+		c.SetBasicAuth(username, appPassword)
+	case username != "" && token != "":
+		c.SetBasicAuth(username, token)
 	case token != "":
 		c.SetAuthToken(token) // Bearer
 	default:
 		return nil, fmt.Errorf(
-			"auth required: set BITBUCKET_USERNAME + BITBUCKET_APP_PASSWORD, or BITBUCKET_TOKEN",
+			"auth required: set BITBUCKET_USERNAME + BITBUCKET_TOKEN, or BITBUCKET_TOKEN alone",
 		)
 	}
 

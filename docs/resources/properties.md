@@ -33,10 +33,6 @@ resource "bitbucket_properties" "example" {
 - `app_key` (String) Path parameter.
 - `property_name` (String) Path parameter.
 
-### Optional
-
-- `operation` (String) Override the default CRUD operation selection.
-
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).

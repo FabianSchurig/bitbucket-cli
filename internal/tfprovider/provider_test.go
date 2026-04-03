@@ -19,16 +19,27 @@ func TestToSnakeCase(t *testing.T) {
 		{"repo-slug", "repo_slug"},
 		{"pullRequestId", "pull_request_id"},
 		{"repoSlug", "repo_slug"},
-		{"content.raw", "content.raw"},
+		{"content.raw", "content_raw"},
 		{"UPPER", "upper"},
 	}
 	for _, tc := range tests {
-		// toSnakeCase is unexported, so test via exported MapCRUDOps indirectly
-		// or use a simple duplicate here for validation.
 		t.Run(tc.input, func(t *testing.T) {
-			// We can only test exported functions, so we test MapCRUDOps
-			// and the overall provider behavior instead.
+			// Test via ParamAttrName which uses toSnakeCase internally.
+			// For non-"id" params, ParamAttrName == toSnakeCase.
+			got := tfprovider.ParamAttrName(tc.input)
+			if got != tc.expected {
+				t.Errorf("ParamAttrName(%q) = %q, want %q", tc.input, got, tc.expected)
+			}
 		})
+	}
+}
+
+func TestParamAttrName_IDCollision(t *testing.T) {
+	// The API param "id" should be remapped to "param_id" to avoid collision
+	// with Terraform's computed "id" attribute.
+	got := tfprovider.ParamAttrName("id")
+	if got != "param_id" {
+		t.Errorf("ParamAttrName(\"id\") = %q, want \"param_id\"", got)
 	}
 }
 

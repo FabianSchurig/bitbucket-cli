@@ -26,10 +26,6 @@ resource "bitbucket_users" "example" {
 ### Required
 - `selected_user` (String) Path parameter.
 
-### Optional
-
-- `operation` (String) Override the default CRUD operation selection.
-
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).

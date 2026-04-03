@@ -15,7 +15,7 @@ Reads Bitbucket branch-restrictions via the Bitbucket Cloud API.
 data "bitbucket_branch_restrictions" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
-  id = "1"
+  param_id = "1"
 }
 
 output "branch_restrictions_response" {
@@ -28,7 +28,7 @@ output "branch_restrictions_response" {
 ### Required
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
-- `id` (String) Path parameter.
+- `param_id` (String) Path parameter.
 
 ### Read-Only
 

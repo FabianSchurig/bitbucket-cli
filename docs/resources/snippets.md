@@ -31,10 +31,6 @@ resource "bitbucket_snippets" "example" {
 - `workspace` (String) Path parameter.
 - `encoded_id` (String) Path parameter.
 
-### Optional
-
-- `operation` (String) Override the default CRUD operation selection.
-
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).

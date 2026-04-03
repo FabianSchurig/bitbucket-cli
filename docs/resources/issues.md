@@ -33,10 +33,6 @@ resource "bitbucket_issues" "example" {
 - `repo_slug` (String) Path parameter.
 - `issue_id` (String) Path parameter.
 
-### Optional
-
-- `operation` (String) Override the default CRUD operation selection.
-
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).

@@ -166,12 +166,12 @@ var paramConfig = map[string][]string{
 	"commits":             {"workspace", "repo_slug", "commit"},
 	"pipelines":           {"workspace", "repo_slug", "pipeline_uuid"},
 	"deployments":         {"workspace", "repo_slug", "environment_uuid"},
-	"branch-restrictions": {"workspace", "repo_slug", "id"},
+	"branch-restrictions": {"workspace", "repo_slug", "param_id"},
 	"branching-model":     {"workspace", "repo_slug"},
 	"commit-statuses":     {"workspace", "repo_slug", "commit", "key"},
 	"downloads":           {"workspace", "repo_slug", "filename"},
 	"users":               {"selected_user"},
-	"reports":             {"workspace", "repo_slug", "commit", "reportId"},
+	"reports":             {"workspace", "repo_slug", "commit", "report_id"},
 	"search":              {"workspace"},
 	"properties":          {"workspace", "repo_slug", "app_key", "property_name"},
 	"addon":               {},
@@ -216,7 +216,7 @@ func exampleValue(param string) string {
 		return "pipeline-uuid"
 	case "environment_uuid":
 		return "env-uuid"
-	case "id":
+	case "param_id":
 		return "1"
 	case "key":
 		return "build-key"
@@ -224,7 +224,7 @@ func exampleValue(param string) string {
 		return "artifact.zip"
 	case "selected_user":
 		return "jdoe"
-	case "reportId":
+	case "report_id":
 		return "report-uuid"
 	case "app_key":
 		return "my-app"
@@ -243,7 +243,7 @@ func buildGroups() []GroupData {
 		hasIDParam := false
 		for _, p := range params {
 			pv[p] = exampleValue(p)
-			if p == "id" {
+			if p == "param_id" {
 				hasIDParam = true
 			}
 		}
@@ -287,14 +287,14 @@ generic resources and data sources. Auto-generated from the Bitbucket OpenAPI sp
 
 ## Authentication
 
-The provider supports two authentication methods:
+The provider supports authentication via API token:
 
-### App Password (recommended)
+### API Token (recommended)
 
 ` + "```" + `hcl
 provider "bitbucket" {
-  username     = "your-username"
-  app_password = "your-app-password"
+  username = "your-username"
+  token    = "your-api-token"
 }
 ` + "```" + `
 
@@ -302,7 +302,7 @@ Or via environment variables:
 
 ` + "```" + `bash
 export BITBUCKET_USERNAME="your-username"
-export BITBUCKET_APP_PASSWORD="your-app-password"
+export BITBUCKET_TOKEN="your-api-token"
 ` + "```" + `
 
 ### OAuth2 Token
@@ -351,8 +351,7 @@ output "repo_info" {
 ### Optional
 
 - ` + "`username`" + ` (String) Bitbucket username. Can also be set via ` + "`BITBUCKET_USERNAME`" + ` environment variable.
-- ` + "`app_password`" + ` (String, Sensitive) Bitbucket app password. Can also be set via ` + "`BITBUCKET_APP_PASSWORD`" + ` environment variable.
-- ` + "`token`" + ` (String, Sensitive) Bitbucket OAuth2 access token. Can also be set via ` + "`BITBUCKET_TOKEN`" + ` environment variable.
+- ` + "`token`" + ` (String, Sensitive) Bitbucket API token. Can also be set via ` + "`BITBUCKET_TOKEN`" + ` environment variable.
 - ` + "`base_url`" + ` (String) Base URL for the Bitbucket API. Defaults to ` + "`https://api.bitbucket.org/2.0`" + `.
 
 ## Resources and Data Sources
@@ -420,10 +419,6 @@ resource "{{.TFName}}" "example" {
 {{- range .Params}}
 - ` + "`" + `{{.}}` + "`" + ` (String) Path parameter.
 {{- end}}
-
-### Optional
-
-- ` + "`" + `operation` + "`" + ` (String) Override the default CRUD operation selection.
 
 ### Read-Only
 {{- if not .HasIDParam}}

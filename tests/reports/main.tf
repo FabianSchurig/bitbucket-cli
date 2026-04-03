@@ -24,7 +24,7 @@ variable "commit" {
   default = "abc123def"
 }
 
-variable "reportId" {
+variable "report_id" {
   type    = string
   default = "report-uuid"
 }
@@ -35,12 +35,12 @@ data "bitbucket_reports" "test" {
   workspace = var.workspace
   repo_slug = var.repo_slug
   commit = var.commit
-  reportId = var.reportId
+  report_id = var.report_id
 }
 
 resource "bitbucket_reports" "test" {
   workspace = var.workspace
   repo_slug = var.repo_slug
   commit = var.commit
-  reportId = var.reportId
+  report_id = var.report_id
 }

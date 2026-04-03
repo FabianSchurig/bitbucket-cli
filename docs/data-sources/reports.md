@@ -16,7 +16,7 @@ data "bitbucket_reports" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
   commit = "abc123def"
-  reportId = "report-uuid"
+  report_id = "report-uuid"
 }
 
 output "reports_response" {
@@ -30,7 +30,7 @@ output "reports_response" {
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `commit` (String) Path parameter.
-- `reportId` (String) Path parameter.
+- `report_id` (String) Path parameter.
 
 ### Read-Only
 

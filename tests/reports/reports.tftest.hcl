@@ -13,7 +13,7 @@ run "read_reports" {
     workspace = "my-workspace"
     repo_slug = "my-repo"
     commit = "abc123def"
-    reportId = "report-uuid"
+    report_id = "report-uuid"
   }
 
   # Data source read should succeed with mock provider
@@ -30,7 +30,7 @@ run "create_reports" {
     workspace = "my-workspace"
     repo_slug = "my-repo"
     commit = "abc123def"
-    reportId = "report-uuid"
+    report_id = "report-uuid"
   }
 
   # Resource create should succeed with mock provider

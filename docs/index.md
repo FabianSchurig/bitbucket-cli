@@ -12,14 +12,14 @@ generic resources and data sources. Auto-generated from the Bitbucket OpenAPI sp
 
 ## Authentication
 
-The provider supports two authentication methods:
+The provider supports authentication via API token:
 
-### App Password (recommended)
+### API Token (recommended)
 
 ```hcl
 provider "bitbucket" {
-  username     = "your-username"
-  app_password = "your-app-password"
+  username = "your-username"
+  token    = "your-api-token"
 }
 ```
 
@@ -27,7 +27,7 @@ Or via environment variables:
 
 ```bash
 export BITBUCKET_USERNAME="your-username"
-export BITBUCKET_APP_PASSWORD="your-app-password"
+export BITBUCKET_TOKEN="your-api-token"
 ```
 
 ### OAuth2 Token
@@ -76,8 +76,7 @@ output "repo_info" {
 ### Optional
 
 - `username` (String) Bitbucket username. Can also be set via `BITBUCKET_USERNAME` environment variable.
-- `app_password` (String, Sensitive) Bitbucket app password. Can also be set via `BITBUCKET_APP_PASSWORD` environment variable.
-- `token` (String, Sensitive) Bitbucket OAuth2 access token. Can also be set via `BITBUCKET_TOKEN` environment variable.
+- `token` (String, Sensitive) Bitbucket API token. Can also be set via `BITBUCKET_TOKEN` environment variable.
 - `base_url` (String) Base URL for the Bitbucket API. Defaults to `https://api.bitbucket.org/2.0`.
 
 ## Resources and Data Sources

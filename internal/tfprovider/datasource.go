@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -26,7 +27,7 @@ type GenericDataSource struct {
 
 // Metadata returns the data source type name.
 func (d *GenericDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_" + d.group.TypeName
+	resp.TypeName = req.ProviderTypeName + "_" + toSnakeCase(d.group.TypeName)
 }
 
 // Schema builds the data source schema from the Read or List operation.
@@ -59,7 +60,7 @@ func (d *GenericDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 			continue
 		}
 		paramSeen[p.Name] = true
-		attrName := toSnakeCase(p.Name)
+		attrName := ParamAttrName(p.Name)
 		// Skip if already defined.
 		if _, exists := attrs[attrName]; exists {
 			continue
@@ -78,7 +79,7 @@ func (d *GenericDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				continue
 			}
 			paramSeen[p.Name] = true
-			attrName := toSnakeCase(p.Name)
+			attrName := ParamAttrName(p.Name)
 			if _, exists := attrs[attrName]; exists {
 				continue
 			}
@@ -124,7 +125,7 @@ func (d *GenericDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	queryParams := map[string]string{}
 
 	for _, p := range op.Params {
-		attrName := toSnakeCase(p.Name)
+		attrName := ParamAttrName(p.Name)
 		var val types.String
 		dd := req.Config.GetAttribute(ctx, attrPath(attrName), &val)
 		resp.Diagnostics.Append(dd...)
@@ -169,19 +170,22 @@ func (d *GenericDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		}
 		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, attrPath("api_response"), types.StringValue(string(jsonBytes)))...)
 
+		idSet := false
 		if m, ok := result.(map[string]any); ok {
 			if id := extractID(m); id != "" {
 				resp.Diagnostics.Append(resp.State.SetAttribute(ctx, attrPath("id"), types.StringValue(id))...)
+				idSet = true
 			}
-		} else {
-			// For list results, use a composite ID.
+		}
+		if !idSet {
+			// For list results or missing ID fields, use a composite ID.
 			resp.Diagnostics.Append(resp.State.SetAttribute(ctx, attrPath("id"), types.StringValue(buildListID(pathParams)))...)
 		}
 	}
 
 	// Copy config params to state.
 	for _, p := range op.Params {
-		attrName := toSnakeCase(p.Name)
+		attrName := ParamAttrName(p.Name)
 		var val types.String
 		dd := req.Config.GetAttribute(ctx, attrPath(attrName), &val)
 		resp.Diagnostics.Append(dd...)
@@ -200,10 +204,16 @@ func (d *GenericDataSource) readOp() *OperationDef {
 }
 
 // buildListID creates a composite ID from path parameters for list data sources.
+// Keys are sorted for deterministic ordering.
 func buildListID(pathParams map[string]string) string {
-	parts := make([]string, 0, len(pathParams))
-	for _, v := range pathParams {
-		parts = append(parts, v)
+	keys := make([]string, 0, len(pathParams))
+	for k := range pathParams {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	parts := make([]string, 0, len(keys))
+	for _, k := range keys {
+		parts = append(parts, pathParams[k])
 	}
 	return strings.Join(parts, "/")
 }

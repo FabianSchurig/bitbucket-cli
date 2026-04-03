@@ -78,7 +78,7 @@ type GenericResource struct {
 
 // Metadata returns the resource type name.
 func (r *GenericResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_" + r.group.TypeName
+	resp.TypeName = req.ProviderTypeName + "_" + toSnakeCase(r.group.TypeName)
 }
 
 // Schema builds the resource schema dynamically from the operation definitions.
@@ -87,10 +87,6 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 		"id": schema.StringAttribute{
 			Description: "Resource identifier.",
 			Computed:    true,
-		},
-		"operation": schema.StringAttribute{
-			Description: "The API operation to use. Set this to override the default CRUD operation selection.",
-			Optional:    true,
 		},
 		"api_response": schema.StringAttribute{
 			Description: "The raw JSON response from the Bitbucket API.",
@@ -120,7 +116,10 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				continue
 			}
 			paramSeen[p.Name] = true
-			attrName := toSnakeCase(p.Name)
+			attrName := ParamAttrName(p.Name)
+			if _, exists := attrs[attrName]; exists {
+				continue
+			}
 			isRequired := primaryRequired[p.Name]
 			attrs[attrName] = schema.StringAttribute{
 				Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
@@ -207,6 +206,7 @@ func (r *GenericResource) Delete(ctx context.Context, req resource.DeleteRequest
 	op := r.group.Ops.Delete
 	if op == nil {
 		// If no delete, just remove from state.
+		resp.State.RemoveResource(ctx)
 		return
 	}
 
@@ -225,7 +225,10 @@ func (r *GenericResource) Delete(ctx context.Context, req resource.DeleteRequest
 	})
 	if err != nil {
 		resp.Diagnostics.AddError("API Error", fmt.Sprintf("Delete failed: %v", err))
+		return
 	}
+
+	resp.State.RemoveResource(ctx)
 }
 
 // ─── Internal helpers ─────────────────────────────────────────────────────────
@@ -265,13 +268,28 @@ func (r *GenericResource) dispatch(ctx context.Context, op *OperationDef, source
 		diags.Append(target.SetAttribute(ctx, attrPath("api_response"), types.StringValue(string(jsonBytes)))...)
 
 		// Try to extract an ID from the response.
+		idSet := false
 		if m, ok := result.(map[string]any); ok {
 			if id := extractID(m); id != "" {
 				diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(id))...)
+				idSet = true
 			}
+		}
+		// Fallback: build deterministic ID from path params + operation.
+		if !idSet {
+			fallbackID := op.OperationID
+			for _, p := range op.Params {
+				if p.In == "path" {
+					if v, ok := pathParams[p.Name]; ok {
+						fallbackID += "/" + v
+					}
+				}
+			}
+			diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(fallbackID))...)
 		}
 	} else {
 		diags.Append(target.SetAttribute(ctx, attrPath("api_response"), types.StringValue(""))...)
+		diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(op.OperationID))...)
 	}
 
 	// Copy source attributes to target for params and body fields.
@@ -284,7 +302,7 @@ func (r *GenericResource) extractParams(ctx context.Context, op *OperationDef, s
 	queryParams := map[string]string{}
 
 	for _, p := range op.Params {
-		attrName := toSnakeCase(p.Name)
+		attrName := ParamAttrName(p.Name)
 		var val types.String
 		d := source.GetAttribute(ctx, attrPath(attrName), &val)
 		diags.Append(d...)
@@ -344,7 +362,7 @@ func (r *GenericResource) copyAttributes(ctx context.Context, _ *OperationDef, s
 	seen := map[string]bool{}
 	for _, op := range r.crudOps() {
 		for _, p := range op.Params {
-			attrName := toSnakeCase(p.Name)
+			attrName := ParamAttrName(p.Name)
 			if seen[attrName] {
 				continue
 			}

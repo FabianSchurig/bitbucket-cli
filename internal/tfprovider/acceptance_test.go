@@ -159,7 +159,7 @@ func startMockServer(t *testing.T) *httptest.Server {
 func setMockEnv(t *testing.T, serverURL string) {
 	t.Helper()
 	t.Setenv("BITBUCKET_USERNAME", "testuser")
-	t.Setenv("BITBUCKET_APP_PASSWORD", "testpassword")
+	t.Setenv("BITBUCKET_TOKEN", "testtoken")
 	t.Setenv("BITBUCKET_BASE_URL", serverURL)
 }
 
@@ -321,9 +321,9 @@ func TestAccProvider_ConfigureWithUsername(t *testing.T) {
 			{
 				Config: fmt.Sprintf(`
 					provider "bitbucket" {
-						username     = "testuser"
-						app_password = "testpassword"
-						base_url     = %q
+						username = "testuser"
+						token    = "testtoken"
+						base_url = %q
 					}
 
 					data "bitbucket_repos" "test" {
@@ -342,9 +342,8 @@ func TestAccProvider_ConfigureWithUsername(t *testing.T) {
 func TestAccProvider_ConfigureWithToken(t *testing.T) {
 	srv := startMockServer(t)
 	defer srv.Close()
-	// Only set token, not username/password
+	// Only set token, not username
 	t.Setenv("BITBUCKET_USERNAME", "")
-	t.Setenv("BITBUCKET_APP_PASSWORD", "")
 	t.Setenv("BITBUCKET_TOKEN", "test-oauth-token")
 	t.Setenv("BITBUCKET_BASE_URL", srv.URL)
 

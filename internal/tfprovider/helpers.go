@@ -41,7 +41,16 @@ func toSnakeCase(s string) string {
 	return strings.ToLower(result.String())
 }
 
-// MapCRUDOps resolves CRUD operations for a resource group by looking up
+// ParamAttrName returns the Terraform attribute name for an API parameter.
+// If the snake_case name collides with reserved Terraform attributes (like "id"),
+// it is prefixed with "param_" to avoid conflicts.
+func ParamAttrName(paramName string) string {
+	name := toSnakeCase(paramName)
+	if name == "id" {
+		return "param_id"
+	}
+	return name
+}
 // operation IDs from the hand-written CRUDConfig map. The typeName parameter
 // identifies the resource group (e.g., "repos", "pr"). Called at runtime by
 // generated init() functions to map Bitbucket API operations to Terraform

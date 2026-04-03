@@ -28,10 +28,9 @@ type BitbucketProvider struct {
 
 // BitbucketProviderModel describes the provider configuration.
 type BitbucketProviderModel struct {
-	Username    types.String `tfsdk:"username"`
-	AppPassword types.String `tfsdk:"app_password"`
-	Token       types.String `tfsdk:"token"`
-	BaseURL     types.String `tfsdk:"base_url"`
+	Username types.String `tfsdk:"username"`
+	Token    types.String `tfsdk:"token"`
+	BaseURL  types.String `tfsdk:"base_url"`
 }
 
 // New creates a new BitbucketProvider instance.
@@ -56,13 +55,8 @@ func (p *BitbucketProvider) Schema(_ context.Context, _ provider.SchemaRequest, 
 				Description: "Bitbucket username. Can also be set via BITBUCKET_USERNAME environment variable.",
 				Optional:    true,
 			},
-			"app_password": schema.StringAttribute{
-				Description: "Bitbucket app password. Can also be set via BITBUCKET_APP_PASSWORD environment variable.",
-				Optional:    true,
-				Sensitive:   true,
-			},
 			"token": schema.StringAttribute{
-				Description: "Bitbucket OAuth2 access token. Can also be set via BITBUCKET_TOKEN environment variable.",
+				Description: "Bitbucket API token. Can also be set via BITBUCKET_TOKEN environment variable.",
 				Optional:    true,
 				Sensitive:   true,
 			},
@@ -82,38 +76,25 @@ func (p *BitbucketProvider) Configure(ctx context.Context, req provider.Configur
 		return
 	}
 
-	// Set env vars from config if provided (config overrides env).
+	// Resolve values: config overrides env vars.
+	username := os.Getenv("BITBUCKET_USERNAME")
 	if !config.Username.IsNull() {
-		if err := os.Setenv("BITBUCKET_USERNAME", config.Username.ValueString()); err != nil {
-			resp.Diagnostics.AddError("Failed to set BITBUCKET_USERNAME", err.Error())
-			return
-		}
+		username = config.Username.ValueString()
 	}
-	if !config.AppPassword.IsNull() {
-		if err := os.Setenv("BITBUCKET_APP_PASSWORD", config.AppPassword.ValueString()); err != nil {
-			resp.Diagnostics.AddError("Failed to set BITBUCKET_APP_PASSWORD", err.Error())
-			return
-		}
-	}
+	token := os.Getenv("BITBUCKET_TOKEN")
 	if !config.Token.IsNull() {
-		if err := os.Setenv("BITBUCKET_TOKEN", config.Token.ValueString()); err != nil {
-			resp.Diagnostics.AddError("Failed to set BITBUCKET_TOKEN", err.Error())
-			return
-		}
+		token = config.Token.ValueString()
 	}
+	baseURL := os.Getenv("BITBUCKET_BASE_URL")
 	if !config.BaseURL.IsNull() {
-		if err := os.Setenv("BITBUCKET_BASE_URL", config.BaseURL.ValueString()); err != nil {
-			resp.Diagnostics.AddError("Failed to set BITBUCKET_BASE_URL", err.Error())
-			return
-		}
+		baseURL = config.BaseURL.ValueString()
 	}
 
-	// Validate that auth is configured.
-	c, err := client.NewClient()
+	c, err := client.NewClientWithConfig(username, "", token, baseURL)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to create Bitbucket client",
-			"Ensure BITBUCKET_USERNAME + BITBUCKET_APP_PASSWORD or BITBUCKET_TOKEN are set. Error: "+err.Error(),
+			"Ensure BITBUCKET_USERNAME + BITBUCKET_TOKEN or BITBUCKET_TOKEN alone are set. Error: "+err.Error(),
 		)
 		return
 	}
