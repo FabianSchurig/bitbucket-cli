@@ -77,13 +77,18 @@ jobs:
           cache: true
 
       - name: Build provider
-        run: go build -o terraform-provider-bitbucket ./cmd/bb-tf/...
+        run: go build -o "${GITHUB_WORKSPACE}/terraform-provider-bitbucket" ./cmd/bb-tf/...
 
-      - name: Install provider locally
+      - name: Configure dev_overrides for local provider
         run: |
-          PLUGIN_DIR="${HOME}/.terraform.d/plugins/registry.terraform.io/FabianSchurig/bitbucket/0.0.1/linux_amd64"
-          mkdir -p "${PLUGIN_DIR}"
-          cp terraform-provider-bitbucket "${PLUGIN_DIR}/"
+          cat > "${HOME}/.terraformrc" <<EOF
+          provider_installation {
+            dev_overrides {
+              "FabianSchurig/bitbucket" = "${GITHUB_WORKSPACE}"
+            }
+            direct {}
+          }
+          EOF
 
       - name: Run terraform test (${{ matrix.test-group }})
         working-directory: tests/${{ matrix.test-group }}

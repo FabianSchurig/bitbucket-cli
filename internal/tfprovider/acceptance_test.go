@@ -112,18 +112,16 @@ func startMockServer(t *testing.T) *httptest.Server {
 	})
 
 	// Project create endpoint
-	mux.HandleFunc("/workspaces/{workspace}/projects/", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusCreated)
-			_ = json.NewEncoder(w).Encode(map[string]any{
-				"uuid":        "{project-uuid-123}",
-				"key":         "TEST",
-				"name":        "Test Project",
-				"description": "A test project",
-				"is_private":  true,
-			})
-		}
+	mux.HandleFunc("POST /workspaces/{workspace}/projects", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"uuid":        "{project-uuid-123}",
+			"key":         "TEST",
+			"name":        "Test Project",
+			"description": "A test project",
+			"is_private":  true,
+		})
 	})
 
 	// Workspace endpoint

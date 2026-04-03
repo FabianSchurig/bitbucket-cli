@@ -38,6 +38,4 @@ resource "bitbucket_branch_restrictions" "example" {
 - `operation` (String) Override the default CRUD operation selection.
 
 ### Read-Only
-
-- `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
