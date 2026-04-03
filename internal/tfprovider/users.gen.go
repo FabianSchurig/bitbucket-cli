@@ -30,7 +30,7 @@ Available operations:
 - updateASshKey: Update a SSH key [PUT]
 - deleteASshKey: Delete a SSH key [DELETE]
 `,
-	Ops: MapCRUDOps([]OperationDef{
+	Ops: MapCRUDOps(`users`, []OperationDef{
 		{
 			OperationID: `getCurrentUser`,
 			Method:      `GET`,

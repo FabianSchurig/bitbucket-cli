@@ -20,7 +20,7 @@ Available operations:
 - searchAccount: Search for code in a user's repositories [GET]
 - searchWorkspace: Search for code in a workspace [GET]
 `,
-	Ops: MapCRUDOps([]OperationDef{
+	Ops: MapCRUDOps(`search`, []OperationDef{
 		{
 			OperationID: `searchTeam`,
 			Method:      `GET`,

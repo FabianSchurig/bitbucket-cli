@@ -38,7 +38,7 @@ Available operations:
 - deleteAProjectForAWorkspace: Delete a project for a workspace [DELETE]
 - listWorkspacePullRequestsForAUser: List workspace pull requests for a user [GET]
 `,
-	Ops: MapCRUDOps([]OperationDef{
+	Ops: MapCRUDOps(`workspaces`, []OperationDef{
 		{
 			OperationID: `listWorkspacesForTheCurrentUser`,
 			Method:      `GET`,

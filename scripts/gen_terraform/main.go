@@ -79,7 +79,7 @@ func init() {
 var {{.VarName}} = ResourceGroup{
 	TypeName:    {{goStringLit .TypeName}},
 	Description: {{goStringLit .Description}},
-	Ops: MapCRUDOps([]OperationDef{
+	Ops: MapCRUDOps({{goStringLit .TypeName}}, []OperationDef{
 {{- range .Operations}}
 		{
 			OperationID: {{goStringLit .OperationID}},

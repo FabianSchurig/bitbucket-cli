@@ -26,7 +26,7 @@ Available operations:
 - createOrUpdateAnnotation: Create or update an annotation [PUT]
 - deleteAnnotation: Delete an annotation [DELETE]
 `,
-	Ops: MapCRUDOps([]OperationDef{
+	Ops: MapCRUDOps(`reports`, []OperationDef{
 		{
 			OperationID: `getReportsForCommit`,
 			Method:      `GET`,

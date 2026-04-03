@@ -85,7 +85,7 @@ Available operations:
 - updatePipelineVariableForWorkspace: Update variable for a workspace [PUT]
 - deletePipelineVariableForWorkspace: Delete a variable for a workspace [DELETE]
 `,
-	Ops: MapCRUDOps([]OperationDef{
+	Ops: MapCRUDOps(`pipelines`, []OperationDef{
 		{
 			OperationID: `getDeploymentVariables`,
 			Method:      `GET`,

@@ -22,7 +22,7 @@ Available operations:
 - updateABuildStatusForACommit: Update a build status for a commit [PUT]
 - listCommitStatusesForAPullRequest: List commit statuses for a pull request [GET]
 `,
-	Ops: MapCRUDOps([]OperationDef{
+	Ops: MapCRUDOps(`commit-statuses`, []OperationDef{
 		{
 			OperationID: `listCommitStatusesForACommit`,
 			Method:      `GET`,

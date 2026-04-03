@@ -48,7 +48,7 @@ Available operations:
 - listRepositoryPermissionsForAUser: List repository permissions for a user [GET]
 - listRepositoryPermissionsInAWorkspaceForAUser: List repository permissions in a workspace for a user [GET]
 `,
-	Ops: MapCRUDOps([]OperationDef{
+	Ops: MapCRUDOps(`repos`, []OperationDef{
 		{
 			OperationID: `listPublicRepositories`,
 			Method:      `GET`,

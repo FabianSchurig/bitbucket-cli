@@ -98,6 +98,20 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 		},
 	}
 
+	// Build a set of params that are required in the primary Create or Read op.
+	// Params from other ops (Update, Delete, List) are always Optional.
+	primaryRequired := map[string]bool{}
+	for _, op := range []*OperationDef{r.group.Ops.Create, r.group.Ops.Read} {
+		if op == nil {
+			continue
+		}
+		for _, p := range op.Params {
+			if p.Required && p.In == "path" {
+				primaryRequired[p.Name] = true
+			}
+		}
+	}
+
 	// Collect params from all CRUD ops.
 	paramSeen := map[string]bool{}
 	for _, op := range r.crudOps() {
@@ -107,10 +121,11 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 			}
 			paramSeen[p.Name] = true
 			attrName := toSnakeCase(p.Name)
+			isRequired := primaryRequired[p.Name]
 			attrs[attrName] = schema.StringAttribute{
 				Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
-				Required:    p.Required && p.In == "path",
-				Optional:    !p.Required || p.In != "path",
+				Required:    isRequired,
+				Optional:    !isRequired,
 			}
 		}
 	}
@@ -322,24 +337,37 @@ func (r *GenericResource) buildBody(ctx context.Context, op *OperationDef, sourc
 	return string(b)
 }
 
-// copyAttributes copies param and body field values from source to target state.
-func (r *GenericResource) copyAttributes(ctx context.Context, op *OperationDef, source, target stateAccessor, diags *diag.Diagnostics) {
-	for _, p := range op.Params {
-		attrName := toSnakeCase(p.Name)
-		var val types.String
-		d := source.GetAttribute(ctx, attrPath(attrName), &val)
-		diags.Append(d...)
-		if !d.HasError() && !val.IsNull() && !val.IsUnknown() {
-			diags.Append(target.SetAttribute(ctx, attrPath(attrName), val)...)
+// copyAttributes copies all param and body field values from source to target state.
+// It copies from ALL CRUD operations so that attributes defined by one operation
+// (e.g., Read's path params) are preserved when another operation (e.g., Create) runs.
+func (r *GenericResource) copyAttributes(ctx context.Context, _ *OperationDef, source, target stateAccessor, diags *diag.Diagnostics) {
+	seen := map[string]bool{}
+	for _, op := range r.crudOps() {
+		for _, p := range op.Params {
+			attrName := toSnakeCase(p.Name)
+			if seen[attrName] {
+				continue
+			}
+			seen[attrName] = true
+			var val types.String
+			d := source.GetAttribute(ctx, attrPath(attrName), &val)
+			diags.Append(d...)
+			if !d.HasError() && !val.IsNull() && !val.IsUnknown() {
+				diags.Append(target.SetAttribute(ctx, attrPath(attrName), val)...)
+			}
 		}
-	}
-	for _, bf := range op.BodyFields {
-		attrName := toSnakeCase(strings.ReplaceAll(bf.Path, ".", "_"))
-		var val types.String
-		d := source.GetAttribute(ctx, attrPath(attrName), &val)
-		diags.Append(d...)
-		if !d.HasError() && !val.IsNull() && !val.IsUnknown() {
-			diags.Append(target.SetAttribute(ctx, attrPath(attrName), val)...)
+		for _, bf := range op.BodyFields {
+			attrName := toSnakeCase(strings.ReplaceAll(bf.Path, ".", "_"))
+			if seen[attrName] {
+				continue
+			}
+			seen[attrName] = true
+			var val types.String
+			d := source.GetAttribute(ctx, attrPath(attrName), &val)
+			diags.Append(d...)
+			if !d.HasError() && !val.IsNull() && !val.IsUnknown() {
+				diags.Append(target.SetAttribute(ctx, attrPath(attrName), val)...)
+			}
 		}
 	}
 }

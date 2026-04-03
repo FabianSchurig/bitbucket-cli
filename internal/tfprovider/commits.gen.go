@@ -33,7 +33,7 @@ Available operations:
 - getTheCommonAncestorBetweenTwoCommits: Get the common ancestor between two commits [GET]
 - getAPatchForTwoCommits: Get a patch for two commits [GET]
 `,
-	Ops: MapCRUDOps([]OperationDef{
+	Ops: MapCRUDOps(`commits`, []OperationDef{
 		{
 			OperationID: `getACommit`,
 			Method:      `GET`,

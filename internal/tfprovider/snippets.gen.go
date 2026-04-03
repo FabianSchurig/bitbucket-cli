@@ -42,7 +42,7 @@ Available operations:
 - getSnippetChangesBetweenVersions: Get snippet changes between versions [GET]
 - getSnippetPatchBetweenVersions: Get snippet patch between versions [GET]
 `,
-	Ops: MapCRUDOps([]OperationDef{
+	Ops: MapCRUDOps(`snippets`, []OperationDef{
 		{
 			OperationID: `listSnippets`,
 			Method:      `GET`,

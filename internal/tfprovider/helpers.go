@@ -21,10 +21,11 @@ func attrPath(name string) path.Path {
 	return path.Root(name)
 }
 
-// toSnakeCase converts parameter names like "repo_slug" or "repoSlug" to
-// Terraform-compatible snake_case attribute names.
+// toSnakeCase converts parameter names like "repo_slug", "repoSlug", or
+// "target.commit.hash" to Terraform-compatible snake_case attribute names.
 func toSnakeCase(s string) string {
 	s = strings.ReplaceAll(s, "-", "_")
+	s = strings.ReplaceAll(s, ".", "_")
 
 	// Handle camelCase by inserting underscores before uppercase letters.
 	var result strings.Builder
@@ -40,62 +41,30 @@ func toSnakeCase(s string) string {
 	return strings.ToLower(result.String())
 }
 
-// MapCRUDOps analyzes a list of operations and assigns them to CRUD slots based
-// on HTTP method heuristics. Called at runtime by generated init() functions to
-// map Bitbucket API operations to Terraform CRUD lifecycle methods.
-func MapCRUDOps(ops []OperationDef) CRUDOps {
-	var crud CRUDOps
-
-	// Score operations by how well they match each CRUD slot.
-	// Prefer specific endpoints (with more path params) for single-resource ops.
-	var (
-		bestCreate, bestRead, bestUpdate, bestDelete, bestList      *OperationDef
-		createScore, readScore, updateScore, deleteScore, listScore int
-	)
-
-	for i := range ops {
-		op := &ops[i]
-		score := len(op.Params) // more specific paths score higher
-		opLower := strings.ToLower(op.OperationID)
-
-		switch op.Method {
-		case "POST":
-			if crud.Create == nil || score > createScore || strings.Contains(opLower, "create") {
-				bestCreate = op
-				createScore = score
-			}
-		case "GET":
-			if op.Paginated || strings.Contains(opLower, "list") || strings.Contains(opLower, "getall") {
-				if crud.List == nil || score < listScore { // prefer less-specific for list
-					bestList = op
-					listScore = score
-				}
-			} else {
-				if crud.Read == nil || score > readScore || strings.Contains(opLower, "get") {
-					bestRead = op
-					readScore = score
-				}
-			}
-		case "PUT", "PATCH":
-			if crud.Update == nil || score > updateScore || strings.Contains(opLower, "update") {
-				bestUpdate = op
-				updateScore = score
-			}
-		case "DELETE":
-			if crud.Delete == nil || score > deleteScore || strings.Contains(opLower, "delete") {
-				bestDelete = op
-				deleteScore = score
-			}
-		}
+// MapCRUDOps resolves CRUD operations for a resource group by looking up
+// operation IDs from the hand-written CRUDConfig map. The typeName parameter
+// identifies the resource group (e.g., "repos", "pr"). Called at runtime by
+// generated init() functions to map Bitbucket API operations to Terraform
+// CRUD lifecycle methods.
+func MapCRUDOps(typeName string, ops []OperationDef) CRUDOps {
+	cfg, ok := CRUDConfig[typeName]
+	if !ok {
+		return CRUDOps{}
 	}
 
-	crud.Create = bestCreate
-	crud.Read = bestRead
-	crud.Update = bestUpdate
-	crud.Delete = bestDelete
-	crud.List = bestList
+	// Build an index of operation ID → *OperationDef for fast lookup.
+	index := make(map[string]*OperationDef, len(ops))
+	for i := range ops {
+		index[ops[i].OperationID] = &ops[i]
+	}
 
-	return crud
+	return CRUDOps{
+		Create: index[cfg.Create],
+		Read:   index[cfg.Read],
+		Update: index[cfg.Update],
+		Delete: index[cfg.Delete],
+		List:   index[cfg.List],
+	}
 }
 
 // BuildResourceDescription builds a description for a Terraform resource

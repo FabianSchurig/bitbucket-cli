@@ -29,7 +29,7 @@ Available operations:
 - updateAWebhookForAWorkspace: Update a webhook for a workspace [PUT]
 - deleteAWebhookForAWorkspace: Delete a webhook for a workspace [DELETE]
 `,
-	Ops: MapCRUDOps([]OperationDef{
+	Ops: MapCRUDOps(`hooks`, []OperationDef{
 		{
 			OperationID: `getAWebhookResource`,
 			Method:      `GET`,

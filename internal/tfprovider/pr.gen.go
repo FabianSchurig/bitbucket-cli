@@ -54,7 +54,7 @@ Available operations:
 - deleteATaskOnAPullRequest: Delete a task on a pull request [DELETE]
 - listWorkspacePullRequestsForAUser: List workspace pull requests for a user [GET]
 `,
-	Ops: MapCRUDOps([]OperationDef{
+	Ops: MapCRUDOps(`pr`, []OperationDef{
 		{
 			OperationID: `getPullrequestsForCommit`,
 			Method:      `GET`,

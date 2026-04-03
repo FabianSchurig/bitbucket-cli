@@ -22,7 +22,7 @@ Available operations:
 - updateABranchRestrictionRule: Update a branch restriction rule [PUT]
 - deleteABranchRestrictionRule: Delete a branch restriction rule [DELETE]
 `,
-	Ops: MapCRUDOps([]OperationDef{
+	Ops: MapCRUDOps(`branch-restrictions`, []OperationDef{
 		{
 			OperationID: `listBranchRestrictions`,
 			Method:      `GET`,

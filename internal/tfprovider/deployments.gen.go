@@ -33,7 +33,7 @@ Available operations:
 - getAProjectDeployKey: Get a project deploy key [GET]
 - deleteADeployKeyFromAProject: Delete a deploy key from a project [DELETE]
 `,
-	Ops: MapCRUDOps([]OperationDef{
+	Ops: MapCRUDOps(`deployments`, []OperationDef{
 		{
 			OperationID: `listRepositoryDeployKeys`,
 			Method:      `GET`,

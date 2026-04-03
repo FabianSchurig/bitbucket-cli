@@ -33,57 +33,25 @@ func TestToSnakeCase(t *testing.T) {
 }
 
 func TestMapCRUDOps_BasicMapping(t *testing.T) {
+	// Register a temporary config entry for this test.
+	tfprovider.CRUDConfig["test-repos"] = tfprovider.CRUDMapping{
+		Create: "createRepo",
+		Read:   "getRepo",
+		Update: "updateRepo",
+		Delete: "deleteRepo",
+		List:   "listRepos",
+	}
+	defer delete(tfprovider.CRUDConfig, "test-repos")
+
 	ops := []tfprovider.OperationDef{
-		{
-			OperationID: "createRepo",
-			Method:      "POST",
-			Path:        "/repositories/{workspace}/{repo_slug}",
-			Params: []tfprovider.ParamDef{
-				{Name: "workspace", In: "path", Type: "string", Required: true},
-				{Name: "repo_slug", In: "path", Type: "string", Required: true},
-			},
-			HasBody: true,
-		},
-		{
-			OperationID: "getRepo",
-			Method:      "GET",
-			Path:        "/repositories/{workspace}/{repo_slug}",
-			Params: []tfprovider.ParamDef{
-				{Name: "workspace", In: "path", Type: "string", Required: true},
-				{Name: "repo_slug", In: "path", Type: "string", Required: true},
-			},
-		},
-		{
-			OperationID: "listRepos",
-			Method:      "GET",
-			Path:        "/repositories/{workspace}",
-			Params: []tfprovider.ParamDef{
-				{Name: "workspace", In: "path", Type: "string", Required: true},
-			},
-			Paginated: true,
-		},
-		{
-			OperationID: "updateRepo",
-			Method:      "PUT",
-			Path:        "/repositories/{workspace}/{repo_slug}",
-			Params: []tfprovider.ParamDef{
-				{Name: "workspace", In: "path", Type: "string", Required: true},
-				{Name: "repo_slug", In: "path", Type: "string", Required: true},
-			},
-			HasBody: true,
-		},
-		{
-			OperationID: "deleteRepo",
-			Method:      "DELETE",
-			Path:        "/repositories/{workspace}/{repo_slug}",
-			Params: []tfprovider.ParamDef{
-				{Name: "workspace", In: "path", Type: "string", Required: true},
-				{Name: "repo_slug", In: "path", Type: "string", Required: true},
-			},
-		},
+		{OperationID: "createRepo", Method: "POST", Path: "/repositories/{workspace}/{repo_slug}"},
+		{OperationID: "getRepo", Method: "GET", Path: "/repositories/{workspace}/{repo_slug}"},
+		{OperationID: "listRepos", Method: "GET", Path: "/repositories/{workspace}", Paginated: true},
+		{OperationID: "updateRepo", Method: "PUT", Path: "/repositories/{workspace}/{repo_slug}"},
+		{OperationID: "deleteRepo", Method: "DELETE", Path: "/repositories/{workspace}/{repo_slug}"},
 	}
 
-	crud := tfprovider.MapCRUDOps(ops)
+	crud := tfprovider.MapCRUDOps("test-repos", ops)
 
 	if crud.Create == nil || crud.Create.OperationID != "createRepo" {
 		t.Errorf("expected Create=createRepo, got %v", crud.Create)
@@ -102,38 +70,32 @@ func TestMapCRUDOps_BasicMapping(t *testing.T) {
 	}
 }
 
-func TestMapCRUDOps_PaginatedDetectedAsList(t *testing.T) {
-	ops := []tfprovider.OperationDef{
-		{
-			OperationID: "getPullRequests",
-			Method:      "GET",
-			Path:        "/repositories/{workspace}/{repo_slug}/pullrequests",
-			Paginated:   true,
-		},
-		{
-			OperationID: "getAPullRequest",
-			Method:      "GET",
-			Path:        "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}",
-			Params: []tfprovider.ParamDef{
-				{Name: "pull_request_id", In: "path", Type: "integer", Required: true},
-			},
-		},
-	}
-
-	crud := tfprovider.MapCRUDOps(ops)
-
-	if crud.List == nil || crud.List.OperationID != "getPullRequests" {
-		t.Errorf("expected List=getPullRequests, got %v", crud.List)
-	}
-	if crud.Read == nil || crud.Read.OperationID != "getAPullRequest" {
-		t.Errorf("expected Read=getAPullRequest, got %v", crud.Read)
+func TestMapCRUDOps_UnknownGroup(t *testing.T) {
+	crud := tfprovider.MapCRUDOps("nonexistent-group", nil)
+	if crud.Create != nil || crud.Read != nil || crud.Update != nil || crud.Delete != nil || crud.List != nil {
+		t.Error("expected all CRUD ops to be nil for unknown group")
 	}
 }
 
-func TestMapCRUDOps_EmptyOps(t *testing.T) {
-	crud := tfprovider.MapCRUDOps(nil)
-	if crud.Create != nil || crud.Read != nil || crud.Update != nil || crud.Delete != nil || crud.List != nil {
-		t.Error("expected all CRUD ops to be nil for empty input")
+func TestMapCRUDOps_MissingOperationID(t *testing.T) {
+	// Config references an operation that doesn't exist in the ops list.
+	tfprovider.CRUDConfig["test-missing"] = tfprovider.CRUDMapping{
+		Create: "doesNotExist",
+		Read:   "getItem",
+	}
+	defer delete(tfprovider.CRUDConfig, "test-missing")
+
+	ops := []tfprovider.OperationDef{
+		{OperationID: "getItem", Method: "GET", Path: "/items/{id}"},
+	}
+
+	crud := tfprovider.MapCRUDOps("test-missing", ops)
+
+	if crud.Create != nil {
+		t.Error("expected Create to be nil for missing operation ID")
+	}
+	if crud.Read == nil || crud.Read.OperationID != "getItem" {
+		t.Errorf("expected Read=getItem, got %v", crud.Read)
 	}
 }
 
@@ -209,15 +171,28 @@ func TestGeneratedResourceGroups_ReposHasAllCRUD(t *testing.T) {
 	if group.TypeName != "repos" {
 		t.Errorf("expected TypeName 'repos', got %q", group.TypeName)
 	}
-	// Repos should have all CRUD operations.
+	// Repos should have all CRUD operations mapped via CRUDConfig.
 	if group.Ops.Create == nil {
 		t.Error("expected repos to have Create operation")
 	}
 	if group.Ops.Read == nil {
 		t.Error("expected repos to have Read operation")
 	}
+	if group.Ops.Update == nil {
+		t.Error("expected repos to have Update operation")
+	}
 	if group.Ops.Delete == nil {
 		t.Error("expected repos to have Delete operation")
+	}
+	if group.Ops.List == nil {
+		t.Error("expected repos to have List operation")
+	}
+	// Verify the correct operations were picked (not sub-resource ones).
+	if group.Ops.Create.OperationID != "createARepository" {
+		t.Errorf("expected Create=createARepository, got %s", group.Ops.Create.OperationID)
+	}
+	if group.Ops.Read.OperationID != "getARepository" {
+		t.Errorf("expected Read=getARepository, got %s", group.Ops.Read.OperationID)
 	}
 }
 
