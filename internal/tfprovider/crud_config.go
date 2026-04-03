@@ -122,6 +122,85 @@ var CRUDConfig = map[string]CRUDMapping{
 		Delete: "deleteAnApp",
 		List:   "listLinkersForAnApp",
 	},
+	// ─── Sub-resource CRUD mappings ───────────────────────────────────────────
+	// These reference operations that live inside existing generated groups
+	// and are registered as additional Terraform resources via sub_resources.go.
+	"workspace-hooks": {
+		Create: "createAWebhookForAWorkspace",
+		Read:   "getAWebhookForAWorkspace",
+		Update: "updateAWebhookForAWorkspace",
+		Delete: "deleteAWebhookForAWorkspace",
+		List:   "listWebhooksForAWorkspace",
+	},
+	"default-reviewers": {
+		Read:   "getADefaultReviewer",
+		Create: "addAUserToTheDefaultReviewers",
+		Delete: "removeAUserFromTheDefaultReviewers",
+		List:   "listDefaultReviewers",
+	},
+	"project-default-reviewers": {
+		Read:   "getWorkspacesProjectsDefault-Reviewers",
+		Create: "addTheSpecificUserAsADefaultReviewerForTheProject",
+		Delete: "removeTheSpecificUserFromTheProjectsDefaultReviewers",
+		List:   "listTheDefaultReviewersInAProject",
+	},
+	"pipeline-variables": {
+		Create: "createRepositoryPipelineVariable",
+		Read:   "getRepositoryPipelineVariable",
+		Update: "updateRepositoryPipelineVariable",
+		Delete: "deleteRepositoryPipelineVariable",
+		List:   "getRepositoryPipelineVariables",
+	},
+	"workspace-pipeline-variables": {
+		Create: "createPipelineVariableForWorkspace",
+		Read:   "getPipelineVariableForWorkspace",
+		Update: "updatePipelineVariableForWorkspace",
+		Delete: "deletePipelineVariableForWorkspace",
+		List:   "getPipelineVariablesForWorkspace",
+	},
+	"deployment-variables": {
+		Create: "createDeploymentVariable",
+		Read:   "getDeploymentVariables",
+		Update: "updateDeploymentVariable",
+		Delete: "deleteDeploymentVariable",
+	},
+	"repo-group-permissions": {
+		Read:   "getAnExplicitGroupPermissionForARepository",
+		Update: "updateAnExplicitGroupPermissionForARepository",
+		Delete: "deleteAnExplicitGroupPermissionForARepository",
+		List:   "listExplicitGroupPermissionsForARepository",
+	},
+	"repo-user-permissions": {
+		Read:   "getAnExplicitUserPermissionForARepository",
+		Update: "updateAnExplicitUserPermissionForARepository",
+		Delete: "deleteAnExplicitUserPermissionForARepository",
+		List:   "listExplicitUserPermissionsForARepository",
+	},
+	"project-group-permissions": {
+		Read:   "getAnExplicitGroupPermissionForAProject",
+		Update: "updateAnExplicitGroupPermissionForAProject",
+		Delete: "deleteAnExplicitGroupPermissionForAProject",
+		List:   "listExplicitGroupPermissionsForAProject",
+	},
+	"project-user-permissions": {
+		Read:   "getAnExplicitUserPermissionForAProject",
+		Update: "updateAnExplicitUserPermissionForAProject",
+		Delete: "deleteAnExplicitUserPermissionForAProject",
+		List:   "listExplicitUserPermissionsForAProject",
+	},
+	"repo-deploy-keys": {
+		Create: "addARepositoryDeployKey",
+		Read:   "getARepositoryDeployKey",
+		Update: "updateARepositoryDeployKey",
+		Delete: "deleteARepositoryDeployKey",
+		List:   "listRepositoryDeployKeys",
+	},
+	"project-deploy-keys": {
+		Create: "createAProjectDeployKey",
+		Read:   "getAProjectDeployKey",
+		Delete: "deleteADeployKeyFromAProject",
+		List:   "listProjectDeployKeys",
+	},
 }
 
 // CRUDMapping holds operation IDs for each CRUD slot.

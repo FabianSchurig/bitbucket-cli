@@ -253,3 +253,121 @@ func TestGeneratedResourceGroups_AllGroupsHaveOps(t *testing.T) {
 		})
 	}
 }
+
+// ─── Sub-resource group tests ─────────────────────────────────────────────────
+
+func TestSubResourceGroups_Registered(t *testing.T) {
+	// Verify that sub-resource CRUDConfig entries resolve correctly
+	// against the parent groups' operations.
+	subResources := map[string]struct {
+		wantRead   string
+		wantCreate string
+		wantList   string
+	}{
+		"workspace-hooks": {
+			wantCreate: "createAWebhookForAWorkspace",
+			wantRead:   "getAWebhookForAWorkspace",
+			wantList:   "listWebhooksForAWorkspace",
+		},
+		"default-reviewers": {
+			wantRead:   "getADefaultReviewer",
+			wantCreate: "addAUserToTheDefaultReviewers",
+			wantList:   "listDefaultReviewers",
+		},
+		"project-default-reviewers": {
+			wantRead:   "getWorkspacesProjectsDefault-Reviewers",
+			wantCreate: "addTheSpecificUserAsADefaultReviewerForTheProject",
+			wantList:   "listTheDefaultReviewersInAProject",
+		},
+		"pipeline-variables": {
+			wantCreate: "createRepositoryPipelineVariable",
+			wantRead:   "getRepositoryPipelineVariable",
+			wantList:   "getRepositoryPipelineVariables",
+		},
+		"workspace-pipeline-variables": {
+			wantCreate: "createPipelineVariableForWorkspace",
+			wantRead:   "getPipelineVariableForWorkspace",
+			wantList:   "getPipelineVariablesForWorkspace",
+		},
+		"deployment-variables": {
+			wantCreate: "createDeploymentVariable",
+			wantRead:   "getDeploymentVariables",
+		},
+		"repo-group-permissions": {
+			wantRead: "getAnExplicitGroupPermissionForARepository",
+			wantList: "listExplicitGroupPermissionsForARepository",
+		},
+		"repo-user-permissions": {
+			wantRead: "getAnExplicitUserPermissionForARepository",
+			wantList: "listExplicitUserPermissionsForARepository",
+		},
+		"project-group-permissions": {
+			wantRead: "getAnExplicitGroupPermissionForAProject",
+			wantList: "listExplicitGroupPermissionsForAProject",
+		},
+		"project-user-permissions": {
+			wantRead: "getAnExplicitUserPermissionForAProject",
+			wantList: "listExplicitUserPermissionsForAProject",
+		},
+		"repo-deploy-keys": {
+			wantCreate: "addARepositoryDeployKey",
+			wantRead:   "getARepositoryDeployKey",
+			wantList:   "listRepositoryDeployKeys",
+		},
+		"project-deploy-keys": {
+			wantCreate: "createAProjectDeployKey",
+			wantRead:   "getAProjectDeployKey",
+			wantList:   "listProjectDeployKeys",
+		},
+	}
+
+	for typeName, expected := range subResources {
+		t.Run(typeName, func(t *testing.T) {
+			cfg, ok := tfprovider.CRUDConfig[typeName]
+			if !ok {
+				t.Fatalf("CRUDConfig missing entry for %q", typeName)
+			}
+
+			// Build the CRUD ops using the same mechanism as production code.
+			// We look up the parent by checking which generated group has the ops.
+			var ops tfprovider.CRUDOps
+			for _, parent := range []tfprovider.ResourceGroup{
+				tfprovider.WorkspacesResourceGroup,
+				tfprovider.PRResourceGroup,
+				tfprovider.ProjectsResourceGroup,
+				tfprovider.PipelinesResourceGroup,
+				tfprovider.ReposResourceGroup,
+				tfprovider.DeploymentsResourceGroup,
+			} {
+				candidate := tfprovider.MapCRUDOps(typeName, parent.AllOps)
+				if candidate.Read != nil || candidate.List != nil || candidate.Create != nil {
+					ops = candidate
+					break
+				}
+			}
+
+			if expected.wantRead != "" {
+				if ops.Read == nil {
+					t.Errorf("expected Read=%s, got nil", expected.wantRead)
+				} else if ops.Read.OperationID != expected.wantRead {
+					t.Errorf("expected Read=%s, got %s", expected.wantRead, ops.Read.OperationID)
+				}
+			}
+			if expected.wantCreate != "" {
+				if ops.Create == nil {
+					t.Errorf("expected Create=%s, got nil", expected.wantCreate)
+				} else if ops.Create.OperationID != expected.wantCreate {
+					t.Errorf("expected Create=%s, got %s", expected.wantCreate, ops.Create.OperationID)
+				}
+			}
+			if expected.wantList != "" {
+				if ops.List == nil {
+					t.Errorf("expected List=%s, got nil", expected.wantList)
+				} else if ops.List.OperationID != expected.wantList {
+					t.Errorf("expected List=%s, got %s", expected.wantList, ops.List.OperationID)
+				}
+			}
+			_ = cfg // cfg verified via MapCRUDOps
+		})
+	}
+}
