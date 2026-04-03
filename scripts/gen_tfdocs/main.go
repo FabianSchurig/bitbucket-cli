@@ -187,6 +187,7 @@ type GroupData struct {
 	HasUpdate   bool
 	HasDelete   bool
 	HasList     bool
+	HasIDParam  bool // true if "id" is a path parameter (avoids conflict with computed id)
 	Params      []string
 	ParamValues map[string]string
 }
@@ -239,8 +240,12 @@ func buildGroups() []GroupData {
 	for name, crud := range crudConfig {
 		params := paramConfig[name]
 		pv := make(map[string]string)
+		hasIDParam := false
 		for _, p := range params {
 			pv[p] = exampleValue(p)
+			if p == "id" {
+				hasIDParam = true
+			}
 		}
 		groups = append(groups, GroupData{
 			Name:        name,
@@ -250,6 +255,7 @@ func buildGroups() []GroupData {
 			HasUpdate:   crud.Update != "",
 			HasDelete:   crud.Delete != "",
 			HasList:     crud.List != "",
+			HasIDParam:  hasIDParam,
 			Params:      params,
 			ParamValues: pv,
 		})
@@ -420,12 +426,12 @@ resource "{{.TFName}}" "example" {
 - ` + "`" + `operation` + "`" + ` (String) Override the default CRUD operation selection.
 
 ### Read-Only
+{{- if not .HasIDParam}}
 
 - ` + "`" + `id` + "`" + ` (String) Resource identifier (extracted from API response).
+{{- end}}
 - ` + "`" + `api_response` + "`" + ` (String) The raw JSON response from the Bitbucket API.
-`
-
-const dataSourceDocTemplate = `---
+` = `---
 page_title: "{{.TFName}} Data Source - bitbucket"
 subcategory: ""
 description: |-
