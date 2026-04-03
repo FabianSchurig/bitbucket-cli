@@ -1301,112 +1301,6 @@ paths:
         type: string
 components:
   schemas:
-    paginated_project_group_permissions:
-      type: object
-      title: Paginated Project Group Permissions
-      description: A paginated list of project group permissions.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/project_group_permission'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    team:
-      allOf:
-      - $ref: '#/components/schemas/account'
-      - type: object
-        title: Team
-        description: A team object.
-        properties:
-          links:
-            $ref: '#/components/schemas/team_links'
-        additionalProperties: true
-    account_links:
-      type: object
-      title: Account Links
-      description: Links related to an Account.
-      properties:
-        avatar:
-          $ref: '#/components/schemas/link'
-      additionalProperties: true
-    user:
-      allOf:
-      - $ref: '#/components/schemas/account'
-      - type: object
-        title: User
-        description: A user object.
-        properties:
-          links:
-            $ref: '#/components/schemas/user_links'
-          account_id:
-            type: string
-            description: The user's Atlassian account ID.
-          account_status:
-            type: string
-            description: The status of the account. Currently the only possible value
-              is "active", but more values may be added in the future.
-          has_2fa_enabled:
-            type: boolean
-          nickname:
-            type: string
-            description: Account name defined by the owner. Should be used instead
-              of the "username" field. Note that "nickname" cannot be used in place
-              of "username" in URLs and queries, as "nickname" is not guaranteed to
-              be unique.
-          is_staff:
-            type: boolean
-        additionalProperties: true
-    account:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Account
-        description: An account object.
-        properties:
-          links:
-            $ref: '#/components/schemas/account_links'
-          created_on:
-            type: string
-            format: date-time
-          display_name:
-            type: string
-          uuid:
-            type: string
-        additionalProperties: true
     project:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -1478,46 +1372,6 @@ components:
 
               Note that private projects cannot contain public repositories.'
         additionalProperties: true
-    object:
-      type: object
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-      required:
-      - type
-      additionalProperties: true
-      discriminator:
-        propertyName: type
-    error:
-      type: object
-      title: Error
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-            detail:
-              type: string
-            data:
-              type: object
-              description: Optional structured data that is endpoint-specific.
-              properties: {}
-              additionalProperties: true
-          required:
-          - message
-          additionalProperties: false
-      required:
-      - type
-      additionalProperties: true
     paginated_default_reviewer_and_type:
       type: object
       title: Paginated Default Reviewer and Type
@@ -1562,10 +1416,151 @@ components:
           minItems: 0
           uniqueItems: true
       additionalProperties: false
-    paginated_project_user_permissions:
+    user_links:
+      allOf:
+      - $ref: '#/components/schemas/account_links'
+      - type: object
+        title: User Links
+        description: Links related to a User.
+        properties:
+          self:
+            $ref: '#/components/schemas/link'
+          html:
+            $ref: '#/components/schemas/link'
+          repositories:
+            $ref: '#/components/schemas/link'
+        additionalProperties: true
+    bitbucket.apps.permissions.serializers.ProjectPermissionUpdateSchema:
       type: object
-      title: Paginated Project User Permissions
-      description: A paginated list of project user permissions.
+      properties:
+        permission:
+          type: string
+          enum:
+          - read
+          - write
+          - create-repo
+          - admin
+      required:
+      - permission
+      additionalProperties: false
+    account:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Account
+        description: An account object.
+        properties:
+          links:
+            $ref: '#/components/schemas/account_links'
+          created_on:
+            type: string
+            format: date-time
+          display_name:
+            type: string
+          uuid:
+            type: string
+        additionalProperties: true
+    error:
+      type: object
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
+    project_user_permission:
+      type: object
+      title: Project User Permission
+      description: A user's direct permission for a given project.
+      properties:
+        type:
+          type: string
+        links:
+          type: object
+          properties:
+            self:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+          additionalProperties: false
+        permission:
+          type: string
+          enum:
+          - read
+          - write
+          - create-repo
+          - admin
+          - none
+        user:
+          $ref: '#/components/schemas/user'
+        project:
+          $ref: '#/components/schemas/project'
+      required:
+      - type
+      additionalProperties: true
+    default_reviewer_and_type:
+      type: object
+      title: Default Reviewer and Type
+      description: Object containing a user that is a default reviewer and the type
+        of reviewer
+      properties:
+        type:
+          type: string
+        reviewer_type:
+          type: string
+        user:
+          $ref: '#/components/schemas/user'
+      required:
+      - type
+      additionalProperties: true
+    team_links:
+      allOf:
+      - $ref: '#/components/schemas/account_links'
+      - type: object
+        title: Team Links
+        description: Links related to a Team.
+        properties:
+          self:
+            $ref: '#/components/schemas/link'
+          html:
+            $ref: '#/components/schemas/link'
+          members:
+            $ref: '#/components/schemas/link'
+          projects:
+            $ref: '#/components/schemas/link'
+          repositories:
+            $ref: '#/components/schemas/link'
+        additionalProperties: true
+    paginated_project_group_permissions:
+      type: object
+      title: Paginated Project Group Permissions
+      description: A paginated list of project group permissions.
       properties:
         size:
           type: integer
@@ -1602,7 +1597,7 @@ components:
         values:
           type: array
           items:
-            $ref: '#/components/schemas/project_user_permission'
+            $ref: '#/components/schemas/project_group_permission'
           minItems: 0
           uniqueItems: true
       additionalProperties: false
@@ -1747,158 +1742,6 @@ components:
             type: string
             format: date-time
         additionalProperties: true
-    default_reviewer_and_type:
-      type: object
-      title: Default Reviewer and Type
-      description: Object containing a user that is a default reviewer and the type
-        of reviewer
-      properties:
-        type:
-          type: string
-        reviewer_type:
-          type: string
-        user:
-          $ref: '#/components/schemas/user'
-      required:
-      - type
-      additionalProperties: true
-    project_group_permission:
-      type: object
-      title: Project Group Permission
-      description: A group's permission for a given project.
-      properties:
-        type:
-          type: string
-        links:
-          type: object
-          properties:
-            self:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-          additionalProperties: false
-        permission:
-          type: string
-          enum:
-          - read
-          - write
-          - create-repo
-          - admin
-          - none
-        group:
-          $ref: '#/components/schemas/group'
-        project:
-          $ref: '#/components/schemas/project'
-      required:
-      - type
-      additionalProperties: true
-    paginated_projects:
-      type: object
-      title: Paginated Projects
-      description: A paginated list of projects
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/project'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    user_links:
-      allOf:
-      - $ref: '#/components/schemas/account_links'
-      - type: object
-        title: User Links
-        description: Links related to a User.
-        properties:
-          self:
-            $ref: '#/components/schemas/link'
-          html:
-            $ref: '#/components/schemas/link'
-          repositories:
-            $ref: '#/components/schemas/link'
-        additionalProperties: true
-    link:
-      type: object
-      title: Link
-      description: A link to a resource related to this object.
-      properties:
-        href:
-          type: string
-          format: uri
-        name:
-          type: string
-      additionalProperties: false
-    bitbucket.apps.permissions.serializers.ProjectPermissionUpdateSchema:
-      type: object
-      properties:
-        permission:
-          type: string
-          enum:
-          - read
-          - write
-          - create-repo
-          - admin
-      required:
-      - permission
-      additionalProperties: false
-    team_links:
-      allOf:
-      - $ref: '#/components/schemas/account_links'
-      - type: object
-        title: Team Links
-        description: Links related to a Team.
-        properties:
-          self:
-            $ref: '#/components/schemas/link'
-          html:
-            $ref: '#/components/schemas/link'
-          members:
-            $ref: '#/components/schemas/link'
-          projects:
-            $ref: '#/components/schemas/link'
-          repositories:
-            $ref: '#/components/schemas/link'
-        additionalProperties: true
     group:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -1953,10 +1796,86 @@ components:
 
               '
         additionalProperties: true
-    project_user_permission:
+    account_links:
       type: object
-      title: Project User Permission
-      description: A user's direct permission for a given project.
+      title: Account Links
+      description: Links related to an Account.
+      properties:
+        avatar:
+          $ref: '#/components/schemas/link'
+      additionalProperties: true
+    object:
+      type: object
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+      required:
+      - type
+      additionalProperties: true
+      discriminator:
+        propertyName: type
+    link:
+      type: object
+      title: Link
+      description: A link to a resource related to this object.
+      properties:
+        href:
+          type: string
+          format: uri
+        name:
+          type: string
+      additionalProperties: false
+    paginated_projects:
+      type: object
+      title: Paginated Projects
+      description: A paginated list of projects
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/project'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    project_group_permission:
+      type: object
+      title: Project Group Permission
+      description: A group's permission for a given project.
       properties:
         type:
           type: string
@@ -1983,10 +1902,91 @@ components:
           - create-repo
           - admin
           - none
-        user:
-          $ref: '#/components/schemas/user'
+        group:
+          $ref: '#/components/schemas/group'
         project:
           $ref: '#/components/schemas/project'
       required:
       - type
       additionalProperties: true
+    user:
+      allOf:
+      - $ref: '#/components/schemas/account'
+      - type: object
+        title: User
+        description: A user object.
+        properties:
+          links:
+            $ref: '#/components/schemas/user_links'
+          account_id:
+            type: string
+            description: The user's Atlassian account ID.
+          account_status:
+            type: string
+            description: The status of the account. Currently the only possible value
+              is "active", but more values may be added in the future.
+          has_2fa_enabled:
+            type: boolean
+          nickname:
+            type: string
+            description: Account name defined by the owner. Should be used instead
+              of the "username" field. Note that "nickname" cannot be used in place
+              of "username" in URLs and queries, as "nickname" is not guaranteed to
+              be unique.
+          is_staff:
+            type: boolean
+        additionalProperties: true
+    team:
+      allOf:
+      - $ref: '#/components/schemas/account'
+      - type: object
+        title: Team
+        description: A team object.
+        properties:
+          links:
+            $ref: '#/components/schemas/team_links'
+        additionalProperties: true
+    paginated_project_user_permissions:
+      type: object
+      title: Paginated Project User Permissions
+      description: A paginated list of project user permissions.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/project_user_permission'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false

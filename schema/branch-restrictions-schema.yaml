@@ -347,33 +347,128 @@ paths:
         type: string
 components:
   schemas:
-    error:
-      type: object
-      title: Error
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-            detail:
-              type: string
-            data:
-              type: object
-              description: Optional structured data that is endpoint-specific.
-              properties: {}
-              additionalProperties: true
-          required:
-          - message
-          additionalProperties: false
-      required:
-      - type
-      additionalProperties: true
+    branchrestriction:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Branch Restriction
+        description: A branch restriction rule.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          id:
+            type: integer
+            description: The branch restriction status' id.
+          kind:
+            type: string
+            description: The type of restriction that is being applied.
+            enum:
+            - push
+            - delete
+            - force
+            - restrict_merges
+            - require_tasks_to_be_completed
+            - require_approvals_to_merge
+            - require_review_group_approvals_to_merge
+            - require_default_reviewer_approvals_to_merge
+            - require_no_changes_requested
+            - require_passing_builds_to_merge
+            - require_commits_behind
+            - reset_pullrequest_approvals_on_change
+            - smart_reset_pullrequest_approvals
+            - reset_pullrequest_changes_requested_on_change
+            - require_all_dependencies_merged
+            - enforce_merge_checks
+            - allow_auto_merge_when_builds_pass
+            - require_all_comments_resolved
+          branch_match_kind:
+            type: string
+            description: Indicates how the restriction is matched against a branch.
+              The default is `glob`.
+            enum:
+            - branching_model
+            - glob
+          branch_type:
+            type: string
+            description: Apply the restriction to branches of this type. Active when
+              `branch_match_kind` is `branching_model`. The branch type will be calculated
+              using the branching model configured for the repository.
+            enum:
+            - feature
+            - bugfix
+            - release
+            - hotfix
+            - development
+            - production
+          pattern:
+            type: string
+            description: Apply the restriction to branches that match this pattern.
+              Active when `branch_match_kind` is `glob`. Will be empty when `branch_match_kind`
+              is `branching_model`.
+          value:
+            type: integer
+            description: 'Value with kind-specific semantics:
+
+
+              * `require_approvals_to_merge` uses it to require a minimum number of
+              approvals on a PR.
+
+
+              * `require_default_reviewer_approvals_to_merge` uses it to require a
+              minimum number of approvals from default reviewers on a PR.
+
+
+              * `require_passing_builds_to_merge` uses it to require a minimum number
+              of passing builds.
+
+
+              * `require_commits_behind` uses it to require the current branch is
+              up to a maximum number of commits behind it destination.'
+          users:
+            type: array
+            items:
+              $ref: '#/components/schemas/account'
+            minItems: 0
+          groups:
+            type: array
+            items:
+              $ref: '#/components/schemas/group'
+            minItems: 0
+        required:
+        - kind
+        - branch_match_kind
+        - pattern
+        additionalProperties: true
+    account:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Account
+        description: An account object.
+        properties:
+          links:
+            $ref: '#/components/schemas/account_links'
+          created_on:
+            type: string
+            format: date-time
+          display_name:
+            type: string
+          uuid:
+            type: string
+        additionalProperties: true
     link:
       type: object
       title: Link
@@ -526,172 +621,33 @@ components:
             type: string
             format: date-time
         additionalProperties: true
-    paginated_branchrestrictions:
+    error:
       type: object
-      title: Paginated Branch Restrictions
-      description: A paginated list of branch restriction rules.
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
       properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
+        type:
           type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/branchrestriction'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    account:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Account
-        description: An account object.
-        properties:
-          links:
-            $ref: '#/components/schemas/account_links'
-          created_on:
-            type: string
-            format: date-time
-          display_name:
-            type: string
-          uuid:
-            type: string
-        additionalProperties: true
-    branchrestriction:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Branch Restriction
-        description: A branch restriction rule.
-        properties:
-          links:
-            type: object
-            properties:
-              self:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-            additionalProperties: false
-          id:
-            type: integer
-            description: The branch restriction status' id.
-          kind:
-            type: string
-            description: The type of restriction that is being applied.
-            enum:
-            - push
-            - delete
-            - force
-            - restrict_merges
-            - require_tasks_to_be_completed
-            - require_approvals_to_merge
-            - require_review_group_approvals_to_merge
-            - require_default_reviewer_approvals_to_merge
-            - require_no_changes_requested
-            - require_passing_builds_to_merge
-            - require_commits_behind
-            - reset_pullrequest_approvals_on_change
-            - smart_reset_pullrequest_approvals
-            - reset_pullrequest_changes_requested_on_change
-            - require_all_dependencies_merged
-            - enforce_merge_checks
-            - allow_auto_merge_when_builds_pass
-            - require_all_comments_resolved
-          branch_match_kind:
-            type: string
-            description: Indicates how the restriction is matched against a branch.
-              The default is `glob`.
-            enum:
-            - branching_model
-            - glob
-          branch_type:
-            type: string
-            description: Apply the restriction to branches of this type. Active when
-              `branch_match_kind` is `branching_model`. The branch type will be calculated
-              using the branching model configured for the repository.
-            enum:
-            - feature
-            - bugfix
-            - release
-            - hotfix
-            - development
-            - production
-          pattern:
-            type: string
-            description: Apply the restriction to branches that match this pattern.
-              Active when `branch_match_kind` is `glob`. Will be empty when `branch_match_kind`
-              is `branching_model`.
-          value:
-            type: integer
-            description: 'Value with kind-specific semantics:
-
-
-              * `require_approvals_to_merge` uses it to require a minimum number of
-              approvals on a PR.
-
-
-              * `require_default_reviewer_approvals_to_merge` uses it to require a
-              minimum number of approvals from default reviewers on a PR.
-
-
-              * `require_passing_builds_to_merge` uses it to require a minimum number
-              of passing builds.
-
-
-              * `require_commits_behind` uses it to require the current branch is
-              up to a maximum number of commits behind it destination.'
-          users:
-            type: array
-            items:
-              $ref: '#/components/schemas/account'
-            minItems: 0
-          groups:
-            type: array
-            items:
-              $ref: '#/components/schemas/group'
-            minItems: 0
-        required:
-        - kind
-        - branch_match_kind
-        - pattern
-        additionalProperties: true
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
     group:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -746,6 +702,58 @@ components:
 
               '
         additionalProperties: true
+    account_links:
+      type: object
+      title: Account Links
+      description: Links related to an Account.
+      properties:
+        avatar:
+          $ref: '#/components/schemas/link'
+      additionalProperties: true
+    paginated_branchrestrictions:
+      type: object
+      title: Paginated Branch Restrictions
+      description: A paginated list of branch restriction rules.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/branchrestriction'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
     object:
       type: object
       description: Base type for most resource objects. It defines the common `type`
@@ -759,11 +767,3 @@ components:
       additionalProperties: true
       discriminator:
         propertyName: type
-    account_links:
-      type: object
-      title: Account Links
-      description: Links related to an Account.
-      properties:
-        avatar:
-          $ref: '#/components/schemas/link'
-      additionalProperties: true
