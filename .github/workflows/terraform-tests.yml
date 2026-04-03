@@ -94,12 +94,11 @@ jobs:
         working-directory: tests/${{ matrix.test-group }}
         run: terraform test
 
-  # Real API tests run only when credentials are available
+  # Real API tests run only on push to main or manual dispatch (when credentials are available)
   acceptance-tests:
     name: Acceptance Tests (real API)
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    environment: bitbucket-api
     steps:
       - uses: actions/checkout@v4
 
@@ -118,7 +117,7 @@ jobs:
         run: |
           if [ -z "$BITBUCKET_USERNAME" ] && [ -z "$BITBUCKET_TOKEN" ]; then
             echo "No Bitbucket credentials configured. Skipping real API tests."
-            echo "Configure BITBUCKET_USERNAME and BITBUCKET_TOKEN in the 'bitbucket-api' environment."
+            echo "Configure BITBUCKET_USERNAME and BITBUCKET_TOKEN as repository secrets."
             exit 0
           fi
           go test -v -timeout 600s ./internal/tfprovider/ -run 'TestAccRealAPI'
