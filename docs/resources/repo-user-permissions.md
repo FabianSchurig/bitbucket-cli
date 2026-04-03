@@ -19,18 +19,18 @@ Manages Bitbucket repo-user-permissions via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_repo_user_permissions" "example" {
-  workspace = "my-workspace"
   repo_slug = "my-repo"
   selected_user_id = "{user-uuid}"
+  workspace = "my-workspace"
 }
 ```
 
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `selected_user_id` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Optional
 

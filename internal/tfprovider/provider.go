@@ -119,15 +119,23 @@ func (p *BitbucketProvider) DataSources(_ context.Context) []func() datasource.D
 var (
 	registeredResources   []func() resource.Resource
 	registeredDataSources []func() datasource.DataSource
+	registeredGroupList   []ResourceGroup
 )
 
 // RegisterResourceGroup registers a resource group as both a Terraform resource
 // and data source. Called by generated code at init time.
 func RegisterResourceGroup(group ResourceGroup) {
+	registeredGroupList = append(registeredGroupList, group)
 	registeredResources = append(registeredResources, func() resource.Resource {
 		return &GenericResource{group: group}
 	})
 	registeredDataSources = append(registeredDataSources, func() datasource.DataSource {
 		return &GenericDataSource{group: group}
 	})
+}
+
+// RegisteredGroups returns all registered resource groups. Useful for code
+// generators that need access to group metadata (params, operations, etc.).
+func RegisteredGroups() []ResourceGroup {
+	return registeredGroupList
 }

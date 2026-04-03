@@ -1,6 +1,6 @@
 data "bitbucket_repos" "example" {
-  workspace = "my-workspace"
   repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 
 output "repos_response" {

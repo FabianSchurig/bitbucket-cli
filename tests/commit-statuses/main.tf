@@ -14,11 +14,6 @@ variable "workspace" {
   default = "test-workspace"
 }
 
-variable "repo_slug" {
-  type    = string
-  default = "my-repo"
-}
-
 variable "commit" {
   type    = string
   default = "abc123def"
@@ -29,18 +24,23 @@ variable "key" {
   default = "build-key"
 }
 
+variable "repo_slug" {
+  type    = string
+  default = "my-repo"
+}
+
 provider "bitbucket" {}
 
 data "bitbucket_commit_statuses" "test" {
-  workspace = var.workspace
-  repo_slug = var.repo_slug
   commit = var.commit
   key = var.key
+  repo_slug = var.repo_slug
+  workspace = var.workspace
 }
 
 resource "bitbucket_commit_statuses" "test" {
-  workspace = var.workspace
-  repo_slug = var.repo_slug
   commit = var.commit
   key = var.key
+  repo_slug = var.repo_slug
+  workspace = var.workspace
 }

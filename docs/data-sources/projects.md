@@ -13,8 +13,8 @@ Reads Bitbucket projects via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_projects" "example" {
-  workspace = "my-workspace"
   project_key = "PROJ"
+  workspace = "my-workspace"
 }
 
 output "projects_response" {
@@ -25,8 +25,8 @@ output "projects_response" {
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
 - `project_key` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Read-Only
 

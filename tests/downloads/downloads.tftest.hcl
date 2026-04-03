@@ -10,9 +10,9 @@ run "read_downloads" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
-    repo_slug = "my-repo"
     filename = "artifact.zip"
+    repo_slug = "my-repo"
+    workspace = "my-workspace"
   }
 
   # Data source read should succeed with mock provider
@@ -26,9 +26,9 @@ run "create_downloads" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
-    repo_slug = "my-repo"
     filename = "artifact.zip"
+    repo_slug = "my-repo"
+    workspace = "my-workspace"
   }
 
   # Resource create should succeed with mock provider

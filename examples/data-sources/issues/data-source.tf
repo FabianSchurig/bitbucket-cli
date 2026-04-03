@@ -1,7 +1,7 @@
 data "bitbucket_issues" "example" {
-  workspace = "my-workspace"
-  repo_slug = "my-repo"
   issue_id = "1"
+  repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 
 output "issues_response" {

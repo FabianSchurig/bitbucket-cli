@@ -1,7 +1,7 @@
 data "bitbucket_project_default_reviewers" "example" {
-  workspace = "my-workspace"
   project_key = "PROJ"
   selected_user = "jdoe"
+  workspace = "my-workspace"
 }
 
 output "project_default_reviewers_response" {

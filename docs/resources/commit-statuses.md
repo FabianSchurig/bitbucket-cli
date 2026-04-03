@@ -19,20 +19,20 @@ Manages Bitbucket commit-statuses via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_commit_statuses" "example" {
-  workspace = "my-workspace"
-  repo_slug = "my-repo"
   commit = "abc123def"
   key = "build-key"
+  repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 ```
 
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
-- `repo_slug` (String) Path parameter.
 - `commit` (String) Path parameter.
 - `key` (String) Path parameter.
+- `repo_slug` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Optional
 

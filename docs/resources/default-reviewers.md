@@ -19,18 +19,18 @@ Manages Bitbucket default-reviewers via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_default_reviewers" "example" {
-  workspace = "my-workspace"
   repo_slug = "my-repo"
   target_username = "jdoe"
+  workspace = "my-workspace"
 }
 ```
 
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `target_username` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Optional
 

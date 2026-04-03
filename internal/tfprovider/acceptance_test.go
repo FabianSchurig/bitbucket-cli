@@ -303,6 +303,115 @@ func startMockServer(t *testing.T) *httptest.Server {
 		}
 	})
 
+	// ─── Wave 2: mock endpoints for additional sub-resources ────────────────
+
+	// Tags endpoints
+	mux.HandleFunc("/repositories/{workspace}/{repo_slug}/refs/tags/{name}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet:
+			_ = json.NewEncoder(w).Encode(map[string]any{"name": "v1.0.0", "type": "tag"})
+		case http.MethodDelete:
+			w.WriteHeader(http.StatusNoContent)
+		}
+	})
+	mux.HandleFunc("POST /repositories/{workspace}/{repo_slug}/refs/tags", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(map[string]any{"name": "v1.0.0", "type": "tag"})
+	})
+
+	// Pipeline SSH keys endpoint
+	mux.HandleFunc("/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet:
+			_ = json.NewEncoder(w).Encode(map[string]any{"uuid": "{ssh-key-uuid}", "public_key": "ssh-rsa AAAA..."})
+		case http.MethodPut:
+			_ = json.NewEncoder(w).Encode(map[string]any{"uuid": "{ssh-key-uuid}", "public_key": "ssh-rsa AAAA..."})
+		case http.MethodDelete:
+			w.WriteHeader(http.StatusNoContent)
+		}
+	})
+
+	// Pipeline schedules endpoint
+	mux.HandleFunc("/repositories/{workspace}/{repo_slug}/pipelines_config/schedules/{schedule_uuid}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet:
+			_ = json.NewEncoder(w).Encode(map[string]any{"uuid": "{schedule-uuid}", "enabled": true})
+		case http.MethodPut:
+			_ = json.NewEncoder(w).Encode(map[string]any{"uuid": "{schedule-uuid}", "enabled": true})
+		case http.MethodDelete:
+			w.WriteHeader(http.StatusNoContent)
+		}
+	})
+	mux.HandleFunc("POST /repositories/{workspace}/{repo_slug}/pipelines_config/schedules", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(map[string]any{"uuid": "{schedule-uuid}", "enabled": true})
+	})
+
+	// Pipeline known hosts endpoint
+	mux.HandleFunc("/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/known_hosts/{known_host_uuid}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet:
+			_ = json.NewEncoder(w).Encode(map[string]any{"uuid": "{known-host-uuid}", "hostname": "bitbucket.org"})
+		case http.MethodPut:
+			_ = json.NewEncoder(w).Encode(map[string]any{"uuid": "{known-host-uuid}", "hostname": "bitbucket.org"})
+		case http.MethodDelete:
+			w.WriteHeader(http.StatusNoContent)
+		}
+	})
+	mux.HandleFunc("POST /repositories/{workspace}/{repo_slug}/pipelines_config/ssh/known_hosts", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(map[string]any{"uuid": "{known-host-uuid}", "hostname": "bitbucket.org"})
+	})
+
+	// Pipeline config endpoint
+	mux.HandleFunc("/repositories/{workspace}/{repo_slug}/pipelines_config", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]any{"enabled": true, "type": "pipelines_config"})
+	})
+
+	// PR comments endpoint
+	mux.HandleFunc("/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments/{comment_id}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet:
+			_ = json.NewEncoder(w).Encode(map[string]any{"id": 1, "content": map[string]any{"raw": "test comment"}})
+		case http.MethodPut:
+			_ = json.NewEncoder(w).Encode(map[string]any{"id": 1, "content": map[string]any{"raw": "updated comment"}})
+		case http.MethodDelete:
+			w.WriteHeader(http.StatusNoContent)
+		}
+	})
+	mux.HandleFunc("POST /repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/comments", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(map[string]any{"id": 1, "content": map[string]any{"raw": "new comment"}})
+	})
+
+	// Issue comments endpoint
+	mux.HandleFunc("/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments/{comment_id}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet:
+			_ = json.NewEncoder(w).Encode(map[string]any{"id": 1, "content": map[string]any{"raw": "test issue comment"}})
+		case http.MethodPut:
+			_ = json.NewEncoder(w).Encode(map[string]any{"id": 1, "content": map[string]any{"raw": "updated issue comment"}})
+		case http.MethodDelete:
+			w.WriteHeader(http.StatusNoContent)
+		}
+	})
+	mux.HandleFunc("POST /repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(map[string]any{"id": 1, "content": map[string]any{"raw": "new issue comment"}})
+	})
+
 	// Catch-all for any other API calls during tests
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -715,6 +824,260 @@ func TestAccDataSourceRepoUserPermissions_Read(t *testing.T) {
 				`, srv.URL),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.bitbucket_repo_user_permissions.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+// ─── Wave 2: additional sub-resource acceptance tests ─────────────────────────
+
+func TestAccDataSourceTags_Read(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					data "bitbucket_tags" "test" {
+						workspace = "testworkspace"
+						repo_slug = "test-repo"
+						name      = "v1.0.0"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_tags.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourceTags_CRUD(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					resource "bitbucket_tags" "test" {
+						workspace = "testworkspace"
+						repo_slug = "test-repo"
+						name      = "v1.0.0"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_tags.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDataSourcePipelineSshKeys_Read(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					data "bitbucket_pipeline_ssh_keys" "test" {
+						workspace = "testworkspace"
+						repo_slug = "test-repo"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_pipeline_ssh_keys.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDataSourcePipelineSchedules_Read(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					data "bitbucket_pipeline_schedules" "test" {
+						workspace     = "testworkspace"
+						repo_slug     = "test-repo"
+						schedule_uuid = "{schedule-uuid}"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_pipeline_schedules.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourcePipelineSchedules_CRUD(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					resource "bitbucket_pipeline_schedules" "test" {
+						workspace     = "testworkspace"
+						repo_slug     = "test-repo"
+						schedule_uuid = "{schedule-uuid}"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_pipeline_schedules.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDataSourcePipelineKnownHosts_Read(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					data "bitbucket_pipeline_known_hosts" "test" {
+						workspace       = "testworkspace"
+						repo_slug       = "test-repo"
+						known_host_uuid = "{known-host-uuid}"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_pipeline_known_hosts.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDataSourcePipelineConfig_Read(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					data "bitbucket_pipeline_config" "test" {
+						workspace = "testworkspace"
+						repo_slug = "test-repo"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_pipeline_config.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourcePRComments_CRUD(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					resource "bitbucket_pr_comments" "test" {
+						workspace        = "testworkspace"
+						repo_slug        = "test-repo"
+						pull_request_id  = "1"
+						comment_id       = "1"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_pr_comments.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourceIssueComments_CRUD(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					resource "bitbucket_issue_comments" "test" {
+						workspace  = "testworkspace"
+						repo_slug  = "test-repo"
+						issue_id   = "1"
+						comment_id = "1"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_issue_comments.test", "api_response"),
 				),
 			},
 		},

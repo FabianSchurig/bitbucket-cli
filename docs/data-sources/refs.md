@@ -13,9 +13,9 @@ Reads Bitbucket refs via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_refs" "example" {
-  workspace = "my-workspace"
-  repo_slug = "my-repo"
   name = "main"
+  repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 
 output "refs_response" {
@@ -26,9 +26,9 @@ output "refs_response" {
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
-- `repo_slug` (String) Path parameter.
 - `name` (String) Path parameter.
+- `repo_slug` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Read-Only
 

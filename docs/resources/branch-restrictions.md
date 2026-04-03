@@ -20,18 +20,18 @@ Manages Bitbucket branch-restrictions via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_branch_restrictions" "example" {
-  workspace = "my-workspace"
-  repo_slug = "my-repo"
   param_id = "1"
+  repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 ```
 
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
-- `repo_slug` (String) Path parameter.
 - `param_id` (String) Path parameter.
+- `repo_slug` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Optional
 

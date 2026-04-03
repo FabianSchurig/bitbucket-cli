@@ -1,7 +1,7 @@
 data "bitbucket_hooks" "example" {
-  workspace = "my-workspace"
   repo_slug = "my-repo"
   uid = "webhook-uuid"
+  workspace = "my-workspace"
 }
 
 output "hooks_response" {

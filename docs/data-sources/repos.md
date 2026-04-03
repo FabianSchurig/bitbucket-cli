@@ -13,8 +13,8 @@ Reads Bitbucket repos via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_repos" "example" {
-  workspace = "my-workspace"
   repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 
 output "repos_response" {
@@ -25,8 +25,8 @@ output "repos_response" {
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Read-Only
 

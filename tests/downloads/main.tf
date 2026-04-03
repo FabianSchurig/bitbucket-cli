@@ -14,26 +14,26 @@ variable "workspace" {
   default = "test-workspace"
 }
 
-variable "repo_slug" {
-  type    = string
-  default = "my-repo"
-}
-
 variable "filename" {
   type    = string
   default = "artifact.zip"
 }
 
+variable "repo_slug" {
+  type    = string
+  default = "my-repo"
+}
+
 provider "bitbucket" {}
 
 data "bitbucket_downloads" "test" {
-  workspace = var.workspace
-  repo_slug = var.repo_slug
   filename = var.filename
+  repo_slug = var.repo_slug
+  workspace = var.workspace
 }
 
 resource "bitbucket_downloads" "test" {
-  workspace = var.workspace
-  repo_slug = var.repo_slug
   filename = var.filename
+  repo_slug = var.repo_slug
+  workspace = var.workspace
 }

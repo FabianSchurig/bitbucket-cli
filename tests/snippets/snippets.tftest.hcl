@@ -10,8 +10,8 @@ run "read_snippets" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
     encoded_id = "snippet-id"
+    workspace = "my-workspace"
   }
 
   # Data source read should succeed with mock provider
@@ -25,8 +25,8 @@ run "create_snippets" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
     encoded_id = "snippet-id"
+    workspace = "my-workspace"
   }
 
   # Resource create should succeed with mock provider

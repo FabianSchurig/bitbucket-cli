@@ -13,9 +13,9 @@ Reads Bitbucket pr via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_pr" "example" {
-  workspace = "my-workspace"
-  repo_slug = "my-repo"
   pull_request_id = "1"
+  repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 
 output "pr_response" {
@@ -26,9 +26,9 @@ output "pr_response" {
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
-- `repo_slug` (String) Path parameter.
 - `pull_request_id` (String) Path parameter.
+- `repo_slug` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Read-Only
 

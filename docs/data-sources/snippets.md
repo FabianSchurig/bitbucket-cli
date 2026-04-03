@@ -13,8 +13,8 @@ Reads Bitbucket snippets via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_snippets" "example" {
-  workspace = "my-workspace"
   encoded_id = "snippet-id"
+  workspace = "my-workspace"
 }
 
 output "snippets_response" {
@@ -25,8 +25,8 @@ output "snippets_response" {
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
 - `encoded_id` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Read-Only
 

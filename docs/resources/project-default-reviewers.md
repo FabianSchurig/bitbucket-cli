@@ -19,18 +19,18 @@ Manages Bitbucket project-default-reviewers via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_project_default_reviewers" "example" {
-  workspace = "my-workspace"
   project_key = "PROJ"
   selected_user = "jdoe"
+  workspace = "my-workspace"
 }
 ```
 
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
 - `project_key` (String) Path parameter.
 - `selected_user` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Optional
 

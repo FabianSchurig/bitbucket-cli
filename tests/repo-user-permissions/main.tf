@@ -27,7 +27,7 @@ variable "selected_user_id" {
 provider "bitbucket" {}
 
 data "bitbucket_repo_user_permissions" "test" {
-  workspace = var.workspace
   repo_slug = var.repo_slug
   selected_user_id = var.selected_user_id
+  workspace = var.workspace
 }

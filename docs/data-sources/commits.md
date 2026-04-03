@@ -13,9 +13,9 @@ Reads Bitbucket commits via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_commits" "example" {
-  workspace = "my-workspace"
-  repo_slug = "my-repo"
   commit = "abc123def"
+  repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 
 output "commits_response" {
@@ -26,9 +26,9 @@ output "commits_response" {
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
-- `repo_slug` (String) Path parameter.
 - `commit` (String) Path parameter.
+- `repo_slug` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Read-Only
 

@@ -14,26 +14,26 @@ variable "workspace" {
   default = "test-workspace"
 }
 
-variable "repo_slug" {
-  type    = string
-  default = "my-repo"
-}
-
 variable "issue_id" {
   type    = string
   default = "1"
 }
 
+variable "repo_slug" {
+  type    = string
+  default = "my-repo"
+}
+
 provider "bitbucket" {}
 
 data "bitbucket_issues" "test" {
-  workspace = var.workspace
-  repo_slug = var.repo_slug
   issue_id = var.issue_id
+  repo_slug = var.repo_slug
+  workspace = var.workspace
 }
 
 resource "bitbucket_issues" "test" {
-  workspace = var.workspace
-  repo_slug = var.repo_slug
   issue_id = var.issue_id
+  repo_slug = var.repo_slug
+  workspace = var.workspace
 }

@@ -19,18 +19,18 @@ Manages Bitbucket repo-group-permissions via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_repo_group_permissions" "example" {
-  workspace = "my-workspace"
-  repo_slug = "my-repo"
   group_slug = "developers"
+  repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 ```
 
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
-- `repo_slug` (String) Path parameter.
 - `group_slug` (String) Path parameter.
+- `repo_slug` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Optional
 

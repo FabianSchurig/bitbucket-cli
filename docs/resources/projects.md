@@ -20,16 +20,16 @@ Manages Bitbucket projects via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_projects" "example" {
-  workspace = "my-workspace"
   project_key = "PROJ"
+  workspace = "my-workspace"
 }
 ```
 
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
 - `project_key` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Optional
 

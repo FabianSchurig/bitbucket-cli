@@ -13,9 +13,9 @@ Reads Bitbucket project-user-permissions via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_project_user_permissions" "example" {
-  workspace = "my-workspace"
   project_key = "PROJ"
   selected_user_id = "{user-uuid}"
+  workspace = "my-workspace"
 }
 
 output "project_user_permissions_response" {
@@ -26,9 +26,9 @@ output "project_user_permissions_response" {
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
 - `project_key` (String) Path parameter.
 - `selected_user_id` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Read-Only
 

@@ -14,26 +14,26 @@ variable "workspace" {
   default = "test-workspace"
 }
 
-variable "project_key" {
-  type    = string
-  default = "PROJ"
-}
-
 variable "key_id" {
   type    = string
   default = "123"
 }
 
+variable "project_key" {
+  type    = string
+  default = "PROJ"
+}
+
 provider "bitbucket" {}
 
 data "bitbucket_project_deploy_keys" "test" {
-  workspace = var.workspace
-  project_key = var.project_key
   key_id = var.key_id
+  project_key = var.project_key
+  workspace = var.workspace
 }
 
 resource "bitbucket_project_deploy_keys" "test" {
-  workspace = var.workspace
-  project_key = var.project_key
   key_id = var.key_id
+  project_key = var.project_key
+  workspace = var.workspace
 }

@@ -13,8 +13,8 @@ Reads Bitbucket branching-model via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_branching_model" "example" {
-  workspace = "my-workspace"
   repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 
 output "branching_model_response" {
@@ -25,8 +25,8 @@ output "branching_model_response" {
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Read-Only
 

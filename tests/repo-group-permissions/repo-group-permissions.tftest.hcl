@@ -10,9 +10,9 @@ run "read_repo_group_permissions" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
-    repo_slug = "my-repo"
     group_slug = "developers"
+    repo_slug = "my-repo"
+    workspace = "my-workspace"
   }
 
   # Data source read should succeed with mock provider

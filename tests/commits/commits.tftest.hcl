@@ -10,9 +10,9 @@ run "read_commits" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
-    repo_slug = "my-repo"
     commit = "abc123def"
+    repo_slug = "my-repo"
+    workspace = "my-workspace"
   }
 
   # Data source read should succeed with mock provider

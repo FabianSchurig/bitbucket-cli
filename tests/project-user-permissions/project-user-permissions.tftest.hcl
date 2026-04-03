@@ -10,9 +10,9 @@ run "read_project_user_permissions" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
     project_key = "PROJ"
     selected_user_id = "{user-uuid}"
+    workspace = "my-workspace"
   }
 
   # Data source read should succeed with mock provider

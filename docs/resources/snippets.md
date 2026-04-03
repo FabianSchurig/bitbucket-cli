@@ -20,16 +20,16 @@ Manages Bitbucket snippets via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_snippets" "example" {
-  workspace = "my-workspace"
   encoded_id = "snippet-id"
+  workspace = "my-workspace"
 }
 ```
 
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
 - `encoded_id` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Optional
 

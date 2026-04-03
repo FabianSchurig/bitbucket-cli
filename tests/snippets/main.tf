@@ -22,11 +22,11 @@ variable "encoded_id" {
 provider "bitbucket" {}
 
 data "bitbucket_snippets" "test" {
-  workspace = var.workspace
   encoded_id = var.encoded_id
+  workspace = var.workspace
 }
 
 resource "bitbucket_snippets" "test" {
-  workspace = var.workspace
   encoded_id = var.encoded_id
+  workspace = var.workspace
 }

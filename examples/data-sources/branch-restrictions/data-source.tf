@@ -1,7 +1,7 @@
 data "bitbucket_branch_restrictions" "example" {
-  workspace = "my-workspace"
-  repo_slug = "my-repo"
   param_id = "1"
+  repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 
 output "branch_restrictions_response" {

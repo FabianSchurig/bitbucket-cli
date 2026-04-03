@@ -10,8 +10,8 @@ run "read_projects" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
     project_key = "PROJ"
+    workspace = "my-workspace"
   }
 
   # Data source read should succeed with mock provider
@@ -25,8 +25,8 @@ run "create_projects" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
     project_key = "PROJ"
+    workspace = "my-workspace"
   }
 
   # Resource create should succeed with mock provider

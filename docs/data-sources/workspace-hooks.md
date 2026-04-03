@@ -13,8 +13,8 @@ Reads Bitbucket workspace-hooks via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_workspace_hooks" "example" {
-  workspace = "my-workspace"
   uid = "webhook-uuid"
+  workspace = "my-workspace"
 }
 
 output "workspace_hooks_response" {
@@ -25,8 +25,8 @@ output "workspace_hooks_response" {
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
 - `uid` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Read-Only
 

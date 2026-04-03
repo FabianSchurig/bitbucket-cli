@@ -10,8 +10,8 @@ run "read_branching_model" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
     repo_slug = "my-repo"
+    workspace = "my-workspace"
   }
 
   # Data source read should succeed with mock provider

@@ -1,5 +1,5 @@
-// gen_tfdocs reads the hand-written CRUD config and all generated *.gen.go
-// files to produce:
+// gen_tfdocs reads the CRUD config and registered resource groups from
+// internal/tfprovider to produce:
 //   - docs/index.md              (provider documentation)
 //   - docs/resources/<name>.md   (one per resource group)
 //   - docs/data-sources/<name>.md (one per data source group)
@@ -21,350 +21,11 @@ import (
 	"sort"
 	"strings"
 	"text/template"
+
+	// Import the tfprovider package to access shared CRUDConfig
+	// and registered resource groups (triggers init() registration).
+	"github.com/FabianSchurig/bitbucket-cli/internal/tfprovider"
 )
-
-// ─── CRUD config (mirrored from internal/tfprovider/crud_config.go) ───────────
-
-type CRUDMapping struct {
-	Create string
-	Read   string
-	Update string
-	Delete string
-	List   string
-}
-
-// crudConfig mirrors the hand-written config in internal/tfprovider/crud_config.go.
-// We duplicate it here so the generator can run without importing internal packages.
-var crudConfig = map[string]CRUDMapping{
-	"repos": {
-		Create: "createARepository",
-		Read:   "getARepository",
-		Update: "updateARepository",
-		Delete: "deleteARepository",
-		List:   "listRepositoriesInAWorkspace",
-	},
-	"pr": {
-		Create: "createAPullRequest",
-		Read:   "getAPullRequest",
-		Update: "updateAPullRequest",
-		List:   "listPullRequests",
-	},
-	"projects": {
-		Create: "createAProjectInAWorkspace",
-		Read:   "getAProjectForAWorkspace",
-		Update: "updateAProjectForAWorkspace",
-		Delete: "deleteAProjectForAWorkspace",
-		List:   "listProjectsInAWorkspace",
-	},
-	"workspaces": {
-		Read: "getAWorkspace",
-		List: "listWorkspacesForUser",
-	},
-	"issues": {
-		Create: "createAnIssue",
-		Read:   "getAnIssue",
-		Update: "updateAnIssue",
-		Delete: "deleteAnIssue",
-		List:   "listIssues",
-	},
-	"hooks": {
-		Create: "createAWebhookForARepository",
-		Read:   "getAWebhookForARepository",
-		Update: "updateAWebhookForARepository",
-		Delete: "deleteAWebhookForARepository",
-		List:   "listWebhooksForARepository",
-	},
-	"snippets": {
-		Create: "createASnippet",
-		Read:   "getASnippet",
-		Update: "updateASnippet",
-		Delete: "deleteASnippet",
-		List:   "listSnippets",
-	},
-	"refs": {
-		Create: "createABranch",
-		Read:   "getABranch",
-		Delete: "deleteABranch",
-		List:   "listBranchesAndTags",
-	},
-	"commits": {
-		Read: "getACommit",
-		List: "listCommits",
-	},
-	"pipelines": {
-		Create: "createPipelineForRepository",
-		Read:   "getPipelineForRepository",
-		List:   "getPipelinesForRepository",
-	},
-	"deployments": {
-		Create: "createEnvironment",
-		Read:   "getEnvironmentForRepository",
-		Delete: "deleteEnvironmentForRepository",
-		List:   "getEnvironmentsForRepository",
-	},
-	"branch-restrictions": {
-		Create: "createABranchRestrictionRule",
-		Read:   "getABranchRestrictionRule",
-		Update: "updateABranchRestrictionRule",
-		Delete: "deleteABranchRestrictionRule",
-		List:   "listBranchRestrictions",
-	},
-	"branching-model": {
-		Read:   "getTheBranchingModelForARepository",
-		Update: "updateTheBranchingModelConfigForARepository",
-	},
-	"commit-statuses": {
-		Create: "createABuildStatusForACommit",
-		Read:   "getABuildStatusForACommit",
-		Update: "updateABuildStatusForACommit",
-		List:   "listCommitStatusesForACommit",
-	},
-	"downloads": {
-		Create: "uploadADownloadArtifact",
-		Read:   "getADownloadArtifactLink",
-		Delete: "deleteADownloadArtifact",
-		List:   "listDownloadArtifacts",
-	},
-	"users": {
-		Read: "getAUser",
-		List: "listSshKeys",
-	},
-	"reports": {
-		Create: "createOrUpdateReport",
-		Read:   "getReport",
-		Delete: "deleteReport",
-		List:   "getReportsForCommit",
-	},
-	"search": {
-		List: "searchWorkspace",
-	},
-	"properties": {
-		Read:   "getRepositoryHostedPropertyValue",
-		Update: "updateRepositoryHostedPropertyValue",
-		Delete: "deleteRepositoryHostedPropertyValue",
-	},
-	"addon": {
-		Update: "updateAnInstalledApp",
-		Delete: "deleteAnApp",
-		List:   "listLinkersForAnApp",
-	},
-	// ─── Sub-resource CRUD mappings ───────────────────────────────────────────
-	"workspace-hooks": {
-		Create: "createAWebhookForAWorkspace",
-		Read:   "getAWebhookForAWorkspace",
-		Update: "updateAWebhookForAWorkspace",
-		Delete: "deleteAWebhookForAWorkspace",
-		List:   "listWebhooksForAWorkspace",
-	},
-	"default-reviewers": {
-		Read:   "getADefaultReviewer",
-		Create: "addAUserToTheDefaultReviewers",
-		Delete: "removeAUserFromTheDefaultReviewers",
-		List:   "listDefaultReviewers",
-	},
-	"project-default-reviewers": {
-		Read:   "getWorkspacesProjectsDefault-Reviewers",
-		Create: "addTheSpecificUserAsADefaultReviewerForTheProject",
-		Delete: "removeTheSpecificUserFromTheProjectsDefaultReviewers",
-		List:   "listTheDefaultReviewersInAProject",
-	},
-	"pipeline-variables": {
-		Create: "createRepositoryPipelineVariable",
-		Read:   "getRepositoryPipelineVariable",
-		Update: "updateRepositoryPipelineVariable",
-		Delete: "deleteRepositoryPipelineVariable",
-		List:   "getRepositoryPipelineVariables",
-	},
-	"workspace-pipeline-variables": {
-		Create: "createPipelineVariableForWorkspace",
-		Read:   "getPipelineVariableForWorkspace",
-		Update: "updatePipelineVariableForWorkspace",
-		Delete: "deletePipelineVariableForWorkspace",
-		List:   "getPipelineVariablesForWorkspace",
-	},
-	"deployment-variables": {
-		Create: "createDeploymentVariable",
-		Read:   "getDeploymentVariables",
-		Update: "updateDeploymentVariable",
-		Delete: "deleteDeploymentVariable",
-	},
-	"repo-group-permissions": {
-		Read:   "getAnExplicitGroupPermissionForARepository",
-		Update: "updateAnExplicitGroupPermissionForARepository",
-		Delete: "deleteAnExplicitGroupPermissionForARepository",
-		List:   "listExplicitGroupPermissionsForARepository",
-	},
-	"repo-user-permissions": {
-		Read:   "getAnExplicitUserPermissionForARepository",
-		Update: "updateAnExplicitUserPermissionForARepository",
-		Delete: "deleteAnExplicitUserPermissionForARepository",
-		List:   "listExplicitUserPermissionsForARepository",
-	},
-	"project-group-permissions": {
-		Read:   "getAnExplicitGroupPermissionForAProject",
-		Update: "updateAnExplicitGroupPermissionForAProject",
-		Delete: "deleteAnExplicitGroupPermissionForAProject",
-		List:   "listExplicitGroupPermissionsForAProject",
-	},
-	"project-user-permissions": {
-		Read:   "getAnExplicitUserPermissionForAProject",
-		Update: "updateAnExplicitUserPermissionForAProject",
-		Delete: "deleteAnExplicitUserPermissionForAProject",
-		List:   "listExplicitUserPermissionsForAProject",
-	},
-	"repo-deploy-keys": {
-		Create: "addARepositoryDeployKey",
-		Read:   "getARepositoryDeployKey",
-		Update: "updateARepositoryDeployKey",
-		Delete: "deleteARepositoryDeployKey",
-		List:   "listRepositoryDeployKeys",
-	},
-	"project-deploy-keys": {
-		Create: "createAProjectDeployKey",
-		Read:   "getAProjectDeployKey",
-		Delete: "deleteADeployKeyFromAProject",
-		List:   "listProjectDeployKeys",
-	},
-	// ─── Wave 2: additional sub-resource CRUD mappings ────────────────────────
-	"tags": {
-		Create: "createATag",
-		Read:   "getATag",
-		Delete: "deleteATag",
-		List:   "listTags",
-	},
-	"pipeline-ssh-keys": {
-		Read:   "getRepositoryPipelineSshKeyPair",
-		Update: "updateRepositoryPipelineKeyPair",
-		Delete: "deleteRepositoryPipelineKeyPair",
-	},
-	"pipeline-known-hosts": {
-		Create: "createRepositoryPipelineKnownHost",
-		Read:   "getRepositoryPipelineKnownHost",
-		Update: "updateRepositoryPipelineKnownHost",
-		Delete: "deleteRepositoryPipelineKnownHost",
-		List:   "getRepositoryPipelineKnownHosts",
-	},
-	"pipeline-schedules": {
-		Create: "createRepositoryPipelineSchedule",
-		Read:   "getRepositoryPipelineSchedule",
-		Update: "updateRepositoryPipelineSchedule",
-		Delete: "deleteRepositoryPipelineSchedule",
-		List:   "getRepositoryPipelineSchedules",
-	},
-	"pipeline-config": {
-		Read:   "getRepositoryPipelineConfig",
-		Update: "updateRepositoryPipelineConfig",
-	},
-	"ssh-keys": {
-		Create: "addANewSshKey",
-		Read:   "getASshKey",
-		Update: "updateASshKey",
-		Delete: "deleteASshKey",
-		List:   "listSshKeys",
-	},
-	"current-user": {
-		Read: "getCurrentUser",
-	},
-	"forked-repository": {
-		Create: "forkARepository",
-		List:   "listRepositoryForks",
-	},
-	"project-branching-model": {
-		Read:   "getTheBranchingModelForAProject",
-		Update: "updateTheBranchingModelConfigForAProject",
-	},
-	"pipeline-oidc": {
-		Read: "getOIDCConfiguration",
-	},
-	"pipeline-oidc-keys": {
-		Read: "getOIDCKeys",
-	},
-	"workspace-members": {
-		Read: "getUserMembershipForAWorkspace",
-		List: "listUsersInAWorkspace",
-	},
-	"annotations": {
-		Create: "createOrUpdateAnnotation",
-		Read:   "getAnnotation",
-		Delete: "deleteAnnotation",
-		List:   "getAnnotationsForReport",
-	},
-	"commit-file": {
-		Create: "createACommitByUploadingAFile",
-		Read:   "getFileOrDirectoryContents",
-	},
-	"pr-comments": {
-		Create: "createACommentOnAPullRequest",
-		Read:   "getACommentOnAPullRequest",
-		Update: "updateACommentOnAPullRequest",
-		Delete: "deleteACommentOnAPullRequest",
-		List:   "listCommentsOnAPullRequest",
-	},
-	"issue-comments": {
-		Create: "createACommentOnAnIssue",
-		Read:   "getACommentOnAnIssue",
-		Update: "updateACommentOnAnIssue",
-		Delete: "deleteACommentOnAnIssue",
-		List:   "listCommentsOnAnIssue",
-	},
-}
-
-// ─── Param info per resource group (required path params for primary Read op) ─
-
-// paramConfig maps resource groups to the required path parameters of their primary Read operation.
-// This determines what attributes appear in examples and tests.
-var paramConfig = map[string][]string{
-	"repos":               {"workspace", "repo_slug"},
-	"pr":                  {"workspace", "repo_slug", "pull_request_id"},
-	"projects":            {"workspace", "project_key"},
-	"workspaces":          {"workspace"},
-	"issues":              {"workspace", "repo_slug", "issue_id"},
-	"hooks":               {"workspace", "repo_slug", "uid"},
-	"snippets":            {"workspace", "encoded_id"},
-	"refs":                {"workspace", "repo_slug", "name"},
-	"commits":             {"workspace", "repo_slug", "commit"},
-	"pipelines":           {"workspace", "repo_slug", "pipeline_uuid"},
-	"deployments":         {"workspace", "repo_slug", "environment_uuid"},
-	"branch-restrictions": {"workspace", "repo_slug", "param_id"},
-	"branching-model":     {"workspace", "repo_slug"},
-	"commit-statuses":     {"workspace", "repo_slug", "commit", "key"},
-	"downloads":           {"workspace", "repo_slug", "filename"},
-	"users":               {"selected_user"},
-	"reports":             {"workspace", "repo_slug", "commit", "report_id"},
-	"search":              {"workspace"},
-	"properties":          {"workspace", "repo_slug", "app_key", "property_name"},
-	"addon":               {},
-	// ─── Sub-resource params ──────────────────────────────────────────────────
-	"workspace-hooks":              {"workspace", "uid"},
-	"default-reviewers":            {"workspace", "repo_slug", "target_username"},
-	"project-default-reviewers":    {"workspace", "project_key", "selected_user"},
-	"pipeline-variables":           {"workspace", "repo_slug", "variable_uuid"},
-	"workspace-pipeline-variables": {"workspace", "variable_uuid"},
-	"deployment-variables":         {"workspace", "repo_slug", "environment_uuid"},
-	"repo-group-permissions":       {"workspace", "repo_slug", "group_slug"},
-	"repo-user-permissions":        {"workspace", "repo_slug", "selected_user_id"},
-	"project-group-permissions":    {"workspace", "project_key", "group_slug"},
-	"project-user-permissions":     {"workspace", "project_key", "selected_user_id"},
-	"repo-deploy-keys":             {"workspace", "repo_slug", "key_id"},
-	"project-deploy-keys":          {"workspace", "project_key", "key_id"},
-	// ─── Wave 2: additional sub-resource params ──────────────────────────────
-	"tags":                          {"workspace", "repo_slug", "name"},
-	"pipeline-ssh-keys":             {"workspace", "repo_slug"},
-	"pipeline-known-hosts":          {"workspace", "repo_slug", "known_host_uuid"},
-	"pipeline-schedules":            {"workspace", "repo_slug", "schedule_uuid"},
-	"pipeline-config":               {"workspace", "repo_slug"},
-	"ssh-keys":                      {"selected_user", "key_id"},
-	"current-user":                  {},
-	"forked-repository":             {"workspace", "repo_slug"},
-	"project-branching-model":       {"workspace", "project_key"},
-	"pipeline-oidc":                 {"workspace"},
-	"pipeline-oidc-keys":            {"workspace"},
-	"workspace-members":             {"workspace", "member"},
-	"annotations":                   {"workspace", "repo_slug", "commit", "reportId", "annotationId"},
-	"commit-file":                   {"workspace", "repo_slug", "commit", "path"},
-	"pr-comments":                   {"workspace", "repo_slug", "pull_request_id", "comment_id"},
-	"issue-comments":                {"workspace", "repo_slug", "issue_id", "comment_id"},
-}
 
 // ─── Template data ────────────────────────────────────────────────────────────
 
@@ -429,15 +90,38 @@ func exampleValue(param string) string {
 		return "{user-uuid}"
 	case "key_id":
 		return "123"
+	case "known_host_uuid":
+		return "{known-host-uuid}"
+	case "schedule_uuid":
+		return "{schedule-uuid}"
+	case "member":
+		return "{member-uuid}"
+	case "annotation_id", "annotationId":
+		return "{annotation-id}"
+	case "report_id_path", "reportId":
+		return "report-uuid"
+	case "path":
+		return "README.md"
+	case "comment_id":
+		return "1"
 	default:
 		return "example-value"
 	}
 }
 
 func buildGroups() []GroupData {
+	// Build a lookup from group name → registered ResourceGroup so we can
+	// derive path params from the Read (or Create/List) operation.
+	groupIndex := make(map[string]tfprovider.ResourceGroup)
+	for _, g := range tfprovider.RegisteredGroups() {
+		groupIndex[g.TypeName] = g
+	}
+
 	var groups []GroupData
-	for name, crud := range crudConfig {
-		params := paramConfig[name]
+	for name, crud := range tfprovider.CRUDConfig {
+		// Derive path params from the best available operation (Read > Create > List).
+		params := deriveParams(name, groupIndex)
+
 		pv := make(map[string]string)
 		hasIDParam := false
 		for _, p := range params {
@@ -461,6 +145,39 @@ func buildGroups() []GroupData {
 	}
 	sort.Slice(groups, func(i, j int) bool { return groups[i].Name < groups[j].Name })
 	return groups
+}
+
+// deriveParams extracts the required path parameters from a resource group's
+// primary operation (Read preferred, then Create, then List). This avoids
+// having to maintain a separate paramConfig map.
+func deriveParams(name string, index map[string]tfprovider.ResourceGroup) []string {
+	rg, ok := index[name]
+	if !ok {
+		return nil
+	}
+
+	// Pick the best operation to derive params from.
+	var op *tfprovider.OperationDef
+	switch {
+	case rg.Ops.Read != nil:
+		op = rg.Ops.Read
+	case rg.Ops.Create != nil:
+		op = rg.Ops.Create
+	case rg.Ops.List != nil:
+		op = rg.Ops.List
+	case rg.Ops.Update != nil:
+		op = rg.Ops.Update
+	default:
+		return nil
+	}
+
+	var params []string
+	for _, p := range op.Params {
+		if p.In == "path" {
+			params = append(params, tfprovider.ParamAttrName(p.Name))
+		}
+	}
+	return params
 }
 
 // ─── Templates ────────────────────────────────────────────────────────────────

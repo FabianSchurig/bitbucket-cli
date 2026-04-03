@@ -22,6 +22,6 @@ variable "repo_slug" {
 provider "bitbucket" {}
 
 data "bitbucket_branching_model" "test" {
-  workspace = var.workspace
   repo_slug = var.repo_slug
+  workspace = var.workspace
 }

@@ -20,16 +20,16 @@ Manages Bitbucket workspace-hooks via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_workspace_hooks" "example" {
-  workspace = "my-workspace"
   uid = "webhook-uuid"
+  workspace = "my-workspace"
 }
 ```
 
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
 - `uid` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Optional
 

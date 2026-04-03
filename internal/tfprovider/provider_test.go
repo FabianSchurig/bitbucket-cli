@@ -319,6 +319,72 @@ func TestSubResourceGroups_Registered(t *testing.T) {
 			wantRead:   "getAProjectDeployKey",
 			wantList:   "listProjectDeployKeys",
 		},
+		// ─── Wave 2: additional sub-resources ─────────────────────────────────
+		"tags": {
+			wantCreate: "createATag",
+			wantRead:   "getATag",
+			wantList:   "listTags",
+		},
+		"pipeline-ssh-keys": {
+			wantRead: "getRepositoryPipelineSshKeyPair",
+		},
+		"pipeline-known-hosts": {
+			wantCreate: "createRepositoryPipelineKnownHost",
+			wantRead:   "getRepositoryPipelineKnownHost",
+			wantList:   "getRepositoryPipelineKnownHosts",
+		},
+		"pipeline-schedules": {
+			wantCreate: "createRepositoryPipelineSchedule",
+			wantRead:   "getRepositoryPipelineSchedule",
+			wantList:   "getRepositoryPipelineSchedules",
+		},
+		"pipeline-config": {
+			wantRead: "getRepositoryPipelineConfig",
+		},
+		"ssh-keys": {
+			wantCreate: "addANewSshKey",
+			wantRead:   "getASshKey",
+			wantList:   "listSshKeys",
+		},
+		"current-user": {
+			wantRead: "getCurrentUser",
+		},
+		"forked-repository": {
+			wantCreate: "forkARepository",
+			wantList:   "listRepositoryForks",
+		},
+		"project-branching-model": {
+			wantRead: "getTheBranchingModelForAProject",
+		},
+		"pipeline-oidc": {
+			wantRead: "getOIDCConfiguration",
+		},
+		"pipeline-oidc-keys": {
+			wantRead: "getOIDCKeys",
+		},
+		"workspace-members": {
+			wantRead: "getUserMembershipForAWorkspace",
+			wantList: "listUsersInAWorkspace",
+		},
+		"annotations": {
+			wantCreate: "createOrUpdateAnnotation",
+			wantRead:   "getAnnotation",
+			wantList:   "getAnnotationsForReport",
+		},
+		"commit-file": {
+			wantCreate: "createACommitByUploadingAFile",
+			wantRead:   "getFileOrDirectoryContents",
+		},
+		"pr-comments": {
+			wantCreate: "createACommentOnAPullRequest",
+			wantRead:   "getACommentOnAPullRequest",
+			wantList:   "listCommentsOnAPullRequest",
+		},
+		"issue-comments": {
+			wantCreate: "createACommentOnAnIssue",
+			wantRead:   "getACommentOnAnIssue",
+			wantList:   "listCommentsOnAnIssue",
+		},
 	}
 
 	for typeName, expected := range subResources {
@@ -338,6 +404,11 @@ func TestSubResourceGroups_Registered(t *testing.T) {
 				tfprovider.PipelinesResourceGroup,
 				tfprovider.ReposResourceGroup,
 				tfprovider.DeploymentsResourceGroup,
+				tfprovider.RefsResourceGroup,
+				tfprovider.UsersResourceGroup,
+				tfprovider.BranchingModelResourceGroup,
+				tfprovider.ReportsResourceGroup,
+				tfprovider.IssuesResourceGroup,
 			} {
 				candidate := tfprovider.MapCRUDOps(typeName, parent.AllOps)
 				if candidate.Read != nil || candidate.List != nil || candidate.Create != nil {

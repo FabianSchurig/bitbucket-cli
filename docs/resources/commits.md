@@ -17,18 +17,18 @@ Manages Bitbucket commits via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_commits" "example" {
-  workspace = "my-workspace"
-  repo_slug = "my-repo"
   commit = "abc123def"
+  repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 ```
 
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
-- `repo_slug` (String) Path parameter.
 - `commit` (String) Path parameter.
+- `repo_slug` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Optional
 

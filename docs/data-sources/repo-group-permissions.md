@@ -13,9 +13,9 @@ Reads Bitbucket repo-group-permissions via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_repo_group_permissions" "example" {
-  workspace = "my-workspace"
-  repo_slug = "my-repo"
   group_slug = "developers"
+  repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 
 output "repo_group_permissions_response" {
@@ -26,9 +26,9 @@ output "repo_group_permissions_response" {
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
-- `repo_slug` (String) Path parameter.
 - `group_slug` (String) Path parameter.
+- `repo_slug` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Read-Only
 

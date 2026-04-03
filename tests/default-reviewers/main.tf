@@ -27,13 +27,13 @@ variable "target_username" {
 provider "bitbucket" {}
 
 data "bitbucket_default_reviewers" "test" {
-  workspace = var.workspace
   repo_slug = var.repo_slug
   target_username = var.target_username
+  workspace = var.workspace
 }
 
 resource "bitbucket_default_reviewers" "test" {
-  workspace = var.workspace
   repo_slug = var.repo_slug
   target_username = var.target_username
+  workspace = var.workspace
 }

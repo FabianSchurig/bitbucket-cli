@@ -10,10 +10,10 @@ run "read_commit_statuses" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
-    repo_slug = "my-repo"
     commit = "abc123def"
     key = "build-key"
+    repo_slug = "my-repo"
+    workspace = "my-workspace"
   }
 
   # Data source read should succeed with mock provider
@@ -27,10 +27,10 @@ run "create_commit_statuses" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
-    repo_slug = "my-repo"
     commit = "abc123def"
     key = "build-key"
+    repo_slug = "my-repo"
+    workspace = "my-workspace"
   }
 
   # Resource create should succeed with mock provider

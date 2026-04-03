@@ -1,7 +1,7 @@
 data "bitbucket_repo_group_permissions" "example" {
-  workspace = "my-workspace"
-  repo_slug = "my-repo"
   group_slug = "developers"
+  repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 
 output "repo_group_permissions_response" {

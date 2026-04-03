@@ -27,13 +27,13 @@ variable "selected_user" {
 provider "bitbucket" {}
 
 data "bitbucket_project_default_reviewers" "test" {
-  workspace = var.workspace
   project_key = var.project_key
   selected_user = var.selected_user
+  workspace = var.workspace
 }
 
 resource "bitbucket_project_default_reviewers" "test" {
-  workspace = var.workspace
   project_key = var.project_key
   selected_user = var.selected_user
+  workspace = var.workspace
 }

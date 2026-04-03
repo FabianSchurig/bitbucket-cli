@@ -14,26 +14,26 @@ variable "workspace" {
   default = "test-workspace"
 }
 
-variable "repo_slug" {
-  type    = string
-  default = "my-repo"
-}
-
 variable "key_id" {
   type    = string
   default = "123"
 }
 
+variable "repo_slug" {
+  type    = string
+  default = "my-repo"
+}
+
 provider "bitbucket" {}
 
 data "bitbucket_repo_deploy_keys" "test" {
-  workspace = var.workspace
-  repo_slug = var.repo_slug
   key_id = var.key_id
+  repo_slug = var.repo_slug
+  workspace = var.workspace
 }
 
 resource "bitbucket_repo_deploy_keys" "test" {
-  workspace = var.workspace
-  repo_slug = var.repo_slug
   key_id = var.key_id
+  repo_slug = var.repo_slug
+  workspace = var.workspace
 }

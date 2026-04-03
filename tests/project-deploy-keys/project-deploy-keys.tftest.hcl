@@ -10,9 +10,9 @@ run "read_project_deploy_keys" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
-    project_key = "PROJ"
     key_id = "123"
+    project_key = "PROJ"
+    workspace = "my-workspace"
   }
 
   # Data source read should succeed with mock provider
@@ -26,9 +26,9 @@ run "create_project_deploy_keys" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
-    project_key = "PROJ"
     key_id = "123"
+    project_key = "PROJ"
+    workspace = "my-workspace"
   }
 
   # Resource create should succeed with mock provider

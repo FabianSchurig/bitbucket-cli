@@ -14,20 +14,20 @@ variable "workspace" {
   default = "test-workspace"
 }
 
-variable "repo_slug" {
-  type    = string
-  default = "my-repo"
-}
-
 variable "commit" {
   type    = string
   default = "abc123def"
 }
 
+variable "repo_slug" {
+  type    = string
+  default = "my-repo"
+}
+
 provider "bitbucket" {}
 
 data "bitbucket_commits" "test" {
-  workspace = var.workspace
-  repo_slug = var.repo_slug
   commit = var.commit
+  repo_slug = var.repo_slug
+  workspace = var.workspace
 }

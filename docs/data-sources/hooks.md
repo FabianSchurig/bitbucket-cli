@@ -13,9 +13,9 @@ Reads Bitbucket hooks via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_hooks" "example" {
-  workspace = "my-workspace"
   repo_slug = "my-repo"
   uid = "webhook-uuid"
+  workspace = "my-workspace"
 }
 
 output "hooks_response" {
@@ -26,9 +26,9 @@ output "hooks_response" {
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `uid` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Read-Only
 

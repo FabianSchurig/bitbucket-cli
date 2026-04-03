@@ -10,9 +10,9 @@ run "read_project_default_reviewers" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
     project_key = "PROJ"
     selected_user = "jdoe"
+    workspace = "my-workspace"
   }
 
   # Data source read should succeed with mock provider
@@ -26,9 +26,9 @@ run "create_project_default_reviewers" {
   command = apply
 
   variables {
-    workspace = "my-workspace"
     project_key = "PROJ"
     selected_user = "jdoe"
+    workspace = "my-workspace"
   }
 
   # Resource create should succeed with mock provider

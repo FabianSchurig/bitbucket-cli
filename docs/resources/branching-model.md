@@ -17,16 +17,16 @@ Manages Bitbucket branching-model via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_branching_model" "example" {
-  workspace = "my-workspace"
   repo_slug = "my-repo"
+  workspace = "my-workspace"
 }
 ```
 
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
+- `workspace` (String) Path parameter.
 
 ### Optional
 

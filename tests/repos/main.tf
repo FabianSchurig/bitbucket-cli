@@ -22,11 +22,11 @@ variable "repo_slug" {
 provider "bitbucket" {}
 
 data "bitbucket_repos" "test" {
-  workspace = var.workspace
   repo_slug = var.repo_slug
+  workspace = var.workspace
 }
 
 resource "bitbucket_repos" "test" {
-  workspace = var.workspace
   repo_slug = var.repo_slug
+  workspace = var.workspace
 }
