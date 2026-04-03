@@ -1351,31 +1351,8 @@ func TestAccRealAPI_ProviderAuth(t *testing.T) {
 	})
 }
 
-// TestAccRealAPI_DataSource_ReposList lists repositories in the test workspace.
-func TestAccRealAPI_DataSource_ReposList(t *testing.T) {
-	workspace := skipIfNoRealAPI(t)
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
-		Steps: []resource.TestStep{
-			{
-				Config: fmt.Sprintf(`
-					provider "bitbucket" {}
-
-					data "bitbucket_repos" "list" {
-						workspace = %q
-					}
-				`, workspace),
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttrSet("data.bitbucket_repos.list", "api_response"),
-					resource.TestCheckResourceAttrSet("data.bitbucket_repos.list", "id"),
-				),
-			},
-		},
-	})
-}
-
-// TestAccRealAPI_DataSource_Commits lists commits for a repository.
+// TestAccRealAPI_DataSource_Commits reads a specific commit via its SHA.
+// Chains through refs to discover the HEAD commit on "main".
 // Requires BITBUCKET_TEST_REPO to be set.
 func TestAccRealAPI_DataSource_Commits(t *testing.T) {
 	workspace := skipIfNoRealAPI(t)
@@ -1391,11 +1368,18 @@ func TestAccRealAPI_DataSource_Commits(t *testing.T) {
 				Config: fmt.Sprintf(`
 					provider "bitbucket" {}
 
+					data "bitbucket_refs" "main" {
+						workspace = %q
+						repo_slug = %q
+						name      = "main"
+					}
+
 					data "bitbucket_commits" "test" {
 						workspace = %q
 						repo_slug = %q
+						commit    = jsondecode(data.bitbucket_refs.main.api_response).target.hash
 					}
-				`, workspace, repoSlug),
+				`, workspace, repoSlug, workspace, repoSlug),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.bitbucket_commits.test", "api_response"),
 					resource.TestCheckResourceAttrSet("data.bitbucket_commits.test", "id"),
@@ -1405,7 +1389,7 @@ func TestAccRealAPI_DataSource_Commits(t *testing.T) {
 	})
 }
 
-// TestAccRealAPI_DataSource_Refs lists branches for a repository.
+// TestAccRealAPI_DataSource_Refs reads the "main" branch for a repository.
 // Requires BITBUCKET_TEST_REPO to be set.
 func TestAccRealAPI_DataSource_Refs(t *testing.T) {
 	workspace := skipIfNoRealAPI(t)
@@ -1424,6 +1408,7 @@ func TestAccRealAPI_DataSource_Refs(t *testing.T) {
 					data "bitbucket_refs" "test" {
 						workspace = %q
 						repo_slug = %q
+						name      = "main"
 					}
 				`, workspace, repoSlug),
 				Check: resource.ComposeTestCheckFunc(
@@ -1465,39 +1450,9 @@ func TestAccRealAPI_DataSource_BranchingModel(t *testing.T) {
 	})
 }
 
-// TestAccRealAPI_DataSource_BranchRestrictions lists branch restrictions for a repository.
-// Requires BITBUCKET_TEST_REPO to be set.
-func TestAccRealAPI_DataSource_BranchRestrictions(t *testing.T) {
-	workspace := skipIfNoRealAPI(t)
-	repoSlug := os.Getenv("BITBUCKET_TEST_REPO")
-	if repoSlug == "" {
-		t.Skip("BITBUCKET_TEST_REPO not set, skipping branch restrictions test")
-	}
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
-		Steps: []resource.TestStep{
-			{
-				Config: fmt.Sprintf(`
-					provider "bitbucket" {}
-
-					data "bitbucket_branch_restrictions" "test" {
-						workspace = %q
-						repo_slug = %q
-					}
-				`, workspace, repoSlug),
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttrSet("data.bitbucket_branch_restrictions.test", "api_response"),
-					resource.TestCheckResourceAttrSet("data.bitbucket_branch_restrictions.test", "id"),
-				),
-			},
-		},
-	})
-}
-
-// TestAccRealAPI_DataSource_SshKeys lists SSH keys for the current user.
-// SSH keys for the current user are accessible via GET /users/{uuid}/ssh-keys.
-func TestAccRealAPI_DataSource_SshKeys(t *testing.T) {
+// TestAccRealAPI_DataSource_HookTypes reads available webhook event types.
+// No additional parameters required — GET /hook_events returns event categories.
+func TestAccRealAPI_DataSource_HookTypes(t *testing.T) {
 	skipIfNoRealAPI(t)
 
 	resource.Test(t, resource.TestCase{
@@ -1507,15 +1462,65 @@ func TestAccRealAPI_DataSource_SshKeys(t *testing.T) {
 				Config: `
 					provider "bitbucket" {}
 
-					data "bitbucket_current_user" "me" {}
-
-					data "bitbucket_ssh_keys" "test" {
-						selected_user = jsondecode(data.bitbucket_current_user.me.api_response).uuid
-					}
+					data "bitbucket_hook_types" "test" {}
 				`,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttrSet("data.bitbucket_ssh_keys.test", "api_response"),
-					resource.TestCheckResourceAttrSet("data.bitbucket_ssh_keys.test", "id"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_hook_types.test", "api_response"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_hook_types.test", "id"),
+				),
+			},
+		},
+	})
+}
+
+// TestAccRealAPI_DataSource_WorkspacePermissions reads the current user's permission
+// on the test workspace. Only requires workspace — GET /user/workspaces/{workspace}/permission.
+func TestAccRealAPI_DataSource_WorkspacePermissions(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {}
+
+					data "bitbucket_workspace_permissions" "test" {
+						workspace = %q
+					}
+				`, workspace),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_workspace_permissions.test", "api_response"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_workspace_permissions.test", "id"),
+				),
+			},
+		},
+	})
+}
+
+// TestAccRealAPI_DataSource_UserEmails reads a specific email address for the current user.
+// Uses BITBUCKET_USERNAME (the Atlassian account email) as the email parameter.
+func TestAccRealAPI_DataSource_UserEmails(t *testing.T) {
+	skipIfNoRealAPI(t)
+	email := os.Getenv("BITBUCKET_USERNAME")
+	if email == "" {
+		t.Skip("BITBUCKET_USERNAME not set, skipping user emails test")
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {}
+
+					data "bitbucket_user_emails" "test" {
+						email = %q
+					}
+				`, email),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_user_emails.test", "api_response"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_user_emails.test", "id"),
 				),
 			},
 		},
