@@ -179,7 +179,7 @@ func (d *GenericDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		}
 		if !idSet {
 			// For list results or missing ID fields, use a composite ID.
-			resp.Diagnostics.Append(resp.State.SetAttribute(ctx, attrPath("id"), types.StringValue(buildListID(pathParams)))...)
+			resp.Diagnostics.Append(resp.State.SetAttribute(ctx, attrPath("id"), types.StringValue(buildListID(op.OperationID, pathParams)))...)
 		}
 	}
 
@@ -203,15 +203,18 @@ func (d *GenericDataSource) readOp() *OperationDef {
 	return d.group.Ops.List
 }
 
-// buildListID creates a composite ID from path parameters for list data sources.
+// buildListID creates a composite ID from operation ID and path parameters for list data sources.
 // Keys are sorted for deterministic ordering.
-func buildListID(pathParams map[string]string) string {
+func buildListID(operationID string, pathParams map[string]string) string {
 	keys := make([]string, 0, len(pathParams))
 	for k := range pathParams {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
-	parts := make([]string, 0, len(keys))
+	parts := make([]string, 0, len(keys)+1)
+	if operationID != "" {
+		parts = append(parts, operationID)
+	}
 	for _, k := range keys {
 		parts = append(parts, pathParams[k])
 	}
