@@ -51,6 +51,8 @@ func ParamAttrName(paramName string) string {
 	}
 	return name
 }
+
+// MapCRUDOps resolves CRUD operations for a resource group by looking up
 // operation IDs from the hand-written CRUDConfig map. The typeName parameter
 // identifies the resource group (e.g., "repos", "pr"). Called at runtime by
 // generated init() functions to map Bitbucket API operations to Terraform
