@@ -7,19 +7,6 @@ import (
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
 )
 
-func TestNewClient_UsernameAndToken(t *testing.T) {
-	t.Setenv("BITBUCKET_USERNAME", "testuser")
-	t.Setenv("BITBUCKET_TOKEN", "testtoken")
-
-	c, err := client.NewClient()
-	if err != nil {
-		t.Fatalf("expected no error with username+token, got: %v", err)
-	}
-	if c == nil {
-		t.Fatal("expected non-nil client")
-	}
-}
-
 func TestNewClient_TokenOnly(t *testing.T) {
 	t.Setenv("BITBUCKET_USERNAME", "")
 	t.Setenv("BITBUCKET_TOKEN", "mytoken")
@@ -27,6 +14,19 @@ func TestNewClient_TokenOnly(t *testing.T) {
 	c, err := client.NewClient()
 	if err != nil {
 		t.Fatalf("expected no error with token, got: %v", err)
+	}
+	if c == nil {
+		t.Fatal("expected non-nil client")
+	}
+}
+
+func TestNewClient_UsernameAndToken(t *testing.T) {
+	t.Setenv("BITBUCKET_USERNAME", "testuser")
+	t.Setenv("BITBUCKET_TOKEN", "testtoken")
+
+	c, err := client.NewClient()
+	if err != nil {
+		t.Fatalf("expected no error with username+token, got: %v", err)
 	}
 	if c == nil {
 		t.Fatal("expected non-nil client")
@@ -43,19 +43,5 @@ func TestNewClient_NoAuth(t *testing.T) {
 	_, err := client.NewClient()
 	if err == nil {
 		t.Error("expected error when no auth is configured, got nil")
-	}
-}
-
-func TestNewClient_UsernameTokenTakesPrecedence(t *testing.T) {
-	// When both username+token are set, basic auth should be used
-	t.Setenv("BITBUCKET_USERNAME", "user")
-	t.Setenv("BITBUCKET_TOKEN", "token")
-
-	c, err := client.NewClient()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if c == nil {
-		t.Fatal("expected non-nil client")
 	}
 }

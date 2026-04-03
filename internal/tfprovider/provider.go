@@ -94,7 +94,7 @@ func (p *BitbucketProvider) Configure(ctx context.Context, req provider.Configur
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to create Bitbucket client",
-			"Ensure BITBUCKET_USERNAME + BITBUCKET_TOKEN or BITBUCKET_TOKEN alone are set. Error: "+err.Error(),
+			"Ensure BITBUCKET_TOKEN is set (API token or OAuth2 access token). Error: "+err.Error(),
 		)
 		return
 	}

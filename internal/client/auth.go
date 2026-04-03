@@ -17,9 +17,8 @@ type BBClient struct {
 
 // NewClient creates an authenticated Bitbucket API client.
 //
-// Authentication precedence:
-//  1. BITBUCKET_USERNAME + BITBUCKET_TOKEN → HTTP Basic Auth
-//  2. BITBUCKET_TOKEN (alone) → Bearer token (OAuth2)
+// Authentication: BITBUCKET_TOKEN is used as a Bearer token.
+// BITBUCKET_USERNAME is optional metadata (not used for auth).
 //
 // The base URL defaults to https://api.bitbucket.org/2.0 but can be
 // overridden with BITBUCKET_BASE_URL (useful for testing).
@@ -35,9 +34,8 @@ func NewClient() (*BBClient, error) {
 // explicit configuration values. Empty strings are treated as unset.
 // This avoids mutating global environment variables.
 //
-// Authentication precedence:
-//  1. username + token → HTTP Basic Auth
-//  2. token alone → Bearer token (OAuth2)
+// Authentication: token is always used as Bearer (OAuth2/API token).
+// Username is optional metadata and not used for authentication.
 func NewClientWithConfig(username, token, baseURL string) (*BBClient, error) {
 	base := baseURL
 	if base == "" {
@@ -46,15 +44,16 @@ func NewClientWithConfig(username, token, baseURL string) (*BBClient, error) {
 	c := resty.New().SetBaseURL(base)
 
 	switch {
-	case username != "" && token != "":
-		c.SetBasicAuth(username, token)
 	case token != "":
 		c.SetAuthToken(token) // Bearer
 	default:
 		return nil, fmt.Errorf(
-			"auth required: set BITBUCKET_USERNAME + BITBUCKET_TOKEN, or BITBUCKET_TOKEN alone",
+			"auth required: set BITBUCKET_TOKEN (API token or OAuth2 access token)",
 		)
 	}
+
+	// Store username as metadata (not used for auth).
+	_ = username
 
 	return &BBClient{c}, nil
 }

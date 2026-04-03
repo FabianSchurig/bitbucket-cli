@@ -46,7 +46,7 @@ export BITBUCKET_TOKEN="your-oauth2-token"
 
 ## Example Usage
 
-``hcl
+```hcl
 terraform {
   required_providers {
     bitbucket = {
@@ -69,7 +69,7 @@ data "bitbucket_repos" "example" {
 output "repo_info" {
   value = data.bitbucket_repos.example.api_response
 }
-``
+```
 
 ## Schema
 

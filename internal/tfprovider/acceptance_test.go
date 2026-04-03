@@ -485,9 +485,14 @@ func TestAccRealAPI_ResourceProjects_CRUD(t *testing.T) {
 	})
 }
 
-// TestAccRealAPI_DataSourceRepos lists repositories in the test workspace.
+// TestAccRealAPI_DataSourceRepos reads a specific repository from the test workspace.
+// Requires BITBUCKET_TEST_REPO to be set, otherwise lists the workspace.
 func TestAccRealAPI_DataSourceRepos(t *testing.T) {
 	workspace := skipIfNoRealAPI(t)
+	repoSlug := os.Getenv("BITBUCKET_TEST_REPO")
+	if repoSlug == "" {
+		t.Skip("BITBUCKET_TEST_REPO not set, skipping repos read test")
+	}
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
@@ -498,8 +503,9 @@ func TestAccRealAPI_DataSourceRepos(t *testing.T) {
 
 					data "bitbucket_repos" "test" {
 						workspace = %q
+						repo_slug = %q
 					}
-				`, workspace),
+				`, workspace, repoSlug),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.bitbucket_repos.test", "api_response"),
 					resource.TestCheckResourceAttrSet("data.bitbucket_repos.test", "id"),

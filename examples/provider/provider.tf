@@ -7,6 +7,6 @@ terraform {
 }
 
 # Configure via environment variables:
-#   BITBUCKET_USERNAME + BITBUCKET_TOKEN (Basic auth)
+#   BITBUCKET_USERNAME + BITBUCKET_TOKEN (Bearer token)
 #   or BITBUCKET_TOKEN (OAuth2)
 provider "bitbucket" {}

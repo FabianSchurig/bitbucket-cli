@@ -321,7 +321,7 @@ export BITBUCKET_TOKEN="your-oauth2-token"
 
 ## Example Usage
 
-{{ "` + "``" + `" }}hcl
+` + "```" + `hcl
 terraform {
   required_providers {
     bitbucket = {
@@ -344,7 +344,7 @@ data "bitbucket_repos" "example" {
 output "repo_info" {
   value = data.bitbucket_repos.example.api_response
 }
-{{ "` + "``" + `" }}
+` + "```" + `
 
 ## Schema
 
@@ -476,7 +476,7 @@ const exampleProviderTemplate = `terraform {
 }
 
 # Configure via environment variables:
-#   BITBUCKET_USERNAME + BITBUCKET_TOKEN (Basic auth)
+#   BITBUCKET_USERNAME + BITBUCKET_TOKEN (Bearer token)
 #   or BITBUCKET_TOKEN (OAuth2)
 provider "bitbucket" {}
 `
