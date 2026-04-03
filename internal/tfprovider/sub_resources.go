@@ -80,6 +80,87 @@ var subResources = []subResource{
 		Description: "Manage deploy keys for a Bitbucket project",
 		sourceOps:   func() []OperationDef { return DeploymentsResourceGroup.AllOps },
 	},
+	// ─── Wave 2: additional sub-resources ─────────────────────────────────────
+	{
+		TypeName:    "tags",
+		Description: "Manage Git tags for a Bitbucket repository",
+		sourceOps:   func() []OperationDef { return RefsResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "pipeline-ssh-keys",
+		Description: "Manage pipeline SSH key pair for a Bitbucket repository",
+		sourceOps:   func() []OperationDef { return PipelinesResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "pipeline-known-hosts",
+		Description: "Manage pipeline SSH known hosts for a Bitbucket repository",
+		sourceOps:   func() []OperationDef { return PipelinesResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "pipeline-schedules",
+		Description: "Manage pipeline schedules for a Bitbucket repository",
+		sourceOps:   func() []OperationDef { return PipelinesResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "pipeline-config",
+		Description: "Manage pipeline configuration for a Bitbucket repository",
+		sourceOps:   func() []OperationDef { return PipelinesResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "ssh-keys",
+		Description: "Manage SSH keys for a Bitbucket user",
+		sourceOps:   func() []OperationDef { return UsersResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "current-user",
+		Description: "Read the currently authenticated Bitbucket user",
+		sourceOps:   func() []OperationDef { return UsersResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "forked-repository",
+		Description: "Manage forked repositories in Bitbucket",
+		sourceOps:   func() []OperationDef { return ReposResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "project-branching-model",
+		Description: "Manage the branching model for a Bitbucket project",
+		sourceOps:   func() []OperationDef { return BranchingModelResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "pipeline-oidc",
+		Description: "Read pipeline OIDC configuration for a Bitbucket workspace",
+		sourceOps:   func() []OperationDef { return PipelinesResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "pipeline-oidc-keys",
+		Description: "Read pipeline OIDC configuration keys for a Bitbucket workspace",
+		sourceOps:   func() []OperationDef { return PipelinesResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "workspace-members",
+		Description: "List and read workspace members in Bitbucket",
+		sourceOps:   func() []OperationDef { return WorkspacesResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "annotations",
+		Description: "Manage report annotations for a Bitbucket commit",
+		sourceOps:   func() []OperationDef { return ReportsResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "commit-file",
+		Description: "Manage file contents via commits in a Bitbucket repository",
+		sourceOps:   func() []OperationDef { return ReposResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "pr-comments",
+		Description: "Manage comments on a Bitbucket pull request",
+		sourceOps:   func() []OperationDef { return PRResourceGroup.AllOps },
+	},
+	{
+		TypeName:    "issue-comments",
+		Description: "Manage comments on a Bitbucket issue",
+		sourceOps:   func() []OperationDef { return IssuesResourceGroup.AllOps },
+	},
 }
 
 func init() {

@@ -225,6 +225,88 @@ var crudConfig = map[string]CRUDMapping{
 		Delete: "deleteADeployKeyFromAProject",
 		List:   "listProjectDeployKeys",
 	},
+	// ─── Wave 2: additional sub-resource CRUD mappings ────────────────────────
+	"tags": {
+		Create: "createATag",
+		Read:   "getATag",
+		Delete: "deleteATag",
+		List:   "listTags",
+	},
+	"pipeline-ssh-keys": {
+		Read:   "getRepositoryPipelineSshKeyPair",
+		Update: "updateRepositoryPipelineKeyPair",
+		Delete: "deleteRepositoryPipelineKeyPair",
+	},
+	"pipeline-known-hosts": {
+		Create: "createRepositoryPipelineKnownHost",
+		Read:   "getRepositoryPipelineKnownHost",
+		Update: "updateRepositoryPipelineKnownHost",
+		Delete: "deleteRepositoryPipelineKnownHost",
+		List:   "getRepositoryPipelineKnownHosts",
+	},
+	"pipeline-schedules": {
+		Create: "createRepositoryPipelineSchedule",
+		Read:   "getRepositoryPipelineSchedule",
+		Update: "updateRepositoryPipelineSchedule",
+		Delete: "deleteRepositoryPipelineSchedule",
+		List:   "getRepositoryPipelineSchedules",
+	},
+	"pipeline-config": {
+		Read:   "getRepositoryPipelineConfig",
+		Update: "updateRepositoryPipelineConfig",
+	},
+	"ssh-keys": {
+		Create: "addANewSshKey",
+		Read:   "getASshKey",
+		Update: "updateASshKey",
+		Delete: "deleteASshKey",
+		List:   "listSshKeys",
+	},
+	"current-user": {
+		Read: "getCurrentUser",
+	},
+	"forked-repository": {
+		Create: "forkARepository",
+		List:   "listRepositoryForks",
+	},
+	"project-branching-model": {
+		Read:   "getTheBranchingModelForAProject",
+		Update: "updateTheBranchingModelConfigForAProject",
+	},
+	"pipeline-oidc": {
+		Read: "getOIDCConfiguration",
+	},
+	"pipeline-oidc-keys": {
+		Read: "getOIDCKeys",
+	},
+	"workspace-members": {
+		Read: "getUserMembershipForAWorkspace",
+		List: "listUsersInAWorkspace",
+	},
+	"annotations": {
+		Create: "createOrUpdateAnnotation",
+		Read:   "getAnnotation",
+		Delete: "deleteAnnotation",
+		List:   "getAnnotationsForReport",
+	},
+	"commit-file": {
+		Create: "createACommitByUploadingAFile",
+		Read:   "getFileOrDirectoryContents",
+	},
+	"pr-comments": {
+		Create: "createACommentOnAPullRequest",
+		Read:   "getACommentOnAPullRequest",
+		Update: "updateACommentOnAPullRequest",
+		Delete: "deleteACommentOnAPullRequest",
+		List:   "listCommentsOnAPullRequest",
+	},
+	"issue-comments": {
+		Create: "createACommentOnAnIssue",
+		Read:   "getACommentOnAnIssue",
+		Update: "updateACommentOnAnIssue",
+		Delete: "deleteACommentOnAnIssue",
+		List:   "listCommentsOnAnIssue",
+	},
 }
 
 // ─── Param info per resource group (required path params for primary Read op) ─
@@ -265,6 +347,23 @@ var paramConfig = map[string][]string{
 	"project-user-permissions":     {"workspace", "project_key", "selected_user_id"},
 	"repo-deploy-keys":             {"workspace", "repo_slug", "key_id"},
 	"project-deploy-keys":          {"workspace", "project_key", "key_id"},
+	// ─── Wave 2: additional sub-resource params ──────────────────────────────
+	"tags":                          {"workspace", "repo_slug", "name"},
+	"pipeline-ssh-keys":             {"workspace", "repo_slug"},
+	"pipeline-known-hosts":          {"workspace", "repo_slug", "known_host_uuid"},
+	"pipeline-schedules":            {"workspace", "repo_slug", "schedule_uuid"},
+	"pipeline-config":               {"workspace", "repo_slug"},
+	"ssh-keys":                      {"selected_user", "key_id"},
+	"current-user":                  {},
+	"forked-repository":             {"workspace", "repo_slug"},
+	"project-branching-model":       {"workspace", "project_key"},
+	"pipeline-oidc":                 {"workspace"},
+	"pipeline-oidc-keys":            {"workspace"},
+	"workspace-members":             {"workspace", "member"},
+	"annotations":                   {"workspace", "repo_slug", "commit", "reportId", "annotationId"},
+	"commit-file":                   {"workspace", "repo_slug", "commit", "path"},
+	"pr-comments":                   {"workspace", "repo_slug", "pull_request_id", "comment_id"},
+	"issue-comments":                {"workspace", "repo_slug", "issue_id", "comment_id"},
 }
 
 // ─── Template data ────────────────────────────────────────────────────────────

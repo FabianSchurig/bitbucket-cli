@@ -201,6 +201,88 @@ var CRUDConfig = map[string]CRUDMapping{
 		Delete: "deleteADeployKeyFromAProject",
 		List:   "listProjectDeployKeys",
 	},
+	// ─── Wave 2: additional sub-resource CRUD mappings ────────────────────────
+	"tags": {
+		Create: "createATag",
+		Read:   "getATag",
+		Delete: "deleteATag",
+		List:   "listTags",
+	},
+	"pipeline-ssh-keys": {
+		Read:   "getRepositoryPipelineSshKeyPair",
+		Update: "updateRepositoryPipelineKeyPair",
+		Delete: "deleteRepositoryPipelineKeyPair",
+	},
+	"pipeline-known-hosts": {
+		Create: "createRepositoryPipelineKnownHost",
+		Read:   "getRepositoryPipelineKnownHost",
+		Update: "updateRepositoryPipelineKnownHost",
+		Delete: "deleteRepositoryPipelineKnownHost",
+		List:   "getRepositoryPipelineKnownHosts",
+	},
+	"pipeline-schedules": {
+		Create: "createRepositoryPipelineSchedule",
+		Read:   "getRepositoryPipelineSchedule",
+		Update: "updateRepositoryPipelineSchedule",
+		Delete: "deleteRepositoryPipelineSchedule",
+		List:   "getRepositoryPipelineSchedules",
+	},
+	"pipeline-config": {
+		Read:   "getRepositoryPipelineConfig",
+		Update: "updateRepositoryPipelineConfig",
+	},
+	"ssh-keys": {
+		Create: "addANewSshKey",
+		Read:   "getASshKey",
+		Update: "updateASshKey",
+		Delete: "deleteASshKey",
+		List:   "listSshKeys",
+	},
+	"current-user": {
+		Read: "getCurrentUser",
+	},
+	"forked-repository": {
+		Create: "forkARepository",
+		List:   "listRepositoryForks",
+	},
+	"project-branching-model": {
+		Read:   "getTheBranchingModelForAProject",
+		Update: "updateTheBranchingModelConfigForAProject",
+	},
+	"pipeline-oidc": {
+		Read: "getOIDCConfiguration",
+	},
+	"pipeline-oidc-keys": {
+		Read: "getOIDCKeys",
+	},
+	"workspace-members": {
+		Read: "getUserMembershipForAWorkspace",
+		List: "listUsersInAWorkspace",
+	},
+	"annotations": {
+		Create: "createOrUpdateAnnotation",
+		Read:   "getAnnotation",
+		Delete: "deleteAnnotation",
+		List:   "getAnnotationsForReport",
+	},
+	"commit-file": {
+		Create: "createACommitByUploadingAFile",
+		Read:   "getFileOrDirectoryContents",
+	},
+	"pr-comments": {
+		Create: "createACommentOnAPullRequest",
+		Read:   "getACommentOnAPullRequest",
+		Update: "updateACommentOnAPullRequest",
+		Delete: "deleteACommentOnAPullRequest",
+		List:   "listCommentsOnAPullRequest",
+	},
+	"issue-comments": {
+		Create: "createACommentOnAnIssue",
+		Read:   "getACommentOnAnIssue",
+		Update: "updateACommentOnAnIssue",
+		Delete: "deleteACommentOnAnIssue",
+		List:   "listCommentsOnAnIssue",
+	},
 }
 
 // CRUDMapping holds operation IDs for each CRUD slot.
