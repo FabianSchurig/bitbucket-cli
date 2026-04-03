@@ -88,20 +88,32 @@ operation groups. Each resource group maps to a set of CRUD operations.
 | `bitbucket_branching_model` | `bitbucket_branching_model` | RU |
 | `bitbucket_commit_statuses` | `bitbucket_commit_statuses` | CRUL |
 | `bitbucket_commits` | `bitbucket_commits` | RL |
+| `bitbucket_default_reviewers` | `bitbucket_default_reviewers` | CRDL |
+| `bitbucket_deployment_variables` | `bitbucket_deployment_variables` | CRUD |
 | `bitbucket_deployments` | `bitbucket_deployments` | CRDL |
 | `bitbucket_downloads` | `bitbucket_downloads` | CRDL |
 | `bitbucket_hooks` | `bitbucket_hooks` | CRUDL |
 | `bitbucket_issues` | `bitbucket_issues` | CRUDL |
+| `bitbucket_pipeline_variables` | `bitbucket_pipeline_variables` | CRUDL |
 | `bitbucket_pipelines` | `bitbucket_pipelines` | CRL |
 | `bitbucket_pr` | `bitbucket_pr` | CRUL |
+| `bitbucket_project_default_reviewers` | `bitbucket_project_default_reviewers` | CRDL |
+| `bitbucket_project_deploy_keys` | `bitbucket_project_deploy_keys` | CRDL |
+| `bitbucket_project_group_permissions` | `bitbucket_project_group_permissions` | RUDL |
+| `bitbucket_project_user_permissions` | `bitbucket_project_user_permissions` | RUDL |
 | `bitbucket_projects` | `bitbucket_projects` | CRUDL |
 | `bitbucket_properties` | `bitbucket_properties` | RUD |
 | `bitbucket_refs` | `bitbucket_refs` | CRDL |
+| `bitbucket_repo_deploy_keys` | `bitbucket_repo_deploy_keys` | CRUDL |
+| `bitbucket_repo_group_permissions` | `bitbucket_repo_group_permissions` | RUDL |
+| `bitbucket_repo_user_permissions` | `bitbucket_repo_user_permissions` | RUDL |
 | `bitbucket_reports` | `bitbucket_reports` | CRDL |
 | `bitbucket_repos` | `bitbucket_repos` | CRUDL |
 | `bitbucket_search` | `bitbucket_search` | L |
 | `bitbucket_snippets` | `bitbucket_snippets` | CRUDL |
 | `bitbucket_users` | `bitbucket_users` | RL |
+| `bitbucket_workspace_hooks` | `bitbucket_workspace_hooks` | CRUDL |
+| `bitbucket_workspace_pipeline_variables` | `bitbucket_workspace_pipeline_variables` | CRUDL |
 | `bitbucket_workspaces` | `bitbucket_workspaces` | RL |
 
 All resources share the same generic schema pattern:

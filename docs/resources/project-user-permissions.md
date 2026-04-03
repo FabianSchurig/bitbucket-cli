@@ -1,0 +1,42 @@
+---
+page_title: "bitbucket_project_user_permissions Resource - bitbucket"
+subcategory: ""
+description: |-
+  Manages Bitbucket project-user-permissions via the Bitbucket Cloud API.
+---
+
+# bitbucket_project_user_permissions (Resource)
+
+Manages Bitbucket project-user-permissions via the Bitbucket Cloud API.
+
+## CRUD Operations
+- **Read**: Supported
+- **Update**: Supported
+- **Delete**: Supported
+- **List**: Supported (via data source)
+
+## Example Usage
+
+```hcl
+resource "bitbucket_project_user_permissions" "example" {
+  workspace = "my-workspace"
+  project_key = "PROJ"
+  selected_user_id = "{user-uuid}"
+}
+```
+
+## Schema
+
+### Required
+- `workspace` (String) Path parameter.
+- `project_key` (String) Path parameter.
+- `selected_user_id` (String) Path parameter.
+
+### Optional
+
+- `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
+
+### Read-Only
+
+- `id` (String) Resource identifier (extracted from API response).
+- `api_response` (String) The raw JSON response from the Bitbucket API.

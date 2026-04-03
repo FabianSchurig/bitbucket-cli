@@ -145,6 +145,164 @@ func startMockServer(t *testing.T) *httptest.Server {
 		})
 	})
 
+	// ─── Workspace webhook endpoints ──────────────────────────────────────────
+	mux.HandleFunc("/workspaces/{workspace}/hooks/{uid}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet:
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"uuid":        "{hook-uuid-123}",
+				"url":         "https://example.com/webhook",
+				"description": "Test webhook",
+				"active":      true,
+			})
+		case http.MethodPut:
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"uuid":        "{hook-uuid-123}",
+				"url":         "https://example.com/webhook-updated",
+				"description": "Updated webhook",
+				"active":      true,
+			})
+		case http.MethodDelete:
+			w.WriteHeader(http.StatusNoContent)
+		}
+	})
+	mux.HandleFunc("POST /workspaces/{workspace}/hooks", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"uuid":        "{hook-uuid-123}",
+			"url":         "https://example.com/webhook",
+			"description": "Test webhook",
+			"active":      true,
+		})
+	})
+
+	// ─── Default reviewer endpoints ───────────────────────────────────────────
+	mux.HandleFunc("/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet:
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"uuid":         "{user-uuid-123}",
+				"display_name": "Test User",
+				"nickname":     "testuser",
+			})
+		case http.MethodPut:
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"uuid":         "{user-uuid-123}",
+				"display_name": "Test User",
+				"nickname":     "testuser",
+			})
+		case http.MethodDelete:
+			w.WriteHeader(http.StatusNoContent)
+		}
+	})
+
+	// ─── Pipeline variable endpoints ──────────────────────────────────────────
+	mux.HandleFunc("/repositories/{workspace}/{repo_slug}/pipelines_config/variables/{variable_uuid}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet:
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"uuid":    "{var-uuid-123}",
+				"key":     "MY_VAR",
+				"value":   "my-value",
+				"secured": false,
+			})
+		case http.MethodPut:
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"uuid":    "{var-uuid-123}",
+				"key":     "MY_VAR",
+				"value":   "updated-value",
+				"secured": false,
+			})
+		case http.MethodDelete:
+			w.WriteHeader(http.StatusNoContent)
+		}
+	})
+	mux.HandleFunc("POST /repositories/{workspace}/{repo_slug}/pipelines_config/variables", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"uuid":    "{var-uuid-123}",
+			"key":     "MY_VAR",
+			"value":   "my-value",
+			"secured": false,
+		})
+	})
+
+	// ─── Repo deploy key endpoints ────────────────────────────────────────────
+	mux.HandleFunc("/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet:
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"id":      123,
+				"key":     "ssh-rsa AAAA...",
+				"label":   "test-key",
+				"comment": "test@example.com",
+			})
+		case http.MethodPut:
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"id":      123,
+				"key":     "ssh-rsa AAAA...",
+				"label":   "updated-key",
+				"comment": "test@example.com",
+			})
+		case http.MethodDelete:
+			w.WriteHeader(http.StatusNoContent)
+		}
+	})
+
+	// ─── Repo explicit permissions endpoints ──────────────────────────────────
+	mux.HandleFunc("/repositories/{workspace}/{repo_slug}/permissions-config/groups/{group_slug}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet:
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"permission": "read",
+				"group": map[string]any{
+					"slug": "developers",
+					"name": "Developers",
+				},
+			})
+		case http.MethodPut:
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"permission": "write",
+				"group": map[string]any{
+					"slug": "developers",
+					"name": "Developers",
+				},
+			})
+		case http.MethodDelete:
+			w.WriteHeader(http.StatusNoContent)
+		}
+	})
+	mux.HandleFunc("/repositories/{workspace}/{repo_slug}/permissions-config/users/{selected_user_id}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet:
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"permission": "read",
+				"user": map[string]any{
+					"uuid":         "{user-uuid-123}",
+					"display_name": "Test User",
+				},
+			})
+		case http.MethodPut:
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"permission": "write",
+				"user": map[string]any{
+					"uuid":         "{user-uuid-123}",
+					"display_name": "Test User",
+				},
+			})
+		case http.MethodDelete:
+			w.WriteHeader(http.StatusNoContent)
+		}
+	})
+
 	// Catch-all for any other API calls during tests
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -302,6 +460,261 @@ func TestAccResourceProjects_CRUD(t *testing.T) {
 					resource.TestCheckResourceAttrSet("bitbucket_projects.test", "api_response"),
 					resource.TestCheckResourceAttr("bitbucket_projects.test", "workspace", "testworkspace"),
 					resource.TestCheckResourceAttr("bitbucket_projects.test", "project_key", "TEST"),
+				),
+			},
+		},
+	})
+}
+
+// ─── Sub-resource acceptance tests ────────────────────────────────────────────
+
+func TestAccDataSourceWorkspaceHooks_Read(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					data "bitbucket_workspace_hooks" "test" {
+						workspace = "testworkspace"
+						uid       = "hook-uuid"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_workspace_hooks.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourceWorkspaceHooks_CRUD(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					resource "bitbucket_workspace_hooks" "test" {
+						workspace = "testworkspace"
+						uid       = "hook-uuid"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_workspace_hooks.test", "api_response"),
+					resource.TestCheckResourceAttr("bitbucket_workspace_hooks.test", "workspace", "testworkspace"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDataSourceDefaultReviewers_Read(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					data "bitbucket_default_reviewers" "test" {
+						workspace       = "testworkspace"
+						repo_slug       = "test-repo"
+						target_username = "testuser"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_default_reviewers.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourceDefaultReviewers_CRUD(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					resource "bitbucket_default_reviewers" "test" {
+						workspace       = "testworkspace"
+						repo_slug       = "test-repo"
+						target_username = "testuser"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_default_reviewers.test", "api_response"),
+					resource.TestCheckResourceAttr("bitbucket_default_reviewers.test", "workspace", "testworkspace"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDataSourcePipelineVariables_Read(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					data "bitbucket_pipeline_variables" "test" {
+						workspace     = "testworkspace"
+						repo_slug     = "test-repo"
+						variable_uuid = "{var-uuid}"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_pipeline_variables.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccResourcePipelineVariables_CRUD(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					resource "bitbucket_pipeline_variables" "test" {
+						workspace     = "testworkspace"
+						repo_slug     = "test-repo"
+						variable_uuid = "{var-uuid}"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_pipeline_variables.test", "api_response"),
+					resource.TestCheckResourceAttr("bitbucket_pipeline_variables.test", "workspace", "testworkspace"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDataSourceRepoDeployKeys_Read(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					data "bitbucket_repo_deploy_keys" "test" {
+						workspace = "testworkspace"
+						repo_slug = "test-repo"
+						key_id    = "123"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_repo_deploy_keys.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDataSourceRepoGroupPermissions_Read(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					data "bitbucket_repo_group_permissions" "test" {
+						workspace  = "testworkspace"
+						repo_slug  = "test-repo"
+						group_slug = "developers"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_repo_group_permissions.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccDataSourceRepoUserPermissions_Read(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {
+						base_url = %q
+					}
+
+					data "bitbucket_repo_user_permissions" "test" {
+						workspace        = "testworkspace"
+						repo_slug        = "test-repo"
+						selected_user_id = "{user-uuid}"
+					}
+				`, srv.URL),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_repo_user_permissions.test", "api_response"),
 				),
 			},
 		},
