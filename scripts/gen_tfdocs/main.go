@@ -431,7 +431,9 @@ resource "{{.TFName}}" "example" {
 - ` + "`" + `id` + "`" + ` (String) Resource identifier (extracted from API response).
 {{- end}}
 - ` + "`" + `api_response` + "`" + ` (String) The raw JSON response from the Bitbucket API.
-` = `---
+`
+
+const dataSourceDocTemplate = `---
 page_title: "{{.TFName}} Data Source - bitbucket"
 subcategory: ""
 description: |-
