@@ -1189,26 +1189,47 @@ func TestAccRealAPI_DataSourceWorkspaces(t *testing.T) {
 	})
 }
 
-// TestAccRealAPI_DataSourceUsers reads a user profile.
-// Requires BITBUCKET_TEST_USER (Bitbucket username or UUID, not email).
-func TestAccRealAPI_DataSourceUsers(t *testing.T) {
+// TestAccRealAPI_DataSourceCurrentUser reads the current authenticated user.
+func TestAccRealAPI_DataSourceCurrentUser(t *testing.T) {
 	skipIfNoRealAPI(t)
-	selectedUser := os.Getenv("BITBUCKET_TEST_USER")
-	if selectedUser == "" {
-		t.Skip("BITBUCKET_TEST_USER not set, skipping user test")
-	}
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
 		Steps: []resource.TestStep{
 			{
-				Config: fmt.Sprintf(`
+				Config: `
 					provider "bitbucket" {}
 
+					data "bitbucket_current_user" "me" {}
+				`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_current_user.me", "api_response"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_current_user.me", "id"),
+				),
+			},
+		},
+	})
+}
+
+// TestAccRealAPI_DataSourceUsers reads a user profile using the current user's UUID.
+// The Bitbucket API (post-GDPR) requires a UUID in the {uuid} format for selected_user.
+// We obtain it via the current-user data source and pass it through jsondecode.
+func TestAccRealAPI_DataSourceUsers(t *testing.T) {
+	skipIfNoRealAPI(t)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: `
+					provider "bitbucket" {}
+
+					data "bitbucket_current_user" "me" {}
+
 					data "bitbucket_users" "test" {
-						selected_user = %q
+						selected_user = jsondecode(data.bitbucket_current_user.me.api_response).uuid
 					}
-				`, selectedUser),
+				`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.bitbucket_users.test", "api_response"),
 					resource.TestCheckResourceAttrSet("data.bitbucket_users.test", "id"),
@@ -1324,6 +1345,177 @@ func TestAccRealAPI_ProviderAuth(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.bitbucket_workspaces.test", "api_response"),
 					resource.TestCheckResourceAttrSet("data.bitbucket_workspaces.test", "id"),
+				),
+			},
+		},
+	})
+}
+
+// TestAccRealAPI_DataSource_ReposList lists repositories in the test workspace.
+func TestAccRealAPI_DataSource_ReposList(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {}
+
+					data "bitbucket_repos" "list" {
+						workspace = %q
+					}
+				`, workspace),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_repos.list", "api_response"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_repos.list", "id"),
+				),
+			},
+		},
+	})
+}
+
+// TestAccRealAPI_DataSource_Commits lists commits for a repository.
+// Requires BITBUCKET_TEST_REPO to be set.
+func TestAccRealAPI_DataSource_Commits(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+	repoSlug := os.Getenv("BITBUCKET_TEST_REPO")
+	if repoSlug == "" {
+		t.Skip("BITBUCKET_TEST_REPO not set, skipping commits test")
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {}
+
+					data "bitbucket_commits" "test" {
+						workspace = %q
+						repo_slug = %q
+					}
+				`, workspace, repoSlug),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_commits.test", "api_response"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_commits.test", "id"),
+				),
+			},
+		},
+	})
+}
+
+// TestAccRealAPI_DataSource_Refs lists branches for a repository.
+// Requires BITBUCKET_TEST_REPO to be set.
+func TestAccRealAPI_DataSource_Refs(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+	repoSlug := os.Getenv("BITBUCKET_TEST_REPO")
+	if repoSlug == "" {
+		t.Skip("BITBUCKET_TEST_REPO not set, skipping refs test")
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {}
+
+					data "bitbucket_refs" "test" {
+						workspace = %q
+						repo_slug = %q
+					}
+				`, workspace, repoSlug),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_refs.test", "api_response"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_refs.test", "id"),
+				),
+			},
+		},
+	})
+}
+
+// TestAccRealAPI_DataSource_BranchingModel reads the branching model for a repository.
+// Requires BITBUCKET_TEST_REPO to be set.
+func TestAccRealAPI_DataSource_BranchingModel(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+	repoSlug := os.Getenv("BITBUCKET_TEST_REPO")
+	if repoSlug == "" {
+		t.Skip("BITBUCKET_TEST_REPO not set, skipping branching model test")
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {}
+
+					data "bitbucket_branching_model" "test" {
+						workspace = %q
+						repo_slug = %q
+					}
+				`, workspace, repoSlug),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_branching_model.test", "api_response"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_branching_model.test", "id"),
+				),
+			},
+		},
+	})
+}
+
+// TestAccRealAPI_DataSource_BranchRestrictions lists branch restrictions for a repository.
+// Requires BITBUCKET_TEST_REPO to be set.
+func TestAccRealAPI_DataSource_BranchRestrictions(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+	repoSlug := os.Getenv("BITBUCKET_TEST_REPO")
+	if repoSlug == "" {
+		t.Skip("BITBUCKET_TEST_REPO not set, skipping branch restrictions test")
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+					provider "bitbucket" {}
+
+					data "bitbucket_branch_restrictions" "test" {
+						workspace = %q
+						repo_slug = %q
+					}
+				`, workspace, repoSlug),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_branch_restrictions.test", "api_response"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_branch_restrictions.test", "id"),
+				),
+			},
+		},
+	})
+}
+
+// TestAccRealAPI_Resource_SshKeys_List lists SSH keys for the current user.
+// SSH keys for the current user are accessible via GET /users/{uuid}/ssh-keys.
+func TestAccRealAPI_Resource_SshKeys_List(t *testing.T) {
+	skipIfNoRealAPI(t)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			{
+				Config: `
+					provider "bitbucket" {}
+
+					data "bitbucket_current_user" "me" {}
+
+					data "bitbucket_ssh_keys" "test" {
+						selected_user = jsondecode(data.bitbucket_current_user.me.api_response).uuid
+					}
+				`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_ssh_keys.test", "api_response"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_ssh_keys.test", "id"),
 				),
 			},
 		},
