@@ -101,6 +101,34 @@ jobs:
           go run scripts/gen_mcptools/main.go schema/properties-schema.yaml internal/mcptools/properties.gen.go
           go run scripts/gen_mcptools/main.go schema/addon-schema.yaml internal/mcptools/addon.gen.go
 
+      - name: Regenerate Terraform resources
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          go run scripts/gen_terraform/main.go schema/pr-schema.yaml internal/tfprovider/pr.gen.go
+          go run scripts/gen_terraform/main.go schema/hooks-schema.yaml internal/tfprovider/hooks.gen.go
+          go run scripts/gen_terraform/main.go schema/search-schema.yaml internal/tfprovider/search.gen.go
+          go run scripts/gen_terraform/main.go schema/refs-schema.yaml internal/tfprovider/refs.gen.go
+          go run scripts/gen_terraform/main.go schema/commits-schema.yaml internal/tfprovider/commits.gen.go
+          go run scripts/gen_terraform/main.go schema/reports-schema.yaml internal/tfprovider/reports.gen.go
+          go run scripts/gen_terraform/main.go schema/repositories-schema.yaml internal/tfprovider/repositories.gen.go
+          go run scripts/gen_terraform/main.go schema/workspaces-schema.yaml internal/tfprovider/workspaces.gen.go
+          go run scripts/gen_terraform/main.go schema/projects-schema.yaml internal/tfprovider/projects.gen.go
+          go run scripts/gen_terraform/main.go schema/pipelines-schema.yaml internal/tfprovider/pipelines.gen.go
+          go run scripts/gen_terraform/main.go schema/issues-schema.yaml internal/tfprovider/issues.gen.go
+          go run scripts/gen_terraform/main.go schema/snippets-schema.yaml internal/tfprovider/snippets.gen.go
+          go run scripts/gen_terraform/main.go schema/deployments-schema.yaml internal/tfprovider/deployments.gen.go
+          go run scripts/gen_terraform/main.go schema/branch-restrictions-schema.yaml internal/tfprovider/branch-restrictions.gen.go
+          go run scripts/gen_terraform/main.go schema/branching-model-schema.yaml internal/tfprovider/branching-model.gen.go
+          go run scripts/gen_terraform/main.go schema/commit-statuses-schema.yaml internal/tfprovider/commit-statuses.gen.go
+          go run scripts/gen_terraform/main.go schema/downloads-schema.yaml internal/tfprovider/downloads.gen.go
+          go run scripts/gen_terraform/main.go schema/users-schema.yaml internal/tfprovider/users.gen.go
+          go run scripts/gen_terraform/main.go schema/properties-schema.yaml internal/tfprovider/properties.gen.go
+          go run scripts/gen_terraform/main.go schema/addon-schema.yaml internal/tfprovider/addon.gen.go
+
+      - name: Regenerate Terraform docs & tests
+        if: steps.diff.outputs.changed == 'true'
+        run: go run scripts/gen_tfdocs/main.go
+
       - name: Build & test
         if: steps.diff.outputs.changed == 'true'
         run: go build ./... && go test ./...
@@ -110,7 +138,7 @@ jobs:
         run: |
           git config user.name "bb-cli-bot"
           git config user.email "bot@github.com"
-          git add schema/ internal/generated/ internal/commands/ internal/mcptools/
+          git add schema/ internal/generated/ internal/commands/ internal/mcptools/ internal/tfprovider/ docs/ examples/ tests/
 
           # Determine next semver patch based on latest tag
           LATEST=$(git tag --list 'v*' --sort=-v:refname | head -n1)

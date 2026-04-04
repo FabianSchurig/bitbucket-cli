@@ -1,0 +1,39 @@
+# Auto-generated Terraform test configuration for bitbucket_project_deploy_keys
+# This file defines the resources/data sources referenced by the test assertions.
+
+terraform {
+  required_providers {
+    bitbucket = {
+      source = "FabianSchurig/bitbucket"
+    }
+  }
+}
+
+variable "workspace" {
+  type    = string
+  default = "test-workspace"
+}
+
+variable "key_id" {
+  type    = string
+  default = "123"
+}
+
+variable "project_key" {
+  type    = string
+  default = "PROJ"
+}
+
+provider "bitbucket" {}
+
+data "bitbucket_project_deploy_keys" "test" {
+  key_id = var.key_id
+  project_key = var.project_key
+  workspace = var.workspace
+}
+
+resource "bitbucket_project_deploy_keys" "test" {
+  key_id = var.key_id
+  project_key = var.project_key
+  workspace = var.workspace
+}

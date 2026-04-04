@@ -1,15 +1,16 @@
 # bitbucket-cli
 
-A low-maintenance CLI and MCP server for [Bitbucket Cloud](https://bitbucket.org/). Most code is **auto-generated** from the live Bitbucket OpenAPI spec — only a thin hand-written layer ties it together. A daily CI job fetches the latest spec, regenerates the code, and releases a new version if anything changed.
+A low-maintenance CLI, MCP server, and Terraform provider for [Bitbucket Cloud](https://bitbucket.org/). Most code is **auto-generated** from the live Bitbucket OpenAPI spec — only a thin hand-written layer ties it together. A daily CI job fetches the latest spec, regenerates the code, and releases a new version if anything changed.
 
 ## Why?
 
-Bitbucket Cloud has no official CLI. Managing pull requests through the web UI is slow when you just want to list, approve, merge, or decline from the terminal. This project fills that gap with two binaries:
+Bitbucket Cloud has no official CLI. Managing pull requests through the web UI is slow when you just want to list, approve, merge, or decline from the terminal. This project fills that gap with three binaries:
 
 - **`bb-cli`** — A command-line interface for all Bitbucket Cloud API endpoints.
 - **`bb-mcp`** — A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server that exposes all Bitbucket operations as MCP tools.
+- **`terraform-provider-bitbucket`** — A [Terraform](https://www.terraform.io/) provider that exposes all Bitbucket operations as resources and data sources.
 
-Both share the same auto-generated foundation:
+All three share the same auto-generated foundation:
 
 - **Stays up-to-date automatically** — new API endpoints appear without manual work.
 - **Requires near-zero maintenance** — the generic dispatch layer means no per-endpoint glue code.
@@ -26,16 +27,19 @@ flowchart LR
     D --> E["oapi-codegen\nmodels.gen.go"]
     D --> F["gen_commands\ncommands/*.gen.go"]
     D --> G["gen_mcptools\nmcptools/*.gen.go"]
+    D --> TF["gen_terraform\ntfprovider/*.gen.go"]
     E & F --> H["bb-cli binary"]
     E & G --> I["bb-mcp binary"]
+    E & TF --> P["terraform-provider-bitbucket"]
     H --> J["auth · dispatch · output\n(hand-written)"]
     I --> K["MCP handler · dispatch\n(hand-written)"]
-    J & K --> L["Shared spec parsing\nscripts/internal/spec"]
+    P --> M["TF provider · resource · datasource\n(hand-written)"]
+    J & K & M --> L["Shared spec parsing\nscripts/internal/spec"]
 ```
 
 The architecture uses a shared intermediate representation (`OperationDef`) that
-both CLI and MCP generators consume. This design supports future extensions
-(e.g., Terraform provider) with minimal additional maintenance.
+CLI, MCP, and Terraform generators all consume. Adding a new consumer requires
+only a new generator script and a thin hand-written handler.
 
 ## Example Usage
 
@@ -86,7 +90,7 @@ go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-mcp@latest
 
 # Set Bitbucket auth
 export BITBUCKET_USERNAME=myuser
-export BITBUCKET_APP_PASSWORD=ATBBxxxxxxxx
+export BITBUCKET_TOKEN=<your-api-token>
 
 # Run as stdio MCP server (default, for MCP clients like Claude Desktop)
 bb-mcp
@@ -106,7 +110,7 @@ Add to your `claude_desktop_config.json`:
       "command": "bb-mcp",
       "env": {
         "BITBUCKET_USERNAME": "myuser",
-        "BITBUCKET_APP_PASSWORD": "ATBBxxxxxxxx"
+        "BITBUCKET_TOKEN": "<your-api-token>"
       }
     }
   }
@@ -126,6 +130,102 @@ Each tool groups related operations with an `operation` parameter:
 | `bitbucket_workspaces` | 21 | Workspaces: members, permissions, projects |
 | ... | | 20 tool groups total, 352+ operations |
 
+## Terraform Provider
+
+The `terraform-provider-bitbucket` binary is a Terraform provider that exposes all Bitbucket Cloud API operations as resources and data sources. It uses the same auto-generated CRUD mapping from the OpenAPI schema.
+
+### Quick Start
+
+```bash
+# Install
+go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-tf@latest
+```
+
+### Configuration
+
+```hcl
+terraform {
+  required_providers {
+    bitbucket = {
+      source = "FabianSchurig/bitbucket"
+    }
+  }
+}
+
+provider "bitbucket" {
+  username = "myuser"
+  token    = "<your-api-token>"
+}
+```
+
+Or use environment variables:
+
+```bash
+export BITBUCKET_USERNAME=myuser
+export BITBUCKET_TOKEN=<your-api-token>
+```
+
+### Example Usage
+
+```hcl
+# Read a repository
+data "bitbucket_repos" "myrepo" {
+  workspace = "myteam"
+  repo_slug = "myrepo"
+}
+
+# Create a pull request
+resource "bitbucket_pr" "feature" {
+  workspace   = "myteam"
+  repo_slug   = "myrepo"
+  title       = "My feature PR"
+  source_branch_name      = "feature-branch"
+  destination_branch_name = "main"
+}
+```
+
+### Available Resources
+
+Each resource group maps Bitbucket API operations to Terraform CRUD:
+
+| Resource | Operations | Description |
+|----------|-----------|-------------|
+| `bitbucket_repos` | 30 | Repositories: create, read, update, delete |
+| `bitbucket_pr` | 37 | Pull requests: create, read, update, delete |
+| `bitbucket_pipelines` | 68 | Pipelines: runs, steps, variables |
+| `bitbucket_issues` | 33 | Issues: create, read, update, delete |
+| `bitbucket_projects` | 17 | Projects: create, read, update, delete |
+| ... | | 20 resource groups total, 352+ operations |
+
+### Migration from DrFaust92/bitbucket
+
+This provider is auto-generated from the complete Bitbucket OpenAPI spec, covering all API endpoints. The DrFaust92/bitbucket provider uses hand-crafted resources with typed attributes. Key differences:
+
+| Aspect | DrFaust92/bitbucket | FabianSchurig/bitbucket |
+|--------|-------------------|----------------------|
+| Coverage | ~20 resources | 20 resource groups, 352+ operations |
+| Maintenance | Manual updates | Auto-generated from live spec |
+| Attributes | Typed per-resource | Generic: params + `api_response` JSON |
+| State | Per-field state | JSON response + input params |
+
+To migrate, replace resource types and use the generic attribute pattern. For example:
+
+```hcl
+# DrFaust92/bitbucket
+resource "bitbucket_repository" "repo" {
+  owner      = "myteam"
+  name       = "myrepo"
+  is_private = true
+}
+
+# FabianSchurig/bitbucket
+resource "bitbucket_repos" "repo" {
+  workspace = "myteam"
+  repo_slug = "myrepo"
+  is_private = "true"
+}
+```
+
 ## Installation
 
 ### Go install (recommended)
@@ -136,6 +236,9 @@ go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-cli@latest
 
 # MCP server
 go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-mcp@latest
+
+# Terraform provider
+go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-tf@latest
 ```
 
 Make sure `$(go env GOPATH)/bin` is in your `PATH`:
@@ -171,7 +274,7 @@ docker pull ghcr.io/fabianschurig/bitbucket-cli:latest
 
 docker run --rm \
   -e BITBUCKET_USERNAME \
-  -e BITBUCKET_APP_PASSWORD \
+  -e BITBUCKET_TOKEN \
   ghcr.io/fabianschurig/bitbucket-cli pr list-pull-requests \
     --workspace myteam --repo-slug myrepo
 ```
