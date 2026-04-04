@@ -53,7 +53,11 @@ resource "bitbucket_reports" "example" {
 - `report_id` (String) Path parameter.
 
 ### Optional
-- `data` (String) An array of data fields to display information on the report. Maximum 10. (JSON array) (also computed from API response)
+- `data` (List of Object) An array of data fields to display information on the report. Maximum 10. (also computed from API response)
+  Nested schema:
+  - `type` (String) The type of data contained in the value field. If not provided, then the value will be detected as a boolean, number or string. [BOOLEAN, DATE, DURATION, LINK, NUMBER, PERCENTAGE, TEXT]
+  - `title` (String) A string describing what this data field represents.
+
 - `details` (String) A string to describe the purpose of the report. (also computed from API response)
 - `external_id` (String) ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique. (also computed from API response)
 - `link` (String) A URL linking to the results of the report in an external tool. (also computed from API response)

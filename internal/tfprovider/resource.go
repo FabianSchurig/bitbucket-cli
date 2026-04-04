@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -47,9 +48,11 @@ type ParamDef struct {
 
 // BodyFieldDef describes a flattened request body field.
 type BodyFieldDef struct {
-	Path string // dot-separated path (e.g., "source.branch.name")
-	Type string // "string", "integer", "boolean"
-	Desc string
+	Path       string         // dot-separated path (e.g., "source.branch.name")
+	Type       string         // "string", "integer", "boolean"
+	Desc       string
+	IsArray    bool           // true when the field is an array of objects
+	ItemFields []BodyFieldDef // nested fields for array item objects (only when IsArray)
 }
 
 // CRUDOps maps CRUD operations to their OperationDef. All fields are optional —
@@ -160,9 +163,19 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 			if desc == "" {
 				desc = bf.Path
 			}
-			attrs[key] = schema.StringAttribute{
-				Description: desc,
-				Optional:    true,
+			if bf.IsArray && len(bf.ItemFields) > 0 {
+				attrs[key] = schema.ListNestedAttribute{
+					Description: desc,
+					Optional:    true,
+					NestedObject: schema.NestedAttributeObject{
+						Attributes: buildNestedItemAttrs(bf.ItemFields),
+					},
+				}
+			} else {
+				attrs[key] = schema.StringAttribute{
+					Description: desc,
+					Optional:    true,
+				}
 			}
 		}
 	}
@@ -186,18 +199,43 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				desc = rf.Path
 			}
 			if existing, exists := attrs[key]; exists {
-				// If already defined as a body field (Optional), make it Optional+Computed.
+				// If already defined as a body field, make it Optional+Computed.
 				// Skip Required attributes -- they cannot also be Computed.
-				if sa, ok := existing.(schema.StringAttribute); ok && !sa.Computed && !sa.Required {
-					sa.Computed = true
-					sa.Description = desc
-					attrs[key] = sa
+				switch sa := existing.(type) {
+				case schema.StringAttribute:
+					if !sa.Computed && !sa.Required {
+						sa.Computed = true
+						sa.Description = desc
+						attrs[key] = sa
+					}
+				case schema.ListNestedAttribute:
+					if !sa.Computed && !sa.Required {
+						sa.Computed = true
+						sa.Description = desc
+						// Merge item fields from response if body had fewer fields.
+						if rf.IsArray && len(rf.ItemFields) > 0 {
+							sa.NestedObject = schema.NestedAttributeObject{
+								Attributes: buildNestedItemAttrs(rf.ItemFields),
+							}
+						}
+						attrs[key] = sa
+					}
 				}
 			} else if !paramSeen[key] {
-				// New response-only field: Computed.
-				attrs[key] = schema.StringAttribute{
-					Description: desc,
-					Computed:    true,
+				// New response-only field.
+				if rf.IsArray && len(rf.ItemFields) > 0 {
+					attrs[key] = schema.ListNestedAttribute{
+						Description: desc,
+						Computed:    true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: buildNestedItemAttrs(rf.ItemFields),
+						},
+					}
+				} else {
+					attrs[key] = schema.StringAttribute{
+						Description: desc,
+						Computed:    true,
+					}
 				}
 			}
 		}
@@ -217,6 +255,36 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 		Description: r.group.Description,
 		Attributes:  attrs,
 	}
+}
+
+// buildNestedItemAttrs creates schema attributes for array item fields.
+// All nested fields are Optional+Computed: users can provide identifiers,
+// and the API response populates the rest.
+func buildNestedItemAttrs(itemFields []BodyFieldDef) map[string]schema.Attribute {
+	nested := map[string]schema.Attribute{}
+	for _, f := range itemFields {
+		key := toSnakeCase(strings.ReplaceAll(f.Path, ".", "_"))
+		desc := f.Desc
+		if desc == "" {
+			desc = f.Path
+		}
+		nested[key] = schema.StringAttribute{
+			Description: desc,
+			Optional:    true,
+			Computed:    true,
+		}
+	}
+	return nested
+}
+
+// itemAttrTypes returns the attr.Type map for a list-nested attribute's items.
+func itemAttrTypes(itemFields []BodyFieldDef) map[string]attr.Type {
+	attrTypes := map[string]attr.Type{}
+	for _, f := range itemFields {
+		key := toSnakeCase(strings.ReplaceAll(f.Path, ".", "_"))
+		attrTypes[key] = types.StringType
+	}
+	return attrTypes
 }
 
 // Configure receives the provider-configured client.
@@ -413,13 +481,21 @@ func (r *GenericResource) buildBody(ctx context.Context, op *OperationDef, sourc
 		bodyObj := map[string]any{}
 		for _, bf := range op.BodyFields {
 			attrName := toSnakeCase(strings.ReplaceAll(bf.Path, ".", "_"))
-			var val types.String
-			d := source.GetAttribute(ctx, attrPath(attrName), &val)
-			diags.Append(d...)
-			if d.HasError() || val.IsNull() || val.IsUnknown() || val.ValueString() == "" {
-				continue
+			if bf.IsArray && len(bf.ItemFields) > 0 {
+				// Read list-nested attribute.
+				arr := readListNested(ctx, source, attrName, bf.ItemFields, diags)
+				if arr != nil {
+					handlers.SetNested(bodyObj, bf.Path, arr)
+				}
+			} else {
+				var val types.String
+				d := source.GetAttribute(ctx, attrPath(attrName), &val)
+				diags.Append(d...)
+				if d.HasError() || val.IsNull() || val.IsUnknown() || val.ValueString() == "" {
+					continue
+				}
+				handlers.SetNested(bodyObj, bf.Path, val.ValueString())
 			}
-			handlers.SetNested(bodyObj, bf.Path, val.ValueString())
 		}
 		if len(bodyObj) == 0 {
 			return ""
@@ -440,6 +516,43 @@ func (r *GenericResource) buildBody(ctx context.Context, op *OperationDef, sourc
 		return ""
 	}
 	return rawBody.ValueString()
+}
+
+// readListNested reads a ListNestedAttribute from state and returns it as a
+// []map[string]any suitable for JSON marshaling. Returns nil if the list is
+// null, unknown, or empty.
+func readListNested(ctx context.Context, source stateAccessor, attrName string, itemFields []BodyFieldDef, diags *diag.Diagnostics) []map[string]any {
+	var list types.List
+	d := source.GetAttribute(ctx, attrPath(attrName), &list)
+	diags.Append(d...)
+	if d.HasError() || list.IsNull() || list.IsUnknown() {
+		return nil
+	}
+	elements := list.Elements()
+	if len(elements) == 0 {
+		return nil
+	}
+	var result []map[string]any
+	for _, elem := range elements {
+		obj, ok := elem.(types.Object)
+		if !ok {
+			continue
+		}
+		item := map[string]any{}
+		objAttrs := obj.Attributes()
+		for _, f := range itemFields {
+			key := toSnakeCase(strings.ReplaceAll(f.Path, ".", "_"))
+			if v, exists := objAttrs[key]; exists {
+				if sv, ok := v.(types.String); ok && !sv.IsNull() && !sv.IsUnknown() && sv.ValueString() != "" {
+					item[f.Path] = sv.ValueString()
+				}
+			}
+		}
+		if len(item) > 0 {
+			result = append(result, item)
+		}
+	}
+	return result
 }
 
 // copyAttributes copies all param and body field values from source to target state.
@@ -471,6 +584,12 @@ func (r *GenericResource) copyAttributes(ctx context.Context, _ *OperationDef, s
 				continue
 			}
 			seen[attrName] = true
+			if bf.IsArray && len(bf.ItemFields) > 0 {
+				// For list-nested attributes, skip copying from source.
+				// The response-populated value from extractResponseFields
+				// should be preserved (it has all computed sub-fields).
+				continue
+			}
 			var val types.String
 			d := source.GetAttribute(ctx, attrPath(attrName), &val)
 			diags.Append(d...)
@@ -560,6 +679,14 @@ func (r *GenericResource) extractResponseFields(ctx context.Context, m map[strin
 		if !ok || val == nil {
 			continue
 		}
+		// For array fields with item schema, build a typed list.
+		if rf.IsArray && len(rf.ItemFields) > 0 {
+			if arr, ok := val.([]any); ok {
+				listVal := buildListFromResponse(arr, rf.ItemFields)
+				diags.Append(target.SetAttribute(ctx, attrPath(key), listVal)...)
+			}
+			continue
+		}
 		// For complex values (arrays, maps), serialize as JSON.
 		var strVal string
 		switch val.(type) {
@@ -574,6 +701,36 @@ func (r *GenericResource) extractResponseFields(ctx context.Context, m map[strin
 		}
 		diags.Append(target.SetAttribute(ctx, attrPath(key), types.StringValue(strVal))...)
 	}
+}
+
+// buildListFromResponse converts a JSON array from the API response into a
+// types.List value suitable for a ListNestedAttribute.
+func buildListFromResponse(arr []any, itemFields []BodyFieldDef) types.List {
+	attrTypes := itemAttrTypes(itemFields)
+	objType := types.ObjectType{AttrTypes: attrTypes}
+
+	if len(arr) == 0 {
+		return types.ListValueMust(objType, []attr.Value{})
+	}
+
+	elements := make([]attr.Value, 0, len(arr))
+	for _, item := range arr {
+		m, ok := item.(map[string]any)
+		if !ok {
+			continue
+		}
+		objAttrs := map[string]attr.Value{}
+		for _, f := range itemFields {
+			key := toSnakeCase(strings.ReplaceAll(f.Path, ".", "_"))
+			if v, exists := m[f.Path]; exists && v != nil {
+				objAttrs[key] = types.StringValue(fmt.Sprintf("%v", v))
+			} else {
+				objAttrs[key] = types.StringNull()
+			}
+		}
+		elements = append(elements, types.ObjectValueMust(attrTypes, objAttrs))
+	}
+	return types.ListValueMust(objType, elements)
 }
 
 // extractID tries to extract an identifier from an API response map.

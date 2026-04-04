@@ -686,10 +686,19 @@ Note that private projects cannot contain public repositories.`},
         whether they have approved the pull request. For performance reasons,
         the API only returns this list when an API requests a pull request by
         id.
-         (JSON array)`},
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
-				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL. (JSON array)"},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
 				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. (JSON array)`},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
@@ -1375,10 +1384,19 @@ Note that private projects cannot contain public repositories.`},
         whether they have approved the pull request. For performance reasons,
         the API only returns this list when an API requests a pull request by
         id.
-         (JSON array)`},
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
-				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL. (JSON array)"},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
 				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. (JSON array)`},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},

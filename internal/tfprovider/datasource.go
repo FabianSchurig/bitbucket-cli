@@ -104,9 +104,19 @@ func (d *GenericDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 		if desc == "" {
 			desc = rf.Path
 		}
-		attrs[key] = schema.StringAttribute{
-			Description: desc,
-			Computed:    true,
+		if rf.IsArray && len(rf.ItemFields) > 0 {
+			attrs[key] = schema.ListNestedAttribute{
+				Description: desc,
+				Computed:    true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: buildDSNestedItemAttrs(rf.ItemFields),
+				},
+			}
+		} else {
+			attrs[key] = schema.StringAttribute{
+				Description: desc,
+				Computed:    true,
+			}
 		}
 	}
 
@@ -207,7 +217,27 @@ func (d *GenericDataSource) Read(ctx context.Context, req datasource.ReadRequest
 				if !ok || val == nil {
 					continue
 				}
-				resp.Diagnostics.Append(resp.State.SetAttribute(ctx, attrPath(key), types.StringValue(fmt.Sprintf("%v", val)))...)
+				// For array fields with item schema, build a typed list.
+				if rf.IsArray && len(rf.ItemFields) > 0 {
+					if arr, ok := val.([]any); ok {
+						listVal := buildListFromResponse(arr, rf.ItemFields)
+						resp.Diagnostics.Append(resp.State.SetAttribute(ctx, attrPath(key), listVal)...)
+					}
+					continue
+				}
+				// For complex values (arrays, maps), serialize as JSON.
+				var strVal string
+				switch val.(type) {
+				case []any, map[string]any:
+					if b, err := json.Marshal(val); err == nil {
+						strVal = string(b)
+					} else {
+						strVal = fmt.Sprintf("%v", val)
+					}
+				default:
+					strVal = fmt.Sprintf("%v", val)
+				}
+				resp.Diagnostics.Append(resp.State.SetAttribute(ctx, attrPath(key), types.StringValue(strVal))...)
 			}
 		}
 		if !idSet {
@@ -234,6 +264,24 @@ func (d *GenericDataSource) readOp() *OperationDef {
 		return d.group.Ops.Read
 	}
 	return d.group.Ops.List
+}
+
+// buildDSNestedItemAttrs creates data source schema attributes for array item fields.
+// All nested fields are Computed in data sources.
+func buildDSNestedItemAttrs(itemFields []BodyFieldDef) map[string]schema.Attribute {
+	nested := map[string]schema.Attribute{}
+	for _, f := range itemFields {
+		key := toSnakeCase(strings.ReplaceAll(f.Path, ".", "_"))
+		desc := f.Desc
+		if desc == "" {
+			desc = f.Path
+		}
+		nested[key] = schema.StringAttribute{
+			Description: desc,
+			Computed:    true,
+		}
+	}
+	return nested
 }
 
 // buildListID creates a composite ID from operation ID and path parameters for list data sources.

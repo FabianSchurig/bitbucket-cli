@@ -50,8 +50,10 @@ type GroupData struct {
 
 // FieldDoc describes a Terraform attribute for documentation.
 type FieldDoc struct {
-	Name string // Terraform attribute name (snake_case)
-	Desc string // Human-readable description
+	Name       string     // Terraform attribute name (snake_case)
+	Desc       string     // Human-readable description
+	IsArray    bool       // true when the field is a list-nested attribute
+	ItemFields []FieldDoc // nested fields for array items
 }
 
 // CRUDOpInfo holds details about a single CRUD operation for documentation.
@@ -268,7 +270,7 @@ func deriveFields(name string, index map[string]tfprovider.ResourceGroup) (bodyF
 	}
 
 	// Collect body fields from all CRUD ops.
-	bodyFieldMap := make(map[string]string) // key → description
+	bodyFieldMap := make(map[string]bodyFieldInfo) // key → field info
 	crudOps := []*tfprovider.OperationDef{rg.Ops.Create, rg.Ops.Read, rg.Ops.Update, rg.Ops.Delete, rg.Ops.List}
 	for _, op := range crudOps {
 		if op == nil {
@@ -284,13 +286,13 @@ func deriveFields(name string, index map[string]tfprovider.ResourceGroup) (bodyF
 				if desc == "" {
 					desc = bf.Path
 				}
-				bodyFieldMap[key] = desc
+				bodyFieldMap[key] = bodyFieldInfo{desc: desc, isArray: bf.IsArray, itemFields: bf.ItemFields}
 			}
 		}
 	}
 
 	// Collect response fields from Read (or Create) operation.
-	responseFieldMap := make(map[string]string)
+	responseFieldMap := make(map[string]bodyFieldInfo)
 	responseOp := rg.Ops.Read
 	if responseOp == nil {
 		responseOp = rg.Ops.Create
@@ -305,23 +307,23 @@ func deriveFields(name string, index map[string]tfprovider.ResourceGroup) (bodyF
 			if desc == "" {
 				desc = rf.Path
 			}
-			responseFieldMap[key] = desc
+			responseFieldMap[key] = bodyFieldInfo{desc: desc, isArray: rf.IsArray, itemFields: rf.ItemFields}
 		}
 	}
 
 	// Categorize into body-only, response-only, and overlap.
 	overlapSet := make(map[string]bool)
-	for key, desc := range bodyFieldMap {
+	for key, info := range bodyFieldMap {
 		if _, isResp := responseFieldMap[key]; isResp {
-			overlapFields = append(overlapFields, FieldDoc{Name: key, Desc: truncateDesc(desc)})
+			overlapFields = append(overlapFields, makeFieldDoc(key, info))
 			overlapSet[key] = true
 		} else {
-			bodyFields = append(bodyFields, FieldDoc{Name: key, Desc: truncateDesc(desc)})
+			bodyFields = append(bodyFields, makeFieldDoc(key, info))
 		}
 	}
-	for key, desc := range responseFieldMap {
+	for key, info := range responseFieldMap {
 		if !overlapSet[key] {
-			responseFields = append(responseFields, FieldDoc{Name: key, Desc: truncateDesc(desc)})
+			responseFields = append(responseFields, makeFieldDoc(key, info))
 		}
 	}
 
@@ -337,6 +339,27 @@ func snakeCaseField(path string) string {
 	s := strings.ReplaceAll(path, ".", "_")
 	s = strings.ReplaceAll(s, "-", "_")
 	return strings.ToLower(s)
+}
+
+// bodyFieldInfo carries metadata needed to build FieldDoc from a BodyFieldDef.
+type bodyFieldInfo struct {
+	desc       string
+	isArray    bool
+	itemFields []tfprovider.BodyFieldDef
+}
+
+// makeFieldDoc converts a bodyFieldInfo into a FieldDoc, including nested fields.
+func makeFieldDoc(key string, info bodyFieldInfo) FieldDoc {
+	fd := FieldDoc{Name: key, Desc: truncateDesc(info.desc), IsArray: info.isArray}
+	for _, item := range info.itemFields {
+		ikey := snakeCaseField(item.Path)
+		idesc := item.Desc
+		if idesc == "" {
+			idesc = item.Path
+		}
+		fd.ItemFields = append(fd.ItemFields, FieldDoc{Name: ikey, Desc: truncateDesc(idesc)})
+	}
+	return fd
 }
 
 // truncateDesc returns a single-line description for documentation.
@@ -411,6 +434,23 @@ var funcMap = template.FuncMap{
 			quoted[i] = "`" + s + "`"
 		}
 		return strings.Join(quoted, ", ")
+	},
+	"fieldType": func(f FieldDoc) string {
+		if f.IsArray {
+			return "List of Object"
+		}
+		return "String"
+	},
+	"renderNestedFields": func(fields []FieldDoc) string {
+		if len(fields) == 0 {
+			return ""
+		}
+		var sb strings.Builder
+		sb.WriteString("\n  Nested schema:\n")
+		for _, f := range fields {
+			sb.WriteString("  - `" + f.Name + "` (String) " + f.Desc + "\n")
+		}
+		return sb.String()
 	},
 }
 
@@ -585,10 +625,10 @@ resource "{{.TFName}}" "example" {
 - ` + "`" + `{{.}}` + "`" + ` (String) Path parameter (auto-populated from API response).
 {{- end}}
 {{- range .OverlapFields}}
-- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}} (also computed from API response)
+- ` + "`" + `{{.Name}}` + "`" + ` ({{fieldType .}}) {{.Desc}} (also computed from API response){{renderNestedFields .ItemFields}}
 {{- end}}
 {{- range .BodyFields}}
-- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}}
+- ` + "`" + `{{.Name}}` + "`" + ` ({{fieldType .}}) {{.Desc}}{{renderNestedFields .ItemFields}}
 {{- end}}
 {{- if .HasBody}}
 - ` + "`" + `request_body` + "`" + ` (String) Raw JSON request body for create/update operations. Use ` + "`" + `jsonencode({...})` + "`" + ` to pass fields not exposed as individual attributes.
@@ -601,7 +641,7 @@ resource "{{.TFName}}" "example" {
 {{- end}}
 - ` + "`" + `api_response` + "`" + ` (String) The raw JSON response from the Bitbucket API.
 {{- range .ResponseFields}}
-- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}}
+- ` + "`" + `{{.Name}}` + "`" + ` ({{fieldType .}}) {{.Desc}}{{renderNestedFields .ItemFields}}
 {{- end}}
 `
 
@@ -671,10 +711,10 @@ output "{{snakeCase .Name}}_response" {
 - ` + "`" + `id` + "`" + ` (String) Resource identifier.
 - ` + "`" + `api_response` + "`" + ` (String) The raw JSON response from the Bitbucket API.
 {{- range .ResponseFields}}
-- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}}
+- ` + "`" + `{{.Name}}` + "`" + ` ({{fieldType .}}) {{.Desc}}{{renderNestedFields .ItemFields}}
 {{- end}}
 {{- range .OverlapFields}}
-- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}}
+- ` + "`" + `{{.Name}}` + "`" + ` ({{fieldType .}}) {{.Desc}}{{renderNestedFields .ItemFields}}
 {{- end}}
 `
 

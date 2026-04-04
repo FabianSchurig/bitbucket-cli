@@ -59,9 +59,11 @@ type TFParamData struct {
 }
 
 type TFBodyFieldData struct {
-	Path string
-	Type string
-	Desc string
+	Path       string
+	Type       string
+	Desc       string
+	IsArray    bool
+	ItemFields []TFBodyFieldData
 }
 
 // ─── Template ─────────────────────────────────────────────────────────────────
@@ -97,12 +99,12 @@ var {{.VarName}} = ResourceGroup{
 			},
 			BodyFields: []BodyFieldDef{
 {{- range .BodyFields}}
-				{Path: {{goStringLit .Path}}, Type: {{goStringLit .Type}}, Desc: {{goStringLit .Desc}}},
+				{{bodyFieldLit .}},
 {{- end}}
 			},
 			ResponseFields: []BodyFieldDef{
 {{- range .ResponseFields}}
-				{Path: {{goStringLit .Path}}, Type: {{goStringLit .Type}}, Desc: {{goStringLit .Desc}}},
+				{{bodyFieldLit .}},
 {{- end}}
 			},
 			HasBody:   {{.HasBody}},
@@ -135,12 +137,12 @@ var {{.VarName}} = ResourceGroup{
 			},
 			BodyFields: []BodyFieldDef{
 {{- range .BodyFields}}
-				{Path: {{goStringLit .Path}}, Type: {{goStringLit .Type}}, Desc: {{goStringLit .Desc}}},
+				{{bodyFieldLit .}},
 {{- end}}
 			},
 			ResponseFields: []BodyFieldDef{
 {{- range .ResponseFields}}
-				{Path: {{goStringLit .Path}}, Type: {{goStringLit .Type}}, Desc: {{goStringLit .Desc}}},
+				{{bodyFieldLit .}},
 {{- end}}
 			},
 			HasBody:   {{.HasBody}},
@@ -164,7 +166,33 @@ var {{.VarName}} = ResourceGroup{
 // ─── Template functions ───────────────────────────────────────────────────────
 
 var templateFuncMap = template.FuncMap{
-	"goStringLit": spec.GoStringLit,
+	"goStringLit":  spec.GoStringLit,
+	"bodyFieldLit": bodyFieldLit,
+}
+
+// bodyFieldLit renders a BodyFieldDef Go literal, including nested ItemFields.
+func bodyFieldLit(bf TFBodyFieldData) string {
+	return renderBodyFieldDef(bf, "\t\t\t\t")
+}
+
+func renderBodyFieldDef(bf TFBodyFieldData, indent string) string {
+	var sb strings.Builder
+	sb.WriteString("{")
+	sb.WriteString(fmt.Sprintf("Path: %s, Type: %s, Desc: %s", spec.GoStringLit(bf.Path), spec.GoStringLit(bf.Type), spec.GoStringLit(bf.Desc)))
+	if bf.IsArray {
+		sb.WriteString(", IsArray: true")
+		if len(bf.ItemFields) > 0 {
+			sb.WriteString(", ItemFields: []BodyFieldDef{")
+			for _, item := range bf.ItemFields {
+				sb.WriteString("\n" + indent + "\t")
+				sb.WriteString(renderBodyFieldDef(item, indent+"\t"))
+				sb.WriteString(",")
+			}
+			sb.WriteString("\n" + indent + "}")
+		}
+	}
+	sb.WriteString("}")
+	return sb.String()
 }
 
 // ─── Conversion ───────────────────────────────────────────────────────────────
@@ -182,20 +210,12 @@ func operationToTFOp(op spec.OperationDef) TFOpData {
 
 	bodyFields := make([]TFBodyFieldData, 0, len(op.BodyFields))
 	for _, bf := range op.BodyFields {
-		bodyFields = append(bodyFields, TFBodyFieldData{
-			Path: bf.Path,
-			Type: bf.GoType,
-			Desc: bf.Desc,
-		})
+		bodyFields = append(bodyFields, specFieldToTFField(bf))
 	}
 
 	responseFields := make([]TFBodyFieldData, 0, len(op.ResponseFields))
 	for _, rf := range op.ResponseFields {
-		responseFields = append(responseFields, TFBodyFieldData{
-			Path: rf.Path,
-			Type: rf.GoType,
-			Desc: rf.Desc,
-		})
+		responseFields = append(responseFields, specFieldToTFField(rf))
 	}
 
 	return TFOpData{
@@ -226,6 +246,21 @@ func buildDescription(cmdShort string, operations []TFOpData) string {
 		fmt.Fprintf(&sb, "- %s: %s [%s]\n", op.OperationID, desc, op.Method)
 	}
 	return sb.String()
+}
+
+// specFieldToTFField converts a spec.BodyField to a TFBodyFieldData,
+// including nested array item fields.
+func specFieldToTFField(bf spec.BodyField) TFBodyFieldData {
+	tf := TFBodyFieldData{
+		Path:    bf.Path,
+		Type:    bf.GoType,
+		Desc:    bf.Desc,
+		IsArray: bf.IsArray,
+	}
+	for _, item := range bf.ItemFields {
+		tf.ItemFields = append(tf.ItemFields, specFieldToTFField(item))
+	}
+	return tf
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────

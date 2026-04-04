@@ -50,9 +50,19 @@ resource "bitbucket_pipelines" "example" {
 - `build_number` (String) The build number of the pipeline. (also computed from API response)
 - `build_seconds_used` (String) The number of build seconds used by this pipeline. (also computed from API response)
 - `completed_on` (String) The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress. (also computed from API response)
-- `configuration_sources` (String) An ordered list of sources of the pipeline configuration (JSON array) (also computed from API response)
+- `configuration_sources` (List of Object) An ordered list of sources of the pipeline configuration (also computed from API response)
+  Nested schema:
+  - `uri` (String) Link to the configuration source view or its immediate content
+  - `source` (String) Identifier of the configuration source
+
 - `uuid` (String) The UUID identifying the pipeline. (also computed from API response)
-- `variables` (String) The variables for the pipeline. (JSON array) (also computed from API response)
+- `variables` (List of Object) The variables for the pipeline. (also computed from API response)
+  Nested schema:
+  - `uuid` (String) The UUID identifying the variable.
+  - `key` (String) The unique name of the variable.
+  - `value` (String) The value of the variable. If the variable is secured, this will be empty.
+  - `secured` (String) If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.
+
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

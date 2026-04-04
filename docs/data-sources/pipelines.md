@@ -52,6 +52,16 @@ output "pipelines_response" {
 - `build_number` (String) The build number of the pipeline.
 - `build_seconds_used` (String) The number of build seconds used by this pipeline.
 - `completed_on` (String) The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.
-- `configuration_sources` (String) An ordered list of sources of the pipeline configuration (JSON array)
+- `configuration_sources` (List of Object) An ordered list of sources of the pipeline configuration
+  Nested schema:
+  - `uri` (String) Link to the configuration source view or its immediate content
+  - `source` (String) Identifier of the configuration source
+
 - `uuid` (String) The UUID identifying the pipeline.
-- `variables` (String) The variables for the pipeline. (JSON array)
+- `variables` (List of Object) The variables for the pipeline.
+  Nested schema:
+  - `uuid` (String) The UUID identifying the variable.
+  - `key` (String) The unique name of the variable.
+  - `value` (String) The value of the variable. If the variable is secured, this will be empty.
+  - `secured` (String) If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.
+

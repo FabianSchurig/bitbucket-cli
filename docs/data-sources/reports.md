@@ -52,7 +52,11 @@ output "reports_response" {
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) The timestamp when the report was created.
 - `updated_on` (String) The timestamp when the report was updated.
-- `data` (String) An array of data fields to display information on the report. Maximum 10. (JSON array)
+- `data` (List of Object) An array of data fields to display information on the report. Maximum 10.
+  Nested schema:
+  - `type` (String) The type of data contained in the value field. If not provided, then the value will be detected as a boolean, number or string. [BOOLEAN, DATE, DURATION, LINK, NUMBER, PERCENTAGE, TEXT]
+  - `title` (String) A string describing what this data field represents.
+
 - `details` (String) A string to describe the purpose of the report.
 - `external_id` (String) ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique.
 - `link` (String) A URL linking to the results of the report in an external tool.
