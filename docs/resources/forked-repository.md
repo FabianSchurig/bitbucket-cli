@@ -31,7 +31,7 @@ resource "bitbucket_forked_repository" "example" {
 ### Optional
 - `description` (String) description (also computed from API response)
 - `fork_policy` (String)  (also computed from API response)
-- `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is ... (also computed from API response)
+- `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs. (also computed from API response)
 - `has_issues` (String)  (also computed from API response)
 - `has_wiki` (String)  (also computed from API response)
 - `is_private` (String) is_private (also computed from API response)
@@ -48,7 +48,7 @@ resource "bitbucket_forked_repository" "example" {
 - `project_uuid` (String) The project's immutable id. (also computed from API response)
 - `scm` (String) [git] (also computed from API response)
 - `size` (String) size (also computed from API response)
-- `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees y... (also computed from API response)
+- `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user. (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

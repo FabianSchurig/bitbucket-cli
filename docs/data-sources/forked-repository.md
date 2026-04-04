@@ -38,7 +38,7 @@ output "forked_repository_response" {
 - `updated_on` (String) updated_on
 - `description` (String) description
 - `fork_policy` (String) 
-- `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is ...
+- `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
 - `has_issues` (String) 
 - `has_wiki` (String) 
 - `is_private` (String) is_private
@@ -55,4 +55,4 @@ output "forked_repository_response" {
 - `project_uuid` (String) The project's immutable id.
 - `scm` (String) [git]
 - `size` (String) size
-- `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees y...
+- `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.

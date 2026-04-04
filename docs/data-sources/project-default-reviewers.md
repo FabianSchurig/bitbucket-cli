@@ -40,5 +40,5 @@ output "project_default_reviewers_response" {
 - `display_name` (String) display_name
 - `has_2fa_enabled` (String) has_2fa_enabled
 - `is_staff` (String) is_staff
-- `nickname` (String) Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be use...
+- `nickname` (String) Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.
 - `uuid` (String) uuid

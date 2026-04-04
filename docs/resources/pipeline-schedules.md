@@ -34,7 +34,7 @@ resource "bitbucket_pipeline_schedules" "example" {
 - `schedule_uuid` (String) Path parameter.
 
 ### Optional
-- `cron_pattern` (String) The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 *... (also computed from API response)
+- `cron_pattern` (String) The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day. (also computed from API response)
 - `enabled` (String) Whether the schedule is enabled. (also computed from API response)
 - `target_ref_name` (String) The name of the reference. (also computed from API response)
 - `target_ref_type` (String) The type of reference (branch only). [branch] (also computed from API response)

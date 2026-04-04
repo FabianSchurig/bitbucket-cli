@@ -37,5 +37,5 @@ output "tags_response" {
 - `date` (String) The date that the tag was created, if available
 - `message` (String) The message associated with the tag, if available.
 - `name` (String) The name of the ref.
-- `tagger_raw` (String) The raw author value from the repository. This may be the only value available if the author does not match a user in...
+- `tagger_raw` (String) The raw author value from the repository. This may be the only value available if the author does not match a user in Bitbucket.
 - `type` (String) type

@@ -38,11 +38,11 @@ resource "bitbucket_issue_comments" "example" {
 ### Optional
 - `content_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext] (also computed from API response)
 - `content_raw` (String) The text as it was typed by a user. (also computed from API response)
-- `inline_from` (String) The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending ... (also computed from API response)
+- `inline_from` (String) The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file. (also computed from API response)
 - `inline_path` (String) The path of the file this comment is anchored to. (also computed from API response)
 - `inline_start_from` (String) The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise. (also computed from API response)
 - `inline_start_to` (String) The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise. (also computed from API response)
-- `inline_to` (String) The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending ... (also computed from API response)
+- `inline_to` (String) The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file. (also computed from API response)
 - `issue_component_name` (String) issue.component.name (also computed from API response)
 - `issue_content_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext] (also computed from API response)
 - `issue_content_raw` (String) The text as it was typed by a user. (also computed from API response)

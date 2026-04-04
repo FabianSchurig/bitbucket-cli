@@ -40,7 +40,7 @@ resource "bitbucket_commit_statuses" "example" {
 - `name` (String) An identifier for the build itself, e.g. BB-DEPLOY-1 (also computed from API response)
 - `refname` (String)  (also computed from API response)
 - `state` (String) Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL] (also computed from API response)
-- `url` (String) A URL linking back to the vendor or build system, for providing more information about whatever process produced this... (also computed from API response)
+- `url` (String) A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time. (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

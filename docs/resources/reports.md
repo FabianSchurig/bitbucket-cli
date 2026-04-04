@@ -36,7 +36,7 @@ resource "bitbucket_reports" "example" {
 
 ### Optional
 - `details` (String) A string to describe the purpose of the report. (also computed from API response)
-- `external_id` (String) ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's gene... (also computed from API response)
+- `external_id` (String) ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique. (also computed from API response)
 - `link` (String) A URL linking to the results of the report in an external tool. (also computed from API response)
 - `logo_url` (String) A URL to the report logo. If none is provided, the default insights logo will be used. (also computed from API response)
 - `remote_link_enabled` (String) If enabled, a remote link is created in Jira for the work item associated with the commit the report belongs to. (also computed from API response)

@@ -288,16 +288,13 @@ func snakeCaseField(path string) string {
 	return strings.ToLower(s)
 }
 
-// truncateDesc returns a single-line truncated description for documentation.
+// truncateDesc returns a single-line description for documentation.
 func truncateDesc(desc string) string {
 	// Take first line only.
 	if idx := strings.IndexByte(desc, '\n'); idx >= 0 {
 		desc = desc[:idx]
 	}
 	desc = strings.TrimSpace(desc)
-	if len(desc) > 120 {
-		desc = desc[:117] + "..."
-	}
 	return desc
 }
 

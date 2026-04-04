@@ -39,7 +39,7 @@ output "reports_response" {
 - `created_on` (String) The timestamp when the report was created.
 - `updated_on` (String) The timestamp when the report was updated.
 - `details` (String) A string to describe the purpose of the report.
-- `external_id` (String) ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's gene...
+- `external_id` (String) ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique.
 - `link` (String) A URL linking to the results of the report in an external tool.
 - `logo_url` (String) A URL to the report logo. If none is provided, the default insights logo will be used.
 - `remote_link_enabled` (String) If enabled, a remote link is created in Jira for the work item associated with the commit the report belongs to.
