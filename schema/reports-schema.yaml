@@ -629,10 +629,23 @@ paths:
       - api-token
 components:
   schemas:
-    paginated_annotations:
+    object:
       type: object
-      title: Paginated Annotations
-      description: A paginated list of annotations.
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+      required:
+      - type
+      additionalProperties: true
+      discriminator:
+        propertyName: type
+    paginated_reports:
+      type: object
+      title: Paginated Reports
+      description: A paginated list of reports.
       properties:
         page:
           type: integer
@@ -642,7 +655,7 @@ components:
           type: array
           minItems: 0
           items:
-            $ref: '#/components/schemas/report_annotation'
+            $ref: '#/components/schemas/report'
           description: The values of the current page.
         size:
           type: integer
@@ -669,6 +682,33 @@ components:
             and never provide previous links. Clients must anticipate that backwards
             navigation is not always available. Use this link to navigate the result
             set and refrain from constructing your own URLs.
+    error:
+      type: object
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
     report:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -744,60 +784,10 @@ components:
       - uuid
       - commitHash
       x-bb-url: /rest/2.0/accounts/{target_user.uuid}/repositories/{repository.uuid}/commits/{commitHash}/reports/{uuid}
-    report_data:
+    paginated_annotations:
       type: object
-      title: Report Data
-      description: A key-value element that will be displayed along with the report.
-      properties:
-        type:
-          enum:
-          - BOOLEAN
-          - DATE
-          - DURATION
-          - LINK
-          - NUMBER
-          - PERCENTAGE
-          - TEXT
-          type: string
-          description: The type of data contained in the value field. If not provided,
-            then the value will be detected as a boolean, number or string.
-        title:
-          type: string
-          description: A string describing what this data field represents.
-        value:
-          type: object
-          description: The value of the data element.
-    error:
-      type: object
-      title: Error
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-            detail:
-              type: string
-            data:
-              type: object
-              description: Optional structured data that is endpoint-specific.
-              properties: {}
-              additionalProperties: true
-          required:
-          - message
-          additionalProperties: false
-      required:
-      - type
-      additionalProperties: true
-    paginated_reports:
-      type: object
-      title: Paginated Reports
-      description: A paginated list of reports.
+      title: Paginated Annotations
+      description: A paginated list of annotations.
       properties:
         page:
           type: integer
@@ -807,7 +797,7 @@ components:
           type: array
           minItems: 0
           items:
-            $ref: '#/components/schemas/report'
+            $ref: '#/components/schemas/report_annotation'
           description: The values of the current page.
         size:
           type: integer
@@ -834,6 +824,29 @@ components:
             and never provide previous links. Clients must anticipate that backwards
             navigation is not always available. Use this link to navigate the result
             set and refrain from constructing your own URLs.
+    report_data:
+      type: object
+      title: Report Data
+      description: A key-value element that will be displayed along with the report.
+      properties:
+        type:
+          enum:
+          - BOOLEAN
+          - DATE
+          - DURATION
+          - LINK
+          - NUMBER
+          - PERCENTAGE
+          - TEXT
+          type: string
+          description: The type of data contained in the value field. If not provided,
+            then the value will be detected as a boolean, number or string.
+        title:
+          type: string
+          description: A string describing what this data field represents.
+        value:
+          type: object
+          description: The value of the data element.
     report_annotation:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -911,16 +924,3 @@ components:
       x-bb-default-fields:
       - uuid
       x-bb-url: /rest/2.0/accounts/{target_user.uuid}/repositories/{repository.uuid}/commits/{commit.hash}/reports/{reportUuid}/annotations/{uuid}
-    object:
-      type: object
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-      required:
-      - type
-      additionalProperties: true
-      discriminator:
-        propertyName: type
