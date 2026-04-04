@@ -965,604 +965,6 @@ paths:
         type: string
 components:
   schemas:
-    object:
-      type: object
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-      required:
-      - type
-      additionalProperties: true
-      discriminator:
-        propertyName: type
-    paginated_deploy_keys:
-      type: object
-      title: Paginated Deploy Keys
-      description: A paginated list of deploy keys.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/deploy_key'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    error:
-      type: object
-      title: Error
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-            detail:
-              type: string
-            data:
-              type: object
-              description: Optional structured data that is endpoint-specific.
-              properties: {}
-              additionalProperties: true
-          required:
-          - message
-          additionalProperties: false
-      required:
-      - type
-      additionalProperties: true
-    branch:
-      allOf:
-      - $ref: '#/components/schemas/ref'
-      - type: object
-        title: Branch
-        description: A branch object, representing a branch in a repository.
-        properties:
-          merge_strategies:
-            type: array
-            description: Available merge strategies for pull requests targeting this
-              branch.
-            items:
-              type: string
-              enum:
-              - merge_commit
-              - squash
-              - fast_forward
-              - squash_fast_forward
-              - rebase_fast_forward
-              - rebase_merge
-          default_merge_strategy:
-            type: string
-            description: The default merge strategy for pull requests targeting this
-              branch.
-        additionalProperties: true
-    account:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Account
-        description: An account object.
-        properties:
-          links:
-            $ref: '#/components/schemas/account_links'
-          created_on:
-            type: string
-            format: date-time
-          display_name:
-            type: string
-          uuid:
-            type: string
-        additionalProperties: true
-    paginated_deployments:
-      type: object
-      title: Paginated Deployments
-      description: A paged list of deployments
-      properties:
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-        values:
-          type: array
-          minItems: 0
-          items:
-            $ref: '#/components/schemas/deployment'
-          description: The values of the current page.
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-        next:
-          type: string
-          format: uri
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-        previous:
-          type: string
-          format: uri
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-    account_links:
-      type: object
-      title: Account Links
-      description: Links related to an Account.
-      properties:
-        avatar:
-          $ref: '#/components/schemas/link'
-      additionalProperties: true
-    team:
-      allOf:
-      - $ref: '#/components/schemas/account'
-      - type: object
-        title: Team
-        description: A team object.
-        properties:
-          links:
-            $ref: '#/components/schemas/team_links'
-        additionalProperties: true
-    link:
-      type: object
-      title: Link
-      description: A link to a resource related to this object.
-      properties:
-        href:
-          type: string
-          format: uri
-        name:
-          type: string
-      additionalProperties: false
-    project:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Project
-        description: "A Bitbucket project.\n            Projects are used by teams\
-          \ to organize repositories."
-        properties:
-          links:
-            type: object
-            properties:
-              html:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              avatar:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-            additionalProperties: false
-          uuid:
-            type: string
-            description: The project's immutable id.
-          key:
-            type: string
-            description: The project's key.
-          owner:
-            $ref: '#/components/schemas/team'
-          name:
-            type: string
-            description: The name of the project.
-          description:
-            type: string
-          is_private:
-            type: boolean
-            description: '
-
-              Indicates whether the project is publicly accessible, or whether it
-              is
-
-              private to the team and consequently only visible to team members.
-
-              Note that private projects cannot contain public repositories.'
-          created_on:
-            type: string
-            format: date-time
-          updated_on:
-            type: string
-            format: date-time
-          has_publicly_visible_repos:
-            type: boolean
-            description: '
-
-              Indicates whether the project contains publicly visible repositories.
-
-              Note that private projects cannot contain public repositories.'
-        additionalProperties: true
-    deployment_state:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - additionalProperties: true
-        type: object
-        title: Deployment State
-        description: The representation of the progress state of a deployment.
-        properties: {}
-    author:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Author
-        description: The author of a change in a repository
-        properties:
-          raw:
-            type: string
-            description: The raw author value from the repository. This may be the
-              only value available if the author does not match a user in Bitbucket.
-          user:
-            $ref: '#/components/schemas/account'
-        additionalProperties: true
-    deploy_key:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Deploy Key
-        description: Represents deploy key for a repository.
-        properties:
-          key:
-            type: string
-            description: The deploy key value.
-          repository:
-            $ref: '#/components/schemas/repository'
-          comment:
-            type: string
-            description: The comment parsed from the deploy key (if present)
-          label:
-            type: string
-            description: The user-defined label for the deploy key
-          added_on:
-            type: string
-            format: date-time
-          last_used:
-            type: string
-            format: date-time
-          links:
-            type: object
-            properties:
-              self:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-            additionalProperties: false
-          owner:
-            $ref: '#/components/schemas/account'
-        additionalProperties: true
-    ref:
-      type: object
-      title: Ref
-      description: A ref object, representing a branch or tag in a repository.
-      properties:
-        type:
-          type: string
-        links:
-          type: object
-          properties:
-            self:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-            commits:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-            html:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-          additionalProperties: false
-        name:
-          type: string
-          description: The name of the ref.
-        target:
-          $ref: '#/components/schemas/commit'
-      required:
-      - type
-      additionalProperties: true
-    commit:
-      allOf:
-      - $ref: '#/components/schemas/base_commit'
-      - type: object
-        title: Commit
-        description: A repository commit object.
-        properties:
-          repository:
-            $ref: '#/components/schemas/repository'
-          participants:
-            type: array
-            items:
-              $ref: '#/components/schemas/participant'
-            minItems: 0
-        additionalProperties: true
-    deployment_environment:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - additionalProperties: true
-        type: object
-        title: Deployment Environment
-        description: A Bitbucket Deployment Environment.
-        properties:
-          uuid:
-            type: string
-            description: The UUID identifying the environment.
-          name:
-            type: string
-            description: The name of the environment.
-      x-bb-default-fields:
-      - uuid
-      x-bb-url: /rest/2.0/accounts/{target_user.uuid}/repositories/{repository.uuid}/environments/{uuid}
-      x-bb-batch-url: /rest/2.0/accounts/{target_user.uuid}/repositories/{repository.uuid}/environments_batch
-      x-bb-batch-max-size: 100
-    base_commit:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Base Commit
-        description: The common base type for both repository and snippet commits.
-        properties:
-          hash:
-            type: string
-            pattern: '[0-9a-f]{7,}?'
-          date:
-            type: string
-            format: date-time
-          author:
-            $ref: '#/components/schemas/author'
-          committer:
-            $ref: '#/components/schemas/committer'
-          message:
-            type: string
-          summary:
-            type: object
-            properties:
-              raw:
-                type: string
-                description: The text as it was typed by a user.
-              markup:
-                type: string
-                description: The type of markup language the raw content is to be
-                  interpreted in.
-                enum:
-                - markdown
-                - creole
-                - plaintext
-              html:
-                type: string
-                description: The user's content rendered as HTML.
-            additionalProperties: false
-          parents:
-            type: array
-            items:
-              $ref: '#/components/schemas/base_commit'
-            minItems: 0
-        additionalProperties: true
-    paginated_environments:
-      type: object
-      title: Paginated Deployment Environments
-      description: A paged list of environments
-      properties:
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-        values:
-          type: array
-          minItems: 0
-          items:
-            $ref: '#/components/schemas/deployment_environment'
-          description: The values of the current page.
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-        next:
-          type: string
-          format: uri
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-        previous:
-          type: string
-          format: uri
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-    paginated_project_deploy_keys:
-      type: object
-      title: Paginated Project Deploy Keys
-      description: A paginated list of project deploy keys.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/project_deploy_key'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    participant:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Participant
-        description: Object describing a user's role on resources like commits or
-          pull requests.
-        properties:
-          user:
-            $ref: '#/components/schemas/account'
-          role:
-            type: string
-            enum:
-            - PARTICIPANT
-            - REVIEWER
-          approved:
-            type: boolean
-          state:
-            type: string
-            enum:
-            - approved
-            - changes_requested
-            - null
-          participated_on:
-            type: string
-            description: The ISO8601 timestamp of the participant's action. For approvers,
-              this is the time of their approval. For commenters and pull request
-              reviewers who are not approvers, this is the time they last commented,
-              or null if they have not commented.
-            format: date-time
-        additionalProperties: true
-    deployment_release:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - additionalProperties: true
-        type: object
-        title: Deployment Release
-        description: A Bitbucket Deployment Release.
-        properties:
-          uuid:
-            type: string
-            description: The UUID identifying the release.
-          name:
-            type: string
-            description: The name of the release.
-          url:
-            type: string
-            format: uri
-            description: Link to the pipeline that produced the release.
-          commit:
-            $ref: '#/components/schemas/commit'
-          created_on:
-            type: string
-            format: date-time
-            description: The timestamp when the release was created.
     team_links:
       allOf:
       - $ref: '#/components/schemas/account_links'
@@ -1581,20 +983,14 @@ components:
           repositories:
             $ref: '#/components/schemas/link'
         additionalProperties: true
-    committer:
+    deployment_state:
       allOf:
       - $ref: '#/components/schemas/object'
-      - type: object
-        title: Committer
-        description: The committer of a change in a repository
-        properties:
-          raw:
-            type: string
-            description: The raw committer value from the repository. This may be
-              the only value available if the committer does not match a user in Bitbucket.
-          user:
-            $ref: '#/components/schemas/account'
-        additionalProperties: true
+      - additionalProperties: true
+        type: object
+        title: Deployment State
+        description: The representation of the progress state of a deployment.
+        properties: {}
     repository:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -1790,6 +1186,147 @@ components:
           mainbranch:
             $ref: '#/components/schemas/branch'
         additionalProperties: true
+    paginated_project_deploy_keys:
+      type: object
+      title: Paginated Project Deploy Keys
+      description: A paginated list of project deploy keys.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/project_deploy_key'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_deploy_keys:
+      type: object
+      title: Paginated Deploy Keys
+      description: A paginated list of deploy keys.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/deploy_key'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    participant:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Participant
+        description: Object describing a user's role on resources like commits or
+          pull requests.
+        properties:
+          user:
+            $ref: '#/components/schemas/account'
+          role:
+            type: string
+            enum:
+            - PARTICIPANT
+            - REVIEWER
+          approved:
+            type: boolean
+          state:
+            type: string
+            enum:
+            - approved
+            - changes_requested
+            - null
+          participated_on:
+            type: string
+            description: The ISO8601 timestamp of the participant's action. For approvers,
+              this is the time of their approval. For commenters and pull request
+              reviewers who are not approvers, this is the time they last commented,
+              or null if they have not commented.
+            format: date-time
+        additionalProperties: true
+    committer:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Committer
+        description: The committer of a change in a repository
+        properties:
+          raw:
+            type: string
+            description: The raw committer value from the repository. This may be
+              the only value available if the committer does not match a user in Bitbucket.
+          user:
+            $ref: '#/components/schemas/account'
+        additionalProperties: true
+    account_links:
+      type: object
+      title: Account Links
+      description: Links related to an Account.
+      properties:
+        avatar:
+          $ref: '#/components/schemas/link'
+      additionalProperties: true
     project_deploy_key:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -1832,6 +1369,124 @@ components:
           created_by:
             $ref: '#/components/schemas/account'
         additionalProperties: true
+    account:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Account
+        description: An account object.
+        properties:
+          links:
+            $ref: '#/components/schemas/account_links'
+          created_on:
+            type: string
+            format: date-time
+          display_name:
+            type: string
+          uuid:
+            type: string
+        additionalProperties: true
+    author:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Author
+        description: The author of a change in a repository
+        properties:
+          raw:
+            type: string
+            description: The raw author value from the repository. This may be the
+              only value available if the author does not match a user in Bitbucket.
+          user:
+            $ref: '#/components/schemas/account'
+        additionalProperties: true
+    link:
+      type: object
+      title: Link
+      description: A link to a resource related to this object.
+      properties:
+        href:
+          type: string
+          format: uri
+        name:
+          type: string
+      additionalProperties: false
+    ref:
+      type: object
+      title: Ref
+      description: A ref object, representing a branch or tag in a repository.
+      properties:
+        type:
+          type: string
+        links:
+          type: object
+          properties:
+            self:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+            commits:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+            html:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+          additionalProperties: false
+        name:
+          type: string
+          description: The name of the ref.
+        target:
+          $ref: '#/components/schemas/commit'
+      required:
+      - type
+      additionalProperties: true
+    deployment_release:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - additionalProperties: true
+        type: object
+        title: Deployment Release
+        description: A Bitbucket Deployment Release.
+        properties:
+          uuid:
+            type: string
+            description: The UUID identifying the release.
+          name:
+            type: string
+            description: The name of the release.
+          url:
+            type: string
+            format: uri
+            description: Link to the pipeline that produced the release.
+          commit:
+            $ref: '#/components/schemas/commit'
+          created_on:
+            type: string
+            format: date-time
+            description: The timestamp when the release was created.
     deployment:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -1849,3 +1504,348 @@ components:
             $ref: '#/components/schemas/deployment_environment'
           release:
             $ref: '#/components/schemas/deployment_release'
+    base_commit:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Base Commit
+        description: The common base type for both repository and snippet commits.
+        properties:
+          hash:
+            type: string
+            pattern: '[0-9a-f]{7,}?'
+          date:
+            type: string
+            format: date-time
+          author:
+            $ref: '#/components/schemas/author'
+          committer:
+            $ref: '#/components/schemas/committer'
+          message:
+            type: string
+          summary:
+            type: object
+            properties:
+              raw:
+                type: string
+                description: The text as it was typed by a user.
+              markup:
+                type: string
+                description: The type of markup language the raw content is to be
+                  interpreted in.
+                enum:
+                - markdown
+                - creole
+                - plaintext
+              html:
+                type: string
+                description: The user's content rendered as HTML.
+            additionalProperties: false
+          parents:
+            type: array
+            items:
+              $ref: '#/components/schemas/base_commit'
+            minItems: 0
+        additionalProperties: true
+    project:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Project
+        description: "A Bitbucket project.\n            Projects are used by teams\
+          \ to organize repositories."
+        properties:
+          links:
+            type: object
+            properties:
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              avatar:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          uuid:
+            type: string
+            description: The project's immutable id.
+          key:
+            type: string
+            description: The project's key.
+          owner:
+            $ref: '#/components/schemas/team'
+          name:
+            type: string
+            description: The name of the project.
+          description:
+            type: string
+          is_private:
+            type: boolean
+            description: '
+
+              Indicates whether the project is publicly accessible, or whether it
+              is
+
+              private to the team and consequently only visible to team members.
+
+              Note that private projects cannot contain public repositories.'
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+          has_publicly_visible_repos:
+            type: boolean
+            description: '
+
+              Indicates whether the project contains publicly visible repositories.
+
+              Note that private projects cannot contain public repositories.'
+        additionalProperties: true
+    error:
+      type: object
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
+    commit:
+      allOf:
+      - $ref: '#/components/schemas/base_commit'
+      - type: object
+        title: Commit
+        description: A repository commit object.
+        properties:
+          repository:
+            $ref: '#/components/schemas/repository'
+          participants:
+            type: array
+            items:
+              $ref: '#/components/schemas/participant'
+            minItems: 0
+        additionalProperties: true
+    deploy_key:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Deploy Key
+        description: Represents deploy key for a repository.
+        properties:
+          key:
+            type: string
+            description: The deploy key value.
+          repository:
+            $ref: '#/components/schemas/repository'
+          comment:
+            type: string
+            description: The comment parsed from the deploy key (if present)
+          label:
+            type: string
+            description: The user-defined label for the deploy key
+          added_on:
+            type: string
+            format: date-time
+          last_used:
+            type: string
+            format: date-time
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          owner:
+            $ref: '#/components/schemas/account'
+        additionalProperties: true
+    paginated_deployments:
+      type: object
+      title: Paginated Deployments
+      description: A paged list of deployments
+      properties:
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+        values:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/deployment'
+          description: The values of the current page.
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+        next:
+          type: string
+          format: uri
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+        previous:
+          type: string
+          format: uri
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+    deployment_environment:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - additionalProperties: true
+        type: object
+        title: Deployment Environment
+        description: A Bitbucket Deployment Environment.
+        properties:
+          uuid:
+            type: string
+            description: The UUID identifying the environment.
+          name:
+            type: string
+            description: The name of the environment.
+      x-bb-default-fields:
+      - uuid
+      x-bb-url: /rest/2.0/accounts/{target_user.uuid}/repositories/{repository.uuid}/environments/{uuid}
+      x-bb-batch-url: /rest/2.0/accounts/{target_user.uuid}/repositories/{repository.uuid}/environments_batch
+      x-bb-batch-max-size: 100
+    paginated_environments:
+      type: object
+      title: Paginated Deployment Environments
+      description: A paged list of environments
+      properties:
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+        values:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/deployment_environment'
+          description: The values of the current page.
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+        next:
+          type: string
+          format: uri
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+        previous:
+          type: string
+          format: uri
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+    team:
+      allOf:
+      - $ref: '#/components/schemas/account'
+      - type: object
+        title: Team
+        description: A team object.
+        properties:
+          links:
+            $ref: '#/components/schemas/team_links'
+        additionalProperties: true
+    object:
+      type: object
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+      required:
+      - type
+      additionalProperties: true
+      discriminator:
+        propertyName: type
+    branch:
+      allOf:
+      - $ref: '#/components/schemas/ref'
+      - type: object
+        title: Branch
+        description: A branch object, representing a branch in a repository.
+        properties:
+          merge_strategies:
+            type: array
+            description: Available merge strategies for pull requests targeting this
+              branch.
+            items:
+              type: string
+              enum:
+              - merge_commit
+              - squash
+              - fast_forward
+              - squash_fast_forward
+              - rebase_fast_forward
+              - rebase_merge
+          default_merge_strategy:
+            type: string
+            description: The default merge strategy for pull requests targeting this
+              branch.
+        additionalProperties: true
