@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_repo_settings Data Source - bitbucket"
-subcategory: ""
+subcategory: "Repositories"
 description: |-
   Reads Bitbucket repo-settings via the Bitbucket Cloud API.
 ---

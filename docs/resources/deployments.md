@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_deployments Resource - bitbucket"
-subcategory: ""
+subcategory: "Deployments"
 description: |-
   Manages Bitbucket deployments via the Bitbucket Cloud API.
 ---

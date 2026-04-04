@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_repo_settings Resource - bitbucket"
-subcategory: ""
+subcategory: "Repositories"
 description: |-
   Manages Bitbucket repo-settings via the Bitbucket Cloud API.
 ---

@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_project_default_reviewers Resource - bitbucket"
-subcategory: ""
+subcategory: "Projects"
 description: |-
   Manages Bitbucket project-default-reviewers via the Bitbucket Cloud API.
 ---

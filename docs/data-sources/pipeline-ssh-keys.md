@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipeline_ssh_keys Data Source - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Reads Bitbucket pipeline-ssh-keys via the Bitbucket Cloud API.
 ---

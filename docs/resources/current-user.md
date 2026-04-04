@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_current_user Resource - bitbucket"
-subcategory: ""
+subcategory: "Users"
 description: |-
   Manages Bitbucket current-user via the Bitbucket Cloud API.
 ---

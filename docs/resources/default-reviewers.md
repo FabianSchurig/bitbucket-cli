@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_default_reviewers Resource - bitbucket"
-subcategory: ""
+subcategory: "Pull Requests"
 description: |-
   Manages Bitbucket default-reviewers via the Bitbucket Cloud API.
 ---

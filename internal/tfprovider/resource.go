@@ -70,6 +70,7 @@ type CRUDOps struct {
 type ResourceGroup struct {
 	TypeName    string // e.g., "bitbucket_repository"
 	Description string
+	Category    string // human-readable API group (e.g., "Pull Requests"); used as subcategory in docs
 	Ops         CRUDOps
 	AllOps      []OperationDef // all operations in the group
 }

@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_workspace_runners Data Source - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Reads Bitbucket workspace-runners via the Bitbucket Cloud API.
 ---

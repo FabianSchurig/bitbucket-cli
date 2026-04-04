@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_workspace_hooks Data Source - bitbucket"
-subcategory: ""
+subcategory: "Workspaces"
 description: |-
   Reads Bitbucket workspace-hooks via the Bitbucket Cloud API.
 ---

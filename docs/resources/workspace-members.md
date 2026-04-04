@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_workspace_members Resource - bitbucket"
-subcategory: ""
+subcategory: "Workspaces"
 description: |-
   Manages Bitbucket workspace-members via the Bitbucket Cloud API.
 ---

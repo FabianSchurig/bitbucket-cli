@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_repo_group_permissions Resource - bitbucket"
-subcategory: ""
+subcategory: "Repositories"
 description: |-
   Manages Bitbucket repo-group-permissions via the Bitbucket Cloud API.
 ---

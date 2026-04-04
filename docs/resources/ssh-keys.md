@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_ssh_keys Resource - bitbucket"
-subcategory: ""
+subcategory: "Users"
 description: |-
   Manages Bitbucket ssh-keys via the Bitbucket Cloud API.
 ---

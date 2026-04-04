@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_forked_repository Resource - bitbucket"
-subcategory: ""
+subcategory: "Repositories"
 description: |-
   Manages Bitbucket forked-repository via the Bitbucket Cloud API.
 ---

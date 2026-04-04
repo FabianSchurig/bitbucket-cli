@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_workspace_members Data Source - bitbucket"
-subcategory: ""
+subcategory: "Workspaces"
 description: |-
   Reads Bitbucket workspace-members via the Bitbucket Cloud API.
 ---

@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_user_emails Resource - bitbucket"
-subcategory: ""
+subcategory: "Users"
 description: |-
   Manages Bitbucket user-emails via the Bitbucket Cloud API.
 ---

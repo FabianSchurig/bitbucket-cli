@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_hook_types Resource - bitbucket"
-subcategory: ""
+subcategory: "Webhooks"
 description: |-
   Manages Bitbucket hook-types via the Bitbucket Cloud API.
 ---

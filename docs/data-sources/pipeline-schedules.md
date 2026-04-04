@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipeline_schedules Data Source - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Reads Bitbucket pipeline-schedules via the Bitbucket Cloud API.
 ---

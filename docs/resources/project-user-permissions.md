@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_project_user_permissions Resource - bitbucket"
-subcategory: ""
+subcategory: "Projects"
 description: |-
   Manages Bitbucket project-user-permissions via the Bitbucket Cloud API.
 ---

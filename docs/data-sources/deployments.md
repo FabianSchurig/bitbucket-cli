@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_deployments Data Source - bitbucket"
-subcategory: ""
+subcategory: "Deployments"
 description: |-
   Reads Bitbucket deployments via the Bitbucket Cloud API.
 ---

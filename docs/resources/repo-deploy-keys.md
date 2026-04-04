@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_repo_deploy_keys Resource - bitbucket"
-subcategory: ""
+subcategory: "Deployments"
 description: |-
   Manages Bitbucket repo-deploy-keys via the Bitbucket Cloud API.
 ---

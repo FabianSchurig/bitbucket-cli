@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_commits Data Source - bitbucket"
-subcategory: ""
+subcategory: "Commits"
 description: |-
   Reads Bitbucket commits via the Bitbucket Cloud API.
 ---

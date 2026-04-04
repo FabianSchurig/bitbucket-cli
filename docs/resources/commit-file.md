@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_commit_file Resource - bitbucket"
-subcategory: ""
+subcategory: "Repositories"
 description: |-
   Manages Bitbucket commit-file via the Bitbucket Cloud API.
 ---

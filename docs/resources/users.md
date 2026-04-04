@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_users Resource - bitbucket"
-subcategory: ""
+subcategory: "Users"
 description: |-
   Manages Bitbucket users via the Bitbucket Cloud API.
 ---

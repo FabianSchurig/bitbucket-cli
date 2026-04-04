@@ -34,6 +34,7 @@ Available operations:
 - updateAnExplicitUserPermissionForAProject: Update an explicit user permission for a project [PUT]
 - deleteAnExplicitUserPermissionForAProject: Delete an explicit user permission for a project [DELETE]
 `,
+	Category: `Projects`,
 	Ops: MapCRUDOps(`projects`, []OperationDef{
 		{
 			OperationID: `listProjectsInAWorkspace`,

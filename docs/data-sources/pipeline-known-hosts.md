@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipeline_known_hosts Data Source - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Reads Bitbucket pipeline-known-hosts via the Bitbucket Cloud API.
 ---

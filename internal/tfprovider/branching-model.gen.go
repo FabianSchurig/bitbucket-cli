@@ -24,6 +24,7 @@ Available operations:
 - getTheBranchingModelConfigForAProject: Get the branching model config for a project [GET]
 - updateTheBranchingModelConfigForAProject: Update the branching model config for a project [PUT]
 `,
+	Category: `Branching Model`,
 	Ops: MapCRUDOps(`branching-model`, []OperationDef{
 		{
 			OperationID: `getTheBranchingModelForARepository`,

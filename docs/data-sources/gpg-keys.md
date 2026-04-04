@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_gpg_keys Data Source - bitbucket"
-subcategory: ""
+subcategory: "Users"
 description: |-
   Reads Bitbucket gpg-keys via the Bitbucket Cloud API.
 ---

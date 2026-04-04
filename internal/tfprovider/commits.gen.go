@@ -33,6 +33,7 @@ Available operations:
 - getTheCommonAncestorBetweenTwoCommits: Get the common ancestor between two commits [GET]
 - getAPatchForTwoCommits: Get a patch for two commits [GET]
 `,
+	Category: `Commits`,
 	Ops: MapCRUDOps(`commits`, []OperationDef{
 		{
 			OperationID: `getACommit`,
@@ -489,10 +490,10 @@ unspecified which will be returned.`,
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
-					{Path: `approved`, Type: `bool`, Desc: `approved`},
 					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
 				}},
 				{Path: `summary.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				{Path: `summary.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
@@ -981,10 +982,10 @@ unspecified which will be returned.`,
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
-					{Path: `approved`, Type: `bool`, Desc: `approved`},
 					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
 				}},
 				{Path: `summary.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				{Path: `summary.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},

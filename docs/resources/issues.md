@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_issues Resource - bitbucket"
-subcategory: ""
+subcategory: "Issues"
 description: |-
   Manages Bitbucket issues via the Bitbucket Cloud API.
 ---

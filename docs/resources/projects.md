@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_projects Resource - bitbucket"
-subcategory: ""
+subcategory: "Projects"
 description: |-
   Manages Bitbucket projects via the Bitbucket Cloud API.
 ---

@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_issue_comments Resource - bitbucket"
-subcategory: ""
+subcategory: "Issues"
 description: |-
   Manages Bitbucket issue-comments via the Bitbucket Cloud API.
 ---

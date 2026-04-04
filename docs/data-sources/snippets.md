@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_snippets Data Source - bitbucket"
-subcategory: ""
+subcategory: "Snippets"
 description: |-
   Reads Bitbucket snippets via the Bitbucket Cloud API.
 ---

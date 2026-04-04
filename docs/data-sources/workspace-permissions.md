@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_workspace_permissions Data Source - bitbucket"
-subcategory: ""
+subcategory: "Workspaces"
 description: |-
   Reads Bitbucket workspace-permissions via the Bitbucket Cloud API.
 ---

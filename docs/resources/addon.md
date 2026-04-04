@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_addon Resource - bitbucket"
-subcategory: ""
+subcategory: "Addon"
 description: |-
   Manages Bitbucket addon via the Bitbucket Cloud API.
 ---

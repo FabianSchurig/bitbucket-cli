@@ -21,6 +21,7 @@ Available operations:
 - getADownloadArtifactLink: Get a download artifact link [GET]
 - deleteADownloadArtifact: Delete a download artifact [DELETE]
 `,
+	Category: `Downloads`,
 	Ops: MapCRUDOps(`downloads`, []OperationDef{
 		{
 			OperationID: `listDownloadArtifacts`,

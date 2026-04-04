@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_hook_types Data Source - bitbucket"
-subcategory: ""
+subcategory: "Webhooks"
 description: |-
   Reads Bitbucket hook-types via the Bitbucket Cloud API.
 ---

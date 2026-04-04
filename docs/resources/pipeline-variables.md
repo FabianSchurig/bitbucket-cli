@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipeline_variables Resource - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Manages Bitbucket pipeline-variables via the Bitbucket Cloud API.
 ---

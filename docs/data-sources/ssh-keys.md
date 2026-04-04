@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_ssh_keys Data Source - bitbucket"
-subcategory: ""
+subcategory: "Users"
 description: |-
   Reads Bitbucket ssh-keys via the Bitbucket Cloud API.
 ---

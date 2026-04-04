@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_tags Resource - bitbucket"
-subcategory: ""
+subcategory: "Refs"
 description: |-
   Manages Bitbucket tags via the Bitbucket Cloud API.
 ---

@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_refs Resource - bitbucket"
-subcategory: ""
+subcategory: "Refs"
 description: |-
   Manages Bitbucket refs via the Bitbucket Cloud API.
 ---

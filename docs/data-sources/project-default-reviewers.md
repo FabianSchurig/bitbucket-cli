@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_project_default_reviewers Data Source - bitbucket"
-subcategory: ""
+subcategory: "Projects"
 description: |-
   Reads Bitbucket project-default-reviewers via the Bitbucket Cloud API.
 ---

@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_project_user_permissions Data Source - bitbucket"
-subcategory: ""
+subcategory: "Projects"
 description: |-
   Reads Bitbucket project-user-permissions via the Bitbucket Cloud API.
 ---

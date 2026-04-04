@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pr Data Source - bitbucket"
-subcategory: ""
+subcategory: "Pull Requests"
 description: |-
   Reads Bitbucket pr via the Bitbucket Cloud API.
 ---
@@ -54,10 +54,10 @@ output "pr_response" {
 - `merge_commit_hash` (String) merge_commit.hash
 - `participants` (List of Object) The list of users that are collaborating on this pull request.
   Nested schema:
-  - `participated_on` (String) The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.
   - `role` (String) [PARTICIPANT, REVIEWER]
   - `approved` (String) approved
   - `state` (String) [approved, changes_requested, <nil>]
+  - `participated_on` (String) The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.
 
 - `queued` (String) A boolean flag indicating whether the pull request is queued
 - `summary_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]

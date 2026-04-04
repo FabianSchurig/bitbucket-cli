@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipeline_oidc Data Source - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Reads Bitbucket pipeline-oidc via the Bitbucket Cloud API.
 ---

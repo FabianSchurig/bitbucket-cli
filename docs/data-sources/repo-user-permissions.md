@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_repo_user_permissions Data Source - bitbucket"
-subcategory: ""
+subcategory: "Repositories"
 description: |-
   Reads Bitbucket repo-user-permissions via the Bitbucket Cloud API.
 ---

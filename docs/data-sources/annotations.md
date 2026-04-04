@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_annotations Data Source - bitbucket"
-subcategory: ""
+subcategory: "Reports"
 description: |-
   Reads Bitbucket annotations via the Bitbucket Cloud API.
 ---

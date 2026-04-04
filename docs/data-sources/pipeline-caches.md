@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipeline_caches Data Source - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Reads Bitbucket pipeline-caches via the Bitbucket Cloud API.
 ---

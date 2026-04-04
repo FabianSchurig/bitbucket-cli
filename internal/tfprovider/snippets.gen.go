@@ -42,6 +42,7 @@ Available operations:
 - getSnippetChangesBetweenVersions: Get snippet changes between versions [GET]
 - getSnippetPatchBetweenVersions: Get snippet patch between versions [GET]
 `,
+	Category: `Snippets`,
 	Ops: MapCRUDOps(`snippets`, []OperationDef{
 		{
 			OperationID: `listSnippets`,

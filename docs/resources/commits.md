@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_commits Resource - bitbucket"
-subcategory: ""
+subcategory: "Commits"
 description: |-
   Manages Bitbucket commits via the Bitbucket Cloud API.
 ---
