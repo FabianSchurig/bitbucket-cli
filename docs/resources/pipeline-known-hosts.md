@@ -34,7 +34,12 @@ resource "bitbucket_pipeline_known_hosts" "example" {
 - `known_host_uuid` (String) Path parameter.
 
 ### Optional
-
+- `hostname` (String) The hostname of the known host. (also computed from API response)
+- `public_key_key` (String) The base64 encoded public key. (also computed from API response)
+- `public_key_key_type` (String) The type of the public key. (also computed from API response)
+- `public_key_md5_fingerprint` (String) The MD5 fingerprint of the public key. (also computed from API response)
+- `public_key_sha256_fingerprint` (String) The SHA-256 fingerprint of the public key. (also computed from API response)
+- `uuid` (String) The UUID identifying the known host. (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

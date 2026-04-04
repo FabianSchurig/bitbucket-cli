@@ -34,3 +34,9 @@ output "pipeline_known_hosts_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `hostname` (String) The hostname of the known host.
+- `public_key_key` (String) The base64 encoded public key.
+- `public_key_key_type` (String) The type of the public key.
+- `public_key_md5_fingerprint` (String) The MD5 fingerprint of the public key.
+- `public_key_sha256_fingerprint` (String) The SHA-256 fingerprint of the public key.
+- `uuid` (String) The UUID identifying the known host.

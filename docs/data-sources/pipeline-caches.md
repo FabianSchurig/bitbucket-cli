@@ -34,3 +34,4 @@ output "pipeline_caches_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `uri` (String) The uri for pipeline cache content.

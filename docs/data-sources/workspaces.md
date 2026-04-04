@@ -30,3 +30,11 @@ output "workspaces_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `created_on` (String) created_on
+- `forking_mode` (String) Controls the rules for forking repositories within this workspace.
+- `is_privacy_enforced` (String) Indicates whether the workspace enforces private content, or whether it allows public content.
+- `is_private` (String) Indicates whether the workspace is publicly accessible, or whether it is
+- `name` (String) The name of the workspace.
+- `slug` (String) The short label that identifies this workspace.
+- `updated_on` (String) updated_on
+- `uuid` (String) The workspace's immutable id.

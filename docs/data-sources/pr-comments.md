@@ -36,3 +36,15 @@ output "pr_comments_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `created_on` (String) created_on
+- `deleted` (String) deleted
+- `updated_on` (String) updated_on
+- `content_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
+- `content_raw` (String) The text as it was typed by a user.
+- `inline_from` (String) The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending ...
+- `inline_path` (String) The path of the file this comment is anchored to.
+- `inline_start_from` (String) The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.
+- `inline_start_to` (String) The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.
+- `inline_to` (String) The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending ...
+- `parent_id` (String) ID of referenced parent
+- `pending` (String) pending

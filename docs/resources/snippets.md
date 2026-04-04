@@ -32,10 +32,14 @@ resource "bitbucket_snippets" "example" {
 - `workspace` (String) Path parameter.
 
 ### Optional
-
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `created_on` (String) created_on
+- `is_private` (String) is_private
+- `scm` (String) The DVCS used to store the snippet. [git]
+- `title` (String) title
+- `updated_on` (String) updated_on

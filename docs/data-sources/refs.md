@@ -34,3 +34,6 @@ output "refs_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch.
+- `name` (String) The name of the ref.
+- `type` (String) type

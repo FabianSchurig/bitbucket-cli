@@ -143,6 +143,8 @@ operation groups. Each resource group maps to a set of CRUD operations.
 All resources share the same generic schema pattern:
 
 - **Path parameters** become required/optional string attributes
-- **Body fields** become optional string attributes
+- **Body fields** become optional string attributes (writable)
+- **Response fields** become computed string attributes (read-only, auto-populated from API response)
+- Fields present in both request and response are **Optional+Computed** (can be set by user, also populated from API)
 - `api_response` (Computed) contains the raw JSON API response
 - `id` (Computed) is extracted from the response (uuid, id, slug, or name)

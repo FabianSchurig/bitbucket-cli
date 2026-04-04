@@ -4,6 +4,7 @@
 /bb-tf
 /gen_commands
 /gen_mcptools
+/gen_terraform
 /gen_tfdocs
 /main
 /terraform-provider-bitbucket

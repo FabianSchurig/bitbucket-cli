@@ -30,16 +30,26 @@ import (
 // ─── Template data ────────────────────────────────────────────────────────────
 
 type GroupData struct {
-	Name        string
-	TFName      string // e.g., "bitbucket_repos"
-	HasCreate   bool
-	HasRead     bool
-	HasUpdate   bool
-	HasDelete   bool
-	HasList     bool
-	HasIDParam  bool // true if "id" is a path parameter (avoids conflict with computed id)
-	Params      []string
-	ParamValues map[string]string
+	Name           string
+	TFName         string // e.g., "bitbucket_repos"
+	HasCreate      bool
+	HasRead        bool
+	HasUpdate      bool
+	HasDelete      bool
+	HasList        bool
+	HasIDParam     bool // true if "id" is a path parameter (avoids conflict with computed id)
+	HasBody        bool // true if any CRUD op accepts a body
+	Params         []string
+	ParamValues    map[string]string
+	BodyFields     []FieldDoc     // writable body fields (Optional)
+	ResponseFields []FieldDoc     // computed response fields (Computed)
+	OverlapFields  []FieldDoc     // fields that are both writable and computed (Optional+Computed)
+}
+
+// FieldDoc describes a Terraform attribute for documentation.
+type FieldDoc struct {
+	Name string // Terraform attribute name (snake_case)
+	Desc string // Human-readable description
 }
 
 func exampleValue(param string) string {
@@ -140,17 +150,25 @@ func buildGroups() []GroupData {
 				hasIDParam = true
 			}
 		}
+
+		// Derive body fields, response fields, and overlaps.
+		bodyFields, responseFields, overlapFields, hasBody := deriveFields(name, groupIndex)
+
 		groups = append(groups, GroupData{
-			Name:        name,
-			TFName:      "bitbucket_" + strings.ReplaceAll(name, "-", "_"),
-			HasCreate:   crud.Create != "",
-			HasRead:     crud.Read != "",
-			HasUpdate:   crud.Update != "",
-			HasDelete:   crud.Delete != "",
-			HasList:     crud.List != "",
-			HasIDParam:  hasIDParam,
-			Params:      params,
-			ParamValues: pv,
+			Name:           name,
+			TFName:         "bitbucket_" + strings.ReplaceAll(name, "-", "_"),
+			HasCreate:      crud.Create != "",
+			HasRead:        crud.Read != "",
+			HasUpdate:      crud.Update != "",
+			HasDelete:      crud.Delete != "",
+			HasList:        crud.List != "",
+			HasIDParam:     hasIDParam,
+			HasBody:        hasBody,
+			Params:         params,
+			ParamValues:    pv,
+			BodyFields:     bodyFields,
+			ResponseFields: responseFields,
+			OverlapFields:  overlapFields,
 		})
 	}
 	sort.Slice(groups, func(i, j int) bool { return groups[i].Name < groups[j].Name })
@@ -188,6 +206,99 @@ func deriveParams(name string, index map[string]tfprovider.ResourceGroup) []stri
 		}
 	}
 	return params
+}
+
+// deriveFields extracts body fields, response fields, and their overlaps
+// from a resource group's CRUD operations for documentation.
+func deriveFields(name string, index map[string]tfprovider.ResourceGroup) (bodyFields, responseFields, overlapFields []FieldDoc, hasBody bool) {
+	rg, ok := index[name]
+	if !ok {
+		return
+	}
+
+	// Collect body fields from all CRUD ops.
+	bodyFieldMap := make(map[string]string) // key → description
+	crudOps := []*tfprovider.OperationDef{rg.Ops.Create, rg.Ops.Read, rg.Ops.Update, rg.Ops.Delete, rg.Ops.List}
+	for _, op := range crudOps {
+		if op == nil {
+			continue
+		}
+		if op.HasBody {
+			hasBody = true
+		}
+		for _, bf := range op.BodyFields {
+			key := snakeCaseField(bf.Path)
+			if _, exists := bodyFieldMap[key]; !exists {
+				desc := bf.Desc
+				if desc == "" {
+					desc = bf.Path
+				}
+				bodyFieldMap[key] = desc
+			}
+		}
+	}
+
+	// Collect response fields from Read (or Create) operation.
+	responseFieldMap := make(map[string]string)
+	responseOp := rg.Ops.Read
+	if responseOp == nil {
+		responseOp = rg.Ops.Create
+	}
+	if responseOp != nil {
+		for _, rf := range responseOp.ResponseFields {
+			key := snakeCaseField(rf.Path)
+			if key == "id" || key == "api_response" || key == "request_body" {
+				continue
+			}
+			desc := rf.Desc
+			if desc == "" {
+				desc = rf.Path
+			}
+			responseFieldMap[key] = desc
+		}
+	}
+
+	// Categorize into body-only, response-only, and overlap.
+	overlapSet := make(map[string]bool)
+	for key, desc := range bodyFieldMap {
+		if _, isResp := responseFieldMap[key]; isResp {
+			overlapFields = append(overlapFields, FieldDoc{Name: key, Desc: truncateDesc(desc)})
+			overlapSet[key] = true
+		} else {
+			bodyFields = append(bodyFields, FieldDoc{Name: key, Desc: truncateDesc(desc)})
+		}
+	}
+	for key, desc := range responseFieldMap {
+		if !overlapSet[key] {
+			responseFields = append(responseFields, FieldDoc{Name: key, Desc: truncateDesc(desc)})
+		}
+	}
+
+	// Sort all lists for deterministic output.
+	sort.Slice(bodyFields, func(i, j int) bool { return bodyFields[i].Name < bodyFields[j].Name })
+	sort.Slice(responseFields, func(i, j int) bool { return responseFields[i].Name < responseFields[j].Name })
+	sort.Slice(overlapFields, func(i, j int) bool { return overlapFields[i].Name < overlapFields[j].Name })
+	return
+}
+
+// snakeCaseField converts a dot-separated field path to snake_case attribute name.
+func snakeCaseField(path string) string {
+	s := strings.ReplaceAll(path, ".", "_")
+	s = strings.ReplaceAll(s, "-", "_")
+	return strings.ToLower(s)
+}
+
+// truncateDesc returns a single-line truncated description for documentation.
+func truncateDesc(desc string) string {
+	// Take first line only.
+	if idx := strings.IndexByte(desc, '\n'); idx >= 0 {
+		desc = desc[:idx]
+	}
+	desc = strings.TrimSpace(desc)
+	if len(desc) > 120 {
+		desc = desc[:117] + "..."
+	}
+	return desc
 }
 
 // ─── Templates ────────────────────────────────────────────────────────────────
@@ -291,7 +402,9 @@ operation groups. Each resource group maps to a set of CRUD operations.
 All resources share the same generic schema pattern:
 
 - **Path parameters** become required/optional string attributes
-- **Body fields** become optional string attributes
+- **Body fields** become optional string attributes (writable)
+- **Response fields** become computed string attributes (read-only, auto-populated from API response)
+- Fields present in both request and response are **Optional+Computed** (can be set by user, also populated from API)
 - ` + "`api_response`" + ` (Computed) contains the raw JSON API response
 - ` + "`id`" + ` (Computed) is extracted from the response (uuid, id, slug, or name)
 `
@@ -342,10 +455,19 @@ resource "{{.TFName}}" "example" {
 {{- range .Params}}
 - ` + "`" + `{{.}}` + "`" + ` (String) Path parameter.
 {{- end}}
+{{- if or .OverlapFields .BodyFields .HasBody}}
 
 ### Optional
-
+{{- end}}
+{{- range .OverlapFields}}
+- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}} (also computed from API response)
+{{- end}}
+{{- range .BodyFields}}
+- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}}
+{{- end}}
+{{- if .HasBody}}
 - ` + "`" + `request_body` + "`" + ` (String) Raw JSON request body for create/update operations. Use ` + "`" + `jsonencode({...})` + "`" + ` to pass fields not exposed as individual attributes.
+{{- end}}
 
 ### Read-Only
 {{- if not .HasIDParam}}
@@ -353,6 +475,9 @@ resource "{{.TFName}}" "example" {
 - ` + "`" + `id` + "`" + ` (String) Resource identifier (extracted from API response).
 {{- end}}
 - ` + "`" + `api_response` + "`" + ` (String) The raw JSON response from the Bitbucket API.
+{{- range .ResponseFields}}
+- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}}
+{{- end}}
 `
 
 const dataSourceDocTemplate = `---
@@ -392,6 +517,12 @@ output "{{snakeCase .Name}}_response" {
 
 - ` + "`" + `id` + "`" + ` (String) Resource identifier.
 - ` + "`" + `api_response` + "`" + ` (String) The raw JSON response from the Bitbucket API.
+{{- range .ResponseFields}}
+- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}}
+{{- end}}
+{{- range .OverlapFields}}
+- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}}
+{{- end}}
 `
 
 const exampleProviderTemplate = `terraform {

@@ -34,3 +34,13 @@ output "project_user_permissions_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `permission` (String) [read, write, create-repo, admin, none]
+- `project_created_on` (String) project.created_on
+- `project_description` (String) project.description
+- `project_has_publicly_visible_repos` (String) 
+- `project_is_private` (String) 
+- `project_key` (String) The project's key.
+- `project_name` (String) The name of the project.
+- `project_updated_on` (String) project.updated_on
+- `project_uuid` (String) The project's immutable id.
+- `type` (String) type

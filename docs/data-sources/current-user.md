@@ -28,3 +28,6 @@ output "current_user_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `created_on` (String) created_on
+- `display_name` (String) display_name
+- `uuid` (String) uuid

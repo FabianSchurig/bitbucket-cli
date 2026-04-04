@@ -34,3 +34,8 @@ output "repo_deploy_keys_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `added_on` (String) added_on
+- `comment` (String) The comment parsed from the deploy key (if present)
+- `key` (String) The deploy key value.
+- `label` (String) The user-defined label for the deploy key
+- `last_used` (String) last_used

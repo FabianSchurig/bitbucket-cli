@@ -38,3 +38,15 @@ output "annotations_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `created_on` (String) The timestamp when the report was created.
+- `summary` (String) The message to display to users.
+- `updated_on` (String) The timestamp when the report was updated.
+- `annotation_type` (String) The type of the report. [VULNERABILITY, CODE_SMELL, BUG]
+- `details` (String) The details to show to users when clicking on the annotation.
+- `external_id` (String) ID of the annotation provided by the annotation creator. It can be used to identify the annotation as an alternative ...
+- `line` (String) The line number that the annotation should belong to. If no line number is provided, then it will default to 0 and in...
+- `link` (String) A URL linking to the annotation in an external tool.
+- `path` (String) The path of the file on which this annotation should be placed. This is the path of the file relative to the git repo...
+- `result` (String) The state of the report. May be set to PENDING and later updated. [PASSED, FAILED, SKIPPED, IGNORED]
+- `severity` (String) The severity of the annotation. [CRITICAL, HIGH, MEDIUM, LOW]
+- `uuid` (String) The UUID that can be used to identify the annotation.

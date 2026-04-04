@@ -34,3 +34,23 @@ output "pr_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `comment_count` (String) The number of comments for a specific pull request.
+- `created_on` (String) The ISO8601 timestamp the request was created.
+- `merge_commit_hash` (String) merge_commit.hash
+- `queued` (String) A boolean flag indicating whether the pull request is queued
+- `summary_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
+- `summary_raw` (String) The text as it was typed by a user.
+- `task_count` (String) The number of open tasks for a specific pull request.
+- `updated_on` (String) The ISO8601 timestamp the request was last updated.
+- `close_source_branch` (String) A boolean flag indicating if merging the pull request closes the source branch.
+- `description` (String) Explains what the pull request does.
+- `destination_branch_default_merge_strategy` (String) The default merge strategy, when this endpoint is the destination of the pull request.
+- `destination_branch_name` (String) destination.branch.name
+- `destination_commit_hash` (String) destination.commit.hash
+- `draft` (String) A boolean flag indicating whether the pull request is a draft.
+- `reason` (String) Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.
+- `source_branch_default_merge_strategy` (String) The default merge strategy, when this endpoint is the destination of the pull request.
+- `source_branch_name` (String) source.branch.name
+- `source_commit_hash` (String) source.commit.hash
+- `state` (String) The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]
+- `title` (String) Title of the pull request.

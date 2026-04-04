@@ -32,3 +32,4 @@ output "pipeline_config_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `enabled` (String) Whether Pipelines is enabled for the repository.

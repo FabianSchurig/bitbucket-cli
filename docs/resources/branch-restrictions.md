@@ -34,7 +34,11 @@ resource "bitbucket_branch_restrictions" "example" {
 - `workspace` (String) Path parameter.
 
 ### Optional
-
+- `branch_match_kind` (String) Indicates how the restriction is matched against a branch. The default is `glob`. [branching_model, glob] (also computed from API response)
+- `branch_type` (String) Apply the restriction to branches of this type. Active when `branch_match_kind` is `branching_model`. The branch type... (also computed from API response)
+- `kind` (String) The type of restriction that is being applied. [push, delete, force, restrict_merges, require_tasks_to_be_completed, ... (also computed from API response)
+- `pattern` (String) Apply the restriction to branches that match this pattern. Active when `branch_match_kind` is `glob`. Will be empty w... (also computed from API response)
+- `value` (String) Value with kind-specific semantics: (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

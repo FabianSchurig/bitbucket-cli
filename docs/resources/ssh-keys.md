@@ -32,10 +32,17 @@ resource "bitbucket_ssh_keys" "example" {
 - `selected_user` (String) Path parameter.
 
 ### Optional
-
+- `comment` (String) The comment parsed from the SSH key (if present) (also computed from API response)
+- `expires_on` (String) expires_on (also computed from API response)
+- `fingerprint` (String) The SSH key fingerprint in SHA-256 format. (also computed from API response)
+- `key` (String) The SSH public key value in OpenSSH format. (also computed from API response)
+- `label` (String) The user-defined label for the SSH key (also computed from API response)
+- `last_used` (String) last_used (also computed from API response)
+- `uuid` (String) The SSH key's immutable ID. (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `created_on` (String) created_on

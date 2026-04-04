@@ -24,11 +24,11 @@ resource "bitbucket_hook_types" "example" {
 
 ### Required
 
-### Optional
-
-- `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
-
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `repository_events_href` (String) repository.events.href
+- `repository_events_name` (String) repository.events.name
+- `workspace_events_href` (String) workspace.events.href
+- `workspace_events_name` (String) workspace.events.name

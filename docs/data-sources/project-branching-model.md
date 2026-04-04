@@ -32,3 +32,7 @@ output "project_branching_model_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `development_name` (String) Name of the target branch. If inherited by a repository, it will default to the main branch if the specified branch d...
+- `development_use_mainbranch` (String) Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`).
+- `production_name` (String) Name of the target branch. If inherited by a repository, it will default to the main branch if the specified branch d...
+- `production_use_mainbranch` (String) Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`).

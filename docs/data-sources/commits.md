@@ -34,3 +34,10 @@ output "commits_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `author_raw` (String) The raw author value from the repository. This may be the only value available if the author does not match a user in...
+- `committer_raw` (String) The raw committer value from the repository. This may be the only value available if the committer does not match a u...
+- `date` (String) date
+- `hash` (String) hash
+- `message` (String) message
+- `summary_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
+- `summary_raw` (String) The text as it was typed by a user.
