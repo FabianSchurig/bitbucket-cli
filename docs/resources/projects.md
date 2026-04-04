@@ -63,5 +63,8 @@ resource "bitbucket_projects" "example" {
 - `is_private` (String) 
 - `key` (String) The project's key.
 - `name` (String) The name of the project.
+- `owner_created_on` (String) owner.created_on
+- `owner_display_name` (String) owner.display_name
+- `owner_uuid` (String) owner.uuid
 - `updated_on` (String) updated_on
 - `uuid` (String) The project's immutable id.

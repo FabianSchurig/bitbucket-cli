@@ -139,6 +139,8 @@ administered through admin.atlassian.com.
 				{Path: `mainbranch.name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `mainbranch.type`, Type: `string`, Desc: `mainbranch.type`},
 				{Path: `name`, Type: `string`, Desc: `name`},
+				{Path: `owner.display_name`, Type: `string`, Desc: `owner.display_name`},
+				{Path: `owner.uuid`, Type: `string`, Desc: `owner.uuid`},
 				{Path: `project.description`, Type: `string`, Desc: `project.description`},
 				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
@@ -195,6 +197,8 @@ administered through admin.atlassian.com.
 				{Path: `mainbranch.name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `mainbranch.type`, Type: `string`, Desc: `mainbranch.type`},
 				{Path: `name`, Type: `string`, Desc: `name`},
+				{Path: `owner.display_name`, Type: `string`, Desc: `owner.display_name`},
+				{Path: `owner.uuid`, Type: `string`, Desc: `owner.uuid`},
 				{Path: `project.description`, Type: `string`, Desc: `project.description`},
 				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
@@ -309,6 +313,8 @@ administered through admin.atlassian.com.
 				{Path: `mainbranch.name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `mainbranch.type`, Type: `string`, Desc: `mainbranch.type`},
 				{Path: `name`, Type: `string`, Desc: `name`},
+				{Path: `owner.display_name`, Type: `string`, Desc: `owner.display_name`},
+				{Path: `owner.uuid`, Type: `string`, Desc: `owner.uuid`},
 				{Path: `project.description`, Type: `string`, Desc: `project.description`},
 				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.

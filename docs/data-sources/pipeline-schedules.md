@@ -56,5 +56,3 @@ output "pipeline_schedules_response" {
 - `enabled` (String) Whether the schedule is enabled.
 - `target_ref_name` (String) The name of the reference.
 - `target_ref_type` (String) The type of reference (branch only). [branch]
-- `target_selector_pattern` (String) The name of the matching pipeline definition.
-- `target_selector_type` (String) The type of selector. [branches, tags, bookmarks, default, custom]

@@ -47,7 +47,13 @@ output "snippets_response" {
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
+- `creator_created_on` (String) creator.created_on
+- `creator_display_name` (String) creator.display_name
+- `creator_uuid` (String) creator.uuid
 - `is_private` (String) is_private
+- `owner_created_on` (String) owner.created_on
+- `owner_display_name` (String) owner.display_name
+- `owner_uuid` (String) owner.uuid
 - `scm` (String) The DVCS used to store the snippet. [git]
 - `title` (String) title
 - `updated_on` (String) updated_on

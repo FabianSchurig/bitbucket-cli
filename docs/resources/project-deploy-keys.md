@@ -57,6 +57,9 @@ resource "bitbucket_project_deploy_keys" "example" {
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `added_on` (String) added_on
 - `comment` (String) The comment parsed from the deploy key (if present)
+- `created_by_created_on` (String) created_by.created_on
+- `created_by_display_name` (String) created_by.display_name
+- `created_by_uuid` (String) created_by.uuid
 - `key` (String) The deploy key value.
 - `label` (String) The user-defined label for the deploy key
 - `last_used` (String) last_used

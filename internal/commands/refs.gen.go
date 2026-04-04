@@ -412,14 +412,18 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 // operationId: createATag
 func newRefsCreateATagCmd() *cobra.Command {
 	var (
-		repoSlug      string
-		workspace     string
-		bodyDate      string
-		bodyMessage   string
-		bodyName      string
-		bodyTaggerRaw string
-		bodyType      string
-		body          string
+		repoSlug          string
+		workspace         string
+		bodyDate          string
+		bodyMessage       string
+		bodyName          string
+		bodyTaggerRaw     string
+		bodyTargetDate    string
+		bodyTargetHash    string
+		bodyTargetMessage string
+		bodyTargetParents string
+		bodyType          string
+		body              string
 	)
 
 	cmd := &cobra.Command{
@@ -456,6 +460,18 @@ func newRefsCreateATagCmd() *cobra.Command {
 				if bodyTaggerRaw != "" {
 					handlers.SetNested(bodyObj, "tagger.raw", bodyTaggerRaw)
 				}
+				if bodyTargetDate != "" {
+					handlers.SetNested(bodyObj, "target.date", bodyTargetDate)
+				}
+				if bodyTargetHash != "" {
+					handlers.SetNested(bodyObj, "target.hash", bodyTargetHash)
+				}
+				if bodyTargetMessage != "" {
+					handlers.SetNested(bodyObj, "target.message", bodyTargetMessage)
+				}
+				if bodyTargetParents != "" {
+					handlers.SetNested(bodyObj, "target.parents", bodyTargetParents)
+				}
 				if bodyType != "" {
 					handlers.SetNested(bodyObj, "type", bodyType)
 				}
@@ -480,6 +496,10 @@ func newRefsCreateATagCmd() *cobra.Command {
 	cmd.Flags().StringVar(&bodyMessage, "message", "", `The message associated with the tag, if available.`)
 	cmd.Flags().StringVar(&bodyName, "name", "", `The name of the ref.`)
 	cmd.Flags().StringVar(&bodyTaggerRaw, "tagger-raw", "", `The raw author value from the repository. This may be the only value available if the author does not match a user in Bitbucket.`)
+	cmd.Flags().StringVar(&bodyTargetDate, "target-date", "", `target.date`)
+	cmd.Flags().StringVar(&bodyTargetHash, "target-hash", "", `target.hash`)
+	cmd.Flags().StringVar(&bodyTargetMessage, "target-message", "", `target.message`)
+	cmd.Flags().StringVar(&bodyTargetParents, "target-parents", "", `parents (JSON array)`)
 	cmd.Flags().StringVar(&bodyType, "type", "", `type`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd

@@ -234,6 +234,37 @@ for specific details.
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
+				{Path: `creator.created_on`, Type: `string`, Desc: `creator.created_on`},
+				{Path: `creator.display_name`, Type: `string`, Desc: `creator.display_name`},
+				{Path: `creator.uuid`, Type: `string`, Desc: `creator.uuid`},
+				{Path: `repository.created_on`, Type: `string`, Desc: `repository.created_on`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.updated_on`, Type: `string`, Desc: `repository.updated_on`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
@@ -267,6 +298,34 @@ for specific details.
 					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
+				{Path: `creator.display_name`, Type: `string`, Desc: `creator.display_name`},
+				{Path: `creator.uuid`, Type: `string`, Desc: `creator.uuid`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
@@ -284,12 +343,43 @@ for specific details.
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
+				{Path: `creator.created_on`, Type: `string`, Desc: `creator.created_on`},
+				{Path: `creator.display_name`, Type: `string`, Desc: `creator.display_name`},
+				{Path: `creator.uuid`, Type: `string`, Desc: `creator.uuid`},
+				{Path: `repository.created_on`, Type: `string`, Desc: `repository.created_on`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.updated_on`, Type: `string`, Desc: `repository.updated_on`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
-					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
 					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 				}},
 			},
 			HasBody:   true,
@@ -416,8 +506,6 @@ for specific details.
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -450,8 +538,6 @@ for specific details.
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -486,8 +572,6 @@ for specific details.
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -521,8 +605,6 @@ for specific details.
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -575,12 +657,43 @@ for specific details.
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
+				{Path: `creator.created_on`, Type: `string`, Desc: `creator.created_on`},
+				{Path: `creator.display_name`, Type: `string`, Desc: `creator.display_name`},
+				{Path: `creator.uuid`, Type: `string`, Desc: `creator.uuid`},
+				{Path: `repository.created_on`, Type: `string`, Desc: `repository.created_on`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.updated_on`, Type: `string`, Desc: `repository.updated_on`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
 					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
-					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 				}},
 			},
 			HasBody:   false,
@@ -809,6 +922,34 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `enabled`, Type: `bool`, Desc: `Whether Pipelines is enabled for the repository.`},
+				{Path: `repository.created_on`, Type: `string`, Desc: `repository.created_on`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.updated_on`, Type: `string`, Desc: `repository.updated_on`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -829,9 +970,63 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `enabled`, Type: `bool`, Desc: `Whether Pipelines is enabled for the repository.`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `enabled`, Type: `bool`, Desc: `Whether Pipelines is enabled for the repository.`},
+				{Path: `repository.created_on`, Type: `string`, Desc: `repository.created_on`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.updated_on`, Type: `string`, Desc: `repository.updated_on`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 			},
 			HasBody:   true,
 			Paginated: false,
@@ -882,8 +1077,6 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
 				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
 				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -918,8 +1111,6 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
 				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
 				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -949,8 +1140,6 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
 				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
 				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -981,8 +1170,6 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
 				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
 				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -1637,8 +1824,6 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -1670,8 +1855,6 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -1705,8 +1888,6 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -1739,8 +1920,6 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -2035,6 +2214,37 @@ for specific details.
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
+				{Path: `creator.created_on`, Type: `string`, Desc: `creator.created_on`},
+				{Path: `creator.display_name`, Type: `string`, Desc: `creator.display_name`},
+				{Path: `creator.uuid`, Type: `string`, Desc: `creator.uuid`},
+				{Path: `repository.created_on`, Type: `string`, Desc: `repository.created_on`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.updated_on`, Type: `string`, Desc: `repository.updated_on`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
@@ -2068,6 +2278,34 @@ for specific details.
 					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
+				{Path: `creator.display_name`, Type: `string`, Desc: `creator.display_name`},
+				{Path: `creator.uuid`, Type: `string`, Desc: `creator.uuid`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
@@ -2085,12 +2323,43 @@ for specific details.
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
+				{Path: `creator.created_on`, Type: `string`, Desc: `creator.created_on`},
+				{Path: `creator.display_name`, Type: `string`, Desc: `creator.display_name`},
+				{Path: `creator.uuid`, Type: `string`, Desc: `creator.uuid`},
+				{Path: `repository.created_on`, Type: `string`, Desc: `repository.created_on`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.updated_on`, Type: `string`, Desc: `repository.updated_on`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
-					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
 					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 				}},
 			},
 			HasBody:   true,
@@ -2217,8 +2486,6 @@ for specific details.
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -2251,8 +2518,6 @@ for specific details.
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -2287,8 +2552,6 @@ for specific details.
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -2322,8 +2585,6 @@ for specific details.
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -2376,12 +2637,43 @@ for specific details.
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
+				{Path: `creator.created_on`, Type: `string`, Desc: `creator.created_on`},
+				{Path: `creator.display_name`, Type: `string`, Desc: `creator.display_name`},
+				{Path: `creator.uuid`, Type: `string`, Desc: `creator.uuid`},
+				{Path: `repository.created_on`, Type: `string`, Desc: `repository.created_on`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.updated_on`, Type: `string`, Desc: `repository.updated_on`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
 					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
-					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 				}},
 			},
 			HasBody:   false,
@@ -2610,6 +2902,34 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `enabled`, Type: `bool`, Desc: `Whether Pipelines is enabled for the repository.`},
+				{Path: `repository.created_on`, Type: `string`, Desc: `repository.created_on`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.updated_on`, Type: `string`, Desc: `repository.updated_on`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -2630,9 +2950,63 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `enabled`, Type: `bool`, Desc: `Whether Pipelines is enabled for the repository.`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `enabled`, Type: `bool`, Desc: `Whether Pipelines is enabled for the repository.`},
+				{Path: `repository.created_on`, Type: `string`, Desc: `repository.created_on`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.updated_on`, Type: `string`, Desc: `repository.updated_on`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 			},
 			HasBody:   true,
 			Paginated: false,
@@ -2683,8 +3057,6 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
 				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
 				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -2719,8 +3091,6 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
 				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
 				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -2750,8 +3120,6 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
 				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
 				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -2782,8 +3150,6 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
 				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
 				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -3438,8 +3804,6 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -3471,8 +3835,6 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -3506,8 +3868,6 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -3540,8 +3900,6 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
 				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
 				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},

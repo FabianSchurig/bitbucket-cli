@@ -57,8 +57,8 @@ resource "bitbucket_pipeline_schedules" "example" {
 - `enabled` (String) Whether the schedule is enabled. (also computed from API response)
 - `target_ref_name` (String) The name of the reference. (also computed from API response)
 - `target_ref_type` (String) The type of reference (branch only). [branch] (also computed from API response)
-- `target_selector_pattern` (String) The name of the matching pipeline definition. (also computed from API response)
-- `target_selector_type` (String) The type of selector. [branches, tags, bookmarks, default, custom] (also computed from API response)
+- `target_selector_pattern` (String) The name of the matching pipeline definition.
+- `target_selector_type` (String) The type of selector. [branches, tags, bookmarks, default, custom]
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

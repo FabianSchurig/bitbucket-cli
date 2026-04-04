@@ -48,6 +48,7 @@ output "gpg_keys_response" {
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
+- `owner_created_on` (String) owner.created_on
 - `added_on` (String) added_on
 - `comment` (String) The comment parsed from the GPG key (if present)
 - `expires_on` (String) expires_on
@@ -55,5 +56,7 @@ output "gpg_keys_response" {
 - `key_id` (String) The unique identifier for the GPG key
 - `last_used` (String) last_used
 - `name` (String) The user-defined label for the GPG key
+- `owner_display_name` (String) owner.display_name
+- `owner_uuid` (String) owner.uuid
 - `parent_fingerprint` (String) The fingerprint of the parent key. This value is null unless the current key is a subkey.
 - `subkeys` (String) subkeys (JSON array)

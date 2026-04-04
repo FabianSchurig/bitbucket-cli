@@ -55,6 +55,19 @@ resource "bitbucket_pipelines" "example" {
   - `source` (String) Identifier of the configuration source
   - `uri` (String) Link to the configuration source view or its immediate content
 
+- `creator_display_name` (String) creator.display_name (also computed from API response)
+- `creator_uuid` (String) creator.uuid (also computed from API response)
+- `repository_description` (String) repository.description (also computed from API response)
+- `repository_fork_policy` (String)  (also computed from API response)
+- `repository_full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs. (also computed from API response)
+- `repository_has_issues` (String)  (also computed from API response)
+- `repository_has_wiki` (String)  (also computed from API response)
+- `repository_is_private` (String) repository.is_private (also computed from API response)
+- `repository_language` (String) repository.language (also computed from API response)
+- `repository_name` (String) repository.name (also computed from API response)
+- `repository_scm` (String) [git] (also computed from API response)
+- `repository_size` (String) repository.size (also computed from API response)
+- `repository_uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user. (also computed from API response)
 - `uuid` (String) The UUID identifying the pipeline. (also computed from API response)
 - `variables` (List of Object) The variables for the pipeline. (also computed from API response)
   Nested schema:
@@ -70,3 +83,6 @@ resource "bitbucket_pipelines" "example" {
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) The timestamp when the pipeline was created.
+- `creator_created_on` (String) creator.created_on
+- `repository_created_on` (String) repository.created_on
+- `repository_updated_on` (String) repository.updated_on

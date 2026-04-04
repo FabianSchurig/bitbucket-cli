@@ -54,10 +54,14 @@ const schemaRefPrefix = "#/components/schemas/"
 
 // FieldResolveOpts controls which properties are skipped during field resolution.
 type FieldResolveOpts struct {
-	SkipPropNames    map[string]bool
-	SkipPropertyRefs map[string]bool
-	SkipAllOfRefs    map[string]bool
-	RefIdOnlySchemas map[string]bool
+	SkipPropNames map[string]bool
+	SkipAllOfRefs map[string]bool
+	// MaxRefDepth controls how many levels of property $ref references are
+	// followed. allOf composition does not count as a level (it is structural
+	// inheritance, not a relationship). Use 1 to expose one level of nested
+	// entity properties (e.g., target.hash for a commit ref), 0 to not follow
+	// any property $ref references at all.
+	MaxRefDepth int
 }
 
 // skipAllOfRefs lists schema names in allOf that should be skipped during
@@ -80,36 +84,10 @@ var skipPropNames = map[string]bool{
 	"resolved_on": true, "resolved_by": true,
 }
 
-// skipPropertyRefs lists schema reference names whose nested properties should
-// not be inlined into body fields (complex linked entities like users,
-// repositories, commits).
-var skipPropertyRefs = map[string]bool{
-	"account": true, "user": true, "team": true,
-	"repository": true, "link": true,
-	"account_links": true, "team_links": true, "user_links": true,
-	"comment_resolution": true, "commitstatus": true,
-	"pullrequest": true, "base_commit": true, "commit": true,
-}
-
-// refIdOnlySchemas lists schema names where only the "id" sub-field should be
-// exposed (rather than inlining the full schema), used for referenced entities.
-var refIdOnlySchemas = map[string]bool{
-	"comment": true,
-}
-
 // responseSkipPropNames is more permissive than skipPropNames — response fields
 // like created_on, updated_on, comment_count etc. are useful computed values.
 var responseSkipPropNames = map[string]bool{
 	"links": true, "html": true, "rendered": true,
-}
-
-// responseSkipPropertyRefs skips complex entity refs in response fields.
-var responseSkipPropertyRefs = map[string]bool{
-	"account": true, "user": true, "team": true,
-	"repository": true, "link": true,
-	"account_links": true, "team_links": true, "user_links": true,
-	"comment_resolution": true, "commitstatus": true,
-	"pullrequest": true, "base_commit": true, "commit": true,
 }
 
 // arrayItemSkipPropNames lists properties to skip when resolving array item fields.
@@ -119,45 +97,34 @@ var arrayItemSkipPropNames = map[string]bool{
 	"links": true, "html": true, "rendered": true,
 }
 
-// arrayItemSkipPropertyRefs lists schema refs to skip within array items.
-// Skips complex nested entities to keep the nested schema shallow.
-var arrayItemSkipPropertyRefs = map[string]bool{
-	"repository": true, "link": true,
-	"account_links": true, "team_links": true, "user_links": true,
-	"comment_resolution": true, "commitstatus": true,
-	"pullrequest": true, "base_commit": true, "commit": true,
-	"account": true, "user": true, "team": true,
-	"workspace": true,
-}
-
 // BodyFieldOpts returns the default options for request body field resolution.
+// MaxRefDepth=1 follows one level of property $ref references, exposing
+// direct properties of referenced entities (e.g., target.hash for commit).
 func BodyFieldOpts() FieldResolveOpts {
 	return FieldResolveOpts{
-		SkipPropNames:    skipPropNames,
-		SkipPropertyRefs: skipPropertyRefs,
-		SkipAllOfRefs:    skipAllOfRefs,
-		RefIdOnlySchemas: refIdOnlySchemas,
+		SkipPropNames: skipPropNames,
+		SkipAllOfRefs: skipAllOfRefs,
+		MaxRefDepth:   1,
 	}
 }
 
 // ResponseFieldOpts returns options for response field resolution (more permissive).
+// MaxRefDepth=1 follows one level of property $ref references.
 func ResponseFieldOpts() FieldResolveOpts {
 	return FieldResolveOpts{
-		SkipPropNames:    responseSkipPropNames,
-		SkipPropertyRefs: responseSkipPropertyRefs,
-		SkipAllOfRefs:    skipAllOfRefs,
-		RefIdOnlySchemas: refIdOnlySchemas,
+		SkipPropNames: responseSkipPropNames,
+		SkipAllOfRefs: skipAllOfRefs,
+		MaxRefDepth:   1,
 	}
 }
 
 // ArrayItemFieldOpts returns options for resolving fields inside array item schemas.
-// More permissive than body opts (includes id, uuid, etc.) but skips complex refs.
+// MaxRefDepth=0 keeps array items shallow — only direct properties are exposed.
 func ArrayItemFieldOpts() FieldResolveOpts {
 	return FieldResolveOpts{
-		SkipPropNames:    arrayItemSkipPropNames,
-		SkipPropertyRefs: arrayItemSkipPropertyRefs,
-		SkipAllOfRefs:    skipAllOfRefs,
-		RefIdOnlySchemas: refIdOnlySchemas,
+		SkipPropNames: arrayItemSkipPropNames,
+		SkipAllOfRefs: skipAllOfRefs,
+		MaxRefDepth:   0,
 	}
 }
 
@@ -371,14 +338,12 @@ func flattenProperty(schemas map[string]any, name, path string, prop map[string]
 }
 
 func resolveRefProperty(schemas map[string]any, name, path, ref string, visited map[string]bool, opts FieldResolveOpts) []BodyField {
-	refName := strings.TrimPrefix(ref, schemaRefPrefix)
-	if opts.SkipPropertyRefs[refName] {
+	if opts.MaxRefDepth <= 0 {
 		return nil
 	}
-	if opts.RefIdOnlySchemas[refName] || visited[refName] {
-		return []BodyField{MakeBodyField(path+".id", "integer", fmt.Sprintf("ID of referenced %s", name))}
-	}
-	return ResolveFields(schemas, ref, path, visited, opts)
+	deeper := opts
+	deeper.MaxRefDepth = opts.MaxRefDepth - 1
+	return ResolveFields(schemas, ref, path, visited, deeper)
 }
 
 // ResolveResponseRef extracts the response entity schema $ref from an operation.

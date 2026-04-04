@@ -240,20 +240,35 @@ func newIssuesListIssuesCmd() *cobra.Command {
 // operationId: createAnIssue
 func newIssuesCreateAnIssueCmd() *cobra.Command {
 	var (
-		repoSlug          string
-		workspace         string
-		bodyComponentName string
-		bodyContentMarkup string
-		bodyContentRaw    string
-		bodyEditedOn      string
-		bodyKind          string
-		bodyMilestoneName string
-		bodyPriority      string
-		bodyState         string
-		bodyTitle         string
-		bodyVersionName   string
-		bodyVotes         int
-		body              string
+		repoSlug                  string
+		workspace                 string
+		bodyAssigneeDisplayName   string
+		bodyAssigneeUuid          string
+		bodyComponentName         string
+		bodyContentMarkup         string
+		bodyContentRaw            string
+		bodyEditedOn              string
+		bodyKind                  string
+		bodyMilestoneName         string
+		bodyPriority              string
+		bodyReporterDisplayName   string
+		bodyReporterUuid          string
+		bodyRepositoryDescription string
+		bodyRepositoryForkPolicy  string
+		bodyRepositoryFullName    string
+		bodyRepositoryHasIssues   bool
+		bodyRepositoryHasWiki     bool
+		bodyRepositoryIsPrivate   bool
+		bodyRepositoryLanguage    string
+		bodyRepositoryName        string
+		bodyRepositoryScm         string
+		bodyRepositorySize        int
+		bodyRepositoryUuid        string
+		bodyState                 string
+		bodyTitle                 string
+		bodyVersionName           string
+		bodyVotes                 int
+		body                      string
 	)
 
 	cmd := &cobra.Command{
@@ -278,6 +293,12 @@ func newIssuesCreateAnIssueCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyAssigneeDisplayName != "" {
+					handlers.SetNested(bodyObj, "assignee.display_name", bodyAssigneeDisplayName)
+				}
+				if bodyAssigneeUuid != "" {
+					handlers.SetNested(bodyObj, "assignee.uuid", bodyAssigneeUuid)
+				}
 				if bodyComponentName != "" {
 					handlers.SetNested(bodyObj, "component.name", bodyComponentName)
 				}
@@ -298,6 +319,45 @@ func newIssuesCreateAnIssueCmd() *cobra.Command {
 				}
 				if bodyPriority != "" {
 					handlers.SetNested(bodyObj, "priority", bodyPriority)
+				}
+				if bodyReporterDisplayName != "" {
+					handlers.SetNested(bodyObj, "reporter.display_name", bodyReporterDisplayName)
+				}
+				if bodyReporterUuid != "" {
+					handlers.SetNested(bodyObj, "reporter.uuid", bodyReporterUuid)
+				}
+				if bodyRepositoryDescription != "" {
+					handlers.SetNested(bodyObj, "repository.description", bodyRepositoryDescription)
+				}
+				if bodyRepositoryForkPolicy != "" {
+					handlers.SetNested(bodyObj, "repository.fork_policy", bodyRepositoryForkPolicy)
+				}
+				if bodyRepositoryFullName != "" {
+					handlers.SetNested(bodyObj, "repository.full_name", bodyRepositoryFullName)
+				}
+				if bodyRepositoryHasIssues {
+					handlers.SetNested(bodyObj, "repository.has_issues", bodyRepositoryHasIssues)
+				}
+				if bodyRepositoryHasWiki {
+					handlers.SetNested(bodyObj, "repository.has_wiki", bodyRepositoryHasWiki)
+				}
+				if bodyRepositoryIsPrivate {
+					handlers.SetNested(bodyObj, "repository.is_private", bodyRepositoryIsPrivate)
+				}
+				if bodyRepositoryLanguage != "" {
+					handlers.SetNested(bodyObj, "repository.language", bodyRepositoryLanguage)
+				}
+				if bodyRepositoryName != "" {
+					handlers.SetNested(bodyObj, "repository.name", bodyRepositoryName)
+				}
+				if bodyRepositoryScm != "" {
+					handlers.SetNested(bodyObj, "repository.scm", bodyRepositoryScm)
+				}
+				if bodyRepositorySize != 0 {
+					handlers.SetNested(bodyObj, "repository.size", bodyRepositorySize)
+				}
+				if bodyRepositoryUuid != "" {
+					handlers.SetNested(bodyObj, "repository.uuid", bodyRepositoryUuid)
 				}
 				if bodyState != "" {
 					handlers.SetNested(bodyObj, "state", bodyState)
@@ -328,6 +388,8 @@ func newIssuesCreateAnIssueCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyAssigneeDisplayName, "assignee-display-name", "", `assignee.display_name`)
+	cmd.Flags().StringVar(&bodyAssigneeUuid, "assignee-uuid", "", `assignee.uuid`)
 	cmd.Flags().StringVar(&bodyComponentName, "component-name", "", `component.name`)
 	cmd.Flags().StringVar(&bodyContentMarkup, "content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
 	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
@@ -335,6 +397,34 @@ func newIssuesCreateAnIssueCmd() *cobra.Command {
 	cmd.Flags().StringVar(&bodyKind, "kind", "", `[bug, enhancement, proposal, task]`)
 	cmd.Flags().StringVar(&bodyMilestoneName, "milestone-name", "", `milestone.name`)
 	cmd.Flags().StringVar(&bodyPriority, "priority", "", `[trivial, minor, major, critical, blocker]`)
+	cmd.Flags().StringVar(&bodyReporterDisplayName, "reporter-display-name", "", `reporter.display_name`)
+	cmd.Flags().StringVar(&bodyReporterUuid, "reporter-uuid", "", `reporter.uuid`)
+	cmd.Flags().StringVar(&bodyRepositoryDescription, "repository-description", "", `repository.description`)
+	cmd.Flags().StringVar(&bodyRepositoryForkPolicy, "repository-fork-policy", "", `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`)
+	cmd.Flags().StringVar(&bodyRepositoryFullName, "repository-full-name", "", `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`)
+	cmd.Flags().BoolVar(&bodyRepositoryHasIssues, "repository-has-issues", false, `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`)
+	cmd.Flags().BoolVar(&bodyRepositoryHasWiki, "repository-has-wiki", false, `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`)
+	cmd.Flags().BoolVar(&bodyRepositoryIsPrivate, "repository-is-private", false, `repository.is_private`)
+	cmd.Flags().StringVar(&bodyRepositoryLanguage, "repository-language", "", `repository.language`)
+	cmd.Flags().StringVar(&bodyRepositoryName, "repository-name", "", `repository.name`)
+	cmd.Flags().StringVar(&bodyRepositoryScm, "repository-scm", "", `[git]`)
+	cmd.Flags().IntVar(&bodyRepositorySize, "repository-size", 0, `repository.size`)
+	cmd.Flags().StringVar(&bodyRepositoryUuid, "repository-uuid", "", `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`)
 	cmd.Flags().StringVar(&bodyState, "state", "", `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`)
 	cmd.Flags().StringVar(&bodyTitle, "title", "", `title`)
 	cmd.Flags().StringVar(&bodyVersionName, "version-name", "", `version.name`)
@@ -1041,16 +1131,13 @@ func newIssuesModifyTheStateOfAnIssueCmd() *cobra.Command {
 		bodyChangesTitleOld     string
 		bodyChangesVersionNew   string
 		bodyChangesVersionOld   string
-		bodyIssueComponentName  string
 		bodyIssueContentMarkup  string
 		bodyIssueContentRaw     string
 		bodyIssueEditedOn       string
 		bodyIssueKind           string
-		bodyIssueMilestoneName  string
 		bodyIssuePriority       string
 		bodyIssueState          string
 		bodyIssueTitle          string
-		bodyIssueVersionName    string
 		bodyIssueVotes          int
 		bodyMessageMarkup       string
 		bodyMessageRaw          string
@@ -1139,9 +1226,6 @@ func newIssuesModifyTheStateOfAnIssueCmd() *cobra.Command {
 				if bodyChangesVersionOld != "" {
 					handlers.SetNested(bodyObj, "changes.version.old", bodyChangesVersionOld)
 				}
-				if bodyIssueComponentName != "" {
-					handlers.SetNested(bodyObj, "issue.component.name", bodyIssueComponentName)
-				}
 				if bodyIssueContentMarkup != "" {
 					handlers.SetNested(bodyObj, "issue.content.markup", bodyIssueContentMarkup)
 				}
@@ -1154,9 +1238,6 @@ func newIssuesModifyTheStateOfAnIssueCmd() *cobra.Command {
 				if bodyIssueKind != "" {
 					handlers.SetNested(bodyObj, "issue.kind", bodyIssueKind)
 				}
-				if bodyIssueMilestoneName != "" {
-					handlers.SetNested(bodyObj, "issue.milestone.name", bodyIssueMilestoneName)
-				}
 				if bodyIssuePriority != "" {
 					handlers.SetNested(bodyObj, "issue.priority", bodyIssuePriority)
 				}
@@ -1165,9 +1246,6 @@ func newIssuesModifyTheStateOfAnIssueCmd() *cobra.Command {
 				}
 				if bodyIssueTitle != "" {
 					handlers.SetNested(bodyObj, "issue.title", bodyIssueTitle)
-				}
-				if bodyIssueVersionName != "" {
-					handlers.SetNested(bodyObj, "issue.version.name", bodyIssueVersionName)
 				}
 				if bodyIssueVotes != 0 {
 					handlers.SetNested(bodyObj, "issue.votes", bodyIssueVotes)
@@ -1220,16 +1298,13 @@ func newIssuesModifyTheStateOfAnIssueCmd() *cobra.Command {
 	cmd.Flags().StringVar(&bodyChangesTitleOld, "changes-title-old", "", `changes.title.old`)
 	cmd.Flags().StringVar(&bodyChangesVersionNew, "changes-version-new", "", `changes.version.new`)
 	cmd.Flags().StringVar(&bodyChangesVersionOld, "changes-version-old", "", `changes.version.old`)
-	cmd.Flags().StringVar(&bodyIssueComponentName, "issue-component-name", "", `issue.component.name`)
 	cmd.Flags().StringVar(&bodyIssueContentMarkup, "issue-content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
 	cmd.Flags().StringVar(&bodyIssueContentRaw, "issue-content-raw", "", `The text as it was typed by a user.`)
 	cmd.Flags().StringVar(&bodyIssueEditedOn, "issue-edited-on", "", `issue.edited_on`)
 	cmd.Flags().StringVar(&bodyIssueKind, "issue-kind", "", `[bug, enhancement, proposal, task]`)
-	cmd.Flags().StringVar(&bodyIssueMilestoneName, "issue-milestone-name", "", `issue.milestone.name`)
 	cmd.Flags().StringVar(&bodyIssuePriority, "issue-priority", "", `[trivial, minor, major, critical, blocker]`)
 	cmd.Flags().StringVar(&bodyIssueState, "issue-state", "", `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`)
 	cmd.Flags().StringVar(&bodyIssueTitle, "issue-title", "", `issue.title`)
-	cmd.Flags().StringVar(&bodyIssueVersionName, "issue-version-name", "", `issue.version.name`)
 	cmd.Flags().IntVar(&bodyIssueVotes, "issue-votes", 0, `issue.votes`)
 	cmd.Flags().StringVar(&bodyMessageMarkup, "message-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
 	cmd.Flags().StringVar(&bodyMessageRaw, "message-raw", "", `The text as it was typed by a user.`)
@@ -1374,18 +1449,14 @@ func newIssuesCreateACommentOnAnIssueCmd() *cobra.Command {
 		bodyInlineStartFrom    int
 		bodyInlineStartTo      int
 		bodyInlineTo           int
-		bodyIssueComponentName string
 		bodyIssueContentMarkup string
 		bodyIssueContentRaw    string
 		bodyIssueEditedOn      string
 		bodyIssueKind          string
-		bodyIssueMilestoneName string
 		bodyIssuePriority      string
 		bodyIssueState         string
 		bodyIssueTitle         string
-		bodyIssueVersionName   string
 		bodyIssueVotes         int
-		bodyParentId           int
 		body                   string
 	)
 
@@ -1436,9 +1507,6 @@ func newIssuesCreateACommentOnAnIssueCmd() *cobra.Command {
 				if bodyInlineTo != 0 {
 					handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
 				}
-				if bodyIssueComponentName != "" {
-					handlers.SetNested(bodyObj, "issue.component.name", bodyIssueComponentName)
-				}
 				if bodyIssueContentMarkup != "" {
 					handlers.SetNested(bodyObj, "issue.content.markup", bodyIssueContentMarkup)
 				}
@@ -1451,9 +1519,6 @@ func newIssuesCreateACommentOnAnIssueCmd() *cobra.Command {
 				if bodyIssueKind != "" {
 					handlers.SetNested(bodyObj, "issue.kind", bodyIssueKind)
 				}
-				if bodyIssueMilestoneName != "" {
-					handlers.SetNested(bodyObj, "issue.milestone.name", bodyIssueMilestoneName)
-				}
 				if bodyIssuePriority != "" {
 					handlers.SetNested(bodyObj, "issue.priority", bodyIssuePriority)
 				}
@@ -1463,14 +1528,8 @@ func newIssuesCreateACommentOnAnIssueCmd() *cobra.Command {
 				if bodyIssueTitle != "" {
 					handlers.SetNested(bodyObj, "issue.title", bodyIssueTitle)
 				}
-				if bodyIssueVersionName != "" {
-					handlers.SetNested(bodyObj, "issue.version.name", bodyIssueVersionName)
-				}
 				if bodyIssueVotes != 0 {
 					handlers.SetNested(bodyObj, "issue.votes", bodyIssueVotes)
-				}
-				if bodyParentId != 0 {
-					handlers.SetNested(bodyObj, "parent.id", bodyParentId)
 				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
@@ -1497,18 +1556,14 @@ func newIssuesCreateACommentOnAnIssueCmd() *cobra.Command {
 	cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
 	cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
 	cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
-	cmd.Flags().StringVar(&bodyIssueComponentName, "issue-component-name", "", `issue.component.name`)
 	cmd.Flags().StringVar(&bodyIssueContentMarkup, "issue-content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
 	cmd.Flags().StringVar(&bodyIssueContentRaw, "issue-content-raw", "", `The text as it was typed by a user.`)
 	cmd.Flags().StringVar(&bodyIssueEditedOn, "issue-edited-on", "", `issue.edited_on`)
 	cmd.Flags().StringVar(&bodyIssueKind, "issue-kind", "", `[bug, enhancement, proposal, task]`)
-	cmd.Flags().StringVar(&bodyIssueMilestoneName, "issue-milestone-name", "", `issue.milestone.name`)
 	cmd.Flags().StringVar(&bodyIssuePriority, "issue-priority", "", `[trivial, minor, major, critical, blocker]`)
 	cmd.Flags().StringVar(&bodyIssueState, "issue-state", "", `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`)
 	cmd.Flags().StringVar(&bodyIssueTitle, "issue-title", "", `issue.title`)
-	cmd.Flags().StringVar(&bodyIssueVersionName, "issue-version-name", "", `issue.version.name`)
 	cmd.Flags().IntVar(&bodyIssueVotes, "issue-votes", 0, `issue.votes`)
-	cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `ID of referenced parent`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -1584,18 +1639,14 @@ func newIssuesUpdateACommentOnAnIssueCmd() *cobra.Command {
 		bodyInlineStartFrom    int
 		bodyInlineStartTo      int
 		bodyInlineTo           int
-		bodyIssueComponentName string
 		bodyIssueContentMarkup string
 		bodyIssueContentRaw    string
 		bodyIssueEditedOn      string
 		bodyIssueKind          string
-		bodyIssueMilestoneName string
 		bodyIssuePriority      string
 		bodyIssueState         string
 		bodyIssueTitle         string
-		bodyIssueVersionName   string
 		bodyIssueVotes         int
-		bodyParentId           int
 		body                   string
 	)
 
@@ -1650,9 +1701,6 @@ func newIssuesUpdateACommentOnAnIssueCmd() *cobra.Command {
 				if bodyInlineTo != 0 {
 					handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
 				}
-				if bodyIssueComponentName != "" {
-					handlers.SetNested(bodyObj, "issue.component.name", bodyIssueComponentName)
-				}
 				if bodyIssueContentMarkup != "" {
 					handlers.SetNested(bodyObj, "issue.content.markup", bodyIssueContentMarkup)
 				}
@@ -1665,9 +1713,6 @@ func newIssuesUpdateACommentOnAnIssueCmd() *cobra.Command {
 				if bodyIssueKind != "" {
 					handlers.SetNested(bodyObj, "issue.kind", bodyIssueKind)
 				}
-				if bodyIssueMilestoneName != "" {
-					handlers.SetNested(bodyObj, "issue.milestone.name", bodyIssueMilestoneName)
-				}
 				if bodyIssuePriority != "" {
 					handlers.SetNested(bodyObj, "issue.priority", bodyIssuePriority)
 				}
@@ -1677,14 +1722,8 @@ func newIssuesUpdateACommentOnAnIssueCmd() *cobra.Command {
 				if bodyIssueTitle != "" {
 					handlers.SetNested(bodyObj, "issue.title", bodyIssueTitle)
 				}
-				if bodyIssueVersionName != "" {
-					handlers.SetNested(bodyObj, "issue.version.name", bodyIssueVersionName)
-				}
 				if bodyIssueVotes != 0 {
 					handlers.SetNested(bodyObj, "issue.votes", bodyIssueVotes)
-				}
-				if bodyParentId != 0 {
-					handlers.SetNested(bodyObj, "parent.id", bodyParentId)
 				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
@@ -1712,18 +1751,14 @@ func newIssuesUpdateACommentOnAnIssueCmd() *cobra.Command {
 	cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
 	cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
 	cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
-	cmd.Flags().StringVar(&bodyIssueComponentName, "issue-component-name", "", `issue.component.name`)
 	cmd.Flags().StringVar(&bodyIssueContentMarkup, "issue-content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
 	cmd.Flags().StringVar(&bodyIssueContentRaw, "issue-content-raw", "", `The text as it was typed by a user.`)
 	cmd.Flags().StringVar(&bodyIssueEditedOn, "issue-edited-on", "", `issue.edited_on`)
 	cmd.Flags().StringVar(&bodyIssueKind, "issue-kind", "", `[bug, enhancement, proposal, task]`)
-	cmd.Flags().StringVar(&bodyIssueMilestoneName, "issue-milestone-name", "", `issue.milestone.name`)
 	cmd.Flags().StringVar(&bodyIssuePriority, "issue-priority", "", `[trivial, minor, major, critical, blocker]`)
 	cmd.Flags().StringVar(&bodyIssueState, "issue-state", "", `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`)
 	cmd.Flags().StringVar(&bodyIssueTitle, "issue-title", "", `issue.title`)
-	cmd.Flags().StringVar(&bodyIssueVersionName, "issue-version-name", "", `issue.version.name`)
 	cmd.Flags().IntVar(&bodyIssueVotes, "issue-votes", 0, `issue.votes`)
-	cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `ID of referenced parent`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }

@@ -472,24 +472,18 @@ func newPRListPullRequestsCmd() *cobra.Command {
 // operationId: createAPullRequest
 func newPRCreateAPullRequestCmd() *cobra.Command {
 	var (
-		repoSlug                                  string
-		workspace                                 string
-		bodyCloseSourceBranch                     bool
-		bodyDescription                           string
-		bodyDestinationBranchDefaultMergeStrategy string
-		bodyDestinationBranchMergeStrategies      string
-		bodyDestinationBranchName                 string
-		bodyDestinationCommitHash                 string
-		bodyDraft                                 bool
-		bodyReason                                string
-		bodyReviewers                             string
-		bodySourceBranchDefaultMergeStrategy      string
-		bodySourceBranchMergeStrategies           string
-		bodySourceBranchName                      string
-		bodySourceCommitHash                      string
-		bodyState                                 string
-		bodyTitle                                 string
-		body                                      string
+		repoSlug                  string
+		workspace                 string
+		bodyCloseSourceBranch     bool
+		bodyDescription           string
+		bodyDestinationCommitHash string
+		bodyDraft                 bool
+		bodyReason                string
+		bodyReviewers             string
+		bodySourceCommitHash      string
+		bodyState                 string
+		bodyTitle                 string
+		body                      string
 	)
 
 	cmd := &cobra.Command{
@@ -520,15 +514,6 @@ func newPRCreateAPullRequestCmd() *cobra.Command {
 				if bodyDescription != "" {
 					handlers.SetNested(bodyObj, "description", bodyDescription)
 				}
-				if bodyDestinationBranchDefaultMergeStrategy != "" {
-					handlers.SetNested(bodyObj, "destination.branch.default_merge_strategy", bodyDestinationBranchDefaultMergeStrategy)
-				}
-				if bodyDestinationBranchMergeStrategies != "" {
-					handlers.SetNested(bodyObj, "destination.branch.merge_strategies", bodyDestinationBranchMergeStrategies)
-				}
-				if bodyDestinationBranchName != "" {
-					handlers.SetNested(bodyObj, "destination.branch.name", bodyDestinationBranchName)
-				}
 				if bodyDestinationCommitHash != "" {
 					handlers.SetNested(bodyObj, "destination.commit.hash", bodyDestinationCommitHash)
 				}
@@ -540,15 +525,6 @@ func newPRCreateAPullRequestCmd() *cobra.Command {
 				}
 				if bodyReviewers != "" {
 					handlers.SetNested(bodyObj, "reviewers", bodyReviewers)
-				}
-				if bodySourceBranchDefaultMergeStrategy != "" {
-					handlers.SetNested(bodyObj, "source.branch.default_merge_strategy", bodySourceBranchDefaultMergeStrategy)
-				}
-				if bodySourceBranchMergeStrategies != "" {
-					handlers.SetNested(bodyObj, "source.branch.merge_strategies", bodySourceBranchMergeStrategies)
-				}
-				if bodySourceBranchName != "" {
-					handlers.SetNested(bodyObj, "source.branch.name", bodySourceBranchName)
 				}
 				if bodySourceCommitHash != "" {
 					handlers.SetNested(bodyObj, "source.commit.hash", bodySourceCommitHash)
@@ -578,16 +554,10 @@ func newPRCreateAPullRequestCmd() *cobra.Command {
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().BoolVar(&bodyCloseSourceBranch, "close-source-branch", false, `A boolean flag indicating if merging the pull request closes the source branch.`)
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `Explains what the pull request does.`)
-	cmd.Flags().StringVar(&bodyDestinationBranchDefaultMergeStrategy, "destination-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
-	cmd.Flags().StringVar(&bodyDestinationBranchMergeStrategies, "destination-branch-merge-strategies", "", `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`)
-	cmd.Flags().StringVar(&bodyDestinationBranchName, "destination-branch-name", "", `destination.branch.name`)
 	cmd.Flags().StringVar(&bodyDestinationCommitHash, "destination-commit-hash", "", `destination.commit.hash`)
 	cmd.Flags().BoolVar(&bodyDraft, "draft", false, `A boolean flag indicating whether the pull request is a draft.`)
 	cmd.Flags().StringVar(&bodyReason, "reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
 	cmd.Flags().StringVar(&bodyReviewers, "reviewers", "", "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.")
-	cmd.Flags().StringVar(&bodySourceBranchDefaultMergeStrategy, "source-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
-	cmd.Flags().StringVar(&bodySourceBranchMergeStrategies, "source-branch-merge-strategies", "", `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`)
-	cmd.Flags().StringVar(&bodySourceBranchName, "source-branch-name", "", `source.branch.name`)
 	cmd.Flags().StringVar(&bodySourceCommitHash, "source-commit-hash", "", `source.commit.hash`)
 	cmd.Flags().StringVar(&bodyState, "state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)
 	cmd.Flags().StringVar(&bodyTitle, "title", "", `Title of the pull request.`)
@@ -693,25 +663,19 @@ func newPRGetAPullRequestCmd() *cobra.Command {
 // operationId: updateAPullRequest
 func newPRUpdateAPullRequestCmd() *cobra.Command {
 	var (
-		pullRequestId                             int
-		repoSlug                                  string
-		workspace                                 string
-		bodyCloseSourceBranch                     bool
-		bodyDescription                           string
-		bodyDestinationBranchDefaultMergeStrategy string
-		bodyDestinationBranchMergeStrategies      string
-		bodyDestinationBranchName                 string
-		bodyDestinationCommitHash                 string
-		bodyDraft                                 bool
-		bodyReason                                string
-		bodyReviewers                             string
-		bodySourceBranchDefaultMergeStrategy      string
-		bodySourceBranchMergeStrategies           string
-		bodySourceBranchName                      string
-		bodySourceCommitHash                      string
-		bodyState                                 string
-		bodyTitle                                 string
-		body                                      string
+		pullRequestId             int
+		repoSlug                  string
+		workspace                 string
+		bodyCloseSourceBranch     bool
+		bodyDescription           string
+		bodyDestinationCommitHash string
+		bodyDraft                 bool
+		bodyReason                string
+		bodyReviewers             string
+		bodySourceCommitHash      string
+		bodyState                 string
+		bodyTitle                 string
+		body                      string
 	)
 
 	cmd := &cobra.Command{
@@ -750,15 +714,6 @@ Only open pull requests can be mutated.`,
 				if bodyDescription != "" {
 					handlers.SetNested(bodyObj, "description", bodyDescription)
 				}
-				if bodyDestinationBranchDefaultMergeStrategy != "" {
-					handlers.SetNested(bodyObj, "destination.branch.default_merge_strategy", bodyDestinationBranchDefaultMergeStrategy)
-				}
-				if bodyDestinationBranchMergeStrategies != "" {
-					handlers.SetNested(bodyObj, "destination.branch.merge_strategies", bodyDestinationBranchMergeStrategies)
-				}
-				if bodyDestinationBranchName != "" {
-					handlers.SetNested(bodyObj, "destination.branch.name", bodyDestinationBranchName)
-				}
 				if bodyDestinationCommitHash != "" {
 					handlers.SetNested(bodyObj, "destination.commit.hash", bodyDestinationCommitHash)
 				}
@@ -770,15 +725,6 @@ Only open pull requests can be mutated.`,
 				}
 				if bodyReviewers != "" {
 					handlers.SetNested(bodyObj, "reviewers", bodyReviewers)
-				}
-				if bodySourceBranchDefaultMergeStrategy != "" {
-					handlers.SetNested(bodyObj, "source.branch.default_merge_strategy", bodySourceBranchDefaultMergeStrategy)
-				}
-				if bodySourceBranchMergeStrategies != "" {
-					handlers.SetNested(bodyObj, "source.branch.merge_strategies", bodySourceBranchMergeStrategies)
-				}
-				if bodySourceBranchName != "" {
-					handlers.SetNested(bodyObj, "source.branch.name", bodySourceBranchName)
 				}
 				if bodySourceCommitHash != "" {
 					handlers.SetNested(bodyObj, "source.commit.hash", bodySourceCommitHash)
@@ -809,16 +755,10 @@ Only open pull requests can be mutated.`,
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().BoolVar(&bodyCloseSourceBranch, "close-source-branch", false, `A boolean flag indicating if merging the pull request closes the source branch.`)
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `Explains what the pull request does.`)
-	cmd.Flags().StringVar(&bodyDestinationBranchDefaultMergeStrategy, "destination-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
-	cmd.Flags().StringVar(&bodyDestinationBranchMergeStrategies, "destination-branch-merge-strategies", "", `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`)
-	cmd.Flags().StringVar(&bodyDestinationBranchName, "destination-branch-name", "", `destination.branch.name`)
 	cmd.Flags().StringVar(&bodyDestinationCommitHash, "destination-commit-hash", "", `destination.commit.hash`)
 	cmd.Flags().BoolVar(&bodyDraft, "draft", false, `A boolean flag indicating whether the pull request is a draft.`)
 	cmd.Flags().StringVar(&bodyReason, "reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
 	cmd.Flags().StringVar(&bodyReviewers, "reviewers", "", "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.")
-	cmd.Flags().StringVar(&bodySourceBranchDefaultMergeStrategy, "source-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
-	cmd.Flags().StringVar(&bodySourceBranchMergeStrategies, "source-branch-merge-strategies", "", `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`)
-	cmd.Flags().StringVar(&bodySourceBranchName, "source-branch-name", "", `source.branch.name`)
 	cmd.Flags().StringVar(&bodySourceCommitHash, "source-commit-hash", "", `source.commit.hash`)
 	cmd.Flags().StringVar(&bodyState, "state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)
 	cmd.Flags().StringVar(&bodyTitle, "title", "", `Title of the pull request.`)
@@ -1040,19 +980,26 @@ func newPRListCommentsOnAPullRequestCmd() *cobra.Command {
 // operationId: createACommentOnAPullRequest
 func newPRCreateACommentOnAPullRequestCmd() *cobra.Command {
 	var (
-		pullRequestId       int
-		repoSlug            string
-		workspace           string
-		bodyContentMarkup   string
-		bodyContentRaw      string
-		bodyInlineFrom      int
-		bodyInlinePath      string
-		bodyInlineStartFrom int
-		bodyInlineStartTo   int
-		bodyInlineTo        int
-		bodyParentId        int
-		bodyPending         bool
-		body                string
+		pullRequestId                    int
+		repoSlug                         string
+		workspace                        string
+		bodyContentMarkup                string
+		bodyContentRaw                   string
+		bodyInlineFrom                   int
+		bodyInlinePath                   string
+		bodyInlineStartFrom              int
+		bodyInlineStartTo                int
+		bodyInlineTo                     int
+		bodyPending                      bool
+		bodyPullrequestCloseSourceBranch bool
+		bodyPullrequestDescription       string
+		bodyPullrequestDraft             bool
+		bodyPullrequestReason            string
+		bodyPullrequestReviewers         string
+		bodyPullrequestState             string
+		bodyPullrequestTitle             string
+		bodyResolutionType               string
+		body                             string
 	)
 
 	cmd := &cobra.Command{
@@ -1104,11 +1051,32 @@ Returns the newly created pull request comment.`,
 				if bodyInlineTo != 0 {
 					handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
 				}
-				if bodyParentId != 0 {
-					handlers.SetNested(bodyObj, "parent.id", bodyParentId)
-				}
 				if bodyPending {
 					handlers.SetNested(bodyObj, "pending", bodyPending)
+				}
+				if bodyPullrequestCloseSourceBranch {
+					handlers.SetNested(bodyObj, "pullrequest.close_source_branch", bodyPullrequestCloseSourceBranch)
+				}
+				if bodyPullrequestDescription != "" {
+					handlers.SetNested(bodyObj, "pullrequest.description", bodyPullrequestDescription)
+				}
+				if bodyPullrequestDraft {
+					handlers.SetNested(bodyObj, "pullrequest.draft", bodyPullrequestDraft)
+				}
+				if bodyPullrequestReason != "" {
+					handlers.SetNested(bodyObj, "pullrequest.reason", bodyPullrequestReason)
+				}
+				if bodyPullrequestReviewers != "" {
+					handlers.SetNested(bodyObj, "pullrequest.reviewers", bodyPullrequestReviewers)
+				}
+				if bodyPullrequestState != "" {
+					handlers.SetNested(bodyObj, "pullrequest.state", bodyPullrequestState)
+				}
+				if bodyPullrequestTitle != "" {
+					handlers.SetNested(bodyObj, "pullrequest.title", bodyPullrequestTitle)
+				}
+				if bodyResolutionType != "" {
+					handlers.SetNested(bodyObj, "resolution.type", bodyResolutionType)
 				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
@@ -1135,8 +1103,15 @@ Returns the newly created pull request comment.`,
 	cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
 	cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
 	cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
-	cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `ID of referenced parent`)
 	cmd.Flags().BoolVar(&bodyPending, "pending", false, `pending`)
+	cmd.Flags().BoolVar(&bodyPullrequestCloseSourceBranch, "pullrequest-close-source-branch", false, `A boolean flag indicating if merging the pull request closes the source branch.`)
+	cmd.Flags().StringVar(&bodyPullrequestDescription, "pullrequest-description", "", `Explains what the pull request does.`)
+	cmd.Flags().BoolVar(&bodyPullrequestDraft, "pullrequest-draft", false, `A boolean flag indicating whether the pull request is a draft.`)
+	cmd.Flags().StringVar(&bodyPullrequestReason, "pullrequest-reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
+	cmd.Flags().StringVar(&bodyPullrequestReviewers, "pullrequest-reviewers", "", "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.")
+	cmd.Flags().StringVar(&bodyPullrequestState, "pullrequest-state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)
+	cmd.Flags().StringVar(&bodyPullrequestTitle, "pullrequest-title", "", `Title of the pull request.`)
+	cmd.Flags().StringVar(&bodyResolutionType, "resolution-type", "", `resolution.type`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -1201,20 +1176,27 @@ func newPRGetACommentOnAPullRequestCmd() *cobra.Command {
 // operationId: updateACommentOnAPullRequest
 func newPRUpdateACommentOnAPullRequestCmd() *cobra.Command {
 	var (
-		commentId           int
-		pullRequestId       int
-		repoSlug            string
-		workspace           string
-		bodyContentMarkup   string
-		bodyContentRaw      string
-		bodyInlineFrom      int
-		bodyInlinePath      string
-		bodyInlineStartFrom int
-		bodyInlineStartTo   int
-		bodyInlineTo        int
-		bodyParentId        int
-		bodyPending         bool
-		body                string
+		commentId                        int
+		pullRequestId                    int
+		repoSlug                         string
+		workspace                        string
+		bodyContentMarkup                string
+		bodyContentRaw                   string
+		bodyInlineFrom                   int
+		bodyInlinePath                   string
+		bodyInlineStartFrom              int
+		bodyInlineStartTo                int
+		bodyInlineTo                     int
+		bodyPending                      bool
+		bodyPullrequestCloseSourceBranch bool
+		bodyPullrequestDescription       string
+		bodyPullrequestDraft             bool
+		bodyPullrequestReason            string
+		bodyPullrequestReviewers         string
+		bodyPullrequestState             string
+		bodyPullrequestTitle             string
+		bodyResolutionType               string
+		body                             string
 	)
 
 	cmd := &cobra.Command{
@@ -1268,11 +1250,32 @@ func newPRUpdateACommentOnAPullRequestCmd() *cobra.Command {
 				if bodyInlineTo != 0 {
 					handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
 				}
-				if bodyParentId != 0 {
-					handlers.SetNested(bodyObj, "parent.id", bodyParentId)
-				}
 				if bodyPending {
 					handlers.SetNested(bodyObj, "pending", bodyPending)
+				}
+				if bodyPullrequestCloseSourceBranch {
+					handlers.SetNested(bodyObj, "pullrequest.close_source_branch", bodyPullrequestCloseSourceBranch)
+				}
+				if bodyPullrequestDescription != "" {
+					handlers.SetNested(bodyObj, "pullrequest.description", bodyPullrequestDescription)
+				}
+				if bodyPullrequestDraft {
+					handlers.SetNested(bodyObj, "pullrequest.draft", bodyPullrequestDraft)
+				}
+				if bodyPullrequestReason != "" {
+					handlers.SetNested(bodyObj, "pullrequest.reason", bodyPullrequestReason)
+				}
+				if bodyPullrequestReviewers != "" {
+					handlers.SetNested(bodyObj, "pullrequest.reviewers", bodyPullrequestReviewers)
+				}
+				if bodyPullrequestState != "" {
+					handlers.SetNested(bodyObj, "pullrequest.state", bodyPullrequestState)
+				}
+				if bodyPullrequestTitle != "" {
+					handlers.SetNested(bodyObj, "pullrequest.title", bodyPullrequestTitle)
+				}
+				if bodyResolutionType != "" {
+					handlers.SetNested(bodyObj, "resolution.type", bodyResolutionType)
 				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
@@ -1300,8 +1303,15 @@ func newPRUpdateACommentOnAPullRequestCmd() *cobra.Command {
 	cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
 	cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
 	cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
-	cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `ID of referenced parent`)
 	cmd.Flags().BoolVar(&bodyPending, "pending", false, `pending`)
+	cmd.Flags().BoolVar(&bodyPullrequestCloseSourceBranch, "pullrequest-close-source-branch", false, `A boolean flag indicating if merging the pull request closes the source branch.`)
+	cmd.Flags().StringVar(&bodyPullrequestDescription, "pullrequest-description", "", `Explains what the pull request does.`)
+	cmd.Flags().BoolVar(&bodyPullrequestDraft, "pullrequest-draft", false, `A boolean flag indicating whether the pull request is a draft.`)
+	cmd.Flags().StringVar(&bodyPullrequestReason, "pullrequest-reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
+	cmd.Flags().StringVar(&bodyPullrequestReviewers, "pullrequest-reviewers", "", "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.")
+	cmd.Flags().StringVar(&bodyPullrequestState, "pullrequest-state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)
+	cmd.Flags().StringVar(&bodyPullrequestTitle, "pullrequest-title", "", `Title of the pull request.`)
+	cmd.Flags().StringVar(&bodyResolutionType, "resolution-type", "", `resolution.type`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -2106,13 +2116,19 @@ See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more det
 // operationId: createATaskOnAPullRequest
 func newPRCreateATaskOnAPullRequestCmd() *cobra.Command {
 	var (
-		pullRequestId  int
-		repoSlug       string
-		workspace      string
-		bodyCommentId  int
-		bodyContentRaw string
-		bodyPending    bool
-		body           string
+		pullRequestId              int
+		repoSlug                   string
+		workspace                  string
+		bodyCommentContentMarkup   string
+		bodyCommentContentRaw      string
+		bodyCommentInlineFrom      int
+		bodyCommentInlinePath      string
+		bodyCommentInlineStartFrom int
+		bodyCommentInlineStartTo   int
+		bodyCommentInlineTo        int
+		bodyContentRaw             string
+		bodyPending                bool
+		body                       string
 	)
 
 	cmd := &cobra.Command{
@@ -2146,8 +2162,26 @@ will cause the task to appear below the comment on a pull request when viewed in
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyCommentId != 0 {
-					handlers.SetNested(bodyObj, "comment.id", bodyCommentId)
+				if bodyCommentContentMarkup != "" {
+					handlers.SetNested(bodyObj, "comment.content.markup", bodyCommentContentMarkup)
+				}
+				if bodyCommentContentRaw != "" {
+					handlers.SetNested(bodyObj, "comment.content.raw", bodyCommentContentRaw)
+				}
+				if bodyCommentInlineFrom != 0 {
+					handlers.SetNested(bodyObj, "comment.inline.from", bodyCommentInlineFrom)
+				}
+				if bodyCommentInlinePath != "" {
+					handlers.SetNested(bodyObj, "comment.inline.path", bodyCommentInlinePath)
+				}
+				if bodyCommentInlineStartFrom != 0 {
+					handlers.SetNested(bodyObj, "comment.inline.start_from", bodyCommentInlineStartFrom)
+				}
+				if bodyCommentInlineStartTo != 0 {
+					handlers.SetNested(bodyObj, "comment.inline.start_to", bodyCommentInlineStartTo)
+				}
+				if bodyCommentInlineTo != 0 {
+					handlers.SetNested(bodyObj, "comment.inline.to", bodyCommentInlineTo)
 				}
 				if bodyContentRaw != "" {
 					handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
@@ -2173,7 +2207,13 @@ will cause the task to appear below the comment on a pull request when viewed in
 	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().IntVar(&bodyCommentId, "comment-id", 0, `ID of referenced comment`)
+	cmd.Flags().StringVar(&bodyCommentContentMarkup, "comment-content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
+	cmd.Flags().StringVar(&bodyCommentContentRaw, "comment-content-raw", "", `The text as it was typed by a user.`)
+	cmd.Flags().IntVar(&bodyCommentInlineFrom, "comment-inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
+	cmd.Flags().StringVar(&bodyCommentInlinePath, "comment-inline-path", "", `The path of the file this comment is anchored to.`)
+	cmd.Flags().IntVar(&bodyCommentInlineStartFrom, "comment-inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
+	cmd.Flags().IntVar(&bodyCommentInlineStartTo, "comment-inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
+	cmd.Flags().IntVar(&bodyCommentInlineTo, "comment-inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
 	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The task contents`)
 	cmd.Flags().BoolVar(&bodyPending, "pending", false, `pending`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")

@@ -484,15 +484,28 @@ for specific details.
 // operationId: createPipelineForRepository
 func newPipelinesCreatePipelineForRepositoryCmd() *cobra.Command {
 	var (
-		workspace                string
-		repoSlug                 string
-		bodyBuildNumber          int
-		bodyBuildSecondsUsed     int
-		bodyCompletedOn          string
-		bodyConfigurationSources string
-		bodyUuid                 string
-		bodyVariables            string
-		body                     string
+		workspace                 string
+		repoSlug                  string
+		bodyBuildNumber           int
+		bodyBuildSecondsUsed      int
+		bodyCompletedOn           string
+		bodyConfigurationSources  string
+		bodyCreatorDisplayName    string
+		bodyCreatorUuid           string
+		bodyRepositoryDescription string
+		bodyRepositoryForkPolicy  string
+		bodyRepositoryFullName    string
+		bodyRepositoryHasIssues   bool
+		bodyRepositoryHasWiki     bool
+		bodyRepositoryIsPrivate   bool
+		bodyRepositoryLanguage    string
+		bodyRepositoryName        string
+		bodyRepositoryScm         string
+		bodyRepositorySize        int
+		bodyRepositoryUuid        string
+		bodyUuid                  string
+		bodyVariables             string
+		body                      string
 	)
 
 	cmd := &cobra.Command{
@@ -529,6 +542,45 @@ func newPipelinesCreatePipelineForRepositoryCmd() *cobra.Command {
 				if bodyConfigurationSources != "" {
 					handlers.SetNested(bodyObj, "configuration_sources", bodyConfigurationSources)
 				}
+				if bodyCreatorDisplayName != "" {
+					handlers.SetNested(bodyObj, "creator.display_name", bodyCreatorDisplayName)
+				}
+				if bodyCreatorUuid != "" {
+					handlers.SetNested(bodyObj, "creator.uuid", bodyCreatorUuid)
+				}
+				if bodyRepositoryDescription != "" {
+					handlers.SetNested(bodyObj, "repository.description", bodyRepositoryDescription)
+				}
+				if bodyRepositoryForkPolicy != "" {
+					handlers.SetNested(bodyObj, "repository.fork_policy", bodyRepositoryForkPolicy)
+				}
+				if bodyRepositoryFullName != "" {
+					handlers.SetNested(bodyObj, "repository.full_name", bodyRepositoryFullName)
+				}
+				if bodyRepositoryHasIssues {
+					handlers.SetNested(bodyObj, "repository.has_issues", bodyRepositoryHasIssues)
+				}
+				if bodyRepositoryHasWiki {
+					handlers.SetNested(bodyObj, "repository.has_wiki", bodyRepositoryHasWiki)
+				}
+				if bodyRepositoryIsPrivate {
+					handlers.SetNested(bodyObj, "repository.is_private", bodyRepositoryIsPrivate)
+				}
+				if bodyRepositoryLanguage != "" {
+					handlers.SetNested(bodyObj, "repository.language", bodyRepositoryLanguage)
+				}
+				if bodyRepositoryName != "" {
+					handlers.SetNested(bodyObj, "repository.name", bodyRepositoryName)
+				}
+				if bodyRepositoryScm != "" {
+					handlers.SetNested(bodyObj, "repository.scm", bodyRepositoryScm)
+				}
+				if bodyRepositorySize != 0 {
+					handlers.SetNested(bodyObj, "repository.size", bodyRepositorySize)
+				}
+				if bodyRepositoryUuid != "" {
+					handlers.SetNested(bodyObj, "repository.uuid", bodyRepositoryUuid)
+				}
 				if bodyUuid != "" {
 					handlers.SetNested(bodyObj, "uuid", bodyUuid)
 				}
@@ -556,6 +608,34 @@ func newPipelinesCreatePipelineForRepositoryCmd() *cobra.Command {
 	cmd.Flags().IntVar(&bodyBuildSecondsUsed, "build-seconds-used", 0, `The number of build seconds used by this pipeline.`)
 	cmd.Flags().StringVar(&bodyCompletedOn, "completed-on", "", `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`)
 	cmd.Flags().StringVar(&bodyConfigurationSources, "configuration-sources", "", `An ordered list of sources of the pipeline configuration`)
+	cmd.Flags().StringVar(&bodyCreatorDisplayName, "creator-display-name", "", `creator.display_name`)
+	cmd.Flags().StringVar(&bodyCreatorUuid, "creator-uuid", "", `creator.uuid`)
+	cmd.Flags().StringVar(&bodyRepositoryDescription, "repository-description", "", `repository.description`)
+	cmd.Flags().StringVar(&bodyRepositoryForkPolicy, "repository-fork-policy", "", `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`)
+	cmd.Flags().StringVar(&bodyRepositoryFullName, "repository-full-name", "", `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`)
+	cmd.Flags().BoolVar(&bodyRepositoryHasIssues, "repository-has-issues", false, `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`)
+	cmd.Flags().BoolVar(&bodyRepositoryHasWiki, "repository-has-wiki", false, `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`)
+	cmd.Flags().BoolVar(&bodyRepositoryIsPrivate, "repository-is-private", false, `repository.is_private`)
+	cmd.Flags().StringVar(&bodyRepositoryLanguage, "repository-language", "", `repository.language`)
+	cmd.Flags().StringVar(&bodyRepositoryName, "repository-name", "", `repository.name`)
+	cmd.Flags().StringVar(&bodyRepositoryScm, "repository-scm", "", `[git]`)
+	cmd.Flags().IntVar(&bodyRepositorySize, "repository-size", 0, `repository.size`)
+	cmd.Flags().StringVar(&bodyRepositoryUuid, "repository-uuid", "", `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`)
 	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID identifying the pipeline.`)
 	cmd.Flags().StringVar(&bodyVariables, "variables", "", `The variables for the pipeline.`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
@@ -1569,10 +1649,21 @@ func newPipelinesGetRepositoryPipelineConfigCmd() *cobra.Command {
 // operationId: updateRepositoryPipelineConfig
 func newPipelinesUpdateRepositoryPipelineConfigCmd() *cobra.Command {
 	var (
-		workspace   string
-		repoSlug    string
-		bodyEnabled bool
-		body        string
+		workspace                 string
+		repoSlug                  string
+		bodyEnabled               bool
+		bodyRepositoryDescription string
+		bodyRepositoryForkPolicy  string
+		bodyRepositoryFullName    string
+		bodyRepositoryHasIssues   bool
+		bodyRepositoryHasWiki     bool
+		bodyRepositoryIsPrivate   bool
+		bodyRepositoryLanguage    string
+		bodyRepositoryName        string
+		bodyRepositoryScm         string
+		bodyRepositorySize        int
+		bodyRepositoryUuid        string
+		body                      string
 	)
 
 	cmd := &cobra.Command{
@@ -1600,6 +1691,39 @@ func newPipelinesUpdateRepositoryPipelineConfigCmd() *cobra.Command {
 				if bodyEnabled {
 					handlers.SetNested(bodyObj, "enabled", bodyEnabled)
 				}
+				if bodyRepositoryDescription != "" {
+					handlers.SetNested(bodyObj, "repository.description", bodyRepositoryDescription)
+				}
+				if bodyRepositoryForkPolicy != "" {
+					handlers.SetNested(bodyObj, "repository.fork_policy", bodyRepositoryForkPolicy)
+				}
+				if bodyRepositoryFullName != "" {
+					handlers.SetNested(bodyObj, "repository.full_name", bodyRepositoryFullName)
+				}
+				if bodyRepositoryHasIssues {
+					handlers.SetNested(bodyObj, "repository.has_issues", bodyRepositoryHasIssues)
+				}
+				if bodyRepositoryHasWiki {
+					handlers.SetNested(bodyObj, "repository.has_wiki", bodyRepositoryHasWiki)
+				}
+				if bodyRepositoryIsPrivate {
+					handlers.SetNested(bodyObj, "repository.is_private", bodyRepositoryIsPrivate)
+				}
+				if bodyRepositoryLanguage != "" {
+					handlers.SetNested(bodyObj, "repository.language", bodyRepositoryLanguage)
+				}
+				if bodyRepositoryName != "" {
+					handlers.SetNested(bodyObj, "repository.name", bodyRepositoryName)
+				}
+				if bodyRepositoryScm != "" {
+					handlers.SetNested(bodyObj, "repository.scm", bodyRepositoryScm)
+				}
+				if bodyRepositorySize != 0 {
+					handlers.SetNested(bodyObj, "repository.size", bodyRepositorySize)
+				}
+				if bodyRepositoryUuid != "" {
+					handlers.SetNested(bodyObj, "repository.uuid", bodyRepositoryUuid)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -1618,6 +1742,32 @@ func newPipelinesUpdateRepositoryPipelineConfigCmd() *cobra.Command {
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().BoolVar(&bodyEnabled, "enabled", false, `Whether Pipelines is enabled for the repository.`)
+	cmd.Flags().StringVar(&bodyRepositoryDescription, "repository-description", "", `repository.description`)
+	cmd.Flags().StringVar(&bodyRepositoryForkPolicy, "repository-fork-policy", "", `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`)
+	cmd.Flags().StringVar(&bodyRepositoryFullName, "repository-full-name", "", `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`)
+	cmd.Flags().BoolVar(&bodyRepositoryHasIssues, "repository-has-issues", false, `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`)
+	cmd.Flags().BoolVar(&bodyRepositoryHasWiki, "repository-has-wiki", false, `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`)
+	cmd.Flags().BoolVar(&bodyRepositoryIsPrivate, "repository-is-private", false, `repository.is_private`)
+	cmd.Flags().StringVar(&bodyRepositoryLanguage, "repository-language", "", `repository.language`)
+	cmd.Flags().StringVar(&bodyRepositoryName, "repository-name", "", `repository.name`)
+	cmd.Flags().StringVar(&bodyRepositoryScm, "repository-scm", "", `[git]`)
+	cmd.Flags().IntVar(&bodyRepositorySize, "repository-size", 0, `repository.size`)
+	cmd.Flags().StringVar(&bodyRepositoryUuid, "repository-uuid", "", `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }

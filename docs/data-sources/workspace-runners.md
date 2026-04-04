@@ -57,7 +57,5 @@ output "workspace_runners_response" {
 - `state_cordoned` (String) Whether the runner is cordoned (prevented from accepting new steps).
 - `state_status` (String) The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]
 - `state_updated_on` (String) The timestamp when the runner state was last updated.
-- `state_version_current` (String) The current recommended version of the runner.
-- `state_version_version` (String) The currently installed version of the runner.
 - `updated_on` (String) The timestamp when the runner was last updated.
 - `uuid` (String) The UUID identifying the runner.

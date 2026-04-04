@@ -60,13 +60,18 @@ resource "bitbucket_repo_group_permissions" "example" {
 - `group_full_slug` (String) The concatenation of the workspace's slug and the group's slug,
 - `group_name` (String) group.name
 - `group_slug` (String) The "sluggified" version of the group's name. This contains only ASCII
-- `group_workspace_created_on` (String) group.workspace.created_on
-- `group_workspace_forking_mode` (String) Controls the rules for forking repositories within this workspace.
-- `group_workspace_is_privacy_enforced` (String) Indicates whether the workspace enforces private content, or whether it allows public content.
-- `group_workspace_is_private` (String) Indicates whether the workspace is publicly accessible, or whether it is
-- `group_workspace_name` (String) The name of the workspace.
-- `group_workspace_slug` (String) The short label that identifies this workspace.
-- `group_workspace_updated_on` (String) group.workspace.updated_on
-- `group_workspace_uuid` (String) The workspace's immutable id.
 - `permission` (String) [read, write, admin, none]
+- `repository_created_on` (String) repository.created_on
+- `repository_description` (String) repository.description
+- `repository_fork_policy` (String) 
+- `repository_full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+- `repository_has_issues` (String) 
+- `repository_has_wiki` (String) 
+- `repository_is_private` (String) repository.is_private
+- `repository_language` (String) repository.language
+- `repository_name` (String) repository.name
+- `repository_scm` (String) [git]
+- `repository_size` (String) repository.size
+- `repository_updated_on` (String) repository.updated_on
+- `repository_uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
 - `type` (String) type

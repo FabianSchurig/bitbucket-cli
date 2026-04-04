@@ -67,3 +67,11 @@ resource "bitbucket_project_user_permissions" "example" {
 - `project_updated_on` (String) project.updated_on
 - `project_uuid` (String) The project's immutable id.
 - `type` (String) type
+- `user_account_id` (String) The user's Atlassian account ID.
+- `user_account_status` (String) The status of the account. Currently the only possible value is "active", but more values may be added in the future.
+- `user_created_on` (String) user.created_on
+- `user_display_name` (String) user.display_name
+- `user_has_2fa_enabled` (String) user.has_2fa_enabled
+- `user_is_staff` (String) user.is_staff
+- `user_nickname` (String) Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.
+- `user_uuid` (String) user.uuid

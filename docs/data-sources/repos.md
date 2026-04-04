@@ -48,6 +48,7 @@ output "repos_response" {
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
+- `owner_created_on` (String) owner.created_on
 - `project_created_on` (String) project.created_on
 - `project_updated_on` (String) project.updated_on
 - `updated_on` (String) updated_on
@@ -63,6 +64,8 @@ output "repos_response" {
 - `mainbranch_name` (String) The name of the ref.
 - `mainbranch_type` (String) mainbranch.type
 - `name` (String) name
+- `owner_display_name` (String) owner.display_name
+- `owner_uuid` (String) owner.uuid
 - `project_description` (String) project.description
 - `project_has_publicly_visible_repos` (String) 
 - `project_is_private` (String) 

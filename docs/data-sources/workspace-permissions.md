@@ -44,6 +44,9 @@ output "workspace_permissions_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `user_created_on` (String) user.created_on
+- `user_display_name` (String) user.display_name
+- `user_uuid` (String) user.uuid
 - `workspace_created_on` (String) workspace.created_on
 - `workspace_forking_mode` (String) Controls the rules for forking repositories within this workspace.
 - `workspace_is_privacy_enforced` (String) Indicates whether the workspace enforces private content, or whether it allows public content.

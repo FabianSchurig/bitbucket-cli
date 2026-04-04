@@ -39,8 +39,8 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `branch_types`, Type: `string`, Desc: `The active branch types.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `kind`, Type: `string`, Desc: `The kind of branch. [feature, bugfix, release, hotfix]`},
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The prefix must be a valid prefix for a branch and must always exist. It cannot be blank, empty or `null`."},
+					{Path: `kind`, Type: `string`, Desc: `The kind of branch. [feature, bugfix, release, hotfix]`},
 				}},
 				{Path: `development.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
 				{Path: `development.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
@@ -175,8 +175,8 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `branch_types`, Type: `string`, Desc: `The active branch types.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The prefix must be a valid prefix for a branch and must always exist. It cannot be blank, empty or `null`."},
 					{Path: `kind`, Type: `string`, Desc: `The kind of branch. [feature, bugfix, release, hotfix]`},
+					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The prefix must be a valid prefix for a branch and must always exist. It cannot be blank, empty or `null`."},
 				}},
 				{Path: `development.name`, Type: `string`, Desc: `Name of the target branch. If inherited by a repository, it will default to the main branch if the specified branch does not exist.`},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`)."},
@@ -203,9 +203,9 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `branch_types`, Type: `string`, Desc: `branch_types`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `enabled`, Type: `bool`, Desc: "Whether the branch type is enabled or not. A disabled branch type may contain an invalid `prefix`."},
 					{Path: `kind`, Type: `string`, Desc: `The kind of the branch type. [feature, bugfix, release, hotfix]`},
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
+					{Path: `enabled`, Type: `bool`, Desc: "Whether the branch type is enabled or not. A disabled branch type may contain an invalid `prefix`."},
 				}},
 				{Path: `development.is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 				{Path: `development.name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
@@ -235,9 +235,9 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `branch_types`, Type: `string`, Desc: `branch_types`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `enabled`, Type: `bool`, Desc: "Whether the branch type is enabled or not. A disabled branch type may contain an invalid `prefix`."},
 					{Path: `kind`, Type: `string`, Desc: `The kind of the branch type. [feature, bugfix, release, hotfix]`},
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
+					{Path: `enabled`, Type: `bool`, Desc: "Whether the branch type is enabled or not. A disabled branch type may contain an invalid `prefix`."},
 				}},
 				{Path: `development.is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 				{Path: `development.name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
@@ -269,8 +269,8 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `branch_types`, Type: `string`, Desc: `The active branch types.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `kind`, Type: `string`, Desc: `The kind of branch. [feature, bugfix, release, hotfix]`},
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The prefix must be a valid prefix for a branch and must always exist. It cannot be blank, empty or `null`."},
+					{Path: `kind`, Type: `string`, Desc: `The kind of branch. [feature, bugfix, release, hotfix]`},
 				}},
 				{Path: `development.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
 				{Path: `development.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
@@ -405,8 +405,8 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `branch_types`, Type: `string`, Desc: `The active branch types.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The prefix must be a valid prefix for a branch and must always exist. It cannot be blank, empty or `null`."},
 					{Path: `kind`, Type: `string`, Desc: `The kind of branch. [feature, bugfix, release, hotfix]`},
+					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The prefix must be a valid prefix for a branch and must always exist. It cannot be blank, empty or `null`."},
 				}},
 				{Path: `development.name`, Type: `string`, Desc: `Name of the target branch. If inherited by a repository, it will default to the main branch if the specified branch does not exist.`},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`)."},
@@ -433,9 +433,9 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `branch_types`, Type: `string`, Desc: `branch_types`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `enabled`, Type: `bool`, Desc: "Whether the branch type is enabled or not. A disabled branch type may contain an invalid `prefix`."},
 					{Path: `kind`, Type: `string`, Desc: `The kind of the branch type. [feature, bugfix, release, hotfix]`},
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
+					{Path: `enabled`, Type: `bool`, Desc: "Whether the branch type is enabled or not. A disabled branch type may contain an invalid `prefix`."},
 				}},
 				{Path: `development.is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 				{Path: `development.name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
@@ -465,9 +465,9 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `branch_types`, Type: `string`, Desc: `branch_types`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `enabled`, Type: `bool`, Desc: "Whether the branch type is enabled or not. A disabled branch type may contain an invalid `prefix`."},
 					{Path: `kind`, Type: `string`, Desc: `The kind of the branch type. [feature, bugfix, release, hotfix]`},
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
+					{Path: `enabled`, Type: `bool`, Desc: "Whether the branch type is enabled or not. A disabled branch type may contain an invalid `prefix`."},
 				}},
 				{Path: `development.is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 				{Path: `development.name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},

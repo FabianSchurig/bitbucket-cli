@@ -55,6 +55,8 @@ resource "bitbucket_forked_repository" "example" {
 - `mainbranch_name` (String) The name of the ref. (also computed from API response)
 - `mainbranch_type` (String) mainbranch.type (also computed from API response)
 - `name` (String) name (also computed from API response)
+- `owner_display_name` (String) owner.display_name (also computed from API response)
+- `owner_uuid` (String) owner.uuid (also computed from API response)
 - `project_description` (String) project.description (also computed from API response)
 - `project_has_publicly_visible_repos` (String)  (also computed from API response)
 - `project_is_private` (String)  (also computed from API response)
@@ -71,6 +73,7 @@ resource "bitbucket_forked_repository" "example" {
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
+- `owner_created_on` (String) owner.created_on
 - `project_created_on` (String) project.created_on
 - `project_updated_on` (String) project.updated_on
 - `updated_on` (String) updated_on

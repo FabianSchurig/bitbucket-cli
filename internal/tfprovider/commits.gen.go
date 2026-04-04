@@ -60,6 +60,34 @@ Available operations:
 					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 				}},
+				{Path: `repository.created_on`, Type: `string`, Desc: `repository.created_on`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.updated_on`, Type: `string`, Desc: `repository.updated_on`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				{Path: `summary.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				{Path: `summary.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 			},
@@ -92,6 +120,9 @@ commits.`,
 				{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 				{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 				{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+				{Path: `user.created_on`, Type: `string`, Desc: `user.created_on`},
+				{Path: `user.display_name`, Type: `string`, Desc: `user.display_name`},
+				{Path: `user.uuid`, Type: `string`, Desc: `user.uuid`},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -143,6 +174,18 @@ commits.`,
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `commit.date`, Type: `string`, Desc: `commit.date`},
+				{Path: `commit.hash`, Type: `string`, Desc: `commit.hash`},
+				{Path: `commit.message`, Type: `string`, Desc: `commit.message`},
+				{Path: `commit.parents`, Type: `string`, Desc: `parents (JSON array)`},
+				{Path: `commit.participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+				}},
+				{Path: `commit.summary.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+				{Path: `commit.summary.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				{Path: `content.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				{Path: `content.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
@@ -153,8 +196,10 @@ commits.`,
 				{Path: `inline.start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
-				{Path: `parent.id`, Type: `int`, Desc: `ID of referenced parent`},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `user.created_on`, Type: `string`, Desc: `user.created_on`},
+				{Path: `user.display_name`, Type: `string`, Desc: `user.display_name`},
+				{Path: `user.uuid`, Type: `string`, Desc: `user.uuid`},
 			},
 			HasBody:   false,
 			Paginated: true,
@@ -175,6 +220,10 @@ commits.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
+				{Path: `commit.date`, Type: `string`, Desc: `commit.date`},
+				{Path: `commit.hash`, Type: `string`, Desc: `commit.hash`},
+				{Path: `commit.message`, Type: `string`, Desc: `commit.message`},
+				{Path: `commit.parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `content.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				{Path: `content.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				{Path: `inline.from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
@@ -182,7 +231,6 @@ commits.`,
 				{Path: `inline.start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
-				{Path: `parent.id`, Type: `int`, Desc: `ID of referenced parent`},
 			},
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        true,
@@ -206,6 +254,18 @@ commits.`,
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `commit.date`, Type: `string`, Desc: `commit.date`},
+				{Path: `commit.hash`, Type: `string`, Desc: `commit.hash`},
+				{Path: `commit.message`, Type: `string`, Desc: `commit.message`},
+				{Path: `commit.parents`, Type: `string`, Desc: `parents (JSON array)`},
+				{Path: `commit.participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+				}},
+				{Path: `commit.summary.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+				{Path: `commit.summary.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				{Path: `content.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				{Path: `content.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
@@ -216,8 +276,10 @@ commits.`,
 				{Path: `inline.start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
-				{Path: `parent.id`, Type: `int`, Desc: `ID of referenced parent`},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `user.created_on`, Type: `string`, Desc: `user.created_on`},
+				{Path: `user.display_name`, Type: `string`, Desc: `user.display_name`},
+				{Path: `user.uuid`, Type: `string`, Desc: `user.uuid`},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -239,6 +301,10 @@ commits.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
+				{Path: `commit.date`, Type: `string`, Desc: `commit.date`},
+				{Path: `commit.hash`, Type: `string`, Desc: `commit.hash`},
+				{Path: `commit.message`, Type: `string`, Desc: `commit.message`},
+				{Path: `commit.parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `content.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				{Path: `content.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				{Path: `inline.from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
@@ -246,7 +312,6 @@ commits.`,
 				{Path: `inline.start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
-				{Path: `parent.id`, Type: `int`, Desc: `ID of referenced parent`},
 			},
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        true,
@@ -490,11 +555,39 @@ unspecified which will be returned.`,
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
-					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 				}},
+				{Path: `repository.created_on`, Type: `string`, Desc: `repository.created_on`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.updated_on`, Type: `string`, Desc: `repository.updated_on`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				{Path: `summary.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				{Path: `summary.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 			},
@@ -552,6 +645,34 @@ unspecified which will be returned.`,
 					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 				}},
+				{Path: `repository.created_on`, Type: `string`, Desc: `repository.created_on`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.updated_on`, Type: `string`, Desc: `repository.updated_on`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				{Path: `summary.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				{Path: `summary.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 			},
@@ -584,6 +705,9 @@ commits.`,
 				{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 				{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 				{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+				{Path: `user.created_on`, Type: `string`, Desc: `user.created_on`},
+				{Path: `user.display_name`, Type: `string`, Desc: `user.display_name`},
+				{Path: `user.uuid`, Type: `string`, Desc: `user.uuid`},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -635,6 +759,18 @@ commits.`,
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `commit.date`, Type: `string`, Desc: `commit.date`},
+				{Path: `commit.hash`, Type: `string`, Desc: `commit.hash`},
+				{Path: `commit.message`, Type: `string`, Desc: `commit.message`},
+				{Path: `commit.parents`, Type: `string`, Desc: `parents (JSON array)`},
+				{Path: `commit.participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+				}},
+				{Path: `commit.summary.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+				{Path: `commit.summary.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				{Path: `content.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				{Path: `content.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
@@ -645,8 +781,10 @@ commits.`,
 				{Path: `inline.start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
-				{Path: `parent.id`, Type: `int`, Desc: `ID of referenced parent`},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `user.created_on`, Type: `string`, Desc: `user.created_on`},
+				{Path: `user.display_name`, Type: `string`, Desc: `user.display_name`},
+				{Path: `user.uuid`, Type: `string`, Desc: `user.uuid`},
 			},
 			HasBody:   false,
 			Paginated: true,
@@ -667,6 +805,10 @@ commits.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
+				{Path: `commit.date`, Type: `string`, Desc: `commit.date`},
+				{Path: `commit.hash`, Type: `string`, Desc: `commit.hash`},
+				{Path: `commit.message`, Type: `string`, Desc: `commit.message`},
+				{Path: `commit.parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `content.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				{Path: `content.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				{Path: `inline.from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
@@ -674,7 +816,6 @@ commits.`,
 				{Path: `inline.start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
-				{Path: `parent.id`, Type: `int`, Desc: `ID of referenced parent`},
 			},
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        true,
@@ -698,6 +839,18 @@ commits.`,
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `commit.date`, Type: `string`, Desc: `commit.date`},
+				{Path: `commit.hash`, Type: `string`, Desc: `commit.hash`},
+				{Path: `commit.message`, Type: `string`, Desc: `commit.message`},
+				{Path: `commit.parents`, Type: `string`, Desc: `parents (JSON array)`},
+				{Path: `commit.participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+				}},
+				{Path: `commit.summary.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+				{Path: `commit.summary.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				{Path: `content.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				{Path: `content.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
@@ -708,8 +861,10 @@ commits.`,
 				{Path: `inline.start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
-				{Path: `parent.id`, Type: `int`, Desc: `ID of referenced parent`},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `user.created_on`, Type: `string`, Desc: `user.created_on`},
+				{Path: `user.display_name`, Type: `string`, Desc: `user.display_name`},
+				{Path: `user.uuid`, Type: `string`, Desc: `user.uuid`},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -731,6 +886,10 @@ commits.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
+				{Path: `commit.date`, Type: `string`, Desc: `commit.date`},
+				{Path: `commit.hash`, Type: `string`, Desc: `commit.hash`},
+				{Path: `commit.message`, Type: `string`, Desc: `commit.message`},
+				{Path: `commit.parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `content.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				{Path: `content.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				{Path: `inline.from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
@@ -738,7 +897,6 @@ commits.`,
 				{Path: `inline.start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				{Path: `inline.to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
-				{Path: `parent.id`, Type: `int`, Desc: `ID of referenced parent`},
 			},
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        true,
@@ -982,11 +1140,39 @@ unspecified which will be returned.`,
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
-					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 				}},
+				{Path: `repository.created_on`, Type: `string`, Desc: `repository.created_on`},
+				{Path: `repository.description`, Type: `string`, Desc: `repository.description`},
+				{Path: `repository.fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `repository.is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `repository.language`},
+				{Path: `repository.name`, Type: `string`, Desc: `repository.name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `repository.size`},
+				{Path: `repository.updated_on`, Type: `string`, Desc: `repository.updated_on`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				{Path: `summary.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				{Path: `summary.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 			},

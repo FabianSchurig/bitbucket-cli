@@ -250,6 +250,8 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 		bodyMainbranchName                 string
 		bodyMainbranchType                 string
 		bodyName                           string
+		bodyOwnerDisplayName               string
+		bodyOwnerUuid                      string
 		bodyProjectDescription             string
 		bodyProjectHasPubliclyVisibleRepos bool
 		bodyProjectIsPrivate               bool
@@ -319,6 +321,12 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 				}
 				if bodyName != "" {
 					handlers.SetNested(bodyObj, "name", bodyName)
+				}
+				if bodyOwnerDisplayName != "" {
+					handlers.SetNested(bodyObj, "owner.display_name", bodyOwnerDisplayName)
+				}
+				if bodyOwnerUuid != "" {
+					handlers.SetNested(bodyObj, "owner.uuid", bodyOwnerUuid)
 				}
 				if bodyProjectDescription != "" {
 					handlers.SetNested(bodyObj, "project.description", bodyProjectDescription)
@@ -391,6 +399,8 @@ administered through admin.atlassian.com.
 	cmd.Flags().StringVar(&bodyMainbranchName, "mainbranch-name", "", `The name of the ref.`)
 	cmd.Flags().StringVar(&bodyMainbranchType, "mainbranch-type", "", `mainbranch.type`)
 	cmd.Flags().StringVar(&bodyName, "name", "", `name`)
+	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `owner.display_name`)
+	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `owner.uuid`)
 	cmd.Flags().StringVar(&bodyProjectDescription, "project-description", "", `project.description`)
 	cmd.Flags().BoolVar(&bodyProjectHasPubliclyVisibleRepos, "project-has-publicly-visible-repos", false, `
 Indicates whether the project contains publicly visible repositories.
@@ -427,6 +437,8 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 		bodyMainbranchName                 string
 		bodyMainbranchType                 string
 		bodyName                           string
+		bodyOwnerDisplayName               string
+		bodyOwnerUuid                      string
 		bodyProjectDescription             string
 		bodyProjectHasPubliclyVisibleRepos bool
 		bodyProjectIsPrivate               bool
@@ -496,6 +508,12 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 				}
 				if bodyName != "" {
 					handlers.SetNested(bodyObj, "name", bodyName)
+				}
+				if bodyOwnerDisplayName != "" {
+					handlers.SetNested(bodyObj, "owner.display_name", bodyOwnerDisplayName)
+				}
+				if bodyOwnerUuid != "" {
+					handlers.SetNested(bodyObj, "owner.uuid", bodyOwnerUuid)
 				}
 				if bodyProjectDescription != "" {
 					handlers.SetNested(bodyObj, "project.description", bodyProjectDescription)
@@ -568,6 +586,8 @@ administered through admin.atlassian.com.
 	cmd.Flags().StringVar(&bodyMainbranchName, "mainbranch-name", "", `The name of the ref.`)
 	cmd.Flags().StringVar(&bodyMainbranchType, "mainbranch-type", "", `mainbranch.type`)
 	cmd.Flags().StringVar(&bodyName, "name", "", `name`)
+	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `owner.display_name`)
+	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `owner.uuid`)
 	cmd.Flags().StringVar(&bodyProjectDescription, "project-description", "", `project.description`)
 	cmd.Flags().BoolVar(&bodyProjectHasPubliclyVisibleRepos, "project-has-publicly-visible-repos", false, `
 Indicates whether the project contains publicly visible repositories.
@@ -791,6 +811,8 @@ func newReposForkARepositoryCmd() *cobra.Command {
 		bodyMainbranchName                 string
 		bodyMainbranchType                 string
 		bodyName                           string
+		bodyOwnerDisplayName               string
+		bodyOwnerUuid                      string
 		bodyProjectDescription             string
 		bodyProjectHasPubliclyVisibleRepos bool
 		bodyProjectIsPrivate               bool
@@ -860,6 +882,12 @@ func newReposForkARepositoryCmd() *cobra.Command {
 				}
 				if bodyName != "" {
 					handlers.SetNested(bodyObj, "name", bodyName)
+				}
+				if bodyOwnerDisplayName != "" {
+					handlers.SetNested(bodyObj, "owner.display_name", bodyOwnerDisplayName)
+				}
+				if bodyOwnerUuid != "" {
+					handlers.SetNested(bodyObj, "owner.uuid", bodyOwnerUuid)
 				}
 				if bodyProjectDescription != "" {
 					handlers.SetNested(bodyObj, "project.description", bodyProjectDescription)
@@ -932,6 +960,8 @@ administered through admin.atlassian.com.
 	cmd.Flags().StringVar(&bodyMainbranchName, "mainbranch-name", "", `The name of the ref.`)
 	cmd.Flags().StringVar(&bodyMainbranchType, "mainbranch-type", "", `mainbranch.type`)
 	cmd.Flags().StringVar(&bodyName, "name", "", `name`)
+	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `owner.display_name`)
+	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `owner.uuid`)
 	cmd.Flags().StringVar(&bodyProjectDescription, "project-description", "", `project.description`)
 	cmd.Flags().BoolVar(&bodyProjectHasPubliclyVisibleRepos, "project-has-publicly-visible-repos", false, `
 Indicates whether the project contains publicly visible repositories.
