@@ -56,36 +56,44 @@ func DispatchRaw(ctx context.Context, c *client.BBClient, r Request) (any, error
 	fetchURL := baseURL
 
 	for {
-		resp, err := executeRequest(ctx, c, r, fetchURL, baseURL)
-		if err != nil {
-			return nil, fmt.Errorf("%s %s: %w", r.Method, fetchURL, err)
-		}
-		if resp.IsError() {
-			return nil, client.ParseError(resp)
-		}
-
-		result, nonJSON, err := parseResponseRaw(resp)
+		result, page, err := fetchResult(ctx, c, r, fetchURL, baseURL)
 		if err != nil {
 			return nil, err
-		}
-		if nonJSON {
-			return nil, nil
 		}
 		if result == nil {
 			return nil, nil
 		}
-
-		if page := extractPage(result); page != nil {
-			allValues = append(allValues, page.values...)
-			if r.All && page.nextURL != "" {
-				fetchURL = page.nextURL
-				continue
-			}
-			return allValues, nil
+		if page == nil {
+			return result, nil
 		}
-
-		return result, nil
+		allValues = append(allValues, page.values...)
+		if shouldFetchNextPage(r.All, page) {
+			fetchURL = page.nextURL
+			continue
+		}
+		return allValues, nil
 	}
+}
+
+func fetchResult(ctx context.Context, c *client.BBClient, r Request, fetchURL, baseURL string) (any, *pageResult, error) {
+	resp, err := executeRequest(ctx, c, r, fetchURL, baseURL)
+	if err != nil {
+		return nil, nil, fmt.Errorf("%s %s: %w", r.Method, fetchURL, err)
+	}
+	if resp.IsError() {
+		return nil, nil, client.ParseError(resp)
+	}
+
+	result, nonJSON, err := parseResponseRaw(resp)
+	if err != nil || nonJSON || result == nil {
+		return nil, nil, err
+	}
+
+	return result, extractPage(result), nil
+}
+
+func shouldFetchNextPage(all bool, page *pageResult) bool {
+	return all && page != nil && page.nextURL != ""
 }
 
 // buildURL substitutes {param} placeholders in a URL template.
@@ -164,30 +172,39 @@ func extractPage(result any) *pageResult {
 // If the value is a string that looks like a JSON array or object, it is parsed
 // so that the resulting body contains the structured value rather than a raw string.
 func SetNested(m map[string]any, path string, value any) {
-	// Auto-parse JSON arrays/objects from string values.
-	if s, ok := value.(string); ok && len(s) > 0 {
-		if s[0] == '[' || s[0] == '{' {
-			var parsed any
-			if err := json.Unmarshal([]byte(s), &parsed); err == nil {
-				value = parsed
-			}
-		}
-	}
+	value = parseNestedValue(value)
 	parts := strings.Split(path, ".")
 	current := m
 	for i, p := range parts {
 		if i == len(parts)-1 {
 			current[p] = value
-		} else {
-			if sub, ok := current[p]; ok {
-				current = sub.(map[string]any)
-			} else {
-				sub := map[string]any{}
-				current[p] = sub
-				current = sub
-			}
+			continue
 		}
+		current = ensureNestedMap(current, p)
 	}
+}
+
+func parseNestedValue(value any) any {
+	s, ok := value.(string)
+	if !ok || len(s) == 0 || (s[0] != '[' && s[0] != '{') {
+		return value
+	}
+
+	var parsed any
+	if err := json.Unmarshal([]byte(s), &parsed); err != nil {
+		return value
+	}
+	return parsed
+}
+
+func ensureNestedMap(current map[string]any, key string) map[string]any {
+	if sub, ok := current[key]; ok {
+		return sub.(map[string]any)
+	}
+
+	sub := map[string]any{}
+	current[key] = sub
+	return sub
 }
 
 // GetNested retrieves a value from a nested map using a dot-separated path.

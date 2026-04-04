@@ -91,209 +91,13 @@ func (r *GenericResource) Metadata(_ context.Context, req resource.MetadataReque
 
 // Schema builds the resource schema dynamically from the operation definitions.
 func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
-	attrs := map[string]schema.Attribute{
-		"id": schema.StringAttribute{
-			Description: "Resource identifier.",
-			Computed:    true,
-		},
-		"api_response": schema.StringAttribute{
-			Description: "The raw JSON response from the Bitbucket API.",
-			Computed:    true,
-		},
-	}
-
-	// Build a set of params that are required in the primary Create op.
-	// If there is no Create op, fall back to Read.
-	// Params that exist only in non-primary ops (Update, Delete, List) or
-	// only in Read when Create exists are Optional+Computed — the provider
-	// populates them from the API response.
-	primaryRequired := map[string]bool{}
-	primaryOp := r.group.Ops.Create
-	if primaryOp == nil {
-		primaryOp = r.group.Ops.Read
-	}
-	if primaryOp != nil {
-		for _, p := range primaryOp.Params {
-			if p.Required && p.In == "path" {
-				primaryRequired[p.Name] = true
-			}
-		}
-	}
-
-	// Collect params from all CRUD ops.
+	attrs := resourceBaseAttrs()
+	ops := r.crudOps()
 	paramSeen := map[string]bool{}
-	for _, op := range r.crudOps() {
-		for _, p := range op.Params {
-			if paramSeen[p.Name] {
-				continue
-			}
-			paramSeen[p.Name] = true
-			attrName := ParamAttrName(p.Name)
-			if _, exists := attrs[attrName]; exists {
-				continue
-			}
-			isRequired := primaryRequired[p.Name]
-			if isRequired {
-				attrs[attrName] = schema.StringAttribute{
-					Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
-					Required:    true,
-				}
-			} else {
-				isComputed := p.In == "path"
-				attrs[attrName] = schema.StringAttribute{
-					Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
-					Optional:    true,
-					Computed:    isComputed,
-				}
-			}
-		}
-	}
-
-	// Collect body fields from create/update ops.
-	bodyFieldSeen := map[string]bool{}
-	hasBody := false
-	for _, op := range r.crudOps() {
-		if op.HasBody {
-			hasBody = true
-		}
-		for _, bf := range op.BodyFields {
-			key := toSnakeCase(strings.ReplaceAll(bf.Path, ".", "_"))
-			if bodyFieldSeen[key] {
-				continue
-			}
-			bodyFieldSeen[key] = true
-			desc := bf.Desc
-			if desc == "" {
-				desc = bf.Path
-			}
-			if bf.IsObject && len(bf.ItemFields) > 0 {
-				attrs[key] = schema.SingleNestedAttribute{
-					Description: desc,
-					Optional:    true,
-					Attributes:  buildNestedItemAttrs(bf.ItemFields),
-				}
-			} else if bf.IsArray && len(bf.ItemFields) > 0 {
-				attrs[key] = schema.ListNestedAttribute{
-					Description: desc,
-					Optional:    true,
-					NestedObject: schema.NestedAttributeObject{
-						Attributes: buildNestedItemAttrs(bf.ItemFields),
-					},
-				}
-			} else if bf.IsArray {
-				// Simple list (e.g., list of strings).
-				attrs[key] = schema.ListAttribute{
-					Description: desc,
-					Optional:    true,
-					ElementType: types.StringType,
-				}
-			} else {
-				attrs[key] = schema.StringAttribute{
-					Description: desc,
-					Optional:    true,
-				}
-			}
-		}
-	}
-
-	// Collect response fields from the Read operation (or Create as fallback).
-	// Fields that overlap with body fields become Optional+Computed.
-	// Response-only fields become Computed.
-	responseOp := r.group.Ops.Read
-	if responseOp == nil {
-		responseOp = r.group.Ops.Create
-	}
-	if responseOp != nil {
-		for _, rf := range responseOp.ResponseFields {
-			key := toSnakeCase(strings.ReplaceAll(rf.Path, ".", "_"))
-			// Skip reserved attributes.
-			if key == "id" || key == "api_response" || key == "request_body" {
-				continue
-			}
-			desc := rf.Desc
-			if desc == "" {
-				desc = rf.Path
-			}
-			if existing, exists := attrs[key]; exists {
-				// If already defined as a body field, make it Optional+Computed.
-				// Skip Required attributes -- they cannot also be Computed.
-				switch sa := existing.(type) {
-				case schema.StringAttribute:
-					if !sa.Computed && !sa.Required {
-						sa.Computed = true
-						sa.Description = desc
-						attrs[key] = sa
-					}
-				case schema.SingleNestedAttribute:
-					if !sa.Computed && !sa.Required {
-						sa.Computed = true
-						sa.Description = desc
-						if rf.IsObject && len(rf.ItemFields) > 0 {
-							sa.Attributes = buildNestedItemAttrs(rf.ItemFields)
-						}
-						attrs[key] = sa
-					}
-				case schema.ListNestedAttribute:
-					if !sa.Computed && !sa.Required {
-						sa.Computed = true
-						sa.Description = desc
-						// Merge item fields from response if body had fewer fields.
-						if rf.IsArray && len(rf.ItemFields) > 0 {
-							sa.NestedObject = schema.NestedAttributeObject{
-								Attributes: buildNestedItemAttrs(rf.ItemFields),
-							}
-						}
-						attrs[key] = sa
-					}
-				case schema.ListAttribute:
-					if !sa.Computed && !sa.Required {
-						sa.Computed = true
-						sa.Description = desc
-						attrs[key] = sa
-					}
-				}
-			} else if !paramSeen[key] {
-				// New response-only field.
-				if rf.IsObject && len(rf.ItemFields) > 0 {
-					attrs[key] = schema.SingleNestedAttribute{
-						Description: desc,
-						Computed:    true,
-						Attributes:  buildNestedItemAttrs(rf.ItemFields),
-					}
-				} else if rf.IsArray && len(rf.ItemFields) > 0 {
-					attrs[key] = schema.ListNestedAttribute{
-						Description: desc,
-						Computed:    true,
-						NestedObject: schema.NestedAttributeObject{
-							Attributes: buildNestedItemAttrs(rf.ItemFields),
-						},
-					}
-				} else if rf.IsArray {
-					// Simple list (e.g., list of strings).
-					attrs[key] = schema.ListAttribute{
-						Description: desc,
-						Computed:    true,
-						ElementType: types.StringType,
-					}
-				} else {
-					attrs[key] = schema.StringAttribute{
-						Description: desc,
-						Computed:    true,
-					}
-				}
-			}
-		}
-	}
-
-	// Add request_body attribute for operations that accept a JSON body.
-	// This allows users to pass arbitrary JSON for create/update operations,
-	// which is especially useful when BodyFields are not explicitly declared.
-	if hasBody {
-		attrs["request_body"] = schema.StringAttribute{
-			Description: "Raw JSON request body for create/update operations. Use this to pass fields not exposed as individual attributes.",
-			Optional:    true,
-		}
-	}
+	addResourceParams(attrs, ops, requiredPrimaryPathParams(r.primaryOp()), paramSeen)
+	hasBody := addResourceBodyFields(attrs, ops)
+	addResourceResponseFields(attrs, r.responseOp(), paramSeen)
+	addRequestBodyAttr(attrs, hasBody)
 
 	resp.Schema = schema.Schema{
 		Description: r.group.Description,
@@ -467,53 +271,10 @@ func (r *GenericResource) dispatch(ctx context.Context, op *OperationDef, source
 		return
 	}
 
-	// Store the API response as JSON.
-	if result != nil {
-		jsonBytes, err := json.MarshalIndent(result, "", "  ")
-		if err != nil {
-			diags.AddError("Response Error", fmt.Sprintf("Failed to marshal response: %v", err))
-			return
-		}
-		diags.Append(target.SetAttribute(ctx, attrPath("api_response"), types.StringValue(string(jsonBytes)))...)
-
-		// Try to extract an ID from the response.
-		idSet := false
-		if m, ok := result.(map[string]any); ok {
-			if id := extractID(m); id != "" {
-				diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(id))...)
-				idSet = true
-			}
-
-			// Extract response fields from the API response.
-			r.extractResponseFields(ctx, m, target, diags)
-		}
-		// Fallback: build deterministic ID from path params + operation.
-		if !idSet {
-			fallbackID := op.OperationID
-			for _, p := range op.Params {
-				if p.In == "path" {
-					if v, ok := pathParams[p.Name]; ok {
-						fallbackID += "/" + v
-					}
-				}
-			}
-			diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(fallbackID))...)
-		}
-	} else {
-		diags.Append(target.SetAttribute(ctx, attrPath("api_response"), types.StringValue(""))...)
-		diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(op.OperationID))...)
+	resultMap := r.storeDispatchResult(ctx, op, pathParams, target, diags, result)
+	if resultMap != nil {
+		r.populateComputedParams(ctx, resultMap, source, target, diags)
 	}
-
-	// Populate computed path params from the response (e.g., param_id after create).
-	// This ensures params like "id" that only appear in Read/Update/Delete paths
-	// are populated in state after a Create operation.
-	if result != nil {
-		if m, ok := result.(map[string]any); ok {
-			r.populateComputedParams(ctx, m, source, target, diags)
-		}
-	}
-
-	// Copy source attributes to target for params and body fields.
 	r.copyAttributes(ctx, op, source, target, diags)
 }
 
@@ -553,58 +314,11 @@ func (r *GenericResource) buildBody(ctx context.Context, op *OperationDef, sourc
 		return ""
 	}
 
-	// If explicit body fields are defined, build from those.
 	if len(op.BodyFields) > 0 {
-		bodyObj := map[string]any{}
-		for _, bf := range op.BodyFields {
-			attrName := toSnakeCase(strings.ReplaceAll(bf.Path, ".", "_"))
-			if bf.IsObject && len(bf.ItemFields) > 0 {
-				// Read single-nested attribute.
-				obj := readSingleNested(ctx, source, attrName, bf.ItemFields, diags)
-				if obj != nil {
-					handlers.SetNested(bodyObj, bf.Path, obj)
-				}
-			} else if bf.IsArray && len(bf.ItemFields) > 0 {
-				// Read list-nested attribute.
-				arr := readListNested(ctx, source, attrName, bf.ItemFields, diags)
-				if arr != nil {
-					handlers.SetNested(bodyObj, bf.Path, arr)
-				}
-			} else if bf.IsArray {
-				// Read simple list attribute (e.g., list of strings).
-				arr := readSimpleList(ctx, source, attrName, diags)
-				if arr != nil {
-					handlers.SetNested(bodyObj, bf.Path, arr)
-				}
-			} else {
-				var val types.String
-				d := source.GetAttribute(ctx, attrPath(attrName), &val)
-				diags.Append(d...)
-				if d.HasError() || val.IsNull() || val.IsUnknown() || val.ValueString() == "" {
-					continue
-				}
-				handlers.SetNested(bodyObj, bf.Path, val.ValueString())
-			}
-		}
-		if len(bodyObj) == 0 {
-			return ""
-		}
-		b, err := json.Marshal(bodyObj)
-		if err != nil {
-			diags.AddError("Body Error", fmt.Sprintf("Failed to marshal request body: %v", err))
-			return ""
-		}
-		return string(b)
+		return marshalBodyObject(diags, buildExplicitBody(ctx, source, op.BodyFields, diags))
 	}
 
-	// Fall back to request_body attribute for raw JSON.
-	var rawBody types.String
-	d := source.GetAttribute(ctx, attrPath("request_body"), &rawBody)
-	diags.Append(d...)
-	if d.HasError() || rawBody.IsNull() || rawBody.IsUnknown() || rawBody.ValueString() == "" {
-		return ""
-	}
-	return rawBody.ValueString()
+	return rawRequestBody(ctx, source, diags)
 }
 
 // readListNested reads a ListNestedAttribute from state and returns it as a
@@ -695,44 +409,16 @@ func readObjectAttrs(obj types.Object, itemFields []BodyFieldDef) map[string]any
 }
 
 func readAttrValue(v attr.Value, f BodyFieldDef) (any, bool) {
-	if f.IsObject && len(f.ItemFields) > 0 {
-		innerObj, ok := v.(types.Object)
-		if !ok || innerObj.IsNull() || innerObj.IsUnknown() {
-			return nil, false
-		}
-		inner := readObjectAttrs(innerObj, f.ItemFields)
-		if len(inner) == 0 {
-			return nil, false
-		}
-		return inner, true
+	switch {
+	case f.IsObject && len(f.ItemFields) > 0:
+		return readObjectAttrValue(v, f.ItemFields)
+	case f.IsArray && len(f.ItemFields) > 0:
+		return readNestedListAttrValue(v, f.ItemFields)
+	case f.IsArray:
+		return readSimpleListAttrValue(v)
+	default:
+		return readStringAttrValue(v)
 	}
-	if f.IsArray && len(f.ItemFields) > 0 {
-		list, ok := v.(types.List)
-		if !ok || list.IsNull() || list.IsUnknown() {
-			return nil, false
-		}
-		items := readListNestedValue(list, f.ItemFields)
-		if len(items) == 0 {
-			return nil, false
-		}
-		return items, true
-	}
-	if f.IsArray {
-		list, ok := v.(types.List)
-		if !ok || list.IsNull() || list.IsUnknown() {
-			return nil, false
-		}
-		items := readSimpleListValue(list)
-		if len(items) == 0 {
-			return nil, false
-		}
-		return items, true
-	}
-	sv, ok := v.(types.String)
-	if !ok || sv.IsNull() || sv.IsUnknown() || sv.ValueString() == "" {
-		return nil, false
-	}
-	return sv.ValueString(), true
 }
 
 // readSimpleList reads a ListAttribute (list of strings) from state and returns
@@ -771,47 +457,11 @@ func (r *GenericResource) copyAttributes(ctx context.Context, _ *OperationDef, s
 		if op.HasBody {
 			hasBody = true
 		}
-		for _, p := range op.Params {
-			attrName := ParamAttrName(p.Name)
-			if seen[attrName] {
-				continue
-			}
-			seen[attrName] = true
-			var val types.String
-			d := source.GetAttribute(ctx, attrPath(attrName), &val)
-			diags.Append(d...)
-			if !d.HasError() && !val.IsNull() && !val.IsUnknown() {
-				diags.Append(target.SetAttribute(ctx, attrPath(attrName), val)...)
-			}
-		}
-		for _, bf := range op.BodyFields {
-			attrName := toSnakeCase(strings.ReplaceAll(bf.Path, ".", "_"))
-			if seen[attrName] {
-				continue
-			}
-			seen[attrName] = true
-			if bf.IsArray || bf.IsObject {
-				// For list/object attributes, skip copying from source.
-				// The response-populated value from extractResponseFields
-				// should be preserved (it has all computed sub-fields).
-				continue
-			}
-			var val types.String
-			d := source.GetAttribute(ctx, attrPath(attrName), &val)
-			diags.Append(d...)
-			if !d.HasError() && !val.IsNull() && !val.IsUnknown() {
-				diags.Append(target.SetAttribute(ctx, attrPath(attrName), val)...)
-			}
-		}
+		copyParamAttributes(ctx, op.Params, seen, source, target, diags)
+		copyBodyAttributes(ctx, op.BodyFields, seen, source, target, diags)
 	}
-	// Copy request_body if present.
 	if hasBody {
-		var val types.String
-		d := source.GetAttribute(ctx, attrPath("request_body"), &val)
-		diags.Append(d...)
-		if !d.HasError() && !val.IsNull() && !val.IsUnknown() {
-			diags.Append(target.SetAttribute(ctx, attrPath("request_body"), val)...)
-		}
+		copyStringAttribute(ctx, "request_body", source, target, diags)
 	}
 }
 
@@ -823,30 +473,11 @@ func (r *GenericResource) populateComputedParams(ctx context.Context, m map[stri
 	seen := map[string]bool{}
 	for _, crudOp := range r.crudOps() {
 		for _, p := range crudOp.Params {
-			if p.In != "path" {
-				continue
-			}
 			attrName := ParamAttrName(p.Name)
-			if seen[attrName] {
+			if shouldSkipComputedParam(p, attrName, seen, ctx, source, diags) {
 				continue
 			}
-			seen[attrName] = true
-
-			// Skip if the user already provided this value.
-			var existing types.String
-			d := source.GetAttribute(ctx, attrPath(attrName), &existing)
-			diags.Append(d...)
-			if d.HasError() {
-				continue
-			}
-			if !existing.IsNull() && !existing.IsUnknown() && existing.ValueString() != "" {
-				continue
-			}
-
-			// Try to extract the param value from the API response.
-			if val, ok := responseParamValue(m, p.Name); ok && val != "" {
-				diags.Append(target.SetAttribute(ctx, attrPath(attrName), types.StringValue(fmt.Sprintf("%v", val)))...)
-			}
+			setComputedParam(ctx, m, p.Name, attrName, target, diags)
 		}
 	}
 }
@@ -879,53 +510,481 @@ func (r *GenericResource) responseFields() []BodyFieldDef {
 // and sets them as computed attributes in the target state.
 func (r *GenericResource) extractResponseFields(ctx context.Context, m map[string]any, target stateAccessor, diags *diag.Diagnostics) {
 	for _, rf := range r.responseFields() {
-		key := toSnakeCase(strings.ReplaceAll(rf.Path, ".", "_"))
-		// Skip reserved attributes.
-		if key == "id" || key == "api_response" || key == "request_body" {
-			continue
-		}
-		val, ok := handlers.GetNested(m, rf.Path)
-		if !ok || val == nil {
-			continue
-		}
-		// For object fields with item schema, build a typed object.
-		if rf.IsObject && len(rf.ItemFields) > 0 {
-			if obj, ok := val.(map[string]any); ok {
-				objVal := buildObjectFromResponse(obj, rf.ItemFields)
-				diags.Append(target.SetAttribute(ctx, attrPath(key), objVal)...)
-			}
-			continue
-		}
-		// For array fields with item schema, build a typed list.
-		if rf.IsArray && len(rf.ItemFields) > 0 {
-			if arr, ok := val.([]any); ok {
-				listVal := buildListFromResponse(arr, rf.ItemFields)
-				diags.Append(target.SetAttribute(ctx, attrPath(key), listVal)...)
-			}
-			continue
-		}
-		// For simple list fields (list of strings), build a string list.
-		if rf.IsArray {
-			if arr, ok := val.([]any); ok {
-				listVal := buildSimpleListFromResponse(arr)
-				diags.Append(target.SetAttribute(ctx, attrPath(key), listVal)...)
-			}
-			continue
-		}
-		// For complex values (arrays, maps), serialize as JSON.
-		var strVal string
-		switch val.(type) {
-		case []any, map[string]any:
-			if b, err := json.Marshal(val); err == nil {
-				strVal = string(b)
-			} else {
-				strVal = fmt.Sprintf("%v", val)
-			}
-		default:
-			strVal = fmt.Sprintf("%v", val)
-		}
-		diags.Append(target.SetAttribute(ctx, attrPath(key), types.StringValue(strVal))...)
+		setResponseField(ctx, rf, m, target, diags)
 	}
+}
+
+func resourceBaseAttrs() map[string]schema.Attribute {
+	return map[string]schema.Attribute{
+		"id": schema.StringAttribute{
+			Description: "Resource identifier.",
+			Computed:    true,
+		},
+		"api_response": schema.StringAttribute{
+			Description: "The raw JSON response from the Bitbucket API.",
+			Computed:    true,
+		},
+	}
+}
+
+func (r *GenericResource) primaryOp() *OperationDef {
+	if r.group.Ops.Create != nil {
+		return r.group.Ops.Create
+	}
+	return r.group.Ops.Read
+}
+
+func (r *GenericResource) responseOp() *OperationDef {
+	if r.group.Ops.Read != nil {
+		return r.group.Ops.Read
+	}
+	return r.group.Ops.Create
+}
+
+func requiredPrimaryPathParams(op *OperationDef) map[string]bool {
+	required := map[string]bool{}
+	if op == nil {
+		return required
+	}
+	for _, p := range op.Params {
+		if p.Required && p.In == "path" {
+			required[p.Name] = true
+		}
+	}
+	return required
+}
+
+func addResourceParams(attrs map[string]schema.Attribute, ops []*OperationDef, primaryRequired map[string]bool, paramSeen map[string]bool) {
+	for _, op := range ops {
+		for _, p := range op.Params {
+			if paramSeen[p.Name] {
+				continue
+			}
+			paramSeen[p.Name] = true
+			attrName := ParamAttrName(p.Name)
+			if _, exists := attrs[attrName]; exists {
+				continue
+			}
+			attrs[attrName] = resourceParamAttr(p, primaryRequired[p.Name])
+		}
+	}
+}
+
+func resourceParamAttr(p ParamDef, isRequired bool) schema.StringAttribute {
+	attr := schema.StringAttribute{
+		Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
+	}
+	if isRequired {
+		attr.Required = true
+		return attr
+	}
+	attr.Optional = true
+	attr.Computed = p.In == "path"
+	return attr
+}
+
+func addResourceBodyFields(attrs map[string]schema.Attribute, ops []*OperationDef) bool {
+	bodyFieldSeen := map[string]bool{}
+	hasBody := false
+	for _, op := range ops {
+		if op.HasBody {
+			hasBody = true
+		}
+		for _, bf := range op.BodyFields {
+			key := toSnakeCase(strings.ReplaceAll(bf.Path, ".", "_"))
+			if bodyFieldSeen[key] {
+				continue
+			}
+			bodyFieldSeen[key] = true
+			attrs[key] = bodyFieldAttr(bf)
+		}
+	}
+	return hasBody
+}
+
+func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
+	desc := bf.Desc
+	if desc == "" {
+		desc = bf.Path
+	}
+	if bf.IsObject && len(bf.ItemFields) > 0 {
+		return schema.SingleNestedAttribute{
+			Description: desc,
+			Optional:    true,
+			Attributes:  buildNestedItemAttrs(bf.ItemFields),
+		}
+	}
+	if bf.IsArray && len(bf.ItemFields) > 0 {
+		return schema.ListNestedAttribute{
+			Description: desc,
+			Optional:    true,
+			NestedObject: schema.NestedAttributeObject{
+				Attributes: buildNestedItemAttrs(bf.ItemFields),
+			},
+		}
+	}
+	if bf.IsArray {
+		return schema.ListAttribute{
+			Description: desc,
+			Optional:    true,
+			ElementType: types.StringType,
+		}
+	}
+	return schema.StringAttribute{
+		Description: desc,
+		Optional:    true,
+	}
+}
+
+func addResourceResponseFields(attrs map[string]schema.Attribute, responseOp *OperationDef, paramSeen map[string]bool) {
+	if responseOp == nil {
+		return
+	}
+	for _, rf := range responseOp.ResponseFields {
+		key := toSnakeCase(strings.ReplaceAll(rf.Path, ".", "_"))
+		if isReservedResourceAttr(key) {
+			continue
+		}
+		if existing, exists := attrs[key]; exists {
+			attrs[key] = mergeResponseAttr(existing, rf)
+			continue
+		}
+		if !paramSeen[key] {
+			attrs[key] = responseFieldAttr(rf)
+		}
+	}
+}
+
+func isReservedResourceAttr(key string) bool {
+	return key == "id" || key == "api_response" || key == "request_body"
+}
+
+func responseFieldAttr(rf BodyFieldDef) schema.Attribute {
+	desc := rf.Desc
+	if desc == "" {
+		desc = rf.Path
+	}
+	if rf.IsObject && len(rf.ItemFields) > 0 {
+		return schema.SingleNestedAttribute{
+			Description: desc,
+			Computed:    true,
+			Attributes:  buildNestedItemAttrs(rf.ItemFields),
+		}
+	}
+	if rf.IsArray && len(rf.ItemFields) > 0 {
+		return schema.ListNestedAttribute{
+			Description: desc,
+			Computed:    true,
+			NestedObject: schema.NestedAttributeObject{
+				Attributes: buildNestedItemAttrs(rf.ItemFields),
+			},
+		}
+	}
+	if rf.IsArray {
+		return schema.ListAttribute{
+			Description: desc,
+			Computed:    true,
+			ElementType: types.StringType,
+		}
+	}
+	return schema.StringAttribute{
+		Description: desc,
+		Computed:    true,
+	}
+}
+
+func mergeResponseAttr(existing schema.Attribute, rf BodyFieldDef) schema.Attribute {
+	desc := rf.Desc
+	if desc == "" {
+		desc = rf.Path
+	}
+	switch sa := existing.(type) {
+	case schema.StringAttribute:
+		if !sa.Computed && !sa.Required {
+			sa.Computed = true
+			sa.Description = desc
+		}
+		return sa
+	case schema.SingleNestedAttribute:
+		if !sa.Computed && !sa.Required {
+			sa.Computed = true
+			sa.Description = desc
+			if rf.IsObject && len(rf.ItemFields) > 0 {
+				sa.Attributes = buildNestedItemAttrs(rf.ItemFields)
+			}
+		}
+		return sa
+	case schema.ListNestedAttribute:
+		if !sa.Computed && !sa.Required {
+			sa.Computed = true
+			sa.Description = desc
+			if rf.IsArray && len(rf.ItemFields) > 0 {
+				sa.NestedObject = schema.NestedAttributeObject{
+					Attributes: buildNestedItemAttrs(rf.ItemFields),
+				}
+			}
+		}
+		return sa
+	case schema.ListAttribute:
+		if !sa.Computed && !sa.Required {
+			sa.Computed = true
+			sa.Description = desc
+		}
+		return sa
+	default:
+		return existing
+	}
+}
+
+func addRequestBodyAttr(attrs map[string]schema.Attribute, hasBody bool) {
+	if !hasBody {
+		return
+	}
+	attrs["request_body"] = schema.StringAttribute{
+		Description: "Raw JSON request body for create/update operations. Use this to pass fields not exposed as individual attributes.",
+		Optional:    true,
+	}
+}
+
+func (r *GenericResource) storeDispatchResult(ctx context.Context, op *OperationDef, pathParams map[string]string, target stateAccessor, diags *diag.Diagnostics, result any) map[string]any {
+	if result == nil {
+		diags.Append(target.SetAttribute(ctx, attrPath("api_response"), types.StringValue(""))...)
+		diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(op.OperationID))...)
+		return nil
+	}
+
+	jsonBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		diags.AddError("Response Error", fmt.Sprintf("Failed to marshal response: %v", err))
+		return nil
+	}
+	diags.Append(target.SetAttribute(ctx, attrPath("api_response"), types.StringValue(string(jsonBytes)))...)
+
+	resultMap, _ := result.(map[string]any)
+	if resultMap != nil {
+		r.extractResponseFields(ctx, resultMap, target, diags)
+		if id := extractID(resultMap); id != "" {
+			diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(id))...)
+			return resultMap
+		}
+	}
+	diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(fallbackResourceID(op, pathParams)))...)
+	return resultMap
+}
+
+func fallbackResourceID(op *OperationDef, pathParams map[string]string) string {
+	fallbackID := op.OperationID
+	for _, p := range op.Params {
+		if p.In == "path" {
+			if v, ok := pathParams[p.Name]; ok {
+				fallbackID += "/" + v
+			}
+		}
+	}
+	return fallbackID
+}
+
+func buildExplicitBody(ctx context.Context, source stateAccessor, fields []BodyFieldDef, diags *diag.Diagnostics) map[string]any {
+	bodyObj := map[string]any{}
+	for _, bf := range fields {
+		if value, ok := bodyFieldValue(ctx, source, bf, diags); ok {
+			handlers.SetNested(bodyObj, bf.Path, value)
+		}
+	}
+	return bodyObj
+}
+
+func bodyFieldValue(ctx context.Context, source stateAccessor, bf BodyFieldDef, diags *diag.Diagnostics) (any, bool) {
+	attrName := toSnakeCase(strings.ReplaceAll(bf.Path, ".", "_"))
+	switch {
+	case bf.IsObject && len(bf.ItemFields) > 0:
+		obj := readSingleNested(ctx, source, attrName, bf.ItemFields, diags)
+		return obj, obj != nil
+	case bf.IsArray && len(bf.ItemFields) > 0:
+		arr := readListNested(ctx, source, attrName, bf.ItemFields, diags)
+		return arr, arr != nil
+	case bf.IsArray:
+		arr := readSimpleList(ctx, source, attrName, diags)
+		return arr, arr != nil
+	default:
+		return readBodyStringValue(ctx, source, attrName, diags)
+	}
+}
+
+func readBodyStringValue(ctx context.Context, source stateAccessor, attrName string, diags *diag.Diagnostics) (string, bool) {
+	var val types.String
+	d := source.GetAttribute(ctx, attrPath(attrName), &val)
+	diags.Append(d...)
+	if d.HasError() || val.IsNull() || val.IsUnknown() || val.ValueString() == "" {
+		return "", false
+	}
+	return val.ValueString(), true
+}
+
+func marshalBodyObject(diags *diag.Diagnostics, bodyObj map[string]any) string {
+	if len(bodyObj) == 0 {
+		return ""
+	}
+	b, err := json.Marshal(bodyObj)
+	if err != nil {
+		diags.AddError("Body Error", fmt.Sprintf("Failed to marshal request body: %v", err))
+		return ""
+	}
+	return string(b)
+}
+
+func rawRequestBody(ctx context.Context, source stateAccessor, diags *diag.Diagnostics) string {
+	body, ok := readBodyStringValue(ctx, source, "request_body", diags)
+	if !ok {
+		return ""
+	}
+	return body
+}
+
+func readObjectAttrValue(v attr.Value, itemFields []BodyFieldDef) (any, bool) {
+	innerObj, ok := v.(types.Object)
+	if !ok || innerObj.IsNull() || innerObj.IsUnknown() {
+		return nil, false
+	}
+	inner := readObjectAttrs(innerObj, itemFields)
+	if len(inner) == 0 {
+		return nil, false
+	}
+	return inner, true
+}
+
+func readNestedListAttrValue(v attr.Value, itemFields []BodyFieldDef) (any, bool) {
+	list, ok := v.(types.List)
+	if !ok || list.IsNull() || list.IsUnknown() {
+		return nil, false
+	}
+	items := readListNestedValue(list, itemFields)
+	if len(items) == 0 {
+		return nil, false
+	}
+	return items, true
+}
+
+func readSimpleListAttrValue(v attr.Value) (any, bool) {
+	list, ok := v.(types.List)
+	if !ok || list.IsNull() || list.IsUnknown() {
+		return nil, false
+	}
+	items := readSimpleListValue(list)
+	if len(items) == 0 {
+		return nil, false
+	}
+	return items, true
+}
+
+func readStringAttrValue(v attr.Value) (any, bool) {
+	sv, ok := v.(types.String)
+	if !ok || sv.IsNull() || sv.IsUnknown() || sv.ValueString() == "" {
+		return nil, false
+	}
+	return sv.ValueString(), true
+}
+
+func copyParamAttributes(ctx context.Context, params []ParamDef, seen map[string]bool, source, target stateAccessor, diags *diag.Diagnostics) {
+	for _, p := range params {
+		attrName := ParamAttrName(p.Name)
+		if seen[attrName] {
+			continue
+		}
+		seen[attrName] = true
+		copyStringAttribute(ctx, attrName, source, target, diags)
+	}
+}
+
+func copyBodyAttributes(ctx context.Context, fields []BodyFieldDef, seen map[string]bool, source, target stateAccessor, diags *diag.Diagnostics) {
+	for _, bf := range fields {
+		attrName := toSnakeCase(strings.ReplaceAll(bf.Path, ".", "_"))
+		if seen[attrName] {
+			continue
+		}
+		seen[attrName] = true
+		if bf.IsArray || bf.IsObject {
+			continue
+		}
+		copyStringAttribute(ctx, attrName, source, target, diags)
+	}
+}
+
+func copyStringAttribute(ctx context.Context, attrName string, source, target stateAccessor, diags *diag.Diagnostics) {
+	var val types.String
+	d := source.GetAttribute(ctx, attrPath(attrName), &val)
+	diags.Append(d...)
+	if !d.HasError() && !val.IsNull() && !val.IsUnknown() {
+		diags.Append(target.SetAttribute(ctx, attrPath(attrName), val)...)
+	}
+}
+
+func shouldSkipComputedParam(p ParamDef, attrName string, seen map[string]bool, ctx context.Context, source stateAccessor, diags *diag.Diagnostics) bool {
+	if p.In != "path" || seen[attrName] {
+		return true
+	}
+	seen[attrName] = true
+	var existing types.String
+	d := source.GetAttribute(ctx, attrPath(attrName), &existing)
+	diags.Append(d...)
+	return d.HasError() || (!existing.IsNull() && !existing.IsUnknown() && existing.ValueString() != "")
+}
+
+func setComputedParam(ctx context.Context, m map[string]any, paramName, attrName string, target stateAccessor, diags *diag.Diagnostics) {
+	if val, ok := responseParamValue(m, paramName); ok && val != "" {
+		diags.Append(target.SetAttribute(ctx, attrPath(attrName), types.StringValue(fmt.Sprintf("%v", val)))...)
+	}
+}
+
+func setResponseField(ctx context.Context, rf BodyFieldDef, m map[string]any, target stateAccessor, diags *diag.Diagnostics) {
+	key := toSnakeCase(strings.ReplaceAll(rf.Path, ".", "_"))
+	if isReservedResourceAttr(key) {
+		return
+	}
+	val, ok := handlers.GetNested(m, rf.Path)
+	if !ok || val == nil {
+		return
+	}
+	attrValue, ok := responseFieldValue(val, rf)
+	if !ok {
+		return
+	}
+	diags.Append(target.SetAttribute(ctx, attrPath(key), attrValue)...)
+}
+
+func responseFieldValue(val any, rf BodyFieldDef) (any, bool) {
+	if rf.IsObject && len(rf.ItemFields) > 0 {
+		obj, ok := val.(map[string]any)
+		if !ok {
+			return nil, false
+		}
+		return buildObjectFromResponse(obj, rf.ItemFields), true
+	}
+	if rf.IsArray && len(rf.ItemFields) > 0 {
+		arr, ok := val.([]any)
+		if !ok {
+			return nil, false
+		}
+		return buildListFromResponse(arr, rf.ItemFields), true
+	}
+	if rf.IsArray {
+		arr, ok := val.([]any)
+		if !ok {
+			return nil, false
+		}
+		return buildSimpleListFromResponse(arr), true
+	}
+	return types.StringValue(stringifyComplexValue(val)), true
+}
+
+func stringifyComplexValue(val any) string {
+	switch val.(type) {
+	case []any, map[string]any:
+		if b, err := json.Marshal(val); err == nil {
+			return string(b)
+		}
+	}
+	return fmt.Sprintf("%v", val)
 }
 
 // buildListFromResponse converts a JSON array from the API response into a

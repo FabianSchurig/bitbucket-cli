@@ -13,6 +13,21 @@ import (
 	"github.com/FabianSchurig/bitbucket-cli/internal/mcptools"
 )
 
+const (
+	testVersion               = "v0.0.1"
+	serverConnectErrFmt       = "server connect: %v"
+	testClientName            = "test-client"
+	clientConnectErrFmt       = "client connect: %v"
+	listingToolsErrFmt        = "listing tools: %v"
+	expectedSingleToolErrFmt  = "expected 1 tool, got %d"
+	unexpectedErrorMsgErrFmt  = "unexpected error message: %s"
+	headerContentType         = "Content-Type"
+	contentTypeJSON           = "application/json"
+	unexpectedErrorErrFmt     = "unexpected error: %s"
+	invalidJSONResponseErrFmt = "invalid JSON response: %v"
+	newItemTitle              = "New Item"
+)
+
 // ─── Test helpers ─────────────────────────────────────────────────────────────
 
 // setupEnv configures Bitbucket auth env vars and returns a cleanup function.
@@ -87,7 +102,7 @@ func testToolGroup() mcptools.ToolGroup {
 func callTool(t *testing.T, group mcptools.ToolGroup, args map[string]any) *mcp.CallToolResult {
 	t.Helper()
 
-	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0.0.1"}, nil)
+	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: testVersion}, nil)
 	mcptools.RegisterToolGroup(server, group)
 
 	ctx := context.Background()
@@ -95,14 +110,14 @@ func callTool(t *testing.T, group mcptools.ToolGroup, args map[string]any) *mcp.
 
 	serverSession, err := server.Connect(ctx, st, nil)
 	if err != nil {
-		t.Fatalf("server connect: %v", err)
+		t.Fatalf(serverConnectErrFmt, err)
 	}
 	defer func() { _ = serverSession.Close() }()
 
-	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0.0.1"}, nil)
+	client := mcp.NewClient(&mcp.Implementation{Name: testClientName, Version: testVersion}, nil)
 	clientSession, err := client.Connect(ctx, ct, nil)
 	if err != nil {
-		t.Fatalf("client connect: %v", err)
+		t.Fatalf(clientConnectErrFmt, err)
 	}
 	defer func() { _ = clientSession.Close() }()
 
@@ -114,6 +129,69 @@ func callTool(t *testing.T, group mcptools.ToolGroup, args map[string]any) *mcp.
 		t.Fatalf("CallTool: %v", err)
 	}
 	return res
+}
+
+func newConnectedServerClient(t *testing.T, group mcptools.ToolGroup) (context.Context, *mcp.ClientSession, *mcp.ServerSession) {
+	t.Helper()
+
+	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: testVersion}, nil)
+	mcptools.RegisterToolGroup(server, group)
+
+	ctx := context.Background()
+	ct, st := mcp.NewInMemoryTransports()
+
+	serverSession, err := server.Connect(ctx, st, nil)
+	if err != nil {
+		t.Fatalf(serverConnectErrFmt, err)
+	}
+
+	client := mcp.NewClient(&mcp.Implementation{Name: testClientName, Version: testVersion}, nil)
+	clientSession, err := client.Connect(ctx, ct, nil)
+	if err != nil {
+		t.Fatalf(clientConnectErrFmt, err)
+	}
+
+	return ctx, clientSession, serverSession
+}
+
+func listTools(t *testing.T, clientSession *mcp.ClientSession, ctx context.Context) []*mcp.Tool {
+	t.Helper()
+
+	var tools []*mcp.Tool
+	for tool, err := range clientSession.Tools(ctx, nil) {
+		if err != nil {
+			t.Fatalf(listingToolsErrFmt, err)
+		}
+		tools = append(tools, tool)
+	}
+	return tools
+}
+
+func operationEnum(t *testing.T, tool *mcp.Tool) []any {
+	t.Helper()
+
+	var schema map[string]any
+	raw, err := json.Marshal(tool.InputSchema)
+	if err != nil {
+		t.Fatalf("marshal input schema: %v", err)
+	}
+	if err := json.Unmarshal(raw, &schema); err != nil {
+		t.Fatalf("unmarshal input schema: %v", err)
+	}
+
+	props, ok := schema["properties"].(map[string]any)
+	if !ok {
+		t.Fatal("expected properties in schema")
+	}
+	opProp, ok := props["operation"].(map[string]any)
+	if !ok {
+		t.Fatal("expected operation property in schema")
+	}
+	enumRaw, ok := opProp["enum"].([]any)
+	if !ok {
+		t.Fatal("expected enum in operation property")
+	}
+	return enumRaw
 }
 
 // textContent extracts the text from the first TextContent in a result.
@@ -132,36 +210,14 @@ func textContent(t *testing.T, res *mcp.CallToolResult) string {
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
 func TestRegisterToolGroup_ToolListedByClient(t *testing.T) {
-	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0.0.1"}, nil)
-	mcptools.RegisterToolGroup(server, testToolGroup())
-
-	ctx := context.Background()
-	ct, st := mcp.NewInMemoryTransports()
-
-	serverSession, err := server.Connect(ctx, st, nil)
-	if err != nil {
-		t.Fatalf("server connect: %v", err)
-	}
+	ctx, clientSession, serverSession := newConnectedServerClient(t, testToolGroup())
 	defer func() { _ = serverSession.Close() }()
-
-	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0.0.1"}, nil)
-	clientSession, err := client.Connect(ctx, ct, nil)
-	if err != nil {
-		t.Fatalf("client connect: %v", err)
-	}
 	defer func() { _ = clientSession.Close() }()
 
-	// List tools and verify our tool is registered.
-	var tools []*mcp.Tool
-	for tool, err := range clientSession.Tools(ctx, nil) {
-		if err != nil {
-			t.Fatalf("listing tools: %v", err)
-		}
-		tools = append(tools, tool)
-	}
+	tools := listTools(t, clientSession, ctx)
 
 	if len(tools) != 1 {
-		t.Fatalf("expected 1 tool, got %d", len(tools))
+		t.Fatalf(expectedSingleToolErrFmt, len(tools))
 	}
 	if tools[0].Name != "test_tool" {
 		t.Errorf("expected tool name 'test_tool', got %q", tools[0].Name)
@@ -175,7 +231,7 @@ func TestToolHandler_MissingOperation(t *testing.T) {
 	}
 	text := textContent(t, res)
 	if text != "missing required parameter: operation" {
-		t.Errorf("unexpected error message: %s", text)
+		t.Errorf(unexpectedErrorMsgErrFmt, text)
 	}
 }
 
@@ -188,7 +244,7 @@ func TestToolHandler_UnknownOperation(t *testing.T) {
 	}
 	text := textContent(t, res)
 	if text != "unknown operation: doesNotExist" {
-		t.Errorf("unexpected error message: %s", text)
+		t.Errorf(unexpectedErrorMsgErrFmt, text)
 	}
 }
 
@@ -203,7 +259,7 @@ func TestToolHandler_MissingRequiredParam(t *testing.T) {
 	}
 	text := textContent(t, res)
 	if text != "missing required parameter: repo_slug (for operation listItems)" {
-		t.Errorf("unexpected error message: %s", text)
+		t.Errorf(unexpectedErrorMsgErrFmt, text)
 	}
 }
 
@@ -240,7 +296,7 @@ func TestToolHandler_GET_Success(t *testing.T) {
 		if r.URL.Path != expected {
 			t.Errorf("expected path %s, got %s", expected, r.URL.Path)
 		}
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set(headerContentType, contentTypeJSON)
 		_ = json.NewEncoder(w).Encode(map[string]any{"id": 42, "title": "Test Item"})
 	}))
 	defer srv.Close()
@@ -253,13 +309,13 @@ func TestToolHandler_GET_Success(t *testing.T) {
 		"item_id":   42,
 	})
 	if res.IsError {
-		t.Fatalf("unexpected error: %s", textContent(t, res))
+		t.Fatalf(unexpectedErrorErrFmt, textContent(t, res))
 	}
 
 	text := textContent(t, res)
 	var result map[string]any
 	if err := json.Unmarshal([]byte(text), &result); err != nil {
-		t.Fatalf("invalid JSON response: %v", err)
+		t.Fatalf(invalidJSONResponseErrFmt, err)
 	}
 	if result["title"] != "Test Item" {
 		t.Errorf("expected title 'Test Item', got %v", result["title"])
@@ -272,7 +328,7 @@ func TestToolHandler_GET_PaginatedList(t *testing.T) {
 	callCount := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		callCount++
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set(headerContentType, contentTypeJSON)
 		switch {
 		case r.URL.Path == "/2.0/repositories/myws/myrepo/items" && callCount == 1:
 			nextURL := "http://" + r.Host + "/page2"
@@ -297,13 +353,13 @@ func TestToolHandler_GET_PaginatedList(t *testing.T) {
 		"repo_slug": "myrepo",
 	})
 	if res.IsError {
-		t.Fatalf("unexpected error: %s", textContent(t, res))
+		t.Fatalf(unexpectedErrorErrFmt, textContent(t, res))
 	}
 
 	text := textContent(t, res)
 	var items []any
 	if err := json.Unmarshal([]byte(text), &items); err != nil {
-		t.Fatalf("invalid JSON response: %v", err)
+		t.Fatalf(invalidJSONResponseErrFmt, err)
 	}
 	if len(items) != 2 {
 		t.Errorf("expected 2 items, got %d", len(items))
@@ -324,16 +380,16 @@ func TestToolHandler_POST_WithBodyFields(t *testing.T) {
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			t.Errorf("decoding body: %v", err)
 		}
-		if body["title"] != "New Item" {
-			t.Errorf("expected title 'New Item', got %v", body["title"])
+		if body["title"] != newItemTitle {
+			t.Errorf("expected title %q, got %v", newItemTitle, body["title"])
 		}
 		content, _ := body["content"].(map[string]any)
 		if content["raw"] != "Hello world" {
 			t.Errorf("expected content.raw 'Hello world', got %v", content["raw"])
 		}
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set(headerContentType, contentTypeJSON)
 		w.WriteHeader(http.StatusCreated)
-		_ = json.NewEncoder(w).Encode(map[string]any{"id": 99, "title": "New Item"})
+		_ = json.NewEncoder(w).Encode(map[string]any{"id": 99, "title": newItemTitle})
 	}))
 	defer srv.Close()
 	t.Setenv("BITBUCKET_BASE_URL", srv.URL+"/2.0")
@@ -342,20 +398,20 @@ func TestToolHandler_POST_WithBodyFields(t *testing.T) {
 		"operation":        "createItem",
 		"workspace":        "myws",
 		"repo_slug":        "myrepo",
-		"body_title":       "New Item",
+		"body_title":       newItemTitle,
 		"body_content_raw": "Hello world",
 	})
 	if res.IsError {
-		t.Fatalf("unexpected error: %s", textContent(t, res))
+		t.Fatalf(unexpectedErrorErrFmt, textContent(t, res))
 	}
 
 	text := textContent(t, res)
 	var result map[string]any
 	if err := json.Unmarshal([]byte(text), &result); err != nil {
-		t.Fatalf("invalid JSON response: %v", err)
+		t.Fatalf(invalidJSONResponseErrFmt, err)
 	}
-	if result["title"] != "New Item" {
-		t.Errorf("expected title 'New Item', got %v", result["title"])
+	if result["title"] != newItemTitle {
+		t.Errorf("expected title %q, got %v", newItemTitle, result["title"])
 	}
 }
 
@@ -378,7 +434,7 @@ func TestToolHandler_DELETE_Success(t *testing.T) {
 		"item_id":   42,
 	})
 	if res.IsError {
-		t.Fatalf("unexpected error: %s", textContent(t, res))
+		t.Fatalf(unexpectedErrorErrFmt, textContent(t, res))
 	}
 
 	text := textContent(t, res)
@@ -398,7 +454,7 @@ func TestToolHandler_POST_WithRawBody(t *testing.T) {
 		if body["custom"] != "field" {
 			t.Errorf("expected custom field, got %v", body["custom"])
 		}
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set(headerContentType, contentTypeJSON)
 		w.WriteHeader(http.StatusCreated)
 		_ = json.NewEncoder(w).Encode(map[string]any{"id": 1})
 	}))
@@ -412,7 +468,7 @@ func TestToolHandler_POST_WithRawBody(t *testing.T) {
 		"body":      `{"custom":"field"}`,
 	})
 	if res.IsError {
-		t.Fatalf("unexpected error: %s", textContent(t, res))
+		t.Fatalf(unexpectedErrorErrFmt, textContent(t, res))
 	}
 }
 
@@ -424,62 +480,17 @@ func TestToolHandler_MultipleOperationsPerTool(t *testing.T) {
 	// Verify that a single tool exposes multiple operations via the operation enum.
 	group := testToolGroup()
 
-	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0.0.1"}, nil)
-	mcptools.RegisterToolGroup(server, group)
-
-	ctx := context.Background()
-	ct, st := mcp.NewInMemoryTransports()
-
-	serverSession, err := server.Connect(ctx, st, nil)
-	if err != nil {
-		t.Fatalf("server connect: %v", err)
-	}
+	ctx, clientSession, serverSession := newConnectedServerClient(t, group)
 	defer func() { _ = serverSession.Close() }()
-
-	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0.0.1"}, nil)
-	clientSession, err := client.Connect(ctx, ct, nil)
-	if err != nil {
-		t.Fatalf("client connect: %v", err)
-	}
 	defer func() { _ = clientSession.Close() }()
 
-	// List tools - should have exactly one tool with all operations.
-	var tools []*mcp.Tool
-	for tool, err := range clientSession.Tools(ctx, nil) {
-		if err != nil {
-			t.Fatalf("listing tools: %v", err)
-		}
-		tools = append(tools, tool)
-	}
+	tools := listTools(t, clientSession, ctx)
 
 	if len(tools) != 1 {
-		t.Fatalf("expected 1 tool, got %d", len(tools))
+		t.Fatalf(expectedSingleToolErrFmt, len(tools))
 	}
 
-	// Verify the tool has an InputSchema with an operation enum.
-	var schema map[string]any
-	raw, err := json.Marshal(tools[0].InputSchema)
-	if err != nil {
-		t.Fatalf("marshal input schema: %v", err)
-	}
-	if err := json.Unmarshal(raw, &schema); err != nil {
-		t.Fatalf("unmarshal input schema: %v", err)
-	}
-
-	props, ok := schema["properties"].(map[string]any)
-	if !ok {
-		t.Fatal("expected properties in schema")
-	}
-
-	opProp, ok := props["operation"].(map[string]any)
-	if !ok {
-		t.Fatal("expected operation property in schema")
-	}
-
-	enumRaw, ok := opProp["enum"].([]any)
-	if !ok {
-		t.Fatal("expected enum in operation property")
-	}
+	enumRaw := operationEnum(t, tools[0])
 
 	if len(enumRaw) != 4 {
 		t.Errorf("expected 4 operations in enum, got %d", len(enumRaw))
@@ -505,35 +516,14 @@ func TestToolHandler_MultipleOperationsPerTool(t *testing.T) {
 
 func TestToolHandler_GeneratedPRToolGroup(t *testing.T) {
 	// Smoke test: verify the generated PRToolGroup can be registered.
-	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0.0.1"}, nil)
-	mcptools.RegisterToolGroup(server, mcptools.PRToolGroup)
-
-	ctx := context.Background()
-	ct, st := mcp.NewInMemoryTransports()
-
-	serverSession, err := server.Connect(ctx, st, nil)
-	if err != nil {
-		t.Fatalf("server connect: %v", err)
-	}
+	ctx, clientSession, serverSession := newConnectedServerClient(t, mcptools.PRToolGroup)
 	defer func() { _ = serverSession.Close() }()
-
-	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0.0.1"}, nil)
-	clientSession, err := client.Connect(ctx, ct, nil)
-	if err != nil {
-		t.Fatalf("client connect: %v", err)
-	}
 	defer func() { _ = clientSession.Close() }()
 
-	var tools []*mcp.Tool
-	for tool, err := range clientSession.Tools(ctx, nil) {
-		if err != nil {
-			t.Fatalf("listing tools: %v", err)
-		}
-		tools = append(tools, tool)
-	}
+	tools := listTools(t, clientSession, ctx)
 
 	if len(tools) != 1 {
-		t.Fatalf("expected 1 tool, got %d", len(tools))
+		t.Fatalf(expectedSingleToolErrFmt, len(tools))
 	}
 	if tools[0].Name != "bitbucket_pr" {
 		t.Errorf("expected tool name 'bitbucket_pr', got %q", tools[0].Name)
@@ -542,7 +532,7 @@ func TestToolHandler_GeneratedPRToolGroup(t *testing.T) {
 
 func TestToolHandler_AllGeneratedToolGroups(t *testing.T) {
 	// Smoke test: verify all generated tool groups can be registered.
-	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0.0.1"}, nil)
+	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: testVersion}, nil)
 
 	groups := []mcptools.ToolGroup{
 		mcptools.PRToolGroup,
@@ -576,21 +566,21 @@ func TestToolHandler_AllGeneratedToolGroups(t *testing.T) {
 
 	serverSession, err := server.Connect(ctx, st, nil)
 	if err != nil {
-		t.Fatalf("server connect: %v", err)
+		t.Fatalf(serverConnectErrFmt, err)
 	}
 	defer func() { _ = serverSession.Close() }()
 
-	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0.0.1"}, nil)
+	client := mcp.NewClient(&mcp.Implementation{Name: testClientName, Version: testVersion}, nil)
 	clientSession, err := client.Connect(ctx, ct, nil)
 	if err != nil {
-		t.Fatalf("client connect: %v", err)
+		t.Fatalf(clientConnectErrFmt, err)
 	}
 	defer func() { _ = clientSession.Close() }()
 
 	var tools []*mcp.Tool
 	for tool, err := range clientSession.Tools(ctx, nil) {
 		if err != nil {
-			t.Fatalf("listing tools: %v", err)
+			t.Fatalf(listingToolsErrFmt, err)
 		}
 		tools = append(tools, tool)
 	}

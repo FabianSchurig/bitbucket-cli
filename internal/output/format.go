@@ -220,12 +220,7 @@ func renderMapSliceKV(w io.Writer, items []any) error {
 	}
 	first, ok := items[0].(map[string]any)
 	if !ok {
-		for _, item := range items {
-			if _, err := fmt.Fprintf(w, "%v\n", item); err != nil {
-				return err
-			}
-		}
-		return nil
+		return writePlainItems(w, items)
 	}
 	cols := pickMapColumns(first)
 	for i, item := range items {
@@ -238,13 +233,26 @@ func renderMapSliceKV(w io.Writer, items []any) error {
 		if !ok {
 			continue
 		}
-		if err := writeKVBlock(w, cols, func(j int) string {
-			return colorIfState(cols[j], flatValue(m[cols[j]]))
-		}); err != nil {
+		if err := writeMapKVBlock(w, cols, m); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func writePlainItems(w io.Writer, items []any) error {
+	for _, item := range items {
+		if _, err := fmt.Fprintf(w, "%v\n", item); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func writeMapKVBlock(w io.Writer, cols []string, m map[string]any) error {
+	return writeKVBlock(w, cols, func(j int) string {
+		return colorIfState(cols[j], flatValue(m[cols[j]]))
+	})
 }
 
 // renderMapKV renders a single map as key-value pairs.

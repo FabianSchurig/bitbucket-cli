@@ -62,69 +62,7 @@ type ToolGroup struct {
 // The tool accepts an "operation" parameter to select which API operation to
 // execute, plus all parameters from all operations (validated at runtime).
 func RegisterToolGroup(server *mcp.Server, group ToolGroup) {
-	// Build the JSON Schema for the tool input.
-	properties := map[string]any{}
-	required := []string{"operation"}
-
-	// Operation enum from all operation IDs.
-	opIDs := make([]any, 0, len(group.Operations))
-	opDescs := make([]string, 0, len(group.Operations))
-	for _, op := range group.Operations {
-		opIDs = append(opIDs, op.OperationID)
-		desc := op.Summary
-		if desc == "" {
-			desc = op.OperationID
-		}
-		opDescs = append(opDescs, fmt.Sprintf("- %s: %s [%s %s]", op.OperationID, desc, op.Method, op.Path))
-	}
-
-	properties["operation"] = map[string]any{
-		"type":        "string",
-		"enum":        opIDs,
-		"description": "The API operation to execute.\n\n" + strings.Join(opDescs, "\n"),
-	}
-
-	// Collect all unique parameter names across operations.
-	paramSeen := map[string]bool{}
-	for _, op := range group.Operations {
-		for _, p := range op.Params {
-			if paramSeen[p.Name] {
-				continue
-			}
-			paramSeen[p.Name] = true
-			prop := map[string]any{
-				"type":        jsonSchemaType(p.Type),
-				"description": fmt.Sprintf("%s parameter", p.In),
-			}
-			properties[p.Name] = prop
-		}
-	}
-
-	// Add body parameter for raw JSON body.
-	properties["body"] = map[string]any{
-		"type":        "string",
-		"description": "Raw JSON request body (for create/update operations). If provided, body field parameters are ignored.",
-	}
-
-	// Collect unique body fields across operations.
-	bodyFieldSeen := map[string]bool{}
-	for _, op := range group.Operations {
-		for _, bf := range op.BodyFields {
-			key := "body_" + strings.ReplaceAll(bf.Path, ".", "_")
-			if bodyFieldSeen[key] {
-				continue
-			}
-			bodyFieldSeen[key] = true
-			desc := bf.Desc
-			if desc == "" {
-				desc = bf.Path
-			}
-			properties[key] = map[string]any{
-				"type":        jsonSchemaType(bf.Type),
-				"description": fmt.Sprintf("Body field: %s", desc),
-			}
-		}
-	}
+	properties := buildToolProperties(group)
 
 	tool := mcp.Tool{
 		Name:        group.Name,
@@ -132,7 +70,7 @@ func RegisterToolGroup(server *mcp.Server, group ToolGroup) {
 		InputSchema: mustMarshal(map[string]any{
 			"type":       "object",
 			"properties": properties,
-			"required":   required,
+			"required":   []string{"operation"},
 		}),
 	}
 
@@ -145,75 +83,102 @@ func RegisterToolGroup(server *mcp.Server, group ToolGroup) {
 	server.AddTool(&tool, newToolHandler(opMap))
 }
 
+func buildToolProperties(group ToolGroup) map[string]any {
+	properties := map[string]any{
+		"operation": operationProperty(group.Operations),
+		"body": map[string]any{
+			"type":        "string",
+			"description": "Raw JSON request body (for create/update operations). If provided, body field parameters are ignored.",
+		},
+	}
+	addParamProperties(properties, group.Operations)
+	addBodyFieldProperties(properties, group.Operations)
+	return properties
+}
+
+func operationProperty(operations []OperationDef) map[string]any {
+	opIDs := make([]any, 0, len(operations))
+	opDescs := make([]string, 0, len(operations))
+	for _, op := range operations {
+		opIDs = append(opIDs, op.OperationID)
+		opDescs = append(opDescs, fmt.Sprintf("- %s: %s [%s %s]", op.OperationID, opDescription(op), op.Method, op.Path))
+	}
+	return map[string]any{
+		"type":        "string",
+		"enum":        opIDs,
+		"description": "The API operation to execute.\n\n" + strings.Join(opDescs, "\n"),
+	}
+}
+
+func opDescription(op OperationDef) string {
+	if op.Summary != "" {
+		return op.Summary
+	}
+	return op.OperationID
+}
+
+func addParamProperties(properties map[string]any, operations []OperationDef) {
+	paramSeen := map[string]bool{}
+	for _, op := range operations {
+		for _, p := range op.Params {
+			if paramSeen[p.Name] {
+				continue
+			}
+			paramSeen[p.Name] = true
+			properties[p.Name] = map[string]any{
+				"type":        jsonSchemaType(p.Type),
+				"description": fmt.Sprintf("%s parameter", p.In),
+			}
+		}
+	}
+}
+
+func addBodyFieldProperties(properties map[string]any, operations []OperationDef) {
+	bodyFieldSeen := map[string]bool{}
+	for _, op := range operations {
+		for _, bf := range op.BodyFields {
+			key := bodyFieldKey(bf.Path)
+			if bodyFieldSeen[key] {
+				continue
+			}
+			bodyFieldSeen[key] = true
+			properties[key] = map[string]any{
+				"type":        jsonSchemaType(bf.Type),
+				"description": fmt.Sprintf("Body field: %s", bodyFieldDescription(bf)),
+			}
+		}
+	}
+}
+
 // newToolHandler returns an MCP tool handler that dispatches to the Bitbucket API
 // based on the "operation" parameter.
 func newToolHandler(opMap map[string]OperationDef) mcp.ToolHandler {
 	return func(ctx context.Context, req *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		// Unmarshal raw JSON arguments into a map.
-		var args map[string]any
-		if len(req.Params.Arguments) > 0 {
-			if err := json.Unmarshal(req.Params.Arguments, &args); err != nil {
-				return errResult(fmt.Sprintf("invalid arguments: %v", err)), nil
-			}
-		}
-		if args == nil {
-			args = map[string]any{}
+		args, err := parseToolArgs(req)
+		if err != nil {
+			return errResult(fmt.Sprintf("invalid arguments: %v", err)), nil
 		}
 
-		opID, _ := args["operation"].(string)
-		if opID == "" {
-			return errResult("missing required parameter: operation"), nil
+		opID, op, toolResult := resolveOperation(args, opMap)
+		if toolResult != nil {
+			return toolResult, nil
 		}
 
-		op, ok := opMap[opID]
-		if !ok {
-			return errResult(fmt.Sprintf("unknown operation: %s", opID)), nil
+		pathParams, queryParams, toolResult := buildRequestParams(args, op, opID)
+		if toolResult != nil {
+			return toolResult, nil
 		}
 
-		// Build path parameters.
-		pathParams := map[string]string{}
-		queryParams := map[string]string{}
-		for _, p := range op.Params {
-			val := extractStringParam(args, p.Name, p.Type)
-			if val == "" {
-				if p.Required {
-					return errResult(fmt.Sprintf("missing required parameter: %s (for operation %s)", p.Name, opID)), nil
-				}
-				continue
-			}
-			switch p.In {
-			case "path":
-				pathParams[p.Name] = val
-			case "query":
-				queryParams[p.Name] = val
-			}
+		body, err := buildRequestBody(args, op)
+		if err != nil {
+			return errResult(fmt.Sprintf("invalid body: %v", err)), nil
 		}
 
-		// Build request body.
-		body := ""
-		if rawBody, ok := args["body"].(string); ok && rawBody != "" {
-			body = rawBody
-		} else if op.HasBody {
-			bodyObj := map[string]any{}
-			for _, bf := range op.BodyFields {
-				key := "body_" + strings.ReplaceAll(bf.Path, ".", "_")
-				if val, ok := args[key]; ok && val != nil && val != "" {
-					handlers.SetNested(bodyObj, bf.Path, val)
-				}
-			}
-			if len(bodyObj) > 0 {
-				b, _ := json.Marshal(bodyObj)
-				body = string(b)
-			}
-		}
-
-		// Create Bitbucket client (uses env vars).
 		c, err := client.NewClient()
 		if err != nil {
 			return errResult(fmt.Sprintf("authentication error: %v", err)), nil
 		}
 
-		// Dispatch the API call.
 		result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
 			Method:      op.Method,
 			URLTemplate: op.Path,
@@ -226,22 +191,118 @@ func newToolHandler(opMap map[string]OperationDef) mcp.ToolHandler {
 			return errResult(fmt.Sprintf("API error: %v", err)), nil
 		}
 
-		// Format result as JSON text content.
-		if result == nil {
-			return &mcp.CallToolResult{
-				Content: []mcp.Content{&mcp.TextContent{Text: "OK"}},
-			}, nil
-		}
+		return formatToolResult(result)
+	}
+}
 
-		jsonBytes, err := json.MarshalIndent(result, "", "  ")
-		if err != nil {
-			return errResult(fmt.Sprintf("failed to format response: %v", err)), nil
+func parseToolArgs(req *mcp.CallToolRequest) (map[string]any, error) {
+	var args map[string]any
+	if len(req.Params.Arguments) > 0 {
+		if err := json.Unmarshal(req.Params.Arguments, &args); err != nil {
+			return nil, err
 		}
+	}
+	if args == nil {
+		args = map[string]any{}
+	}
+	return args, nil
+}
 
+func resolveOperation(args map[string]any, opMap map[string]OperationDef) (string, OperationDef, *mcp.CallToolResult) {
+	opID, _ := args["operation"].(string)
+	if opID == "" {
+		return "", OperationDef{}, errResult("missing required parameter: operation")
+	}
+	op, ok := opMap[opID]
+	if !ok {
+		return "", OperationDef{}, errResult(fmt.Sprintf("unknown operation: %s", opID))
+	}
+	return opID, op, nil
+}
+
+func buildRequestParams(args map[string]any, op OperationDef, opID string) (map[string]string, map[string]string, *mcp.CallToolResult) {
+	pathParams := map[string]string{}
+	queryParams := map[string]string{}
+	for _, p := range op.Params {
+		val := extractStringParam(args, p.Name, p.Type)
+		if val == "" {
+			if p.Required {
+				return nil, nil, errResult(fmt.Sprintf("missing required parameter: %s (for operation %s)", p.Name, opID))
+			}
+			continue
+		}
+		assignRequestParam(pathParams, queryParams, p, val)
+	}
+	return pathParams, queryParams, nil
+}
+
+func assignRequestParam(pathParams, queryParams map[string]string, p ParamDef, val string) {
+	switch p.In {
+	case "path":
+		pathParams[p.Name] = val
+	case "query":
+		queryParams[p.Name] = val
+	}
+}
+
+func buildRequestBody(args map[string]any, op OperationDef) (string, error) {
+	if rawBody, ok := args["body"].(string); ok && rawBody != "" {
+		return rawBody, nil
+	}
+	if !op.HasBody {
+		return "", nil
+	}
+	bodyObj := map[string]any{}
+	for _, bf := range op.BodyFields {
+		if val, ok := bodyFieldValue(args, bf.Path); ok {
+			handlers.SetNested(bodyObj, bf.Path, val)
+		}
+	}
+	if len(bodyObj) == 0 {
+		return "", nil
+	}
+	b, err := json.Marshal(bodyObj)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+func bodyFieldValue(args map[string]any, path string) (any, bool) {
+	key := bodyFieldKey(path)
+	val, ok := args[key]
+	if !ok || val == nil || val == "" {
+		return nil, false
+	}
+	return val, true
+}
+
+func bodyFieldKey(path string) string {
+	return "body_" + strings.ReplaceAll(path, ".", "_")
+}
+
+func bodyFieldDescription(bf BodyFieldDef) string {
+	if bf.Desc != "" {
+		return bf.Desc
+	}
+	return bf.Path
+}
+
+func formatToolResult(result any) (*mcp.CallToolResult, error) {
+	if result == nil {
 		return &mcp.CallToolResult{
-			Content: []mcp.Content{&mcp.TextContent{Text: string(jsonBytes)}},
+			Content: []mcp.Content{&mcp.TextContent{Text: "OK"}},
 		}, nil
 	}
+
+	jsonBytes, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		return errResult(fmt.Sprintf("failed to format response: %v", err)), nil
+	}
+
+	return &mcp.CallToolResult{
+		Content: []mcp.Content{&mcp.TextContent{Text: string(jsonBytes)}},
+	}, nil
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

@@ -9,6 +9,11 @@ import (
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
 
+const (
+	renderToErrFmt = "RenderTo: %v"
+	fixedDate      = "2026-01-01T00:00:00Z"
+)
+
 func TestRenderJSON(t *testing.T) {
 	output.Format = "json"
 
@@ -23,7 +28,7 @@ func TestRenderJSON(t *testing.T) {
 
 	var buf bytes.Buffer
 	if err := output.RenderTo(&buf, pr); err != nil {
-		t.Fatalf("RenderTo: %v", err)
+		t.Fatalf(renderToErrFmt, err)
 	}
 
 	got := buf.String()
@@ -40,7 +45,7 @@ func TestRenderTable_EmptySlice(t *testing.T) {
 
 	var buf bytes.Buffer
 	if err := output.RenderTo(&buf, []generated.Pullrequest{}); err != nil {
-		t.Fatalf("RenderTo: %v", err)
+		t.Fatalf(renderToErrFmt, err)
 	}
 
 	got := buf.String()
@@ -64,7 +69,7 @@ func TestRenderTable_Slice(t *testing.T) {
 
 	var buf bytes.Buffer
 	if err := output.RenderTo(&buf, prs); err != nil {
-		t.Fatalf("RenderTo: %v", err)
+		t.Fatalf(renderToErrFmt, err)
 	}
 
 	got := buf.String()
@@ -88,7 +93,7 @@ func TestRenderID(t *testing.T) {
 
 	var buf bytes.Buffer
 	if err := output.RenderTo(&buf, prs); err != nil {
-		t.Fatalf("RenderTo: %v", err)
+		t.Fatalf(renderToErrFmt, err)
 	}
 
 	got := buf.String()
@@ -115,8 +120,8 @@ func TestRenderMapSliceTable_AllKeysShown(t *testing.T) {
 			"id":         float64(1),
 			"content":    map[string]any{"raw": "hello world"},
 			"user":       map[string]any{"display_name": "alice"},
-			"created_on": "2026-01-01T00:00:00Z",
-			"updated_on": "2026-01-01T00:00:00Z",
+			"created_on": fixedDate,
+			"updated_on": fixedDate,
 			"pending":    false,
 			"type":       "pullrequest_comment",
 			"inline":     map[string]any{"path": "main.go"},
@@ -125,7 +130,7 @@ func TestRenderMapSliceTable_AllKeysShown(t *testing.T) {
 
 	var buf bytes.Buffer
 	if err := output.RenderTo(&buf, items); err != nil {
-		t.Fatalf("RenderTo: %v", err)
+		t.Fatalf(renderToErrFmt, err)
 	}
 
 	got := buf.String()
@@ -145,7 +150,7 @@ func TestRenderMapSliceTable_PriorityKeysFirst(t *testing.T) {
 		map[string]any{
 			"id":         float64(1),
 			"content":    map[string]any{"raw": "text"},
-			"created_on": "2026-01-01T00:00:00Z",
+			"created_on": fixedDate,
 			"zebra":      "extra",
 			"alpha":      "extra",
 		},
@@ -153,7 +158,7 @@ func TestRenderMapSliceTable_PriorityKeysFirst(t *testing.T) {
 
 	var buf bytes.Buffer
 	if err := output.RenderTo(&buf, items); err != nil {
-		t.Fatalf("RenderTo: %v", err)
+		t.Fatalf(renderToErrFmt, err)
 	}
 
 	got := buf.String()
@@ -189,7 +194,7 @@ func TestRenderMapTable_AllKeysShown(t *testing.T) {
 
 	var buf bytes.Buffer
 	if err := output.RenderTo(&buf, m); err != nil {
-		t.Fatalf("RenderTo: %v", err)
+		t.Fatalf(renderToErrFmt, err)
 	}
 
 	got := buf.String()
@@ -213,7 +218,7 @@ func TestFlatValue_FullTextNotTruncated(t *testing.T) {
 
 	var buf bytes.Buffer
 	if err := output.RenderTo(&buf, items); err != nil {
-		t.Fatalf("RenderTo: %v", err)
+		t.Fatalf(renderToErrFmt, err)
 	}
 
 	got := buf.String()
@@ -235,7 +240,7 @@ func TestFlatValue_DateFormatting(t *testing.T) {
 
 	var buf bytes.Buffer
 	if err := output.RenderTo(&buf, items); err != nil {
-		t.Fatalf("RenderTo: %v", err)
+		t.Fatalf(renderToErrFmt, err)
 	}
 
 	got := buf.String()
@@ -261,7 +266,7 @@ func TestRenderTable_KVFormat(t *testing.T) {
 
 	var buf bytes.Buffer
 	if err := output.RenderTo(&buf, items); err != nil {
-		t.Fatalf("RenderTo: %v", err)
+		t.Fatalf(renderToErrFmt, err)
 	}
 
 	got := buf.String()

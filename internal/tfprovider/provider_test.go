@@ -7,6 +7,13 @@ import (
 	"github.com/FabianSchurig/bitbucket-cli/internal/tfprovider"
 )
 
+const (
+	testReposGroupName          = "test-repos"
+	testMissingGroupName        = "test-missing"
+	repoPathTemplate            = "/repositories/{workspace}/{repo_slug}"
+	expectedNonNilProviderError = "expected non-nil provider"
+)
+
 // ─── Helper tests ─────────────────────────────────────────────────────────────
 
 func TestToSnakeCase(t *testing.T) {
@@ -45,24 +52,24 @@ func TestParamAttrName_IDCollision(t *testing.T) {
 
 func TestMapCRUDOps_BasicMapping(t *testing.T) {
 	// Register a temporary config entry for this test.
-	tfprovider.CRUDConfig["test-repos"] = tfprovider.CRUDMapping{
+	tfprovider.CRUDConfig[testReposGroupName] = tfprovider.CRUDMapping{
 		Create: "createRepo",
 		Read:   "getRepo",
 		Update: "updateRepo",
 		Delete: "deleteRepo",
 		List:   "listRepos",
 	}
-	defer delete(tfprovider.CRUDConfig, "test-repos")
+	defer delete(tfprovider.CRUDConfig, testReposGroupName)
 
 	ops := []tfprovider.OperationDef{
-		{OperationID: "createRepo", Method: "POST", Path: "/repositories/{workspace}/{repo_slug}"},
-		{OperationID: "getRepo", Method: "GET", Path: "/repositories/{workspace}/{repo_slug}"},
+		{OperationID: "createRepo", Method: "POST", Path: repoPathTemplate},
+		{OperationID: "getRepo", Method: "GET", Path: repoPathTemplate},
 		{OperationID: "listRepos", Method: "GET", Path: "/repositories/{workspace}", Paginated: true},
-		{OperationID: "updateRepo", Method: "PUT", Path: "/repositories/{workspace}/{repo_slug}"},
-		{OperationID: "deleteRepo", Method: "DELETE", Path: "/repositories/{workspace}/{repo_slug}"},
+		{OperationID: "updateRepo", Method: "PUT", Path: repoPathTemplate},
+		{OperationID: "deleteRepo", Method: "DELETE", Path: repoPathTemplate},
 	}
 
-	crud := tfprovider.MapCRUDOps("test-repos", ops)
+	crud := tfprovider.MapCRUDOps(testReposGroupName, ops)
 
 	if crud.Create == nil || crud.Create.OperationID != "createRepo" {
 		t.Errorf("expected Create=createRepo, got %v", crud.Create)
@@ -90,17 +97,17 @@ func TestMapCRUDOps_UnknownGroup(t *testing.T) {
 
 func TestMapCRUDOps_MissingOperationID(t *testing.T) {
 	// Config references an operation that doesn't exist in the ops list.
-	tfprovider.CRUDConfig["test-missing"] = tfprovider.CRUDMapping{
+	tfprovider.CRUDConfig[testMissingGroupName] = tfprovider.CRUDMapping{
 		Create: "doesNotExist",
 		Read:   "getItem",
 	}
-	defer delete(tfprovider.CRUDConfig, "test-missing")
+	defer delete(tfprovider.CRUDConfig, testMissingGroupName)
 
 	ops := []tfprovider.OperationDef{
 		{OperationID: "getItem", Method: "GET", Path: "/items/{id}"},
 	}
 
-	crud := tfprovider.MapCRUDOps("test-missing", ops)
+	crud := tfprovider.MapCRUDOps(testMissingGroupName, ops)
 
 	if crud.Create != nil {
 		t.Error("expected Create to be nil for missing operation ID")
@@ -131,20 +138,13 @@ func TestProviderNew(t *testing.T) {
 	if factory == nil {
 		t.Fatal("expected non-nil factory function")
 	}
-	p := factory()
-	if p == nil {
-		t.Fatal("expected non-nil provider")
-	}
+	assertNonNilProvider(t, factory())
 }
 
 func TestRegisterResourceGroup(t *testing.T) {
 	// The generated code calls RegisterResourceGroup in init().
 	// Verify that New returns a provider with resources.
-	factory := tfprovider.New("test")
-	p := factory()
-	if p == nil {
-		t.Fatal("expected non-nil provider")
-	}
+	assertNonNilProvider(t, tfprovider.New("test")())
 }
 
 // ─── Generated resource group smoke tests ─────────────────────────────────────
@@ -152,11 +152,7 @@ func TestRegisterResourceGroup(t *testing.T) {
 func TestAllGeneratedResourceGroups_AreRegistered(t *testing.T) {
 	// Verify that the provider factory works and the generated init()
 	// functions have registered resource groups.
-	factory := tfprovider.New("test")
-	p := factory()
-	if p == nil {
-		t.Fatal("expected non-nil provider")
-	}
+	assertNonNilProvider(t, tfprovider.New("test")())
 	// The provider's Resources and DataSources methods are called by
 	// Terraform framework. We can't call them directly without the full
 	// provider lifecycle, but we can verify the provider was created.
@@ -394,51 +390,58 @@ func TestSubResourceGroups_Registered(t *testing.T) {
 				t.Fatalf("CRUDConfig missing entry for %q", typeName)
 			}
 
-			// Build the CRUD ops using the same mechanism as production code.
-			// We look up the parent by checking which generated group has the ops.
-			var ops tfprovider.CRUDOps
-			for _, parent := range []tfprovider.ResourceGroup{
-				tfprovider.WorkspacesResourceGroup,
-				tfprovider.PRResourceGroup,
-				tfprovider.ProjectsResourceGroup,
-				tfprovider.PipelinesResourceGroup,
-				tfprovider.ReposResourceGroup,
-				tfprovider.DeploymentsResourceGroup,
-				tfprovider.RefsResourceGroup,
-				tfprovider.UsersResourceGroup,
-				tfprovider.BranchingModelResourceGroup,
-				tfprovider.ReportsResourceGroup,
-				tfprovider.IssuesResourceGroup,
-			} {
-				candidate := tfprovider.MapCRUDOps(typeName, parent.AllOps)
-				if candidate.Read != nil || candidate.List != nil || candidate.Create != nil {
-					ops = candidate
-					break
-				}
-			}
-
-			if expected.wantRead != "" {
-				if ops.Read == nil {
-					t.Errorf("expected Read=%s, got nil", expected.wantRead)
-				} else if ops.Read.OperationID != expected.wantRead {
-					t.Errorf("expected Read=%s, got %s", expected.wantRead, ops.Read.OperationID)
-				}
-			}
-			if expected.wantCreate != "" {
-				if ops.Create == nil {
-					t.Errorf("expected Create=%s, got nil", expected.wantCreate)
-				} else if ops.Create.OperationID != expected.wantCreate {
-					t.Errorf("expected Create=%s, got %s", expected.wantCreate, ops.Create.OperationID)
-				}
-			}
-			if expected.wantList != "" {
-				if ops.List == nil {
-					t.Errorf("expected List=%s, got nil", expected.wantList)
-				} else if ops.List.OperationID != expected.wantList {
-					t.Errorf("expected List=%s, got %s", expected.wantList, ops.List.OperationID)
-				}
-			}
+			ops := subResourceCRUDOps(typeName)
+			assertExpectedOperation(t, "Read", expected.wantRead, ops.Read)
+			assertExpectedOperation(t, "Create", expected.wantCreate, ops.Create)
+			assertExpectedOperation(t, "List", expected.wantList, ops.List)
 			_ = cfg // cfg verified via MapCRUDOps
 		})
+	}
+}
+
+func assertNonNilProvider(t *testing.T, provider any) {
+	t.Helper()
+	if provider == nil {
+		t.Fatal(expectedNonNilProviderError)
+	}
+}
+
+func subResourceCRUDOps(typeName string) tfprovider.CRUDOps {
+	for _, parent := range subResourceParents() {
+		candidate := tfprovider.MapCRUDOps(typeName, parent.AllOps)
+		if candidate.Read != nil || candidate.List != nil || candidate.Create != nil {
+			return candidate
+		}
+	}
+	return tfprovider.CRUDOps{}
+}
+
+func subResourceParents() []tfprovider.ResourceGroup {
+	return []tfprovider.ResourceGroup{
+		tfprovider.WorkspacesResourceGroup,
+		tfprovider.PRResourceGroup,
+		tfprovider.ProjectsResourceGroup,
+		tfprovider.PipelinesResourceGroup,
+		tfprovider.ReposResourceGroup,
+		tfprovider.DeploymentsResourceGroup,
+		tfprovider.RefsResourceGroup,
+		tfprovider.UsersResourceGroup,
+		tfprovider.BranchingModelResourceGroup,
+		tfprovider.ReportsResourceGroup,
+		tfprovider.IssuesResourceGroup,
+	}
+}
+
+func assertExpectedOperation(t *testing.T, label, expected string, op *tfprovider.OperationDef) {
+	t.Helper()
+	if expected == "" {
+		return
+	}
+	if op == nil {
+		t.Errorf("expected %s=%s, got nil", label, expected)
+		return
+	}
+	if op.OperationID != expected {
+		t.Errorf("expected %s=%s, got %s", label, expected, op.OperationID)
 	}
 }

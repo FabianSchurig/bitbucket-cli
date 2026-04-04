@@ -14,6 +14,13 @@ import (
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
 
+const (
+	headerContentType = "Content-Type"
+	contentTypeJSON   = "application/json"
+	dispatchErrFmt    = "Dispatch: %v"
+	pullRequestsPath  = "/repositories/{workspace}/{repo_slug}/pullrequests"
+)
+
 // newTestClient creates a BBClient that points to the provided test server.
 func newTestClient(t *testing.T, serverURL string) *client.BBClient {
 	t.Helper()
@@ -32,7 +39,7 @@ func TestDispatch_GET_SingleResource(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("expected GET, got %s", r.Method)
 		}
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set(headerContentType, contentTypeJSON)
 		_ = json.NewEncoder(w).Encode(map[string]any{"id": 42, "title": "My PR"})
 	}))
 	defer srv.Close()
@@ -44,7 +51,7 @@ func TestDispatch_GET_SingleResource(t *testing.T) {
 		PathParams:  map[string]string{"workspace": "myorg", "repo_slug": "myrepo", "pull_request_id": "42"},
 	})
 	if err != nil {
-		t.Fatalf("Dispatch: %v", err)
+		t.Fatalf(dispatchErrFmt, err)
 	}
 }
 
@@ -58,7 +65,7 @@ func TestDispatch_GET_Paginated_SinglePage(t *testing.T) {
 		if r.URL.Query().Get("state") != "OPEN" {
 			t.Errorf("expected state=OPEN query param, got %s", r.URL.Query().Get("state"))
 		}
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set(headerContentType, contentTypeJSON)
 		_ = json.NewEncoder(w).Encode(map[string]any{
 			"values": []any{
 				map[string]any{"id": 1, "title": "First PR"},
@@ -70,12 +77,12 @@ func TestDispatch_GET_Paginated_SinglePage(t *testing.T) {
 	c := newTestClient(t, srv.URL)
 	err := handlers.Dispatch(context.Background(), c, handlers.Request{
 		Method:      "GET",
-		URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests",
+		URLTemplate: pullRequestsPath,
 		PathParams:  map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
 		QueryParams: map[string]string{"state": "OPEN"},
 	})
 	if err != nil {
-		t.Fatalf("Dispatch: %v", err)
+		t.Fatalf(dispatchErrFmt, err)
 	}
 }
 
@@ -85,7 +92,7 @@ func TestDispatch_GET_Paginated_AllPages(t *testing.T) {
 	callCount := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		callCount++
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set(headerContentType, contentTypeJSON)
 
 		switch r.URL.Path {
 		case "/repositories/myorg/myrepo/pullrequests":
@@ -107,12 +114,12 @@ func TestDispatch_GET_Paginated_AllPages(t *testing.T) {
 	c := newTestClient(t, srv.URL)
 	err := handlers.Dispatch(context.Background(), c, handlers.Request{
 		Method:      "GET",
-		URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests",
+		URLTemplate: pullRequestsPath,
 		PathParams:  map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
 		All:         true,
 	})
 	if err != nil {
-		t.Fatalf("Dispatch: %v", err)
+		t.Fatalf(dispatchErrFmt, err)
 	}
 	if callCount != 2 {
 		t.Errorf("expected 2 pages fetched, got %d", callCount)
@@ -134,7 +141,7 @@ func TestDispatch_POST_WithBody(t *testing.T) {
 			t.Errorf("expected title 'My Feature', got %v", body["title"])
 		}
 		w.WriteHeader(http.StatusCreated)
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set(headerContentType, contentTypeJSON)
 		_ = json.NewEncoder(w).Encode(map[string]any{"id": 1, "title": "My Feature"})
 	}))
 	defer srv.Close()
@@ -142,12 +149,12 @@ func TestDispatch_POST_WithBody(t *testing.T) {
 	c := newTestClient(t, srv.URL)
 	err := handlers.Dispatch(context.Background(), c, handlers.Request{
 		Method:      "POST",
-		URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests",
+		URLTemplate: pullRequestsPath,
 		PathParams:  map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
 		Body:        `{"title":"My Feature","source":{"branch":{"name":"feature/x"}}}`,
 	})
 	if err != nil {
-		t.Fatalf("Dispatch: %v", err)
+		t.Fatalf(dispatchErrFmt, err)
 	}
 }
 
@@ -163,7 +170,7 @@ func TestDispatch_APIError(t *testing.T) {
 	c := newTestClient(t, srv.URL)
 	err := handlers.Dispatch(context.Background(), c, handlers.Request{
 		Method:      "GET",
-		URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests",
+		URLTemplate: pullRequestsPath,
 		PathParams:  map[string]string{"workspace": "myorg", "repo_slug": "myrepo"},
 	})
 	if err == nil {
@@ -189,6 +196,6 @@ func TestDispatch_DELETE_NoContent(t *testing.T) {
 		PathParams:  map[string]string{"workspace": "myorg", "repo_slug": "myrepo", "pull_request_id": "5"},
 	})
 	if err != nil {
-		t.Fatalf("Dispatch: %v", err)
+		t.Fatalf(dispatchErrFmt, err)
 	}
 }
