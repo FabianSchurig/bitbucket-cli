@@ -53,8 +53,23 @@ Available operations:
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `workspace.created_on`, Type: `string`, Desc: `workspace.created_on`},
+				{Path: `workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `workspace.updated_on`, Type: `string`, Desc: `workspace.updated_on`},
+				{Path: `workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `getUserWorkspaces`,
@@ -69,8 +84,13 @@ Available operations:
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `administrator`, Type: `bool`, Desc: `The permission level the user has for the workspace. True if the user is an administrator, otherwise False.`},
+				{Path: `workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `getUserPermissionOnAWorkspace`,
@@ -82,8 +102,23 @@ Available operations:
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `workspace.created_on`, Type: `string`, Desc: `workspace.created_on`},
+				{Path: `workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `workspace.updated_on`, Type: `string`, Desc: `workspace.updated_on`},
+				{Path: `workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `listWorkspacesForUser`,
@@ -99,8 +134,23 @@ Available operations:
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `getAWorkspace`,
@@ -112,8 +162,23 @@ Available operations:
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `listWebhooksForAWorkspace`,
@@ -127,8 +192,19 @@ Available operations:
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `active`, Type: `bool`, Desc: `active`},
+				{Path: `created_at`, Type: `string`, Desc: `created_at`},
+				{Path: `description`, Type: `string`, Desc: `A user-defined description of the webhook.`},
+				{Path: `secret`, Type: `string`, Desc: "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret."},
+				{Path: `secret_set`, Type: `bool`, Desc: `Indicates whether or not the hook has an associated secret. It is not possible to see the hook's secret. This field is ignored during updates.`},
+				{Path: `subject.type`, Type: `string`, Desc: `subject.type`},
+				{Path: `subject_type`, Type: `string`, Desc: "The type of entity. Set to either `repository` or `workspace` based on where the subscription is defined. [repository, workspace]"},
+				{Path: `url`, Type: `string`, Desc: `The URL events get delivered to.`},
+				{Path: `uuid`, Type: `string`, Desc: `The webhook's id`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `createAWebhookForAWorkspace`,
@@ -140,8 +216,19 @@ Available operations:
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `active`, Type: `bool`, Desc: `active`},
+				{Path: `created_at`, Type: `string`, Desc: `created_at`},
+				{Path: `description`, Type: `string`, Desc: `A user-defined description of the webhook.`},
+				{Path: `secret`, Type: `string`, Desc: "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret."},
+				{Path: `secret_set`, Type: `bool`, Desc: `Indicates whether or not the hook has an associated secret. It is not possible to see the hook's secret. This field is ignored during updates.`},
+				{Path: `subject.type`, Type: `string`, Desc: `subject.type`},
+				{Path: `subject_type`, Type: `string`, Desc: "The type of entity. Set to either `repository` or `workspace` based on where the subscription is defined. [repository, workspace]"},
+				{Path: `url`, Type: `string`, Desc: `The URL events get delivered to.`},
+				{Path: `uuid`, Type: `string`, Desc: `The webhook's id`},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `getAWebhookForAWorkspace`,
@@ -155,8 +242,19 @@ workspace.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `active`, Type: `bool`, Desc: `active`},
+				{Path: `created_at`, Type: `string`, Desc: `created_at`},
+				{Path: `description`, Type: `string`, Desc: `A user-defined description of the webhook.`},
+				{Path: `secret`, Type: `string`, Desc: "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret."},
+				{Path: `secret_set`, Type: `bool`, Desc: `Indicates whether or not the hook has an associated secret. It is not possible to see the hook's secret. This field is ignored during updates.`},
+				{Path: `subject.type`, Type: `string`, Desc: `subject.type`},
+				{Path: `subject_type`, Type: `string`, Desc: "The type of entity. Set to either `repository` or `workspace` based on where the subscription is defined. [repository, workspace]"},
+				{Path: `url`, Type: `string`, Desc: `The URL events get delivered to.`},
+				{Path: `uuid`, Type: `string`, Desc: `The webhook's id`},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `updateAWebhookForAWorkspace`,
@@ -169,8 +267,19 @@ workspace.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `active`, Type: `bool`, Desc: `active`},
+				{Path: `created_at`, Type: `string`, Desc: `created_at`},
+				{Path: `description`, Type: `string`, Desc: `A user-defined description of the webhook.`},
+				{Path: `secret`, Type: `string`, Desc: "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret."},
+				{Path: `secret_set`, Type: `bool`, Desc: `Indicates whether or not the hook has an associated secret. It is not possible to see the hook's secret. This field is ignored during updates.`},
+				{Path: `subject.type`, Type: `string`, Desc: `subject.type`},
+				{Path: `subject_type`, Type: `string`, Desc: "The type of entity. Set to either `repository` or `workspace` based on where the subscription is defined. [repository, workspace]"},
+				{Path: `url`, Type: `string`, Desc: `The URL events get delivered to.`},
+				{Path: `uuid`, Type: `string`, Desc: `The webhook's id`},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `deleteAWebhookForAWorkspace`,
@@ -182,9 +291,10 @@ workspace.`,
 				{Name: `uid`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
 		},
 		{
 			OperationID: `listUsersInAWorkspace`,
@@ -198,8 +308,23 @@ workspace.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `workspace.created_on`, Type: `string`, Desc: `workspace.created_on`},
+				{Path: `workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `workspace.updated_on`, Type: `string`, Desc: `workspace.updated_on`},
+				{Path: `workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `getUserMembershipForAWorkspace`,
@@ -212,8 +337,23 @@ workspace.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `workspace.created_on`, Type: `string`, Desc: `workspace.created_on`},
+				{Path: `workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `workspace.updated_on`, Type: `string`, Desc: `workspace.updated_on`},
+				{Path: `workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `listUserPermissionsInAWorkspace`,
@@ -228,8 +368,23 @@ workspace.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `workspace.created_on`, Type: `string`, Desc: `workspace.created_on`},
+				{Path: `workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `workspace.updated_on`, Type: `string`, Desc: `workspace.updated_on`},
+				{Path: `workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `listAllRepositoryPermissionsForAWorkspace`,
@@ -245,8 +400,12 @@ workspace.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `permission`, Type: `string`, Desc: `[read, write, admin, none]`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `listARepositoryPermissionsForAWorkspace`,
@@ -263,8 +422,12 @@ workspace.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `permission`, Type: `string`, Desc: `[read, write, admin, none]`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `listProjectsInAWorkspace`,
@@ -278,8 +441,23 @@ workspace.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `createAProjectInAWorkspace`,
@@ -291,8 +469,23 @@ workspace.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `getAProjectForAWorkspace`,
@@ -305,8 +498,23 @@ workspace.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `updateAProjectForAWorkspace`,
@@ -319,8 +527,23 @@ workspace.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `deleteAProjectForAWorkspace`,
@@ -332,9 +555,10 @@ workspace.`,
 				{Name: `project_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
 		},
 		{
 			OperationID: `listWorkspacePullRequestsForAUser`,
@@ -350,8 +574,31 @@ workspace.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
+				{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
+				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
+				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
+				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
+				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
+				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
+				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
+				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
+				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
+				{Path: `summary.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+				{Path: `summary.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+				{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
+				{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
+				{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `getTheWorkspaceSystemGpgPublicKeys`,
@@ -363,9 +610,10 @@ During a key rotation period, two keys may be returned.`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
 		},
 	}),
 	AllOps: []OperationDef{
@@ -382,8 +630,23 @@ During a key rotation period, two keys may be returned.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `workspace.created_on`, Type: `string`, Desc: `workspace.created_on`},
+				{Path: `workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `workspace.updated_on`, Type: `string`, Desc: `workspace.updated_on`},
+				{Path: `workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `getUserWorkspaces`,
@@ -398,8 +661,13 @@ During a key rotation period, two keys may be returned.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `administrator`, Type: `bool`, Desc: `The permission level the user has for the workspace. True if the user is an administrator, otherwise False.`},
+				{Path: `workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `getUserPermissionOnAWorkspace`,
@@ -411,8 +679,23 @@ During a key rotation period, two keys may be returned.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `workspace.created_on`, Type: `string`, Desc: `workspace.created_on`},
+				{Path: `workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `workspace.updated_on`, Type: `string`, Desc: `workspace.updated_on`},
+				{Path: `workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `listWorkspacesForUser`,
@@ -428,8 +711,23 @@ During a key rotation period, two keys may be returned.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `getAWorkspace`,
@@ -441,8 +739,23 @@ During a key rotation period, two keys may be returned.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `listWebhooksForAWorkspace`,
@@ -456,8 +769,19 @@ During a key rotation period, two keys may be returned.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `active`, Type: `bool`, Desc: `active`},
+				{Path: `created_at`, Type: `string`, Desc: `created_at`},
+				{Path: `description`, Type: `string`, Desc: `A user-defined description of the webhook.`},
+				{Path: `secret`, Type: `string`, Desc: "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret."},
+				{Path: `secret_set`, Type: `bool`, Desc: `Indicates whether or not the hook has an associated secret. It is not possible to see the hook's secret. This field is ignored during updates.`},
+				{Path: `subject.type`, Type: `string`, Desc: `subject.type`},
+				{Path: `subject_type`, Type: `string`, Desc: "The type of entity. Set to either `repository` or `workspace` based on where the subscription is defined. [repository, workspace]"},
+				{Path: `url`, Type: `string`, Desc: `The URL events get delivered to.`},
+				{Path: `uuid`, Type: `string`, Desc: `The webhook's id`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `createAWebhookForAWorkspace`,
@@ -469,8 +793,19 @@ During a key rotation period, two keys may be returned.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `active`, Type: `bool`, Desc: `active`},
+				{Path: `created_at`, Type: `string`, Desc: `created_at`},
+				{Path: `description`, Type: `string`, Desc: `A user-defined description of the webhook.`},
+				{Path: `secret`, Type: `string`, Desc: "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret."},
+				{Path: `secret_set`, Type: `bool`, Desc: `Indicates whether or not the hook has an associated secret. It is not possible to see the hook's secret. This field is ignored during updates.`},
+				{Path: `subject.type`, Type: `string`, Desc: `subject.type`},
+				{Path: `subject_type`, Type: `string`, Desc: "The type of entity. Set to either `repository` or `workspace` based on where the subscription is defined. [repository, workspace]"},
+				{Path: `url`, Type: `string`, Desc: `The URL events get delivered to.`},
+				{Path: `uuid`, Type: `string`, Desc: `The webhook's id`},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `getAWebhookForAWorkspace`,
@@ -484,8 +819,19 @@ workspace.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `active`, Type: `bool`, Desc: `active`},
+				{Path: `created_at`, Type: `string`, Desc: `created_at`},
+				{Path: `description`, Type: `string`, Desc: `A user-defined description of the webhook.`},
+				{Path: `secret`, Type: `string`, Desc: "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret."},
+				{Path: `secret_set`, Type: `bool`, Desc: `Indicates whether or not the hook has an associated secret. It is not possible to see the hook's secret. This field is ignored during updates.`},
+				{Path: `subject.type`, Type: `string`, Desc: `subject.type`},
+				{Path: `subject_type`, Type: `string`, Desc: "The type of entity. Set to either `repository` or `workspace` based on where the subscription is defined. [repository, workspace]"},
+				{Path: `url`, Type: `string`, Desc: `The URL events get delivered to.`},
+				{Path: `uuid`, Type: `string`, Desc: `The webhook's id`},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `updateAWebhookForAWorkspace`,
@@ -498,8 +844,19 @@ workspace.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `active`, Type: `bool`, Desc: `active`},
+				{Path: `created_at`, Type: `string`, Desc: `created_at`},
+				{Path: `description`, Type: `string`, Desc: `A user-defined description of the webhook.`},
+				{Path: `secret`, Type: `string`, Desc: "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret."},
+				{Path: `secret_set`, Type: `bool`, Desc: `Indicates whether or not the hook has an associated secret. It is not possible to see the hook's secret. This field is ignored during updates.`},
+				{Path: `subject.type`, Type: `string`, Desc: `subject.type`},
+				{Path: `subject_type`, Type: `string`, Desc: "The type of entity. Set to either `repository` or `workspace` based on where the subscription is defined. [repository, workspace]"},
+				{Path: `url`, Type: `string`, Desc: `The URL events get delivered to.`},
+				{Path: `uuid`, Type: `string`, Desc: `The webhook's id`},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `deleteAWebhookForAWorkspace`,
@@ -511,9 +868,10 @@ workspace.`,
 				{Name: `uid`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
 		},
 		{
 			OperationID: `listUsersInAWorkspace`,
@@ -527,8 +885,23 @@ workspace.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `workspace.created_on`, Type: `string`, Desc: `workspace.created_on`},
+				{Path: `workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `workspace.updated_on`, Type: `string`, Desc: `workspace.updated_on`},
+				{Path: `workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `getUserMembershipForAWorkspace`,
@@ -541,8 +914,23 @@ workspace.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `workspace.created_on`, Type: `string`, Desc: `workspace.created_on`},
+				{Path: `workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `workspace.updated_on`, Type: `string`, Desc: `workspace.updated_on`},
+				{Path: `workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `listUserPermissionsInAWorkspace`,
@@ -557,8 +945,23 @@ workspace.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `workspace.created_on`, Type: `string`, Desc: `workspace.created_on`},
+				{Path: `workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `workspace.updated_on`, Type: `string`, Desc: `workspace.updated_on`},
+				{Path: `workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `listAllRepositoryPermissionsForAWorkspace`,
@@ -574,8 +977,12 @@ workspace.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `permission`, Type: `string`, Desc: `[read, write, admin, none]`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `listARepositoryPermissionsForAWorkspace`,
@@ -592,8 +999,12 @@ workspace.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `permission`, Type: `string`, Desc: `[read, write, admin, none]`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `listProjectsInAWorkspace`,
@@ -607,8 +1018,23 @@ workspace.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `createAProjectInAWorkspace`,
@@ -620,8 +1046,23 @@ workspace.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `getAProjectForAWorkspace`,
@@ -634,8 +1075,23 @@ workspace.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `updateAProjectForAWorkspace`,
@@ -648,8 +1104,23 @@ workspace.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `deleteAProjectForAWorkspace`,
@@ -661,9 +1132,10 @@ workspace.`,
 				{Name: `project_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
 		},
 		{
 			OperationID: `listWorkspacePullRequestsForAUser`,
@@ -679,8 +1151,31 @@ workspace.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
+				{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
+				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
+				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
+				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
+				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
+				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
+				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
+				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
+				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
+				{Path: `summary.markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+				{Path: `summary.raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+				{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
+				{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
+				{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `getTheWorkspaceSystemGpgPublicKeys`,
@@ -692,9 +1187,10 @@ During a key rotation period, two keys may be returned.`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
 		},
 	},
 }

@@ -23,15 +23,16 @@ var _ resource.ResourceWithConfigure = &GenericResource{}
 
 // OperationDef holds metadata for a single Bitbucket API operation.
 type OperationDef struct {
-	OperationID string
-	Method      string
-	Path        string
-	Summary     string
-	Description string
-	Params      []ParamDef
-	BodyFields  []BodyFieldDef
-	HasBody     bool
-	Paginated   bool
+	OperationID    string
+	Method         string
+	Path           string
+	Summary        string
+	Description    string
+	Params         []ParamDef
+	BodyFields     []BodyFieldDef
+	ResponseFields []BodyFieldDef // Flattened fields from the response schema (computed)
+	HasBody        bool
+	Paginated      bool
 }
 
 // ParamDef describes a single API parameter.
@@ -149,6 +150,41 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 			attrs[key] = schema.StringAttribute{
 				Description: desc,
 				Optional:    true,
+			}
+		}
+	}
+
+	// Collect response fields from the Read operation (or Create as fallback).
+	// Fields that overlap with body fields become Optional+Computed.
+	// Response-only fields become Computed.
+	responseOp := r.group.Ops.Read
+	if responseOp == nil {
+		responseOp = r.group.Ops.Create
+	}
+	if responseOp != nil {
+		for _, rf := range responseOp.ResponseFields {
+			key := toSnakeCase(strings.ReplaceAll(rf.Path, ".", "_"))
+			// Skip reserved attributes.
+			if key == "id" || key == "api_response" || key == "request_body" {
+				continue
+			}
+			desc := rf.Desc
+			if desc == "" {
+				desc = rf.Path
+			}
+			if existing, exists := attrs[key]; exists {
+				// If already defined as a body field or param, make it Optional+Computed.
+				if sa, ok := existing.(schema.StringAttribute); ok && !sa.Computed {
+					sa.Computed = true
+					sa.Description = desc
+					attrs[key] = sa
+				}
+			} else if !paramSeen[key] {
+				// New response-only field: Computed.
+				attrs[key] = schema.StringAttribute{
+					Description: desc,
+					Computed:    true,
+				}
 			}
 		}
 	}
@@ -288,6 +324,9 @@ func (r *GenericResource) dispatch(ctx context.Context, op *OperationDef, source
 				diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(id))...)
 				idSet = true
 			}
+
+			// Extract response fields from the API response.
+			r.extractResponseFields(ctx, m, target, diags)
 		}
 		// Fallback: build deterministic ID from path params + operation.
 		if !idSet {
@@ -438,6 +477,35 @@ func (r *GenericResource) crudOps() []*OperationDef {
 		}
 	}
 	return result
+}
+
+// responseFields returns the response fields from the Read operation (preferred)
+// or Create operation as fallback.
+func (r *GenericResource) responseFields() []BodyFieldDef {
+	if r.group.Ops.Read != nil && len(r.group.Ops.Read.ResponseFields) > 0 {
+		return r.group.Ops.Read.ResponseFields
+	}
+	if r.group.Ops.Create != nil && len(r.group.Ops.Create.ResponseFields) > 0 {
+		return r.group.Ops.Create.ResponseFields
+	}
+	return nil
+}
+
+// extractResponseFields extracts individual field values from the API response
+// and sets them as computed attributes in the target state.
+func (r *GenericResource) extractResponseFields(ctx context.Context, m map[string]any, target stateAccessor, diags *diag.Diagnostics) {
+	for _, rf := range r.responseFields() {
+		key := toSnakeCase(strings.ReplaceAll(rf.Path, ".", "_"))
+		// Skip reserved attributes.
+		if key == "id" || key == "api_response" || key == "request_body" {
+			continue
+		}
+		val, ok := handlers.GetNested(m, rf.Path)
+		if !ok || val == nil {
+			continue
+		}
+		diags.Append(target.SetAttribute(ctx, attrPath(key), types.StringValue(fmt.Sprintf("%v", val)))...)
+	}
 }
 
 // extractID tries to extract an identifier from an API response map.

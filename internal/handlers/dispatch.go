@@ -178,3 +178,21 @@ func SetNested(m map[string]any, path string, value any) {
 		}
 	}
 }
+
+// GetNested retrieves a value from a nested map using a dot-separated path.
+// Returns the value and true if found, or nil and false otherwise.
+func GetNested(m map[string]any, path string) (any, bool) {
+	parts := strings.Split(path, ".")
+	current := any(m)
+	for _, p := range parts {
+		cm, ok := current.(map[string]any)
+		if !ok {
+			return nil, false
+		}
+		current, ok = cm[p]
+		if !ok {
+			return nil, false
+		}
+	}
+	return current, true
+}

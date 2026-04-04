@@ -186,15 +186,16 @@ func InjectPaginationParams(params []ParamDef) []ParamDef {
 // This is the shared intermediate representation consumed by both
 // CLI command generators and MCP/Terraform tool generators.
 type OperationDef struct {
-	OperationID string
-	Method      string
-	Path        string
-	Summary     string
-	Description string
-	Params      []ParamDef
-	BodyFields  []BodyField
-	HasBody     bool
-	Paginated   bool
+	OperationID    string
+	Method         string
+	Path           string
+	Summary        string
+	Description    string
+	Params         []ParamDef
+	BodyFields     []BodyField
+	ResponseFields []BodyField // Flattened fields from the response schema
+	HasBody        bool
+	Paginated      bool
 }
 
 // BuildOperation creates an OperationDef from a path entry, method/op, and schema.
@@ -213,21 +214,35 @@ func BuildOperation(pe PathEntry, entry MethodOp, schema *Schema) OperationDef {
 		})
 	}
 
+	// Resolve response fields from the response schema.
+	var responseFields []BodyField
+	if schema.Components.Schemas != nil {
+		respRef := ResolveResponseRef(op, schema.Components.Schemas)
+		if respRef != "" {
+			visited := make(map[string]bool)
+			responseFields = ResolveResponseFields(schema.Components.Schemas, respRef, "", visited)
+			sort.Slice(responseFields, func(i, j int) bool {
+				return responseFields[i].Path < responseFields[j].Path
+			})
+		}
+	}
+
 	paginated := IsPaginated(op)
 	if paginated {
 		paramDefs = InjectPaginationParams(paramDefs)
 	}
 
 	return OperationDef{
-		OperationID: op.OperationID,
-		Method:      entry.Method,
-		Path:        pe.Path,
-		Summary:     op.Summary,
-		Description: op.Description,
-		Params:      paramDefs,
-		BodyFields:  bodyFields,
-		HasBody:     op.RequestBody != nil,
-		Paginated:   paginated,
+		OperationID:    op.OperationID,
+		Method:         entry.Method,
+		Path:           pe.Path,
+		Summary:        op.Summary,
+		Description:    op.Description,
+		Params:         paramDefs,
+		BodyFields:     bodyFields,
+		ResponseFields: responseFields,
+		HasBody:        op.RequestBody != nil,
+		Paginated:      paginated,
 	}
 }
 

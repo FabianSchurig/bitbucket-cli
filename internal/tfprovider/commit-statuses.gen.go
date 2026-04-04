@@ -40,8 +40,27 @@ Available operations:
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `A description of the build (e.g. "Unit tests in Bamboo")`},
+				{Path: `key`, Type: `string`, Desc: `An identifier for the status that's unique to
+        its type (current "build" is the only supported type) and the vendor,
+        e.g. BB-DEPLOY`},
+				{Path: `name`, Type: `string`, Desc: `An identifier for the build itself, e.g. BB-DEPLOY-1`},
+				{Path: `refname`, Type: `string`, Desc: `
+The name of the ref that pointed to this commit at the time the status
+object was created. Note that this the ref may since have moved off of
+the commit. This optional field can be useful for build systems whose
+build triggers and configuration are branch-dependent (e.g. a Pipeline
+build).
+It is legitimate for this field to not be set, or even apply (e.g. a
+static linting job).`},
+				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `createABuildStatusForACommit`,
@@ -71,6 +90,25 @@ static linting job).`},
 				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
 				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
 			},
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `A description of the build (e.g. "Unit tests in Bamboo")`},
+				{Path: `key`, Type: `string`, Desc: `An identifier for the status that's unique to
+        its type (current "build" is the only supported type) and the vendor,
+        e.g. BB-DEPLOY`},
+				{Path: `name`, Type: `string`, Desc: `An identifier for the build itself, e.g. BB-DEPLOY-1`},
+				{Path: `refname`, Type: `string`, Desc: `
+The name of the ref that pointed to this commit at the time the status
+object was created. Note that this the ref may since have moved off of
+the commit. This optional field can be useful for build systems whose
+build triggers and configuration are branch-dependent (e.g. a Pipeline
+build).
+It is legitimate for this field to not be set, or even apply (e.g. a
+static linting job).`},
+				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
+			},
 			HasBody:   true,
 			Paginated: false,
 		},
@@ -87,8 +125,27 @@ static linting job).`},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `A description of the build (e.g. "Unit tests in Bamboo")`},
+				{Path: `key`, Type: `string`, Desc: `An identifier for the status that's unique to
+        its type (current "build" is the only supported type) and the vendor,
+        e.g. BB-DEPLOY`},
+				{Path: `name`, Type: `string`, Desc: `An identifier for the build itself, e.g. BB-DEPLOY-1`},
+				{Path: `refname`, Type: `string`, Desc: `
+The name of the ref that pointed to this commit at the time the status
+object was created. Note that this the ref may since have moved off of
+the commit. This optional field can be useful for build systems whose
+build triggers and configuration are branch-dependent (e.g. a Pipeline
+build).
+It is legitimate for this field to not be set, or even apply (e.g. a
+static linting job).`},
+				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `updateABuildStatusForACommit`,
@@ -119,6 +176,25 @@ static linting job).`},
 				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
 				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
 			},
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `A description of the build (e.g. "Unit tests in Bamboo")`},
+				{Path: `key`, Type: `string`, Desc: `An identifier for the status that's unique to
+        its type (current "build" is the only supported type) and the vendor,
+        e.g. BB-DEPLOY`},
+				{Path: `name`, Type: `string`, Desc: `An identifier for the build itself, e.g. BB-DEPLOY-1`},
+				{Path: `refname`, Type: `string`, Desc: `
+The name of the ref that pointed to this commit at the time the status
+object was created. Note that this the ref may since have moved off of
+the commit. This optional field can be useful for build systems whose
+build triggers and configuration are branch-dependent (e.g. a Pipeline
+build).
+It is legitimate for this field to not be set, or even apply (e.g. a
+static linting job).`},
+				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
+			},
 			HasBody:   true,
 			Paginated: false,
 		},
@@ -139,8 +215,27 @@ request.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `A description of the build (e.g. "Unit tests in Bamboo")`},
+				{Path: `key`, Type: `string`, Desc: `An identifier for the status that's unique to
+        its type (current "build" is the only supported type) and the vendor,
+        e.g. BB-DEPLOY`},
+				{Path: `name`, Type: `string`, Desc: `An identifier for the build itself, e.g. BB-DEPLOY-1`},
+				{Path: `refname`, Type: `string`, Desc: `
+The name of the ref that pointed to this commit at the time the status
+object was created. Note that this the ref may since have moved off of
+the commit. This optional field can be useful for build systems whose
+build triggers and configuration are branch-dependent (e.g. a Pipeline
+build).
+It is legitimate for this field to not be set, or even apply (e.g. a
+static linting job).`},
+				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 	}),
 	AllOps: []OperationDef{
@@ -161,8 +256,27 @@ request.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `A description of the build (e.g. "Unit tests in Bamboo")`},
+				{Path: `key`, Type: `string`, Desc: `An identifier for the status that's unique to
+        its type (current "build" is the only supported type) and the vendor,
+        e.g. BB-DEPLOY`},
+				{Path: `name`, Type: `string`, Desc: `An identifier for the build itself, e.g. BB-DEPLOY-1`},
+				{Path: `refname`, Type: `string`, Desc: `
+The name of the ref that pointed to this commit at the time the status
+object was created. Note that this the ref may since have moved off of
+the commit. This optional field can be useful for build systems whose
+build triggers and configuration are branch-dependent (e.g. a Pipeline
+build).
+It is legitimate for this field to not be set, or even apply (e.g. a
+static linting job).`},
+				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 		{
 			OperationID: `createABuildStatusForACommit`,
@@ -192,6 +306,25 @@ static linting job).`},
 				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
 				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
 			},
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `A description of the build (e.g. "Unit tests in Bamboo")`},
+				{Path: `key`, Type: `string`, Desc: `An identifier for the status that's unique to
+        its type (current "build" is the only supported type) and the vendor,
+        e.g. BB-DEPLOY`},
+				{Path: `name`, Type: `string`, Desc: `An identifier for the build itself, e.g. BB-DEPLOY-1`},
+				{Path: `refname`, Type: `string`, Desc: `
+The name of the ref that pointed to this commit at the time the status
+object was created. Note that this the ref may since have moved off of
+the commit. This optional field can be useful for build systems whose
+build triggers and configuration are branch-dependent (e.g. a Pipeline
+build).
+It is legitimate for this field to not be set, or even apply (e.g. a
+static linting job).`},
+				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
+			},
 			HasBody:   true,
 			Paginated: false,
 		},
@@ -208,8 +341,27 @@ static linting job).`},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `A description of the build (e.g. "Unit tests in Bamboo")`},
+				{Path: `key`, Type: `string`, Desc: `An identifier for the status that's unique to
+        its type (current "build" is the only supported type) and the vendor,
+        e.g. BB-DEPLOY`},
+				{Path: `name`, Type: `string`, Desc: `An identifier for the build itself, e.g. BB-DEPLOY-1`},
+				{Path: `refname`, Type: `string`, Desc: `
+The name of the ref that pointed to this commit at the time the status
+object was created. Note that this the ref may since have moved off of
+the commit. This optional field can be useful for build systems whose
+build triggers and configuration are branch-dependent (e.g. a Pipeline
+build).
+It is legitimate for this field to not be set, or even apply (e.g. a
+static linting job).`},
+				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
+			},
+			HasBody:   false,
+			Paginated: false,
 		},
 		{
 			OperationID: `updateABuildStatusForACommit`,
@@ -240,6 +392,25 @@ static linting job).`},
 				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
 				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
 			},
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `A description of the build (e.g. "Unit tests in Bamboo")`},
+				{Path: `key`, Type: `string`, Desc: `An identifier for the status that's unique to
+        its type (current "build" is the only supported type) and the vendor,
+        e.g. BB-DEPLOY`},
+				{Path: `name`, Type: `string`, Desc: `An identifier for the build itself, e.g. BB-DEPLOY-1`},
+				{Path: `refname`, Type: `string`, Desc: `
+The name of the ref that pointed to this commit at the time the status
+object was created. Note that this the ref may since have moved off of
+the commit. This optional field can be useful for build systems whose
+build triggers and configuration are branch-dependent (e.g. a Pipeline
+build).
+It is legitimate for this field to not be set, or even apply (e.g. a
+static linting job).`},
+				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
+			},
 			HasBody:   true,
 			Paginated: false,
 		},
@@ -260,8 +431,27 @@ request.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `A description of the build (e.g. "Unit tests in Bamboo")`},
+				{Path: `key`, Type: `string`, Desc: `An identifier for the status that's unique to
+        its type (current "build" is the only supported type) and the vendor,
+        e.g. BB-DEPLOY`},
+				{Path: `name`, Type: `string`, Desc: `An identifier for the build itself, e.g. BB-DEPLOY-1`},
+				{Path: `refname`, Type: `string`, Desc: `
+The name of the ref that pointed to this commit at the time the status
+object was created. Note that this the ref may since have moved off of
+the commit. This optional field can be useful for build systems whose
+build triggers and configuration are branch-dependent (e.g. a Pipeline
+build).
+It is legitimate for this field to not be set, or even apply (e.g. a
+static linting job).`},
+				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
+			},
+			HasBody:   false,
+			Paginated: true,
 		},
 	},
 }

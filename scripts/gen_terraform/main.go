@@ -37,15 +37,16 @@ type TFResourceData struct {
 }
 
 type TFOpData struct {
-	OperationID string
-	Method      string
-	Path        string
-	Summary     string
-	Description string
-	Params      []TFParamData
-	BodyFields  []TFBodyFieldData
-	HasBody     bool
-	Paginated   bool
+	OperationID    string
+	Method         string
+	Path           string
+	Summary        string
+	Description    string
+	Params         []TFParamData
+	BodyFields     []TFBodyFieldData
+	ResponseFields []TFBodyFieldData
+	HasBody        bool
+	Paginated      bool
 }
 
 type TFParamData struct {
@@ -97,6 +98,11 @@ var {{.VarName}} = ResourceGroup{
 				{Path: {{goStringLit .Path}}, Type: {{goStringLit .Type}}, Desc: {{goStringLit .Desc}}},
 {{- end}}
 			},
+			ResponseFields: []BodyFieldDef{
+{{- range .ResponseFields}}
+				{Path: {{goStringLit .Path}}, Type: {{goStringLit .Type}}, Desc: {{goStringLit .Desc}}},
+{{- end}}
+			},
 			HasBody:   {{.HasBody}},
 			Paginated: {{.Paginated}},
 		},
@@ -117,6 +123,11 @@ var {{.VarName}} = ResourceGroup{
 			},
 			BodyFields: []BodyFieldDef{
 {{- range .BodyFields}}
+				{Path: {{goStringLit .Path}}, Type: {{goStringLit .Type}}, Desc: {{goStringLit .Desc}}},
+{{- end}}
+			},
+			ResponseFields: []BodyFieldDef{
+{{- range .ResponseFields}}
 				{Path: {{goStringLit .Path}}, Type: {{goStringLit .Type}}, Desc: {{goStringLit .Desc}}},
 {{- end}}
 			},
@@ -156,16 +167,26 @@ func operationToTFOp(op spec.OperationDef) TFOpData {
 		})
 	}
 
+	responseFields := make([]TFBodyFieldData, 0, len(op.ResponseFields))
+	for _, rf := range op.ResponseFields {
+		responseFields = append(responseFields, TFBodyFieldData{
+			Path: rf.Path,
+			Type: rf.GoType,
+			Desc: rf.Desc,
+		})
+	}
+
 	return TFOpData{
-		OperationID: op.OperationID,
-		Method:      op.Method,
-		Path:        op.Path,
-		Summary:     op.Summary,
-		Description: op.Description,
-		Params:      params,
-		BodyFields:  bodyFields,
-		HasBody:     op.HasBody,
-		Paginated:   op.Paginated,
+		OperationID:    op.OperationID,
+		Method:         op.Method,
+		Path:           op.Path,
+		Summary:        op.Summary,
+		Description:    op.Description,
+		Params:         params,
+		BodyFields:     bodyFields,
+		ResponseFields: responseFields,
+		HasBody:        op.HasBody,
+		Paginated:      op.Paginated,
 	}
 }
 
