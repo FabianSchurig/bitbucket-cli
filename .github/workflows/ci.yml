@@ -42,7 +42,8 @@ jobs:
 
       - name: Normalize coverage report for SonarQube
         run: |
-          awk 'NR == 1 || $0 !~ /\.gen\.go:/' coverage.out \
+          test -s coverage.out
+          awk 'NR == 1 || ($0 !~ /\.gen\.go:/ && $0 !~ /^github.com\/FabianSchurig\/bitbucket-cli\/scripts\//)' coverage.out \
             | sed '2,$ s#^github.com/FabianSchurig/bitbucket-cli/##' \
             > coverage.out.tmp
           mv coverage.out.tmp coverage.out
