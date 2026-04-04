@@ -64,6 +64,7 @@ type TFBodyFieldData struct {
 	Type       string
 	Desc       string
 	IsArray    bool
+	IsObject   bool
 	ItemFields []TFBodyFieldData
 }
 
@@ -183,15 +184,18 @@ func renderBodyFieldDef(bf TFBodyFieldData, indent string) string {
 	fmt.Fprintf(&sb, "Path: %s, Type: %s, Desc: %s", spec.GoStringLit(bf.Path), spec.GoStringLit(bf.Type), spec.GoStringLit(bf.Desc))
 	if bf.IsArray {
 		sb.WriteString(", IsArray: true")
-		if len(bf.ItemFields) > 0 {
-			sb.WriteString(", ItemFields: []BodyFieldDef{")
-			for _, item := range bf.ItemFields {
-				sb.WriteString("\n" + indent + "\t")
-				sb.WriteString(renderBodyFieldDef(item, indent+"\t"))
-				sb.WriteString(",")
-			}
-			sb.WriteString("\n" + indent + "}")
+	}
+	if bf.IsObject {
+		sb.WriteString(", IsObject: true")
+	}
+	if len(bf.ItemFields) > 0 {
+		sb.WriteString(", ItemFields: []BodyFieldDef{")
+		for _, item := range bf.ItemFields {
+			sb.WriteString("\n" + indent + "\t")
+			sb.WriteString(renderBodyFieldDef(item, indent+"\t"))
+			sb.WriteString(",")
 		}
+		sb.WriteString("\n" + indent + "}")
 	}
 	sb.WriteString("}")
 	return sb.String()
@@ -254,10 +258,11 @@ func buildDescription(cmdShort string, operations []TFOpData) string {
 // including nested array item fields.
 func specFieldToTFField(bf spec.BodyField) TFBodyFieldData {
 	tf := TFBodyFieldData{
-		Path:    bf.Path,
-		Type:    bf.GoType,
-		Desc:    bf.Desc,
-		IsArray: bf.IsArray,
+		Path:     bf.Path,
+		Type:     bf.GoType,
+		Desc:     bf.Desc,
+		IsArray:  bf.IsArray,
+		IsObject: bf.IsObject,
 	}
 	for _, item := range bf.ItemFields {
 		tf.ItemFields = append(tf.ItemFields, specFieldToTFField(item))

@@ -234,12 +234,47 @@ for specific details.
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
+				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
+				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
-					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
 					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 				}},
 			},
 			HasBody:   false,
@@ -267,6 +302,38 @@ for specific details.
 					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
+				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
+				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
@@ -284,12 +351,47 @@ for specific details.
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
+				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
+				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
-					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
 					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 				}},
 			},
 			HasBody:   true,
@@ -409,15 +511,17 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -443,15 +547,17 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -479,15 +585,17 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -514,15 +622,17 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -575,12 +685,47 @@ for specific details.
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
+				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
+				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
 					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
-					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 				}},
 			},
 			HasBody:   false,
@@ -606,10 +751,12 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the step execution was completed. This is not set if the step is still in progress.`},
-				{Path: `image.email`, Type: `string`, Desc: `The email needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
-				{Path: `image.name`, Type: `string`, Desc: `The name of the image. If the image is hosted on DockerHub the short name can be used, otherwise the fully qualified name is required here.`},
-				{Path: `image.password`, Type: `string`, Desc: `The password needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
-				{Path: `image.username`, Type: `string`, Desc: `The username needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+				{Path: `image`, Type: `string`, Desc: `The definition of a Docker image that can be used for a Bitbucket Pipelines step execution context.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the image. If the image is hosted on DockerHub the short name can be used, otherwise the fully qualified name is required here.`},
+					{Path: `username`, Type: `string`, Desc: `The username needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+					{Path: `password`, Type: `string`, Desc: `The password needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+					{Path: `email`, Type: `string`, Desc: `The email needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+				}},
 				{Path: `script_commands`, Type: `string`, Desc: `The list of build commands. These commands are executed in the build container.`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `name`, Type: `string`, Desc: `The name of the command.`},
 					{Path: `command`, Type: `string`, Desc: `The executable command.`},
@@ -643,10 +790,12 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the step execution was completed. This is not set if the step is still in progress.`},
-				{Path: `image.email`, Type: `string`, Desc: `The email needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
-				{Path: `image.name`, Type: `string`, Desc: `The name of the image. If the image is hosted on DockerHub the short name can be used, otherwise the fully qualified name is required here.`},
-				{Path: `image.password`, Type: `string`, Desc: `The password needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
-				{Path: `image.username`, Type: `string`, Desc: `The username needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+				{Path: `image`, Type: `string`, Desc: `The definition of a Docker image that can be used for a Bitbucket Pipelines step execution context.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `password`, Type: `string`, Desc: `The password needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+					{Path: `email`, Type: `string`, Desc: `The email needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+					{Path: `name`, Type: `string`, Desc: `The name of the image. If the image is hosted on DockerHub the short name can be used, otherwise the fully qualified name is required here.`},
+					{Path: `username`, Type: `string`, Desc: `The username needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+				}},
 				{Path: `script_commands`, Type: `string`, Desc: `The list of build commands. These commands are executed in the build container.`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `name`, Type: `string`, Desc: `The name of the command.`},
 					{Path: `command`, Type: `string`, Desc: `The executable command.`},
@@ -809,6 +958,36 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `enabled`, Type: `bool`, Desc: `Whether Pipelines is enabled for the repository.`},
+				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				}},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -829,9 +1008,67 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `enabled`, Type: `bool`, Desc: `Whether Pipelines is enabled for the repository.`},
+				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				}},
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `enabled`, Type: `bool`, Desc: `Whether Pipelines is enabled for the repository.`},
+				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				}},
 			},
 			HasBody:   true,
 			Paginated: false,
@@ -880,10 +1117,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the schedule was created.`},
 				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`},
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
-				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
-				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
+				{Path: `target`, Type: `string`, Desc: `target`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
+					{Path: `ref_name`, Type: `string`, Desc: `The name of the reference.`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -907,19 +1144,23 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			BodyFields: []BodyFieldDef{
 				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`},
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
-				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
-				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch only). [branch]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
+				{Path: `target`, Type: `string`, Desc: `The target on which the schedule will be executed.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `selector`, Type: `string`, Desc: `selector`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
+						{Path: `pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
+					}},
+					{Path: `ref_name`, Type: `string`, Desc: `The name of the reference.`},
+					{Path: `ref_type`, Type: `string`, Desc: `The type of reference (branch only). [branch]`},
+				}},
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the schedule was created.`},
 				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`},
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
-				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
-				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
+				{Path: `target`, Type: `string`, Desc: `target`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
+					{Path: `ref_name`, Type: `string`, Desc: `The name of the reference.`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -947,10 +1188,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the schedule was created.`},
 				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`},
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
-				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
-				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
+				{Path: `target`, Type: `string`, Desc: `target`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `ref_name`, Type: `string`, Desc: `The name of the reference.`},
+					{Path: `ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -979,10 +1220,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the schedule was created.`},
 				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`},
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
-				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
-				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
+				{Path: `target`, Type: `string`, Desc: `target`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `ref_name`, Type: `string`, Desc: `The name of the reference.`},
+					{Path: `ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -1117,10 +1358,12 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
-				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
-				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
-				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				{Path: `public_key`, Type: `string`, Desc: `public_key`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `key`, Type: `string`, Desc: `The base64 encoded public key.`},
+					{Path: `md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
+					{Path: `sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+					{Path: `key_type`, Type: `string`, Desc: `The type of the public key.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
 			},
 			HasBody:   false,
@@ -1142,18 +1385,22 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
-				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
-				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
-				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				{Path: `public_key`, Type: `string`, Desc: `public_key`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `key_type`, Type: `string`, Desc: `The type of the public key.`},
+					{Path: `key`, Type: `string`, Desc: `The base64 encoded public key.`},
+					{Path: `md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
+					{Path: `sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
-				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
-				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
-				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				{Path: `public_key`, Type: `string`, Desc: `public_key`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `key_type`, Type: `string`, Desc: `The type of the public key.`},
+					{Path: `key`, Type: `string`, Desc: `The base64 encoded public key.`},
+					{Path: `md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
+					{Path: `sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
 			},
 			HasBody:   true,
@@ -1177,10 +1424,12 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
-				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
-				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
-				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				{Path: `public_key`, Type: `string`, Desc: `public_key`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `key_type`, Type: `string`, Desc: `The type of the public key.`},
+					{Path: `key`, Type: `string`, Desc: `The base64 encoded public key.`},
+					{Path: `md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
+					{Path: `sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
 			},
 			HasBody:   false,
@@ -1203,18 +1452,22 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
-				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
-				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
-				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				{Path: `public_key`, Type: `string`, Desc: `public_key`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
+					{Path: `sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+					{Path: `key_type`, Type: `string`, Desc: `The type of the public key.`},
+					{Path: `key`, Type: `string`, Desc: `The base64 encoded public key.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
-				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
-				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
-				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				{Path: `public_key`, Type: `string`, Desc: `public_key`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `key_type`, Type: `string`, Desc: `The type of the public key.`},
+					{Path: `key`, Type: `string`, Desc: `The base64 encoded public key.`},
+					{Path: `md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
+					{Path: `sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
 			},
 			HasBody:   true,
@@ -1630,15 +1883,17 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -1663,15 +1918,17 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -1698,15 +1955,17 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -1732,15 +1991,17 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -2035,12 +2296,47 @@ for specific details.
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
+				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
+				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
-					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
 					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 				}},
 			},
 			HasBody:   false,
@@ -2068,6 +2364,38 @@ for specific details.
 					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
+				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
+				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
@@ -2085,12 +2413,47 @@ for specific details.
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
+				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
+				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
-					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
 					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 				}},
 			},
 			HasBody:   true,
@@ -2210,15 +2573,17 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -2244,15 +2609,17 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -2280,15 +2647,17 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -2315,15 +2684,17 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -2376,12 +2747,47 @@ for specific details.
 					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
+				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
+				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
 					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
-					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 				}},
 			},
 			HasBody:   false,
@@ -2407,10 +2813,12 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the step execution was completed. This is not set if the step is still in progress.`},
-				{Path: `image.email`, Type: `string`, Desc: `The email needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
-				{Path: `image.name`, Type: `string`, Desc: `The name of the image. If the image is hosted on DockerHub the short name can be used, otherwise the fully qualified name is required here.`},
-				{Path: `image.password`, Type: `string`, Desc: `The password needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
-				{Path: `image.username`, Type: `string`, Desc: `The username needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+				{Path: `image`, Type: `string`, Desc: `The definition of a Docker image that can be used for a Bitbucket Pipelines step execution context.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the image. If the image is hosted on DockerHub the short name can be used, otherwise the fully qualified name is required here.`},
+					{Path: `username`, Type: `string`, Desc: `The username needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+					{Path: `password`, Type: `string`, Desc: `The password needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+					{Path: `email`, Type: `string`, Desc: `The email needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+				}},
 				{Path: `script_commands`, Type: `string`, Desc: `The list of build commands. These commands are executed in the build container.`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `name`, Type: `string`, Desc: `The name of the command.`},
 					{Path: `command`, Type: `string`, Desc: `The executable command.`},
@@ -2444,10 +2852,12 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the step execution was completed. This is not set if the step is still in progress.`},
-				{Path: `image.email`, Type: `string`, Desc: `The email needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
-				{Path: `image.name`, Type: `string`, Desc: `The name of the image. If the image is hosted on DockerHub the short name can be used, otherwise the fully qualified name is required here.`},
-				{Path: `image.password`, Type: `string`, Desc: `The password needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
-				{Path: `image.username`, Type: `string`, Desc: `The username needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+				{Path: `image`, Type: `string`, Desc: `The definition of a Docker image that can be used for a Bitbucket Pipelines step execution context.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `password`, Type: `string`, Desc: `The password needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+					{Path: `email`, Type: `string`, Desc: `The email needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+					{Path: `name`, Type: `string`, Desc: `The name of the image. If the image is hosted on DockerHub the short name can be used, otherwise the fully qualified name is required here.`},
+					{Path: `username`, Type: `string`, Desc: `The username needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+				}},
 				{Path: `script_commands`, Type: `string`, Desc: `The list of build commands. These commands are executed in the build container.`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `name`, Type: `string`, Desc: `The name of the command.`},
 					{Path: `command`, Type: `string`, Desc: `The executable command.`},
@@ -2610,6 +3020,36 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `enabled`, Type: `bool`, Desc: `Whether Pipelines is enabled for the repository.`},
+				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				}},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -2630,9 +3070,67 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `enabled`, Type: `bool`, Desc: `Whether Pipelines is enabled for the repository.`},
+				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				}},
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `enabled`, Type: `bool`, Desc: `Whether Pipelines is enabled for the repository.`},
+				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `fork_policy`, Type: `string`, Desc: `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				}},
 			},
 			HasBody:   true,
 			Paginated: false,
@@ -2681,10 +3179,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the schedule was created.`},
 				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`},
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
-				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
-				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
+				{Path: `target`, Type: `string`, Desc: `target`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
+					{Path: `ref_name`, Type: `string`, Desc: `The name of the reference.`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -2708,19 +3206,23 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			BodyFields: []BodyFieldDef{
 				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`},
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
-				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
-				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch only). [branch]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
+				{Path: `target`, Type: `string`, Desc: `The target on which the schedule will be executed.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `selector`, Type: `string`, Desc: `selector`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
+						{Path: `pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
+					}},
+					{Path: `ref_name`, Type: `string`, Desc: `The name of the reference.`},
+					{Path: `ref_type`, Type: `string`, Desc: `The type of reference (branch only). [branch]`},
+				}},
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the schedule was created.`},
 				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`},
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
-				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
-				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
+				{Path: `target`, Type: `string`, Desc: `target`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
+					{Path: `ref_name`, Type: `string`, Desc: `The name of the reference.`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -2748,10 +3250,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the schedule was created.`},
 				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`},
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
-				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
-				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
+				{Path: `target`, Type: `string`, Desc: `target`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `ref_name`, Type: `string`, Desc: `The name of the reference.`},
+					{Path: `ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -2780,10 +3282,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the schedule was created.`},
 				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`},
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
-				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
-				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
+				{Path: `target`, Type: `string`, Desc: `target`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `ref_name`, Type: `string`, Desc: `The name of the reference.`},
+					{Path: `ref_type`, Type: `string`, Desc: `The type of reference (branch/tag). [branch, tag, named_branch, bookmark]`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the schedule was updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the schedule.`},
 			},
@@ -2918,10 +3420,12 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
-				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
-				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
-				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				{Path: `public_key`, Type: `string`, Desc: `public_key`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `key`, Type: `string`, Desc: `The base64 encoded public key.`},
+					{Path: `md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
+					{Path: `sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+					{Path: `key_type`, Type: `string`, Desc: `The type of the public key.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
 			},
 			HasBody:   false,
@@ -2943,18 +3447,22 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
-				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
-				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
-				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				{Path: `public_key`, Type: `string`, Desc: `public_key`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `key_type`, Type: `string`, Desc: `The type of the public key.`},
+					{Path: `key`, Type: `string`, Desc: `The base64 encoded public key.`},
+					{Path: `md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
+					{Path: `sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
-				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
-				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
-				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				{Path: `public_key`, Type: `string`, Desc: `public_key`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `key_type`, Type: `string`, Desc: `The type of the public key.`},
+					{Path: `key`, Type: `string`, Desc: `The base64 encoded public key.`},
+					{Path: `md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
+					{Path: `sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
 			},
 			HasBody:   true,
@@ -2978,10 +3486,12 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
-				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
-				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
-				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				{Path: `public_key`, Type: `string`, Desc: `public_key`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `key_type`, Type: `string`, Desc: `The type of the public key.`},
+					{Path: `key`, Type: `string`, Desc: `The base64 encoded public key.`},
+					{Path: `md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
+					{Path: `sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
 			},
 			HasBody:   false,
@@ -3004,18 +3514,22 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
-				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
-				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
-				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				{Path: `public_key`, Type: `string`, Desc: `public_key`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
+					{Path: `sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+					{Path: `key_type`, Type: `string`, Desc: `The type of the public key.`},
+					{Path: `key`, Type: `string`, Desc: `The base64 encoded public key.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
-				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
-				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
-				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				{Path: `public_key`, Type: `string`, Desc: `public_key`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `key_type`, Type: `string`, Desc: `The type of the public key.`},
+					{Path: `key`, Type: `string`, Desc: `The base64 encoded public key.`},
+					{Path: `md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
+					{Path: `sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
 			},
 			HasBody:   true,
@@ -3431,15 +3945,17 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -3464,15 +3980,17 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -3499,15 +4017,17 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},
@@ -3533,15 +4053,17 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
 				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
-				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
-				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
-				{Path: `oauth_client.secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
-				{Path: `oauth_client.token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
-				{Path: `state.cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
-				{Path: `state.status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
-				{Path: `state.updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
-				{Path: `state.version.current`, Type: `string`, Desc: `The current recommended version of the runner.`},
-				{Path: `state.version.version`, Type: `string`, Desc: `The currently installed version of the runner.`},
+				{Path: `oauth_client`, Type: `string`, Desc: `oauth_client`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `string`, Desc: `The OAuth client ID.`},
+					{Path: `secret`, Type: `string`, Desc: `The OAuth client secret. This is an optional element that is only provided once.`},
+					{Path: `token_endpoint`, Type: `string`, Desc: `The OAuth token endpoint URL.`},
+					{Path: `audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
+				}},
+				{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `status`, Type: `string`, Desc: `The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]`},
+					{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner state was last updated.`},
+					{Path: `cordoned`, Type: `bool`, Desc: `Whether the runner is cordoned (prevented from accepting new steps).`},
+				}},
 				{Path: `updated_on`, Type: `string`, Desc: `The timestamp when the runner was last updated.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the runner.`},
 			},

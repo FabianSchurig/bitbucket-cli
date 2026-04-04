@@ -57,6 +57,11 @@ resource "bitbucket_ssh_keys" "example" {
 - `key` (String) The SSH public key value in OpenSSH format. (also computed from API response)
 - `label` (String) The user-defined label for the SSH key (also computed from API response)
 - `last_used` (String) last_used (also computed from API response)
+- `owner` (Object) owner (also computed from API response)
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
 - `uuid` (String) The SSH key's immutable ID. (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 

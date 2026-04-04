@@ -50,12 +50,26 @@ output "project_user_permissions_response" {
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `permission` (String) [read, write, create-repo, admin, none]
-- `project_created_on` (String) project.created_on
-- `project_description` (String) project.description
-- `project_has_publicly_visible_repos` (String) 
-- `project_is_private` (String) 
-- `project_key` (String) The project's key.
-- `project_name` (String) The name of the project.
-- `project_updated_on` (String) project.updated_on
-- `project_uuid` (String) The project's immutable id.
+- `project` (Object) project
+  Nested schema:
+  - `key` (String) The project's key.
+  - `name` (String) The name of the project.
+  - `is_private` (String) 
+  - `created_on` (String) created_on
+  - `uuid` (String) The project's immutable id.
+  - `description` (String) description
+  - `updated_on` (String) updated_on
+  - `has_publicly_visible_repos` (String) 
+
 - `type` (String) type
+- `user` (Object) user
+  Nested schema:
+  - `created_on` (String) created_on
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+  - `has_2fa_enabled` (String) has_2fa_enabled
+  - `nickname` (String) Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.
+  - `is_staff` (String) is_staff
+  - `account_id` (String) The user's Atlassian account ID.
+  - `account_status` (String) The status of the account. Currently the only possible value is "active", but more values may be added in the future.
+

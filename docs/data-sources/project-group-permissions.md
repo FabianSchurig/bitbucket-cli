@@ -49,24 +49,22 @@ output "project_group_permissions_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `group_full_slug` (String) The concatenation of the workspace's slug and the group's slug,
-- `group_name` (String) group.name
-- `group_slug` (String) The "sluggified" version of the group's name. This contains only ASCII
-- `group_workspace_created_on` (String) group.workspace.created_on
-- `group_workspace_forking_mode` (String) Controls the rules for forking repositories within this workspace.
-- `group_workspace_is_privacy_enforced` (String) Indicates whether the workspace enforces private content, or whether it allows public content.
-- `group_workspace_is_private` (String) Indicates whether the workspace is publicly accessible, or whether it is
-- `group_workspace_name` (String) The name of the workspace.
-- `group_workspace_slug` (String) The short label that identifies this workspace.
-- `group_workspace_updated_on` (String) group.workspace.updated_on
-- `group_workspace_uuid` (String) The workspace's immutable id.
+- `group` (Object) group
+  Nested schema:
+  - `slug` (String) The "sluggified" version of the group's name. This contains only ASCII
+  - `full_slug` (String) The concatenation of the workspace's slug and the group's slug,
+  - `name` (String) name
+
 - `permission` (String) [read, write, create-repo, admin, none]
-- `project_created_on` (String) project.created_on
-- `project_description` (String) project.description
-- `project_has_publicly_visible_repos` (String) 
-- `project_is_private` (String) 
-- `project_key` (String) The project's key.
-- `project_name` (String) The name of the project.
-- `project_updated_on` (String) project.updated_on
-- `project_uuid` (String) The project's immutable id.
+- `project` (Object) project
+  Nested schema:
+  - `description` (String) description
+  - `updated_on` (String) updated_on
+  - `has_publicly_visible_repos` (String) 
+  - `key` (String) The project's key.
+  - `name` (String) The name of the project.
+  - `is_private` (String) 
+  - `created_on` (String) created_on
+  - `uuid` (String) The project's immutable id.
+
 - `type` (String) type

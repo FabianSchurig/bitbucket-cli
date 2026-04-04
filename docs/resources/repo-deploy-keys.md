@@ -63,3 +63,25 @@ resource "bitbucket_repo_deploy_keys" "example" {
 - `key` (String) The deploy key value.
 - `label` (String) The user-defined label for the deploy key
 - `last_used` (String) last_used
+- `owner` (Object) owner
+  Nested schema:
+  - `created_on` (String) created_on
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
+- `repository` (Object) repository
+  Nested schema:
+  - `name` (String) name
+  - `created_on` (String) created_on
+  - `has_issues` (String) 
+  - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+  - `is_private` (String) is_private
+  - `description` (String) description
+  - `updated_on` (String) updated_on
+  - `size` (String) size
+  - `language` (String) language
+  - `fork_policy` (String) 
+  - `scm` (String) [git]
+  - `has_wiki` (String) 
+

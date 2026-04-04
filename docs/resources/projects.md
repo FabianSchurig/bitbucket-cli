@@ -63,5 +63,11 @@ resource "bitbucket_projects" "example" {
 - `is_private` (String) 
 - `key` (String) The project's key.
 - `name` (String) The name of the project.
+- `owner` (Object) owner
+  Nested schema:
+  - `created_on` (String) created_on
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
 - `updated_on` (String) updated_on
 - `uuid` (String) The project's immutable id.

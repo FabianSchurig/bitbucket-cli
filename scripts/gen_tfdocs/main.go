@@ -56,7 +56,8 @@ type FieldDoc struct {
 	Name       string     // Terraform attribute name (snake_case)
 	Desc       string     // Human-readable description
 	IsArray    bool       // true when the field is a list-nested attribute
-	ItemFields []FieldDoc // nested fields for array items
+	IsObject   bool       // true when the field is a single-nested object attribute
+	ItemFields []FieldDoc // nested fields for array items or object properties
 }
 
 // CRUDOpInfo holds details about a single CRUD operation for documentation.
@@ -375,7 +376,7 @@ func deriveFields(name string, index map[string]tfprovider.ResourceGroup) (bodyF
 				if desc == "" {
 					desc = bf.Path
 				}
-				bodyFieldMap[key] = bodyFieldInfo{desc: desc, isArray: bf.IsArray, itemFields: bf.ItemFields}
+				bodyFieldMap[key] = bodyFieldInfo{desc: desc, isArray: bf.IsArray, isObject: bf.IsObject, itemFields: bf.ItemFields}
 			}
 		}
 	}
@@ -396,7 +397,7 @@ func deriveFields(name string, index map[string]tfprovider.ResourceGroup) (bodyF
 			if desc == "" {
 				desc = rf.Path
 			}
-			responseFieldMap[key] = bodyFieldInfo{desc: desc, isArray: rf.IsArray, itemFields: rf.ItemFields}
+			responseFieldMap[key] = bodyFieldInfo{desc: desc, isArray: rf.IsArray, isObject: rf.IsObject, itemFields: rf.ItemFields}
 		}
 	}
 
@@ -434,19 +435,29 @@ func snakeCaseField(path string) string {
 type bodyFieldInfo struct {
 	desc       string
 	isArray    bool
+	isObject   bool
 	itemFields []tfprovider.BodyFieldDef
 }
 
 // makeFieldDoc converts a bodyFieldInfo into a FieldDoc, including nested fields.
 func makeFieldDoc(key string, info bodyFieldInfo) FieldDoc {
-	fd := FieldDoc{Name: key, Desc: truncateDesc(info.desc), IsArray: info.isArray}
+	fd := FieldDoc{Name: key, Desc: truncateDesc(info.desc), IsArray: info.isArray, IsObject: info.isObject}
 	for _, item := range info.itemFields {
 		ikey := snakeCaseField(item.Path)
 		idesc := item.Desc
 		if idesc == "" {
 			idesc = item.Path
 		}
-		fd.ItemFields = append(fd.ItemFields, FieldDoc{Name: ikey, Desc: truncateDesc(idesc)})
+		child := FieldDoc{Name: ikey, Desc: truncateDesc(idesc), IsArray: item.IsArray, IsObject: item.IsObject}
+		for _, sub := range item.ItemFields {
+			skey := snakeCaseField(sub.Path)
+			sdesc := sub.Desc
+			if sdesc == "" {
+				sdesc = sub.Path
+			}
+			child.ItemFields = append(child.ItemFields, FieldDoc{Name: skey, Desc: truncateDesc(sdesc)})
+		}
+		fd.ItemFields = append(fd.ItemFields, child)
 	}
 	return fd
 }
@@ -459,6 +470,20 @@ func truncateDesc(desc string) string {
 	}
 	desc = strings.TrimSpace(desc)
 	return desc
+}
+
+// nestedFieldType returns the type string for a nested field in documentation.
+func nestedFieldType(f FieldDoc) string {
+	if f.IsObject && len(f.ItemFields) > 0 {
+		return "Object"
+	}
+	if f.IsArray && len(f.ItemFields) > 0 {
+		return "List of Object"
+	}
+	if f.IsArray {
+		return "List of String"
+	}
+	return "String"
 }
 
 // filterFields removes FieldDoc entries whose Name matches any key in the exclude set.
@@ -525,6 +550,9 @@ var funcMap = template.FuncMap{
 		return strings.Join(quoted, ", ")
 	},
 	"fieldType": func(f FieldDoc) string {
+		if f.IsObject && len(f.ItemFields) > 0 {
+			return "Object"
+		}
 		if f.IsArray && len(f.ItemFields) > 0 {
 			return "List of Object"
 		}
@@ -540,7 +568,10 @@ var funcMap = template.FuncMap{
 		var sb strings.Builder
 		sb.WriteString("\n  Nested schema:\n")
 		for _, f := range fields {
-			sb.WriteString("  - `" + f.Name + "` (String) " + f.Desc + "\n")
+			sb.WriteString("  - `" + f.Name + "` (" + nestedFieldType(f) + ") " + f.Desc + "\n")
+			for _, sub := range f.ItemFields {
+				sb.WriteString("    - `" + sub.Name + "` (" + nestedFieldType(sub) + ") " + sub.Desc + "\n")
+			}
 		}
 		return sb.String()
 	},

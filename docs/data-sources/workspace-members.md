@@ -47,11 +47,20 @@ output "workspace_members_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `workspace_created_on` (String) workspace.created_on
-- `workspace_forking_mode` (String) Controls the rules for forking repositories within this workspace.
-- `workspace_is_privacy_enforced` (String) Indicates whether the workspace enforces private content, or whether it allows public content.
-- `workspace_is_private` (String) Indicates whether the workspace is publicly accessible, or whether it is
-- `workspace_name` (String) The name of the workspace.
-- `workspace_slug` (String) The short label that identifies this workspace.
-- `workspace_updated_on` (String) workspace.updated_on
-- `workspace_uuid` (String) The workspace's immutable id.
+- `user` (Object) user
+  Nested schema:
+  - `created_on` (String) created_on
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
+- `workspace` (Object) workspace
+  Nested schema:
+  - `uuid` (String) The workspace's immutable id.
+  - `is_privacy_enforced` (String) Indicates whether the workspace enforces private content, or whether it allows public content.
+  - `created_on` (String) created_on
+  - `name` (String) The name of the workspace.
+  - `slug` (String) The short label that identifies this workspace.
+  - `is_private` (String) Indicates whether the workspace is publicly accessible, or whether it is
+  - `forking_mode` (String) Controls the rules for forking repositories within this workspace.
+  - `updated_on` (String) updated_on
+

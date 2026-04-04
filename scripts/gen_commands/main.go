@@ -84,8 +84,7 @@ func operationToCommand(op spec.OperationDef) CommandData {
 		flags = append(flags, paramToFlag(p))
 	}
 
-	bodyFields := make([]spec.BodyField, len(op.BodyFields))
-	copy(bodyFields, op.BodyFields)
+	bodyFields := spec.FlattenBodyFields(op.BodyFields)
 
 	// Resolve body field flag name collisions with parameter flags.
 	paramNames := make(map[string]bool, len(flags))

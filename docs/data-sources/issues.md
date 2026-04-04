@@ -49,19 +49,55 @@ output "issues_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `component_id` (String) component.id
 - `created_on` (String) created_on
-- `milestone_id` (String) milestone.id
 - `updated_on` (String) updated_on
-- `version_id` (String) version.id
-- `component_name` (String) component.name
-- `content_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
-- `content_raw` (String) The text as it was typed by a user.
+- `assignee` (Object) assignee
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
+- `component` (Object) component
+  Nested schema:
+  - `name` (String) name
+  - `id` (String) id
+
+- `content` (Object) content
+  Nested schema:
+  - `raw` (String) The text as it was typed by a user.
+  - `markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
+
 - `edited_on` (String) edited_on
 - `kind` (String) [bug, enhancement, proposal, task]
-- `milestone_name` (String) milestone.name
+- `milestone` (Object) milestone
+  Nested schema:
+  - `name` (String) name
+  - `id` (String) id
+
 - `priority` (String) [trivial, minor, major, critical, blocker]
+- `reporter` (Object) reporter
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
+- `repository` (Object) repository
+  Nested schema:
+  - `size` (String) size
+  - `fork_policy` (String) 
+  - `name` (String) name
+  - `language` (String) language
+  - `has_issues` (String) 
+  - `has_wiki` (String) 
+  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+  - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+  - `is_private` (String) is_private
+  - `scm` (String) [git]
+  - `description` (String) description
+
 - `state` (String) [submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]
 - `title` (String) title
-- `version_name` (String) version.name
+- `version` (Object) version
+  Nested schema:
+  - `name` (String) name
+  - `id` (String) id
+
 - `votes` (String) votes

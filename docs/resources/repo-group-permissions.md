@@ -57,16 +57,27 @@ resource "bitbucket_repo_group_permissions" "example" {
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `group_full_slug` (String) The concatenation of the workspace's slug and the group's slug,
-- `group_name` (String) group.name
-- `group_slug` (String) The "sluggified" version of the group's name. This contains only ASCII
-- `group_workspace_created_on` (String) group.workspace.created_on
-- `group_workspace_forking_mode` (String) Controls the rules for forking repositories within this workspace.
-- `group_workspace_is_privacy_enforced` (String) Indicates whether the workspace enforces private content, or whether it allows public content.
-- `group_workspace_is_private` (String) Indicates whether the workspace is publicly accessible, or whether it is
-- `group_workspace_name` (String) The name of the workspace.
-- `group_workspace_slug` (String) The short label that identifies this workspace.
-- `group_workspace_updated_on` (String) group.workspace.updated_on
-- `group_workspace_uuid` (String) The workspace's immutable id.
+- `group` (Object) group
+  Nested schema:
+  - `name` (String) name
+  - `slug` (String) The "sluggified" version of the group's name. This contains only ASCII
+  - `full_slug` (String) The concatenation of the workspace's slug and the group's slug,
+
 - `permission` (String) [read, write, admin, none]
+- `repository` (Object) repository
+  Nested schema:
+  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+  - `name` (String) name
+  - `description` (String) description
+  - `updated_on` (String) updated_on
+  - `fork_policy` (String) 
+  - `is_private` (String) is_private
+  - `scm` (String) [git]
+  - `has_wiki` (String) 
+  - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+  - `size` (String) size
+  - `language` (String) language
+  - `has_issues` (String) 
+  - `created_on` (String) created_on
+
 - `type` (String) type

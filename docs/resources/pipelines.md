@@ -55,6 +55,25 @@ resource "bitbucket_pipelines" "example" {
   - `source` (String) Identifier of the configuration source
   - `uri` (String) Link to the configuration source view or its immediate content
 
+- `creator` (Object) creator (also computed from API response)
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
+- `repository` (Object) repository (also computed from API response)
+  Nested schema:
+  - `scm` (String) [git]
+  - `language` (String) language
+  - `has_issues` (String) 
+  - `fork_policy` (String) 
+  - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+  - `is_private` (String) is_private
+  - `name` (String) name
+  - `description` (String) description
+  - `size` (String) size
+  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+  - `has_wiki` (String) 
+
 - `uuid` (String) The UUID identifying the pipeline. (also computed from API response)
 - `variables` (List of Object) The variables for the pipeline. (also computed from API response)
   Nested schema:

@@ -49,18 +49,43 @@ output "commits_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `author_raw` (String) The raw author value from the repository. This may be the only value available if the author does not match a user in Bitbucket.
-- `committer_raw` (String) The raw committer value from the repository. This may be the only value available if the committer does not match a user in Bitbucket.
+- `author` (Object) author
+  Nested schema:
+  - `raw` (String) The raw author value from the repository. This may be the only value available if the author does not match a user in Bitbucket.
+
+- `committer` (Object) committer
+  Nested schema:
+  - `raw` (String) The raw committer value from the repository. This may be the only value available if the committer does not match a user in Bitbucket.
+
 - `date` (String) date
 - `hash` (String) hash
 - `message` (String) message
 - `parents` (String) parents (JSON array)
 - `participants` (List of Object) participants
   Nested schema:
+  - `participated_on` (String) The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.
   - `role` (String) [PARTICIPANT, REVIEWER]
   - `approved` (String) approved
   - `state` (String) [approved, changes_requested, <nil>]
-  - `participated_on` (String) The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.
 
-- `summary_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
-- `summary_raw` (String) The text as it was typed by a user.
+- `repository` (Object) repository
+  Nested schema:
+  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+  - `name` (String) name
+  - `updated_on` (String) updated_on
+  - `is_private` (String) is_private
+  - `description` (String) description
+  - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+  - `scm` (String) [git]
+  - `created_on` (String) created_on
+  - `has_issues` (String) 
+  - `size` (String) size
+  - `language` (String) language
+  - `has_wiki` (String) 
+  - `fork_policy` (String) 
+
+- `summary` (Object) summary
+  Nested schema:
+  - `raw` (String) The text as it was typed by a user.
+  - `markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
+

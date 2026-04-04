@@ -51,5 +51,15 @@ output "tags_response" {
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `date` (String) The date that the tag was created, if available
 - `message` (String) The message associated with the tag, if available.
-- `tagger_raw` (String) The raw author value from the repository. This may be the only value available if the author does not match a user in Bitbucket.
+- `tagger` (Object) tagger
+  Nested schema:
+  - `raw` (String) The raw author value from the repository. This may be the only value available if the author does not match a user in Bitbucket.
+
+- `target` (Object) target
+  Nested schema:
+  - `parents` (String) parents (JSON array)
+  - `hash` (String) hash
+  - `date` (String) date
+  - `message` (String) message
+
 - `type` (String) type

@@ -115,8 +115,9 @@ func operationToMCPOp(op spec.OperationDef) MCPOpData {
 		})
 	}
 
-	bodyFields := make([]MCPBodyFieldData, 0, len(op.BodyFields))
-	for _, bf := range op.BodyFields {
+	flatFields := spec.FlattenBodyFields(op.BodyFields)
+	bodyFields := make([]MCPBodyFieldData, 0, len(flatFields))
+	for _, bf := range flatFields {
 		bodyFields = append(bodyFields, MCPBodyFieldData{
 			Path: bf.Path,
 			Type: bf.GoType,

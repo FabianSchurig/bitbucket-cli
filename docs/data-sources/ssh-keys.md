@@ -54,4 +54,9 @@ output "ssh_keys_response" {
 - `key` (String) The SSH public key value in OpenSSH format.
 - `label` (String) The user-defined label for the SSH key
 - `last_used` (String) last_used
+- `owner` (Object) owner
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
 - `uuid` (String) The SSH key's immutable ID.

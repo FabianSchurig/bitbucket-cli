@@ -61,8 +61,8 @@ output "branch_restrictions_response" {
 - `pattern` (String) Apply the restriction to branches that match this pattern. Active when `branch_match_kind` is `glob`. Will be empty when `branch_match_kind` is `branching_model`.
 - `users` (List of Object) users
   Nested schema:
+  - `created_on` (String) created_on
   - `display_name` (String) display_name
   - `uuid` (String) uuid
-  - `created_on` (String) created_on
 
 - `value` (String) Value with kind-specific semantics:

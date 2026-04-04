@@ -53,16 +53,55 @@ resource "bitbucket_issues" "example" {
 
 ### Optional
 - `issue_id` (String) Path parameter (auto-populated from API response).
-- `component_name` (String) component.name (also computed from API response)
-- `content_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext] (also computed from API response)
-- `content_raw` (String) The text as it was typed by a user. (also computed from API response)
+- `assignee` (Object) assignee (also computed from API response)
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
+- `component` (Object) component (also computed from API response)
+  Nested schema:
+  - `name` (String) name
+  - `id` (String) id
+
+- `content` (Object) content (also computed from API response)
+  Nested schema:
+  - `raw` (String) The text as it was typed by a user.
+  - `markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
+
 - `edited_on` (String) edited_on (also computed from API response)
 - `kind` (String) [bug, enhancement, proposal, task] (also computed from API response)
-- `milestone_name` (String) milestone.name (also computed from API response)
+- `milestone` (Object) milestone (also computed from API response)
+  Nested schema:
+  - `name` (String) name
+  - `id` (String) id
+
 - `priority` (String) [trivial, minor, major, critical, blocker] (also computed from API response)
+- `reporter` (Object) reporter (also computed from API response)
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
+- `repository` (Object) repository (also computed from API response)
+  Nested schema:
+  - `size` (String) size
+  - `fork_policy` (String) 
+  - `name` (String) name
+  - `language` (String) language
+  - `has_issues` (String) 
+  - `has_wiki` (String) 
+  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+  - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+  - `is_private` (String) is_private
+  - `scm` (String) [git]
+  - `description` (String) description
+
 - `state` (String) [submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed] (also computed from API response)
 - `title` (String) title (also computed from API response)
-- `version_name` (String) version.name (also computed from API response)
+- `version` (Object) version (also computed from API response)
+  Nested schema:
+  - `name` (String) name
+  - `id` (String) id
+
 - `votes` (String) votes (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
@@ -70,8 +109,5 @@ resource "bitbucket_issues" "example" {
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `component_id` (String) component.id
 - `created_on` (String) created_on
-- `milestone_id` (String) milestone.id
 - `updated_on` (String) updated_on
-- `version_id` (String) version.id
