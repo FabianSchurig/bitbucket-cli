@@ -28,7 +28,6 @@ run "create_pipeline_schedules" {
   variables {
     workspace = "my-workspace"
     repo_slug = "my-repo"
-    schedule_uuid = "{schedule-uuid}"
   }
 
   # Resource create should succeed with mock provider

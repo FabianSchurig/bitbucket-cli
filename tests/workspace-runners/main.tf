@@ -28,5 +28,4 @@ data "bitbucket_workspace_runners" "test" {
 
 resource "bitbucket_workspace_runners" "test" {
   workspace = var.workspace
-  runner_uuid = var.runner_uuid
 }

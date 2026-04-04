@@ -46,6 +46,7 @@ resource "bitbucket_project_branching_model" "example" {
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `branch_types` (String) The active branch types. (JSON array)
 - `development_name` (String) Name of the target branch. If inherited by a repository, it will default to the main branch if the specified branch does not exist.
 - `development_use_mainbranch` (String) Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`).
 - `production_name` (String) Name of the target branch. If inherited by a repository, it will default to the main branch if the specified branch does not exist.

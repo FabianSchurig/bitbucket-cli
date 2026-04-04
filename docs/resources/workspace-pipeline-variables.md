@@ -41,7 +41,6 @@ Manages Bitbucket workspace-pipeline-variables via the Bitbucket Cloud API.
 ```hcl
 resource "bitbucket_workspace_pipeline_variables" "example" {
   workspace = "my-workspace"
-  variable_uuid = "{variable-uuid}"
 }
 ```
 
@@ -49,9 +48,9 @@ resource "bitbucket_workspace_pipeline_variables" "example" {
 
 ### Required
 - `workspace` (String) Path parameter.
-- `variable_uuid` (String) Path parameter.
 
 ### Optional
+- `variable_uuid` (String) Path parameter (auto-populated from API response).
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

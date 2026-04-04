@@ -13,6 +13,7 @@ run "read_deployment_variables" {
     workspace = "my-workspace"
     repo_slug = "my-repo"
     environment_uuid = "env-uuid"
+    variable_uuid = "{variable-uuid}"
   }
 
   # Data source read should succeed with mock provider

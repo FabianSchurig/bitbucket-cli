@@ -52,4 +52,6 @@ output "pipelines_response" {
 - `build_number` (String) The build number of the pipeline.
 - `build_seconds_used` (String) The number of build seconds used by this pipeline.
 - `completed_on` (String) The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.
+- `configuration_sources` (String) An ordered list of sources of the pipeline configuration (JSON array)
 - `uuid` (String) The UUID identifying the pipeline.
+- `variables` (String) The variables for the pipeline. (JSON array)

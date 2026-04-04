@@ -40,18 +40,16 @@ Manages Bitbucket snippets via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_snippets" "example" {
-  encoded_id = "snippet-id"
-  workspace = "my-workspace"
 }
 ```
 
 ## Schema
 
 ### Required
-- `encoded_id` (String) Path parameter.
-- `workspace` (String) Path parameter.
 
 ### Optional
+- `encoded_id` (String) Path parameter (auto-populated from API response).
+- `workspace` (String) Path parameter (auto-populated from API response).
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

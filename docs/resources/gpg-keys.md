@@ -37,7 +37,6 @@ Manages Bitbucket gpg-keys via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_gpg_keys" "example" {
-  fingerprint = "AA:BB:CC:DD"
   selected_user = "jdoe"
 }
 ```
@@ -45,10 +44,10 @@ resource "bitbucket_gpg_keys" "example" {
 ## Schema
 
 ### Required
-- `fingerprint` (String) Path parameter.
 - `selected_user` (String) Path parameter.
 
 ### Optional
+- `fingerprint` (String) Path parameter (auto-populated from API response).
 - `added_on` (String) added_on (also computed from API response)
 - `comment` (String) The comment parsed from the GPG key (if present) (also computed from API response)
 - `expires_on` (String) expires_on (also computed from API response)
@@ -58,6 +57,7 @@ resource "bitbucket_gpg_keys" "example" {
 - `last_used` (String) last_used (also computed from API response)
 - `name` (String) The user-defined label for the GPG key (also computed from API response)
 - `parent_fingerprint` (String) The fingerprint of the parent key. This value is null unless the current key is a subkey. (also computed from API response)
+- `subkeys` (String) subkeys (JSON array) (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

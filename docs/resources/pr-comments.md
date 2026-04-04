@@ -40,7 +40,6 @@ Manages Bitbucket pr-comments via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_pr_comments" "example" {
-  comment_id = "1"
   pull_request_id = "1"
   repo_slug = "my-repo"
   workspace = "my-workspace"
@@ -50,12 +49,12 @@ resource "bitbucket_pr_comments" "example" {
 ## Schema
 
 ### Required
-- `comment_id` (String) Path parameter.
 - `pull_request_id` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
 
 ### Optional
+- `comment_id` (String) Path parameter (auto-populated from API response).
 - `content_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext] (also computed from API response)
 - `content_raw` (String) The text as it was typed by a user. (also computed from API response)
 - `inline_from` (String) The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file. (also computed from API response)

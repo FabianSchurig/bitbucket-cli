@@ -28,6 +28,7 @@ data "bitbucket_deployment_variables" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
   environment_uuid = "env-uuid"
+  variable_uuid = "{variable-uuid}"
 }
 
 output "deployment_variables_response" {
@@ -41,6 +42,7 @@ output "deployment_variables_response" {
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `environment_uuid` (String) Path parameter.
+- `variable_uuid` (String) Path parameter.
 
 ### Read-Only
 

@@ -27,6 +27,4 @@ data "bitbucket_snippets" "test" {
 }
 
 resource "bitbucket_snippets" "test" {
-  encoded_id = var.encoded_id
-  workspace = var.workspace
 }

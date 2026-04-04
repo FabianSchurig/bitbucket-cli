@@ -161,7 +161,18 @@ func extractPage(result any) *pageResult {
 
 // SetNested sets a value in a nested map using a dot-separated path.
 // E.g., SetNested(m, "content.raw", "hello") produces {"content": {"raw": "hello"}}.
+// If the value is a string that looks like a JSON array or object, it is parsed
+// so that the resulting body contains the structured value rather than a raw string.
 func SetNested(m map[string]any, path string, value any) {
+	// Auto-parse JSON arrays/objects from string values.
+	if s, ok := value.(string); ok && len(s) > 0 {
+		if s[0] == '[' || s[0] == '{' {
+			var parsed any
+			if err := json.Unmarshal([]byte(s), &parsed); err == nil {
+				value = parsed
+			}
+		}
+	}
 	parts := strings.Split(path, ".")
 	current := m
 	for i, p := range parts {

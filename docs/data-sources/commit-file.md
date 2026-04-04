@@ -25,10 +25,10 @@ Reads Bitbucket commit-file via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_commit_file" "example" {
-  commit = "abc123def"
-  path = "README.md"
   repo_slug = "my-repo"
   workspace = "my-workspace"
+  commit = "abc123def"
+  path = "README.md"
 }
 
 output "commit_file_response" {
@@ -39,10 +39,10 @@ output "commit_file_response" {
 ## Schema
 
 ### Required
-- `commit` (String) Path parameter.
-- `path` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+- `commit` (String) Path parameter.
+- `path` (String) Path parameter.
 
 ### Read-Only
 

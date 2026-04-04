@@ -40,7 +40,6 @@ Manages Bitbucket issues via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_issues" "example" {
-  issue_id = "1"
   repo_slug = "my-repo"
   workspace = "my-workspace"
 }
@@ -49,11 +48,11 @@ resource "bitbucket_issues" "example" {
 ## Schema
 
 ### Required
-- `issue_id` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
 
 ### Optional
+- `issue_id` (String) Path parameter (auto-populated from API response).
 - `component_name` (String) component.name (also computed from API response)
 - `content_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext] (also computed from API response)
 - `content_raw` (String) The text as it was typed by a user. (also computed from API response)

@@ -1,6 +1,6 @@
 data "bitbucket_gpg_keys" "example" {
-  fingerprint = "AA:BB:CC:DD"
   selected_user = "jdoe"
+  fingerprint = "AA:BB:CC:DD"
 }
 
 output "gpg_keys_response" {

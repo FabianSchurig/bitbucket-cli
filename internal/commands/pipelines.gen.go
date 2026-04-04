@@ -484,13 +484,15 @@ for specific details.
 // operationId: createPipelineForRepository
 func newPipelinesCreatePipelineForRepositoryCmd() *cobra.Command {
 	var (
-		workspace            string
-		repoSlug             string
-		bodyBuildNumber      int
-		bodyBuildSecondsUsed int
-		bodyCompletedOn      string
-		bodyUuid             string
-		body                 string
+		workspace                string
+		repoSlug                 string
+		bodyBuildNumber          int
+		bodyBuildSecondsUsed     int
+		bodyCompletedOn          string
+		bodyConfigurationSources string
+		bodyUuid                 string
+		bodyVariables            string
+		body                     string
 	)
 
 	cmd := &cobra.Command{
@@ -524,8 +526,14 @@ func newPipelinesCreatePipelineForRepositoryCmd() *cobra.Command {
 				if bodyCompletedOn != "" {
 					handlers.SetNested(bodyObj, "completed_on", bodyCompletedOn)
 				}
+				if bodyConfigurationSources != "" {
+					handlers.SetNested(bodyObj, "configuration_sources", bodyConfigurationSources)
+				}
 				if bodyUuid != "" {
 					handlers.SetNested(bodyObj, "uuid", bodyUuid)
+				}
+				if bodyVariables != "" {
+					handlers.SetNested(bodyObj, "variables", bodyVariables)
 				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
@@ -547,7 +555,9 @@ func newPipelinesCreatePipelineForRepositoryCmd() *cobra.Command {
 	cmd.Flags().IntVar(&bodyBuildNumber, "build-number", 0, `The build number of the pipeline.`)
 	cmd.Flags().IntVar(&bodyBuildSecondsUsed, "build-seconds-used", 0, `The number of build seconds used by this pipeline.`)
 	cmd.Flags().StringVar(&bodyCompletedOn, "completed-on", "", `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`)
+	cmd.Flags().StringVar(&bodyConfigurationSources, "configuration-sources", "", `An ordered list of sources of the pipeline configuration (JSON array)`)
 	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID identifying the pipeline.`)
+	cmd.Flags().StringVar(&bodyVariables, "variables", "", `The variables for the pipeline. (JSON array)`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }

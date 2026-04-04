@@ -37,7 +37,6 @@ Manages Bitbucket project-deploy-keys via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_project_deploy_keys" "example" {
-  key_id = "123"
   project_key = "PROJ"
   workspace = "my-workspace"
 }
@@ -46,9 +45,11 @@ resource "bitbucket_project_deploy_keys" "example" {
 ## Schema
 
 ### Required
-- `key_id` (String) Path parameter.
 - `project_key` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `key_id` (String) Path parameter (auto-populated from API response).
 
 ### Read-Only
 

@@ -37,7 +37,6 @@ Manages Bitbucket refs via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_refs" "example" {
-  name = "main"
   repo_slug = "my-repo"
   workspace = "my-workspace"
 }
@@ -46,14 +45,17 @@ resource "bitbucket_refs" "example" {
 ## Schema
 
 ### Required
-- `name` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `name` (String) Path parameter (auto-populated from API response).
 
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch.
+- `merge_strategies` (String) Available merge strategies for pull requests targeting this branch. (JSON array)
 - `name` (String) The name of the ref.
 - `type` (String) type

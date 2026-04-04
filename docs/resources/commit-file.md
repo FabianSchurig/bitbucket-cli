@@ -31,8 +31,6 @@ Manages Bitbucket commit-file via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_commit_file" "example" {
-  commit = "abc123def"
-  path = "README.md"
   repo_slug = "my-repo"
   workspace = "my-workspace"
 }
@@ -41,10 +39,12 @@ resource "bitbucket_commit_file" "example" {
 ## Schema
 
 ### Required
-- `commit` (String) Path parameter.
-- `path` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `commit` (String) Path parameter (auto-populated from API response).
+- `path` (String) Path parameter (auto-populated from API response).
 
 ### Read-Only
 

@@ -22,11 +22,10 @@ variable "uid" {
 provider "bitbucket" {}
 
 data "bitbucket_workspace_hooks" "test" {
-  uid = var.uid
   workspace = var.workspace
+  uid = var.uid
 }
 
 resource "bitbucket_workspace_hooks" "test" {
-  uid = var.uid
   workspace = var.workspace
 }

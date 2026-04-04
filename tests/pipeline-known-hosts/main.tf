@@ -35,5 +35,4 @@ data "bitbucket_pipeline_known_hosts" "test" {
 resource "bitbucket_pipeline_known_hosts" "test" {
   workspace = var.workspace
   repo_slug = var.repo_slug
-  known_host_uuid = var.known_host_uuid
 }

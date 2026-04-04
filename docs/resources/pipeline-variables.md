@@ -42,7 +42,6 @@ Manages Bitbucket pipeline-variables via the Bitbucket Cloud API.
 resource "bitbucket_pipeline_variables" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
-  variable_uuid = "{variable-uuid}"
 }
 ```
 
@@ -51,9 +50,9 @@ resource "bitbucket_pipeline_variables" "example" {
 ### Required
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
-- `variable_uuid` (String) Path parameter.
 
 ### Optional
+- `variable_uuid` (String) Path parameter (auto-populated from API response).
 - `key` (String) The unique name of the variable. (also computed from API response)
 - `secured` (String) If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API. (also computed from API response)
 - `uuid` (String) The UUID identifying the variable. (also computed from API response)

@@ -26,7 +26,6 @@ run "create_workspace_pipeline_variables" {
 
   variables {
     workspace = "my-workspace"
-    variable_uuid = "{variable-uuid}"
   }
 
   # Resource create should succeed with mock provider

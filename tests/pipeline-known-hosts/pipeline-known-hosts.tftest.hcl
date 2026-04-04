@@ -28,7 +28,6 @@ run "create_pipeline_known_hosts" {
   variables {
     workspace = "my-workspace"
     repo_slug = "my-repo"
-    known_host_uuid = "{known-host-uuid}"
   }
 
   # Resource create should succeed with mock provider

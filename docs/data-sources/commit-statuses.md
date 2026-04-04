@@ -28,9 +28,9 @@ Reads Bitbucket commit-statuses via the Bitbucket Cloud API.
 ```hcl
 data "bitbucket_commit_statuses" "example" {
   commit = "abc123def"
-  key = "build-key"
   repo_slug = "my-repo"
   workspace = "my-workspace"
+  key = "build-key"
 }
 
 output "commit_statuses_response" {
@@ -42,9 +42,9 @@ output "commit_statuses_response" {
 
 ### Required
 - `commit` (String) Path parameter.
-- `key` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+- `key` (String) Path parameter.
 
 ### Read-Only
 

@@ -42,7 +42,6 @@ Manages Bitbucket pipeline-schedules via the Bitbucket Cloud API.
 resource "bitbucket_pipeline_schedules" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
-  schedule_uuid = "{schedule-uuid}"
 }
 ```
 
@@ -51,9 +50,9 @@ resource "bitbucket_pipeline_schedules" "example" {
 ### Required
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
-- `schedule_uuid` (String) Path parameter.
 
 ### Optional
+- `schedule_uuid` (String) Path parameter (auto-populated from API response).
 - `cron_pattern` (String) The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day. (also computed from API response)
 - `enabled` (String) Whether the schedule is enabled. (also computed from API response)
 - `target_ref_name` (String) The name of the reference. (also computed from API response)

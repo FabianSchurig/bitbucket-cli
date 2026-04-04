@@ -38,7 +38,6 @@ Manages Bitbucket commit-statuses via the Bitbucket Cloud API.
 ```hcl
 resource "bitbucket_commit_statuses" "example" {
   commit = "abc123def"
-  key = "build-key"
   repo_slug = "my-repo"
   workspace = "my-workspace"
 }
@@ -48,11 +47,11 @@ resource "bitbucket_commit_statuses" "example" {
 
 ### Required
 - `commit` (String) Path parameter.
-- `key` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
 
 ### Optional
+- `key` (String) Path parameter (auto-populated from API response).
 - `description` (String) A description of the build (e.g. "Unit tests in Bamboo") (also computed from API response)
 - `key` (String) An identifier for the status that's unique to (also computed from API response)
 - `name` (String) An identifier for the build itself, e.g. BB-DEPLOY-1 (also computed from API response)

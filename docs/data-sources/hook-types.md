@@ -27,6 +27,7 @@ Reads Bitbucket hook-types via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_hook_types" "example" {
+  subject_type = "repository"
 }
 
 output "hook_types_response" {
@@ -37,6 +38,7 @@ output "hook_types_response" {
 ## Schema
 
 ### Required
+- `subject_type` (String) Path parameter.
 
 ### Read-Only
 

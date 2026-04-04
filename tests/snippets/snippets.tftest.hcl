@@ -25,8 +25,6 @@ run "create_snippets" {
   command = apply
 
   variables {
-    encoded_id = "snippet-id"
-    workspace = "my-workspace"
   }
 
   # Resource create should succeed with mock provider

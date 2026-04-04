@@ -26,7 +26,6 @@ run "create_workspace_runners" {
 
   variables {
     workspace = "my-workspace"
-    runner_uuid = "{runner-uuid}"
   }
 
   # Resource create should succeed with mock provider

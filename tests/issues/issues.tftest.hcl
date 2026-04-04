@@ -10,9 +10,9 @@ run "read_issues" {
   command = apply
 
   variables {
-    issue_id = "1"
     repo_slug = "my-repo"
     workspace = "my-workspace"
+    issue_id = "1"
   }
 
   # Data source read should succeed with mock provider
@@ -26,7 +26,6 @@ run "create_issues" {
   command = apply
 
   variables {
-    issue_id = "1"
     repo_slug = "my-repo"
     workspace = "my-workspace"
   }

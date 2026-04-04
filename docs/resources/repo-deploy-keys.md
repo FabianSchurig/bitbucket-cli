@@ -40,7 +40,6 @@ Manages Bitbucket repo-deploy-keys via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_repo_deploy_keys" "example" {
-  key_id = "123"
   repo_slug = "my-repo"
   workspace = "my-workspace"
 }
@@ -49,9 +48,11 @@ resource "bitbucket_repo_deploy_keys" "example" {
 ## Schema
 
 ### Required
-- `key_id` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `key_id` (String) Path parameter (auto-populated from API response).
 
 ### Read-Only
 

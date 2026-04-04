@@ -97,14 +97,18 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 		},
 	}
 
-	// Build a set of params that are required in the primary Create or Read op.
-	// Params from other ops (Update, Delete, List) are always Optional.
+	// Build a set of params that are required in the primary Create op.
+	// If there is no Create op, fall back to Read.
+	// Params that exist only in non-primary ops (Update, Delete, List) or
+	// only in Read when Create exists are Optional+Computed — the provider
+	// populates them from the API response.
 	primaryRequired := map[string]bool{}
-	for _, op := range []*OperationDef{r.group.Ops.Create, r.group.Ops.Read} {
-		if op == nil {
-			continue
-		}
-		for _, p := range op.Params {
+	primaryOp := r.group.Ops.Create
+	if primaryOp == nil {
+		primaryOp = r.group.Ops.Read
+	}
+	if primaryOp != nil {
+		for _, p := range primaryOp.Params {
 			if p.Required && p.In == "path" {
 				primaryRequired[p.Name] = true
 			}
@@ -124,11 +128,18 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				continue
 			}
 			isRequired := primaryRequired[p.Name]
+		if isRequired {
 			attrs[attrName] = schema.StringAttribute{
 				Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
-				Required:    isRequired,
-				Optional:    !isRequired,
+				Required:    true,
 			}
+		} else {
+			attrs[attrName] = schema.StringAttribute{
+				Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
+				Optional:    true,
+				Computed:    true,
+			}
+		}
 		}
 	}
 
@@ -348,6 +359,15 @@ func (r *GenericResource) dispatch(ctx context.Context, op *OperationDef, source
 		diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(op.OperationID))...)
 	}
 
+	// Populate computed path params from the response (e.g., param_id after create).
+	// This ensures params like "id" that only appear in Read/Update/Delete paths
+	// are populated in state after a Create operation.
+	if result != nil {
+		if m, ok := result.(map[string]any); ok {
+			r.populateComputedParams(ctx, m, source, target, diags)
+		}
+	}
+
 	// Copy source attributes to target for params and body fields.
 	r.copyAttributes(ctx, op, source, target, diags)
 }
@@ -470,6 +490,39 @@ func (r *GenericResource) copyAttributes(ctx context.Context, _ *OperationDef, s
 	}
 }
 
+// populateComputedParams sets path param attributes from the API response for
+// params that the user did not provide (Optional+Computed). For example, after
+// a Create on branch-restrictions, the API returns the new restriction's "id"
+// which is needed for subsequent Read/Update/Delete operations.
+func (r *GenericResource) populateComputedParams(ctx context.Context, m map[string]any, source, target stateAccessor, diags *diag.Diagnostics) {
+	seen := map[string]bool{}
+	for _, crudOp := range r.crudOps() {
+		for _, p := range crudOp.Params {
+			if p.In != "path" {
+				continue
+			}
+			attrName := ParamAttrName(p.Name)
+			if seen[attrName] {
+				continue
+			}
+			seen[attrName] = true
+
+			// Skip if the user already provided this value.
+			var existing types.String
+			if d := source.GetAttribute(ctx, attrPath(attrName), &existing); !d.HasError() {
+				if !existing.IsNull() && !existing.IsUnknown() && existing.ValueString() != "" {
+					continue
+				}
+			}
+
+			// Try to extract the param value from the API response.
+			if val, ok := m[p.Name]; ok && val != nil {
+				diags.Append(target.SetAttribute(ctx, attrPath(attrName), types.StringValue(fmt.Sprintf("%v", val)))...)
+			}
+		}
+	}
+}
+
 // crudOps returns all non-nil CRUD operations.
 func (r *GenericResource) crudOps() []*OperationDef {
 	ops := []*OperationDef{r.group.Ops.Create, r.group.Ops.Read, r.group.Ops.Update, r.group.Ops.Delete, r.group.Ops.List}
@@ -507,7 +560,19 @@ func (r *GenericResource) extractResponseFields(ctx context.Context, m map[strin
 		if !ok || val == nil {
 			continue
 		}
-		diags.Append(target.SetAttribute(ctx, attrPath(key), types.StringValue(fmt.Sprintf("%v", val)))...)
+		// For complex values (arrays, maps), serialize as JSON.
+		var strVal string
+		switch val.(type) {
+		case []any, map[string]any:
+			if b, err := json.Marshal(val); err == nil {
+				strVal = string(b)
+			} else {
+				strVal = fmt.Sprintf("%v", val)
+			}
+		default:
+			strVal = fmt.Sprintf("%v", val)
+		}
+		diags.Append(target.SetAttribute(ctx, attrPath(key), types.StringValue(strVal))...)
 	}
 }
 

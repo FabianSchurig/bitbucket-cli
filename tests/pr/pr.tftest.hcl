@@ -10,9 +10,9 @@ run "read_pr" {
   command = apply
 
   variables {
-    pull_request_id = "1"
     repo_slug = "my-repo"
     workspace = "my-workspace"
+    pull_request_id = "1"
   }
 
   # Data source read should succeed with mock provider
@@ -26,7 +26,6 @@ run "create_pr" {
   command = apply
 
   variables {
-    pull_request_id = "1"
     repo_slug = "my-repo"
     workspace = "my-workspace"
   }

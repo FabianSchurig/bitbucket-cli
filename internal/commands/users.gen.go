@@ -257,6 +257,7 @@ func newUsersAddANewGpgKeyCmd() *cobra.Command {
 		bodyLastUsed          string
 		bodyName              string
 		bodyParentFingerprint string
+		bodySubkeys           string
 		body                  string
 	)
 
@@ -305,6 +306,9 @@ func newUsersAddANewGpgKeyCmd() *cobra.Command {
 				if bodyParentFingerprint != "" {
 					handlers.SetNested(bodyObj, "parent_fingerprint", bodyParentFingerprint)
 				}
+				if bodySubkeys != "" {
+					handlers.SetNested(bodyObj, "subkeys", bodySubkeys)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -330,6 +334,7 @@ func newUsersAddANewGpgKeyCmd() *cobra.Command {
 	cmd.Flags().StringVar(&bodyLastUsed, "last-used", "", `last_used`)
 	cmd.Flags().StringVar(&bodyName, "name", "", `The user-defined label for the GPG key`)
 	cmd.Flags().StringVar(&bodyParentFingerprint, "parent-fingerprint", "", `The fingerprint of the parent key. This value is null unless the current key is a subkey.`)
+	cmd.Flags().StringVar(&bodySubkeys, "subkeys", "", `subkeys (JSON array)`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }

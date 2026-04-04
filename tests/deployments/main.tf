@@ -35,5 +35,4 @@ data "bitbucket_deployments" "test" {
 resource "bitbucket_deployments" "test" {
   workspace = var.workspace
   repo_slug = var.repo_slug
-  environment_uuid = var.environment_uuid
 }

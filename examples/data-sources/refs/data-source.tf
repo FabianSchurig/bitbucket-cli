@@ -1,7 +1,7 @@
 data "bitbucket_refs" "example" {
-  name = "main"
   repo_slug = "my-repo"
   workspace = "my-workspace"
+  name = "main"
 }
 
 output "refs_response" {

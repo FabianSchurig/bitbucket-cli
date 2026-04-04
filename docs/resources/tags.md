@@ -37,7 +37,6 @@ Manages Bitbucket tags via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_tags" "example" {
-  name = "main"
   repo_slug = "my-repo"
   workspace = "my-workspace"
 }
@@ -46,11 +45,11 @@ resource "bitbucket_tags" "example" {
 ## Schema
 
 ### Required
-- `name` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
 
 ### Optional
+- `name` (String) Path parameter (auto-populated from API response).
 - `date` (String) The date that the tag was created, if available (also computed from API response)
 - `message` (String) The message associated with the tag, if available. (also computed from API response)
 - `name` (String) The name of the ref. (also computed from API response)

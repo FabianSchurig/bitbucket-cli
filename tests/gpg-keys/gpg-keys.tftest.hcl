@@ -10,8 +10,8 @@ run "read_gpg_keys" {
   command = apply
 
   variables {
-    fingerprint = "AA:BB:CC:DD"
     selected_user = "jdoe"
+    fingerprint = "AA:BB:CC:DD"
   }
 
   # Data source read should succeed with mock provider
@@ -25,7 +25,6 @@ run "create_gpg_keys" {
   command = apply
 
   variables {
-    fingerprint = "AA:BB:CC:DD"
     selected_user = "jdoe"
   }
 

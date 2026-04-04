@@ -38,6 +38,9 @@ resource "bitbucket_hook_types" "example" {
 
 ### Required
 
+### Optional
+- `subject_type` (String) Path parameter (auto-populated from API response).
+
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).

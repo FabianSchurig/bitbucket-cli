@@ -477,11 +477,14 @@ func newPRCreateAPullRequestCmd() *cobra.Command {
 		bodyCloseSourceBranch                     bool
 		bodyDescription                           string
 		bodyDestinationBranchDefaultMergeStrategy string
+		bodyDestinationBranchMergeStrategies      string
 		bodyDestinationBranchName                 string
 		bodyDestinationCommitHash                 string
 		bodyDraft                                 bool
 		bodyReason                                string
+		bodyReviewers                             string
 		bodySourceBranchDefaultMergeStrategy      string
+		bodySourceBranchMergeStrategies           string
 		bodySourceBranchName                      string
 		bodySourceCommitHash                      string
 		bodyState                                 string
@@ -520,6 +523,9 @@ func newPRCreateAPullRequestCmd() *cobra.Command {
 				if bodyDestinationBranchDefaultMergeStrategy != "" {
 					handlers.SetNested(bodyObj, "destination.branch.default_merge_strategy", bodyDestinationBranchDefaultMergeStrategy)
 				}
+				if bodyDestinationBranchMergeStrategies != "" {
+					handlers.SetNested(bodyObj, "destination.branch.merge_strategies", bodyDestinationBranchMergeStrategies)
+				}
 				if bodyDestinationBranchName != "" {
 					handlers.SetNested(bodyObj, "destination.branch.name", bodyDestinationBranchName)
 				}
@@ -532,8 +538,14 @@ func newPRCreateAPullRequestCmd() *cobra.Command {
 				if bodyReason != "" {
 					handlers.SetNested(bodyObj, "reason", bodyReason)
 				}
+				if bodyReviewers != "" {
+					handlers.SetNested(bodyObj, "reviewers", bodyReviewers)
+				}
 				if bodySourceBranchDefaultMergeStrategy != "" {
 					handlers.SetNested(bodyObj, "source.branch.default_merge_strategy", bodySourceBranchDefaultMergeStrategy)
+				}
+				if bodySourceBranchMergeStrategies != "" {
+					handlers.SetNested(bodyObj, "source.branch.merge_strategies", bodySourceBranchMergeStrategies)
 				}
 				if bodySourceBranchName != "" {
 					handlers.SetNested(bodyObj, "source.branch.name", bodySourceBranchName)
@@ -567,11 +579,14 @@ func newPRCreateAPullRequestCmd() *cobra.Command {
 	cmd.Flags().BoolVar(&bodyCloseSourceBranch, "close-source-branch", false, `A boolean flag indicating if merging the pull request closes the source branch.`)
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `Explains what the pull request does.`)
 	cmd.Flags().StringVar(&bodyDestinationBranchDefaultMergeStrategy, "destination-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
+	cmd.Flags().StringVar(&bodyDestinationBranchMergeStrategies, "destination-branch-merge-strategies", "", `Available merge strategies, when this endpoint is the destination of the pull request. (JSON array)`)
 	cmd.Flags().StringVar(&bodyDestinationBranchName, "destination-branch-name", "", `destination.branch.name`)
 	cmd.Flags().StringVar(&bodyDestinationCommitHash, "destination-commit-hash", "", `destination.commit.hash`)
 	cmd.Flags().BoolVar(&bodyDraft, "draft", false, `A boolean flag indicating whether the pull request is a draft.`)
 	cmd.Flags().StringVar(&bodyReason, "reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
+	cmd.Flags().StringVar(&bodyReviewers, "reviewers", "", "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL. (JSON array)")
 	cmd.Flags().StringVar(&bodySourceBranchDefaultMergeStrategy, "source-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
+	cmd.Flags().StringVar(&bodySourceBranchMergeStrategies, "source-branch-merge-strategies", "", `Available merge strategies, when this endpoint is the destination of the pull request. (JSON array)`)
 	cmd.Flags().StringVar(&bodySourceBranchName, "source-branch-name", "", `source.branch.name`)
 	cmd.Flags().StringVar(&bodySourceCommitHash, "source-commit-hash", "", `source.commit.hash`)
 	cmd.Flags().StringVar(&bodyState, "state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)
@@ -684,11 +699,14 @@ func newPRUpdateAPullRequestCmd() *cobra.Command {
 		bodyCloseSourceBranch                     bool
 		bodyDescription                           string
 		bodyDestinationBranchDefaultMergeStrategy string
+		bodyDestinationBranchMergeStrategies      string
 		bodyDestinationBranchName                 string
 		bodyDestinationCommitHash                 string
 		bodyDraft                                 bool
 		bodyReason                                string
+		bodyReviewers                             string
 		bodySourceBranchDefaultMergeStrategy      string
+		bodySourceBranchMergeStrategies           string
 		bodySourceBranchName                      string
 		bodySourceCommitHash                      string
 		bodyState                                 string
@@ -735,6 +753,9 @@ Only open pull requests can be mutated.`,
 				if bodyDestinationBranchDefaultMergeStrategy != "" {
 					handlers.SetNested(bodyObj, "destination.branch.default_merge_strategy", bodyDestinationBranchDefaultMergeStrategy)
 				}
+				if bodyDestinationBranchMergeStrategies != "" {
+					handlers.SetNested(bodyObj, "destination.branch.merge_strategies", bodyDestinationBranchMergeStrategies)
+				}
 				if bodyDestinationBranchName != "" {
 					handlers.SetNested(bodyObj, "destination.branch.name", bodyDestinationBranchName)
 				}
@@ -747,8 +768,14 @@ Only open pull requests can be mutated.`,
 				if bodyReason != "" {
 					handlers.SetNested(bodyObj, "reason", bodyReason)
 				}
+				if bodyReviewers != "" {
+					handlers.SetNested(bodyObj, "reviewers", bodyReviewers)
+				}
 				if bodySourceBranchDefaultMergeStrategy != "" {
 					handlers.SetNested(bodyObj, "source.branch.default_merge_strategy", bodySourceBranchDefaultMergeStrategy)
+				}
+				if bodySourceBranchMergeStrategies != "" {
+					handlers.SetNested(bodyObj, "source.branch.merge_strategies", bodySourceBranchMergeStrategies)
 				}
 				if bodySourceBranchName != "" {
 					handlers.SetNested(bodyObj, "source.branch.name", bodySourceBranchName)
@@ -783,11 +810,14 @@ Only open pull requests can be mutated.`,
 	cmd.Flags().BoolVar(&bodyCloseSourceBranch, "close-source-branch", false, `A boolean flag indicating if merging the pull request closes the source branch.`)
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `Explains what the pull request does.`)
 	cmd.Flags().StringVar(&bodyDestinationBranchDefaultMergeStrategy, "destination-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
+	cmd.Flags().StringVar(&bodyDestinationBranchMergeStrategies, "destination-branch-merge-strategies", "", `Available merge strategies, when this endpoint is the destination of the pull request. (JSON array)`)
 	cmd.Flags().StringVar(&bodyDestinationBranchName, "destination-branch-name", "", `destination.branch.name`)
 	cmd.Flags().StringVar(&bodyDestinationCommitHash, "destination-commit-hash", "", `destination.commit.hash`)
 	cmd.Flags().BoolVar(&bodyDraft, "draft", false, `A boolean flag indicating whether the pull request is a draft.`)
 	cmd.Flags().StringVar(&bodyReason, "reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
+	cmd.Flags().StringVar(&bodyReviewers, "reviewers", "", "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL. (JSON array)")
 	cmd.Flags().StringVar(&bodySourceBranchDefaultMergeStrategy, "source-branch-default-merge-strategy", "", `The default merge strategy, when this endpoint is the destination of the pull request.`)
+	cmd.Flags().StringVar(&bodySourceBranchMergeStrategies, "source-branch-merge-strategies", "", `Available merge strategies, when this endpoint is the destination of the pull request. (JSON array)`)
 	cmd.Flags().StringVar(&bodySourceBranchName, "source-branch-name", "", `source.branch.name`)
 	cmd.Flags().StringVar(&bodySourceCommitHash, "source-commit-hash", "", `source.commit.hash`)
 	cmd.Flags().StringVar(&bodyState, "state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)

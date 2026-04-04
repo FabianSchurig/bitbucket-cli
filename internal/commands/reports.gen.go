@@ -176,6 +176,7 @@ func newReportsCreateOrUpdateReportCmd() *cobra.Command {
 		repoSlug              string
 		commit                string
 		reportId              string
+		bodyData              string
 		bodyDetails           string
 		bodyExternalId        string
 		bodyLink              string
@@ -219,6 +220,9 @@ func newReportsCreateOrUpdateReportCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyData != "" {
+					handlers.SetNested(bodyObj, "data", bodyData)
+				}
 				if bodyDetails != "" {
 					handlers.SetNested(bodyObj, "details", bodyDetails)
 				}
@@ -268,6 +272,7 @@ func newReportsCreateOrUpdateReportCmd() *cobra.Command {
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
 	cmd.Flags().StringVar(&reportId, "reportId", "", "reportId (path parameter)")
+	cmd.Flags().StringVar(&bodyData, "data", "", `An array of data fields to display information on the report. Maximum 10. (JSON array)`)
 	cmd.Flags().StringVar(&bodyDetails, "details", "", `A string to describe the purpose of the report.`)
 	cmd.Flags().StringVar(&bodyExternalId, "external-id", "", `ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique.`)
 	cmd.Flags().StringVar(&bodyLink, "link", "", `A URL linking to the results of the report in an external tool.`)

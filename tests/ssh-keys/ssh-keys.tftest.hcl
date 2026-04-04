@@ -10,8 +10,8 @@ run "read_ssh_keys" {
   command = apply
 
   variables {
-    key_id = "123"
     selected_user = "jdoe"
+    key_id = "123"
   }
 
   # Data source read should succeed with mock provider
@@ -25,7 +25,6 @@ run "create_ssh_keys" {
   command = apply
 
   variables {
-    key_id = "123"
     selected_user = "jdoe"
   }
 

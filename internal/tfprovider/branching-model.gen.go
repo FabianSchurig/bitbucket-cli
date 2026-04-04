@@ -37,12 +37,15 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `branch_types`, Type: `string`, Desc: `The active branch types. (JSON array)`},
 				{Path: `development.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `development.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. (JSON array)`},
 				{Path: `development.branch.name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `development.branch.type`, Type: `string`, Desc: `development.branch.type`},
 				{Path: `development.name`, Type: `string`, Desc: "Name of the target branch. Will be listed here even when the target branch does not exist. Will be `null` if targeting the main branch and the repository is empty."},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`)."},
 				{Path: `production.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `production.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. (JSON array)`},
 				{Path: `production.branch.name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `production.branch.type`, Type: `string`, Desc: `production.branch.type`},
 				{Path: `production.name`, Type: `string`, Desc: "Name of the target branch. Will be listed here even when the target branch does not exist. Will be `null` if targeting the main branch and the repository is empty."},
@@ -67,6 +70,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `branch_types`, Type: `string`, Desc: `branch_types (JSON array)`},
 				{Path: `development.is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 				{Path: `development.name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
@@ -94,6 +98,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `branch_types`, Type: `string`, Desc: `branch_types (JSON array)`},
 				{Path: `development.is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 				{Path: `development.name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
@@ -121,12 +126,15 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `branch_types`, Type: `string`, Desc: `The active branch types. (JSON array)`},
 				{Path: `development.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `development.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. (JSON array)`},
 				{Path: `development.branch.name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `development.branch.type`, Type: `string`, Desc: `development.branch.type`},
 				{Path: `development.name`, Type: `string`, Desc: "Name of the target branch. Will be listed here even when the target branch does not exist. Will be `null` if targeting the main branch and the repository is empty."},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`)."},
 				{Path: `production.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `production.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. (JSON array)`},
 				{Path: `production.branch.name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `production.branch.type`, Type: `string`, Desc: `production.branch.type`},
 				{Path: `production.name`, Type: `string`, Desc: "Name of the target branch. Will be listed here even when the target branch does not exist. Will be `null` if targeting the main branch and the repository is empty."},
@@ -151,6 +159,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `branch_types`, Type: `string`, Desc: `The active branch types. (JSON array)`},
 				{Path: `development.name`, Type: `string`, Desc: `Name of the target branch. If inherited by a repository, it will default to the main branch if the specified branch does not exist.`},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`)."},
 				{Path: `production.name`, Type: `string`, Desc: `Name of the target branch. If inherited by a repository, it will default to the main branch if the specified branch does not exist.`},
@@ -175,6 +184,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `branch_types`, Type: `string`, Desc: `branch_types (JSON array)`},
 				{Path: `development.is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 				{Path: `development.name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
@@ -202,6 +212,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `branch_types`, Type: `string`, Desc: `branch_types (JSON array)`},
 				{Path: `development.is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 				{Path: `development.name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
@@ -231,12 +242,15 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `branch_types`, Type: `string`, Desc: `The active branch types. (JSON array)`},
 				{Path: `development.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `development.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. (JSON array)`},
 				{Path: `development.branch.name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `development.branch.type`, Type: `string`, Desc: `development.branch.type`},
 				{Path: `development.name`, Type: `string`, Desc: "Name of the target branch. Will be listed here even when the target branch does not exist. Will be `null` if targeting the main branch and the repository is empty."},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`)."},
 				{Path: `production.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `production.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. (JSON array)`},
 				{Path: `production.branch.name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `production.branch.type`, Type: `string`, Desc: `production.branch.type`},
 				{Path: `production.name`, Type: `string`, Desc: "Name of the target branch. Will be listed here even when the target branch does not exist. Will be `null` if targeting the main branch and the repository is empty."},
@@ -261,6 +275,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `branch_types`, Type: `string`, Desc: `branch_types (JSON array)`},
 				{Path: `development.is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 				{Path: `development.name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
@@ -288,6 +303,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `branch_types`, Type: `string`, Desc: `branch_types (JSON array)`},
 				{Path: `development.is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 				{Path: `development.name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
@@ -315,12 +331,15 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `branch_types`, Type: `string`, Desc: `The active branch types. (JSON array)`},
 				{Path: `development.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `development.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. (JSON array)`},
 				{Path: `development.branch.name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `development.branch.type`, Type: `string`, Desc: `development.branch.type`},
 				{Path: `development.name`, Type: `string`, Desc: "Name of the target branch. Will be listed here even when the target branch does not exist. Will be `null` if targeting the main branch and the repository is empty."},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`)."},
 				{Path: `production.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `production.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. (JSON array)`},
 				{Path: `production.branch.name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `production.branch.type`, Type: `string`, Desc: `production.branch.type`},
 				{Path: `production.name`, Type: `string`, Desc: "Name of the target branch. Will be listed here even when the target branch does not exist. Will be `null` if targeting the main branch and the repository is empty."},
@@ -345,6 +364,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `branch_types`, Type: `string`, Desc: `The active branch types. (JSON array)`},
 				{Path: `development.name`, Type: `string`, Desc: `Name of the target branch. If inherited by a repository, it will default to the main branch if the specified branch does not exist.`},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`)."},
 				{Path: `production.name`, Type: `string`, Desc: `Name of the target branch. If inherited by a repository, it will default to the main branch if the specified branch does not exist.`},
@@ -369,6 +389,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `branch_types`, Type: `string`, Desc: `branch_types (JSON array)`},
 				{Path: `development.is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 				{Path: `development.name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
@@ -396,6 +417,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `branch_types`, Type: `string`, Desc: `branch_types (JSON array)`},
 				{Path: `development.is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 				{Path: `development.name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 				{Path: `development.use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},

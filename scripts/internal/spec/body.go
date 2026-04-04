@@ -237,6 +237,12 @@ func flattenProperty(schemas map[string]any, name, path string, prop map[string]
 		if subProps, ok := prop["properties"].(map[string]any); ok {
 			return flattenProperties(schemas, subProps, path, visited, opts)
 		}
+	case "array":
+		// Expose array fields as a single string field accepting a JSON array.
+		if desc == "" {
+			desc = name
+		}
+		return []BodyField{MakeBodyField(path, "string", desc+" (JSON array)")}
 	}
 	return nil
 }

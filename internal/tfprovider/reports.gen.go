@@ -43,6 +43,7 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the report was created.`},
+				{Path: `data`, Type: `string`, Desc: `An array of data fields to display information on the report. Maximum 10. (JSON array)`},
 				{Path: `details`, Type: `string`, Desc: `A string to describe the purpose of the report.`},
 				{Path: `external_id`, Type: `string`, Desc: `ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique.`},
 				{Path: `link`, Type: `string`, Desc: `A URL linking to the results of the report in an external tool.`},
@@ -77,6 +78,7 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the report was created.`},
+				{Path: `data`, Type: `string`, Desc: `An array of data fields to display information on the report. Maximum 10. (JSON array)`},
 				{Path: `details`, Type: `string`, Desc: `A string to describe the purpose of the report.`},
 				{Path: `external_id`, Type: `string`, Desc: `ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique.`},
 				{Path: `link`, Type: `string`, Desc: `A URL linking to the results of the report in an external tool.`},
@@ -109,6 +111,7 @@ Available operations:
 				{Name: `reportId`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
+				{Path: `data`, Type: `string`, Desc: `An array of data fields to display information on the report. Maximum 10. (JSON array)`},
 				{Path: `details`, Type: `string`, Desc: `A string to describe the purpose of the report.`},
 				{Path: `external_id`, Type: `string`, Desc: `ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique.`},
 				{Path: `link`, Type: `string`, Desc: `A URL linking to the results of the report in an external tool.`},
@@ -122,6 +125,7 @@ Available operations:
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the report was created.`},
+				{Path: `data`, Type: `string`, Desc: `An array of data fields to display information on the report. Maximum 10. (JSON array)`},
 				{Path: `details`, Type: `string`, Desc: `A string to describe the purpose of the report.`},
 				{Path: `external_id`, Type: `string`, Desc: `ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique.`},
 				{Path: `link`, Type: `string`, Desc: `A URL linking to the results of the report in an external tool.`},
@@ -339,6 +343,7 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the report was created.`},
+				{Path: `data`, Type: `string`, Desc: `An array of data fields to display information on the report. Maximum 10. (JSON array)`},
 				{Path: `details`, Type: `string`, Desc: `A string to describe the purpose of the report.`},
 				{Path: `external_id`, Type: `string`, Desc: `ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique.`},
 				{Path: `link`, Type: `string`, Desc: `A URL linking to the results of the report in an external tool.`},
@@ -373,6 +378,7 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the report was created.`},
+				{Path: `data`, Type: `string`, Desc: `An array of data fields to display information on the report. Maximum 10. (JSON array)`},
 				{Path: `details`, Type: `string`, Desc: `A string to describe the purpose of the report.`},
 				{Path: `external_id`, Type: `string`, Desc: `ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique.`},
 				{Path: `link`, Type: `string`, Desc: `A URL linking to the results of the report in an external tool.`},
@@ -405,6 +411,7 @@ Available operations:
 				{Name: `reportId`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
+				{Path: `data`, Type: `string`, Desc: `An array of data fields to display information on the report. Maximum 10. (JSON array)`},
 				{Path: `details`, Type: `string`, Desc: `A string to describe the purpose of the report.`},
 				{Path: `external_id`, Type: `string`, Desc: `ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique.`},
 				{Path: `link`, Type: `string`, Desc: `A URL linking to the results of the report in an external tool.`},
@@ -418,6 +425,7 @@ Available operations:
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the report was created.`},
+				{Path: `data`, Type: `string`, Desc: `An array of data fields to display information on the report. Maximum 10. (JSON array)`},
 				{Path: `details`, Type: `string`, Desc: `A string to describe the purpose of the report.`},
 				{Path: `external_id`, Type: `string`, Desc: `ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique.`},
 				{Path: `link`, Type: `string`, Desc: `A URL linking to the results of the report in an external tool.`},

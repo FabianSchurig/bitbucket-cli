@@ -53,5 +53,7 @@ resource "bitbucket_commits" "example" {
 - `date` (String) date
 - `hash` (String) hash
 - `message` (String) message
+- `parents` (String) parents (JSON array)
+- `participants` (String) participants (JSON array)
 - `summary_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
 - `summary_raw` (String) The text as it was typed by a user.

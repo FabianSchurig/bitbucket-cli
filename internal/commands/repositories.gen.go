@@ -246,6 +246,7 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 		bodyIsPrivate                      bool
 		bodyLanguage                       string
 		bodyMainbranchDefaultMergeStrategy string
+		bodyMainbranchMergeStrategies      string
 		bodyMainbranchName                 string
 		bodyMainbranchType                 string
 		bodyName                           string
@@ -306,6 +307,9 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 				}
 				if bodyMainbranchDefaultMergeStrategy != "" {
 					handlers.SetNested(bodyObj, "mainbranch.default_merge_strategy", bodyMainbranchDefaultMergeStrategy)
+				}
+				if bodyMainbranchMergeStrategies != "" {
+					handlers.SetNested(bodyObj, "mainbranch.merge_strategies", bodyMainbranchMergeStrategies)
 				}
 				if bodyMainbranchName != "" {
 					handlers.SetNested(bodyObj, "mainbranch.name", bodyMainbranchName)
@@ -383,6 +387,7 @@ administered through admin.atlassian.com.
 	cmd.Flags().BoolVar(&bodyIsPrivate, "is-private", false, `is_private`)
 	cmd.Flags().StringVar(&bodyLanguage, "language", "", `language`)
 	cmd.Flags().StringVar(&bodyMainbranchDefaultMergeStrategy, "mainbranch-default-merge-strategy", "", `The default merge strategy for pull requests targeting this branch.`)
+	cmd.Flags().StringVar(&bodyMainbranchMergeStrategies, "mainbranch-merge-strategies", "", `Available merge strategies for pull requests targeting this branch. (JSON array)`)
 	cmd.Flags().StringVar(&bodyMainbranchName, "mainbranch-name", "", `The name of the ref.`)
 	cmd.Flags().StringVar(&bodyMainbranchType, "mainbranch-type", "", `mainbranch.type`)
 	cmd.Flags().StringVar(&bodyName, "name", "", `name`)
@@ -418,6 +423,7 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 		bodyIsPrivate                      bool
 		bodyLanguage                       string
 		bodyMainbranchDefaultMergeStrategy string
+		bodyMainbranchMergeStrategies      string
 		bodyMainbranchName                 string
 		bodyMainbranchType                 string
 		bodyName                           string
@@ -478,6 +484,9 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 				}
 				if bodyMainbranchDefaultMergeStrategy != "" {
 					handlers.SetNested(bodyObj, "mainbranch.default_merge_strategy", bodyMainbranchDefaultMergeStrategy)
+				}
+				if bodyMainbranchMergeStrategies != "" {
+					handlers.SetNested(bodyObj, "mainbranch.merge_strategies", bodyMainbranchMergeStrategies)
 				}
 				if bodyMainbranchName != "" {
 					handlers.SetNested(bodyObj, "mainbranch.name", bodyMainbranchName)
@@ -555,6 +564,7 @@ administered through admin.atlassian.com.
 	cmd.Flags().BoolVar(&bodyIsPrivate, "is-private", false, `is_private`)
 	cmd.Flags().StringVar(&bodyLanguage, "language", "", `language`)
 	cmd.Flags().StringVar(&bodyMainbranchDefaultMergeStrategy, "mainbranch-default-merge-strategy", "", `The default merge strategy for pull requests targeting this branch.`)
+	cmd.Flags().StringVar(&bodyMainbranchMergeStrategies, "mainbranch-merge-strategies", "", `Available merge strategies for pull requests targeting this branch. (JSON array)`)
 	cmd.Flags().StringVar(&bodyMainbranchName, "mainbranch-name", "", `The name of the ref.`)
 	cmd.Flags().StringVar(&bodyMainbranchType, "mainbranch-type", "", `mainbranch.type`)
 	cmd.Flags().StringVar(&bodyName, "name", "", `name`)
@@ -777,6 +787,7 @@ func newReposForkARepositoryCmd() *cobra.Command {
 		bodyIsPrivate                      bool
 		bodyLanguage                       string
 		bodyMainbranchDefaultMergeStrategy string
+		bodyMainbranchMergeStrategies      string
 		bodyMainbranchName                 string
 		bodyMainbranchType                 string
 		bodyName                           string
@@ -837,6 +848,9 @@ func newReposForkARepositoryCmd() *cobra.Command {
 				}
 				if bodyMainbranchDefaultMergeStrategy != "" {
 					handlers.SetNested(bodyObj, "mainbranch.default_merge_strategy", bodyMainbranchDefaultMergeStrategy)
+				}
+				if bodyMainbranchMergeStrategies != "" {
+					handlers.SetNested(bodyObj, "mainbranch.merge_strategies", bodyMainbranchMergeStrategies)
 				}
 				if bodyMainbranchName != "" {
 					handlers.SetNested(bodyObj, "mainbranch.name", bodyMainbranchName)
@@ -914,6 +928,7 @@ administered through admin.atlassian.com.
 	cmd.Flags().BoolVar(&bodyIsPrivate, "is-private", false, `is_private`)
 	cmd.Flags().StringVar(&bodyLanguage, "language", "", `language`)
 	cmd.Flags().StringVar(&bodyMainbranchDefaultMergeStrategy, "mainbranch-default-merge-strategy", "", `The default merge strategy for pull requests targeting this branch.`)
+	cmd.Flags().StringVar(&bodyMainbranchMergeStrategies, "mainbranch-merge-strategies", "", `Available merge strategies for pull requests targeting this branch. (JSON array)`)
 	cmd.Flags().StringVar(&bodyMainbranchName, "mainbranch-name", "", `The name of the ref.`)
 	cmd.Flags().StringVar(&bodyMainbranchType, "mainbranch-type", "", `mainbranch.type`)
 	cmd.Flags().StringVar(&bodyName, "name", "", `name`)

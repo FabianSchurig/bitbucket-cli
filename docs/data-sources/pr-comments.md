@@ -27,10 +27,10 @@ Reads Bitbucket pr-comments via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_pr_comments" "example" {
-  comment_id = "1"
   pull_request_id = "1"
   repo_slug = "my-repo"
   workspace = "my-workspace"
+  comment_id = "1"
 }
 
 output "pr_comments_response" {
@@ -41,10 +41,10 @@ output "pr_comments_response" {
 ## Schema
 
 ### Required
-- `comment_id` (String) Path parameter.
 - `pull_request_id` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+- `comment_id` (String) Path parameter.
 
 ### Read-Only
 

@@ -14,7 +14,13 @@ variable "workspace" {
   default = "test-workspace"
 }
 
+variable "subject_type" {
+  type    = string
+  default = "repository"
+}
+
 provider "bitbucket" {}
 
 data "bitbucket_hook_types" "test" {
+  subject_type = var.subject_type
 }
