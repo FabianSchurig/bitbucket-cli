@@ -37,7 +37,6 @@ Available operations:
 - updateAProjectForAWorkspace: Update a project for a workspace [PUT]
 - deleteAProjectForAWorkspace: Delete a project for a workspace [DELETE]
 - listWorkspacePullRequestsForAUser: List workspace pull requests for a user [GET]
-- getTheWorkspaceSystemGpgPublicKeys: Get the workspace system GPG public key(s) [GET]
 `,
 	Ops: MapCRUDOps(`workspaces`, []OperationDef{
 		{
@@ -353,20 +352,6 @@ workspace.`,
 			HasBody:    false,
 			Paginated:  true,
 		},
-		{
-			OperationID: `getTheWorkspaceSystemGpgPublicKeys`,
-			Method:      `GET`,
-			Path:        `/workspaces/{workspace}/settings/gpg/public-key`,
-			Summary:     `Get the workspace system GPG public key(s)`,
-			Description: `Returns the system public GPG key(s). In most cases a single key is returned.
-During a key rotation period, two keys may be returned.`,
-			Params: []ParamDef{
-				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
-			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
-		},
 	}),
 	AllOps: []OperationDef{
 		{
@@ -681,20 +666,6 @@ workspace.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
-		},
-		{
-			OperationID: `getTheWorkspaceSystemGpgPublicKeys`,
-			Method:      `GET`,
-			Path:        `/workspaces/{workspace}/settings/gpg/public-key`,
-			Summary:     `Get the workspace system GPG public key(s)`,
-			Description: `Returns the system public GPG key(s). In most cases a single key is returned.
-During a key rotation period, two keys may be returned.`,
-			Params: []ParamDef{
-				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
-			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
 		},
 	},
 }
