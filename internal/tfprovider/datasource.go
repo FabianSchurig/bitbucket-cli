@@ -91,24 +91,22 @@ func (d *GenericDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 	}
 
 	// Add computed attributes from response fields.
-	if op != nil {
-		for _, rf := range op.ResponseFields {
-			key := toSnakeCase(strings.ReplaceAll(rf.Path, ".", "_"))
-			// Skip reserved attributes and already-defined params.
-			if key == "id" || key == "api_response" {
-				continue
-			}
-			if _, exists := attrs[key]; exists {
-				continue
-			}
-			desc := rf.Desc
-			if desc == "" {
-				desc = rf.Path
-			}
-			attrs[key] = schema.StringAttribute{
-				Description: desc,
-				Computed:    true,
-			}
+	for _, rf := range op.ResponseFields {
+		key := toSnakeCase(strings.ReplaceAll(rf.Path, ".", "_"))
+		// Skip reserved attributes and already-defined params.
+		if key == "id" || key == "api_response" {
+			continue
+		}
+		if _, exists := attrs[key]; exists {
+			continue
+		}
+		desc := rf.Desc
+		if desc == "" {
+			desc = rf.Path
+		}
+		attrs[key] = schema.StringAttribute{
+			Description: desc,
+			Computed:    true,
 		}
 	}
 

@@ -41,10 +41,10 @@ type GroupData struct {
 	HasBody        bool // true if any CRUD op accepts a body
 	Params         []string
 	ParamValues    map[string]string
-	BodyFields     []FieldDoc     // writable body fields (Optional)
-	ResponseFields []FieldDoc     // computed response fields (Computed)
-	OverlapFields  []FieldDoc     // fields that are both writable and computed (Optional+Computed)
-	CRUDOps        []CRUDOpInfo   // CRUD operation details (scopes, doc links)
+	BodyFields     []FieldDoc   // writable body fields (Optional)
+	ResponseFields []FieldDoc   // computed response fields (Computed)
+	OverlapFields  []FieldDoc   // fields that are both writable and computed (Optional+Computed)
+	CRUDOps        []CRUDOpInfo // CRUD operation details (scopes, doc links)
 }
 
 // FieldDoc describes a Terraform attribute for documentation.

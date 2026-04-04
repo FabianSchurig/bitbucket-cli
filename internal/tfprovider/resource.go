@@ -175,8 +175,9 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				desc = rf.Path
 			}
 			if existing, exists := attrs[key]; exists {
-				// If already defined as a body field or param, make it Optional+Computed.
-				if sa, ok := existing.(schema.StringAttribute); ok && !sa.Computed {
+				// If already defined as a body field (Optional), make it Optional+Computed.
+				// Skip Required attributes -- they cannot also be Computed.
+				if sa, ok := existing.(schema.StringAttribute); ok && !sa.Computed && !sa.Required {
 					sa.Computed = true
 					sa.Description = desc
 					attrs[key] = sa
