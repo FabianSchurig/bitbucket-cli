@@ -53,7 +53,6 @@ output "commit_statuses_response" {
 - `created_on` (String) created_on
 - `updated_on` (String) updated_on
 - `description` (String) A description of the build (e.g. "Unit tests in Bamboo")
-- `key` (String) An identifier for the status that's unique to
 - `name` (String) An identifier for the build itself, e.g. BB-DEPLOY-1
 - `refname` (String) 
 - `state` (String) Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]

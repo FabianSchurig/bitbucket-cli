@@ -50,5 +50,4 @@ resource "bitbucket_commit_file" "example" {
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `path` (String) The path in the repository
 - `type` (String) type

@@ -171,6 +171,16 @@ func buildGroups() []GroupData {
 		// Derive body fields, response fields, and overlaps.
 		bodyFields, responseFields, overlapFields, hasBody := deriveFields(name, groupIndex)
 
+		// Remove body/overlap/response fields that collide with computed params
+		// (e.g., "name" may be both a computed path param and a body field).
+		computedSet := make(map[string]bool)
+		for _, p := range computedParams {
+			computedSet[p] = true
+		}
+		bodyFields = filterFields(bodyFields, computedSet)
+		overlapFields = filterFields(overlapFields, computedSet)
+		responseFields = filterFields(responseFields, computedSet)
+
 		// Collect CRUD operation details (scopes, doc links).
 		crudOps := deriveCRUDOps(name, groupIndex)
 
@@ -337,6 +347,20 @@ func truncateDesc(desc string) string {
 	}
 	desc = strings.TrimSpace(desc)
 	return desc
+}
+
+// filterFields removes FieldDoc entries whose Name matches any key in the exclude set.
+func filterFields(fields []FieldDoc, exclude map[string]bool) []FieldDoc {
+	if len(exclude) == 0 {
+		return fields
+	}
+	var result []FieldDoc
+	for _, f := range fields {
+		if !exclude[f.Name] {
+			result = append(result, f)
+		}
+	}
+	return result
 }
 
 // deriveCRUDOps collects details (scopes, doc URL) for each CRUD operation.

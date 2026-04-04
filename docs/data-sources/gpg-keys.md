@@ -50,7 +50,6 @@ output "gpg_keys_response" {
 - `added_on` (String) added_on
 - `comment` (String) The comment parsed from the GPG key (if present)
 - `expires_on` (String) expires_on
-- `fingerprint` (String) The GPG key fingerprint.
 - `key` (String) The GPG key value in X format.
 - `key_id` (String) The unique identifier for the GPG key
 - `last_used` (String) last_used
