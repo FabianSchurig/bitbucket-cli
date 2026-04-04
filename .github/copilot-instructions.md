@@ -62,7 +62,7 @@ go run scripts/gen_mcptools/main.go schema/pr-schema.yaml internal/mcptools/pr.g
 
 ## Conventions
 
-- **Auth**: `BITBUCKET_USERNAME` + `BITBUCKET_APP_PASSWORD` (Basic) or `BITBUCKET_TOKEN` (Bearer)
+- **Auth**: `BITBUCKET_USERNAME` + `BITBUCKET_TOKEN` (Basic) or `BITBUCKET_TOKEN` alone (workspace/repo access tokens)
 - **Flags**: path params → `--workspace`, `--repo-slug`; body fields → flattened with dots (`--source-branch` maps to `source.branch`)
 - **Output**: `--output table|json|id`; table is default
 - **Pagination**: `--all` flag (default: **true**) auto-follows cursor-based `next` links; pass `--all=false` for a single page

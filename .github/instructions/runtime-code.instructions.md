@@ -25,8 +25,8 @@ Bitbucket uses cursor-based pagination (`values` array + `next` URL). The `--all
 
 ## Auth priority
 
-1. `BITBUCKET_USERNAME` + `BITBUCKET_APP_PASSWORD` → HTTP Basic
-2. `BITBUCKET_TOKEN` alone → Bearer (OAuth2)
+1. `BITBUCKET_USERNAME` + `BITBUCKET_TOKEN` → HTTP Basic (API tokens, app passwords)
+2. `BITBUCKET_TOKEN` alone → HTTP Basic with "x-token-auth" (workspace/repo access tokens)
 
 ## Testing
 

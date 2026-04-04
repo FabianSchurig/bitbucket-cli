@@ -269,7 +269,17 @@ Download a pre-built binary from the [GitHub Releases](https://github.com/Fabian
 
 ### Docker
 
+Two images are published to GHCR on every release:
+
+| Image | Description |
+|-------|-------------|
+| `ghcr.io/fabianschurig/bitbucket-cli` | CLI (`bb-cli`) |
+| `ghcr.io/fabianschurig/bitbucket-mcp` | MCP server (`bb-mcp`) |
+
+Both images use the hardened `dhi.io/golang` base image.
+
 ```bash
+# CLI
 docker pull ghcr.io/fabianschurig/bitbucket-cli:latest
 
 docker run --rm \
@@ -277,7 +287,37 @@ docker run --rm \
   -e BITBUCKET_TOKEN \
   ghcr.io/fabianschurig/bitbucket-cli pr list-pull-requests \
     --workspace myteam --repo-slug myrepo
+
+# MCP server (stdio, e.g. for Claude Desktop)
+docker run --rm -i \
+  -e BITBUCKET_USERNAME \
+  -e BITBUCKET_TOKEN \
+  ghcr.io/fabianschurig/bitbucket-mcp
+
+# MCP server (SSE over HTTP)
+docker run --rm -p 8080:8080 \
+  -e BITBUCKET_USERNAME \
+  -e BITBUCKET_TOKEN \
+  ghcr.io/fabianschurig/bitbucket-mcp --transport sse --addr :8080
 ```
+
+#### Building Docker images locally
+
+```bash
+# Build CLI image
+docker build --target bb-cli -t bb-cli .
+
+# Build MCP server image
+docker build --target bb-mcp -t bb-mcp .
+```
+
+#### Extending the Dockerfile
+
+Each target is a self-contained stage that installs a binary with `go install`
+on the hardened base image. To add a new binary target:
+
+1. Add a new stage that installs the binary with `go install` (use the existing `bb-cli` or `bb-mcp` stages as a template).
+2. Add the new target to the build matrix in `.github/workflows/docker.yml` so CI builds and pushes the image automatically.
 
 ### Build from source
 

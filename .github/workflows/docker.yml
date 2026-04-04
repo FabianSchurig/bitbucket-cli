@@ -13,6 +13,13 @@ permissions:
 jobs:
   docker:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - target: bb-cli
+            image: bitbucket-cli
+          - target: bb-mcp
+            image: bitbucket-mcp
     steps:
       - uses: actions/checkout@v4
 
@@ -40,7 +47,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -52,6 +59,7 @@ jobs:
         with:
           context: .
           push: true
+          target: ${{ matrix.target }}
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
