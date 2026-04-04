@@ -767,6 +767,299 @@ paths:
       required: true
       schema:
         type: string
+  /repositories/{workspace}/{repo_slug}/hooks:
+    get:
+      tags:
+      - Repositories
+      - Webhooks
+      description: Returns a paginated list of webhooks installed on this repository.
+      summary: List webhooks for a repository
+      responses:
+        '200':
+          description: The paginated list of installed webhooks.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_webhook_subscriptions'
+        '403':
+          description: If the authenticated user does not have permission to access
+            the webhooks.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the repository does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - webhook
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:webhook:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listWebhooksForARepository
+    post:
+      tags:
+      - Repositories
+      - Webhooks
+      description: "Creates a new webhook on the specified repository.\n\nExample:\n\
+        \n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n\
+        \  https://api.bitbucket.org/2.0/repositories/my-workspace/my-repo-slug/hooks\n\
+        \  -d '\n    {\n      \"description\": \"Webhook Description\",\n      \"\
+        url\": \"https://example.com/\",\n      \"active\": true,\n      \"secret\"\
+        : \"this is a really bad secret\",\n      \"events\": [\n        \"repo:push\"\
+        ,\n        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n\
+        ```\n\nWhen the `secret` is provided it will be used as the key to generate\
+        \ a HMAC\ndigest value sent in the `X-Hub-Signature` header at delivery time.\
+        \ Passing\na `null` or empty `secret` or not passing a `secret` will leave\
+        \ the webhook's\nsecret unset. Bitbucket only generates the `X-Hub-Signature`\
+        \ when the webhook's\nsecret is set.\n\nNote that this call requires the webhook\
+        \ scope, as well as any scope\nthat applies to the events that the webhook\
+        \ subscribes to. In the\nexample above that means: `webhook`, `repository`\
+        \ and `issue`.\n\nAlso note that the `url` must properly resolve and cannot\
+        \ be an\ninternal, non-routed address."
+      summary: Create a webhook for a repository
+      responses:
+        '201':
+          description: If the webhook was registered successfully.
+          headers:
+            Location:
+              description: The URL of new newly created webhook.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook_subscription'
+        '403':
+          description: If the authenticated user does not have permission to install
+            webhooks on the specified repository.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the repository does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - webhook
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:webhook:bitbucket
+        - write:webhook:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: createAWebhookForARepository
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/hooks/{uid}:
+    delete:
+      tags:
+      - Repositories
+      - Webhooks
+      description: 'Deletes the specified webhook subscription from the given
+
+        repository.'
+      summary: Delete a webhook for a repository
+      responses:
+        '204':
+          description: When the webhook was deleted successfully
+        '403':
+          description: If the authenticated user does not have permission to delete
+            the webhook.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the webhook or repository does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - webhook
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - delete:webhook:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: deleteAWebhookForARepository
+    get:
+      tags:
+      - Repositories
+      - Webhooks
+      description: 'Returns the webhook with the specified id installed on the specified
+
+        repository.'
+      summary: Get a webhook for a repository
+      responses:
+        '200':
+          description: The webhook subscription object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook_subscription'
+        '404':
+          description: If the webhook or repository does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - webhook
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:webhook:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getAWebhookForARepository
+    put:
+      tags:
+      - Repositories
+      - Webhooks
+      description: 'Updates the specified webhook subscription.
+
+
+        The following properties can be mutated:
+
+
+        * `description`
+
+        * `url`
+
+        * `secret`
+
+        * `active`
+
+        * `events`
+
+
+        The hook''s secret is used as a key to generate the HMAC hex digest sent in
+        the
+
+        `X-Hub-Signature` header at delivery time. This signature is only generated
+
+        when the hook has a secret.
+
+
+        Set the hook''s secret by passing the new value in the `secret` field. Passing
+        a
+
+        `null` value in the `secret` field will remove the secret from the hook. The
+
+        hook''s secret can be left unchanged by not passing the `secret` field in
+        the
+
+        request.'
+      summary: Update a webhook for a repository
+      responses:
+        '200':
+          description: The webhook subscription object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook_subscription'
+        '403':
+          description: If the authenticated user does not have permission to update
+            the webhook.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the webhook or repository does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - webhook
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:webhook:bitbucket
+        - write:webhook:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: updateAWebhookForARepository
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: uid
+      in: path
+      description: Installed webhook's ID
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
   /repositories/{workspace}/{repo_slug}/override-settings:
     get:
       tags:
@@ -2418,301 +2711,33 @@ paths:
       required: true
       schema:
         type: string
-  /repositories/{workspace}/{repo_slug}/hooks:
-    get:
-      tags:
-      - Repositories
-      - Webhooks
-      description: Returns a paginated list of webhooks installed on this repository.
-      summary: List webhooks for a repository
-      responses:
-        '200':
-          description: The paginated list of installed webhooks.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paginated_webhook_subscriptions'
-        '403':
-          description: If the authenticated user does not have permission to access
-            the webhooks.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '404':
-          description: If the repository does not exist.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - webhook
-      - basic: []
-      - api_key: []
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:webhook:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: listWebhooksForARepository
-    post:
-      tags:
-      - Repositories
-      - Webhooks
-      description: "Creates a new webhook on the specified repository.\n\nExample:\n\
-        \n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n\
-        \  https://api.bitbucket.org/2.0/repositories/my-workspace/my-repo-slug/hooks\n\
-        \  -d '\n    {\n      \"description\": \"Webhook Description\",\n      \"\
-        url\": \"https://example.com/\",\n      \"active\": true,\n      \"secret\"\
-        : \"this is a really bad secret\",\n      \"events\": [\n        \"repo:push\"\
-        ,\n        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n\
-        ```\n\nWhen the `secret` is provided it will be used as the key to generate\
-        \ a HMAC\ndigest value sent in the `X-Hub-Signature` header at delivery time.\
-        \ Passing\na `null` or empty `secret` or not passing a `secret` will leave\
-        \ the webhook's\nsecret unset. Bitbucket only generates the `X-Hub-Signature`\
-        \ when the webhook's\nsecret is set.\n\nNote that this call requires the webhook\
-        \ scope, as well as any scope\nthat applies to the events that the webhook\
-        \ subscribes to. In the\nexample above that means: `webhook`, `repository`\
-        \ and `issue`.\n\nAlso note that the `url` must properly resolve and cannot\
-        \ be an\ninternal, non-routed address."
-      summary: Create a webhook for a repository
-      responses:
-        '201':
-          description: If the webhook was registered successfully.
-          headers:
-            Location:
-              description: The URL of new newly created webhook.
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/webhook_subscription'
-        '403':
-          description: If the authenticated user does not have permission to install
-            webhooks on the specified repository.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '404':
-          description: If the repository does not exist.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - webhook
-      - basic: []
-      - api_key: []
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:webhook:bitbucket
-        - write:webhook:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: createAWebhookForARepository
-    parameters:
-    - name: repo_slug
-      in: path
-      description: 'This can either be the repository slug or the UUID of the repository,
-
-        surrounded by curly-braces, for example: `{repository UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-    - name: workspace
-      in: path
-      description: 'This can either be the workspace ID (slug) or the workspace UUID
-
-        surrounded by curly-braces, for example: `{workspace UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-  /repositories/{workspace}/{repo_slug}/hooks/{uid}:
-    delete:
-      tags:
-      - Repositories
-      - Webhooks
-      description: 'Deletes the specified webhook subscription from the given
-
-        repository.'
-      summary: Delete a webhook for a repository
-      responses:
-        '204':
-          description: When the webhook was deleted successfully
-        '403':
-          description: If the authenticated user does not have permission to delete
-            the webhook.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '404':
-          description: If the webhook or repository does not exist.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - webhook
-      - basic: []
-      - api_key: []
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - delete:webhook:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: deleteAWebhookForARepository
-    get:
-      tags:
-      - Repositories
-      - Webhooks
-      description: 'Returns the webhook with the specified id installed on the specified
-
-        repository.'
-      summary: Get a webhook for a repository
-      responses:
-        '200':
-          description: The webhook subscription object.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/webhook_subscription'
-        '404':
-          description: If the webhook or repository does not exist.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - webhook
-      - basic: []
-      - api_key: []
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:webhook:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: getAWebhookForARepository
-    put:
-      tags:
-      - Repositories
-      - Webhooks
-      description: 'Updates the specified webhook subscription.
-
-
-        The following properties can be mutated:
-
-
-        * `description`
-
-        * `url`
-
-        * `secret`
-
-        * `active`
-
-        * `events`
-
-
-        The hook''s secret is used as a key to generate the HMAC hex digest sent in
-        the
-
-        `X-Hub-Signature` header at delivery time. This signature is only generated
-
-        when the hook has a secret.
-
-
-        Set the hook''s secret by passing the new value in the `secret` field. Passing
-        a
-
-        `null` value in the `secret` field will remove the secret from the hook. The
-
-        hook''s secret can be left unchanged by not passing the `secret` field in
-        the
-
-        request.'
-      summary: Update a webhook for a repository
-      responses:
-        '200':
-          description: The webhook subscription object.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/webhook_subscription'
-        '403':
-          description: If the authenticated user does not have permission to update
-            the webhook.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '404':
-          description: If the webhook or repository does not exist.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - webhook
-      - basic: []
-      - api_key: []
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:webhook:bitbucket
-        - write:webhook:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: updateAWebhookForARepository
-    parameters:
-    - name: repo_slug
-      in: path
-      description: 'This can either be the repository slug or the UUID of the repository,
-
-        surrounded by curly-braces, for example: `{repository UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-    - name: uid
-      in: path
-      description: Installed webhook's ID
-      required: true
-      schema:
-        type: string
-    - name: workspace
-      in: path
-      description: 'This can either be the workspace ID (slug) or the workspace UUID
-
-        surrounded by curly-braces, for example: `{workspace UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
 components:
   schemas:
+    account:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Account
+        description: An account object.
+        properties:
+          links:
+            $ref: '#/components/schemas/account_links'
+          created_on:
+            type: string
+            format: date-time
+          display_name:
+            type: string
+          uuid:
+            type: string
+        additionalProperties: true
+    account_links:
+      type: object
+      title: Account Links
+      description: Links related to an Account.
+      properties:
+        avatar:
+          $ref: '#/components/schemas/link'
+      additionalProperties: true
     author:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -2727,14 +2752,61 @@ components:
           user:
             $ref: '#/components/schemas/account'
         additionalProperties: true
-    account_links:
+    base_commit:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Base Commit
+        description: The common base type for both repository and snippet commits.
+        properties:
+          hash:
+            type: string
+            pattern: '[0-9a-f]{7,}?'
+          date:
+            type: string
+            format: date-time
+          author:
+            $ref: '#/components/schemas/author'
+          committer:
+            $ref: '#/components/schemas/committer'
+          message:
+            type: string
+          summary:
+            type: object
+            properties:
+              raw:
+                type: string
+                description: The text as it was typed by a user.
+              markup:
+                type: string
+                description: The type of markup language the raw content is to be
+                  interpreted in.
+                enum:
+                - markdown
+                - creole
+                - plaintext
+              html:
+                type: string
+                description: The user's content rendered as HTML.
+            additionalProperties: false
+          parents:
+            type: array
+            items:
+              $ref: '#/components/schemas/base_commit'
+            minItems: 0
+        additionalProperties: true
+    bitbucket.apps.permissions.serializers.RepoPermissionUpdateSchema:
       type: object
-      title: Account Links
-      description: Links related to an Account.
       properties:
-        avatar:
-          $ref: '#/components/schemas/link'
-      additionalProperties: true
+        permission:
+          type: string
+          enum:
+          - read
+          - write
+          - admin
+      required:
+      - permission
+      additionalProperties: false
     branch:
       allOf:
       - $ref: '#/components/schemas/ref'
@@ -2760,42 +2832,211 @@ components:
             description: The default merge strategy for pull requests targeting this
               branch.
         additionalProperties: true
-    repository_group_permission:
+    commit:
+      allOf:
+      - $ref: '#/components/schemas/base_commit'
+      - type: object
+        title: Commit
+        description: A repository commit object.
+        properties:
+          repository:
+            $ref: '#/components/schemas/repository'
+          participants:
+            type: array
+            items:
+              $ref: '#/components/schemas/participant'
+            minItems: 0
+        additionalProperties: true
+    commit_file:
       type: object
-      title: Repository Group Permission
-      description: A group's permission for a given repository.
+      title: Commit File
+      description: A file object, representing a file at a commit in a repository
       properties:
         type:
           type: string
-        links:
-          type: object
-          properties:
-            self:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-          additionalProperties: false
-        permission:
+        path:
+          type: string
+          description: The path in the repository
+        commit:
+          $ref: '#/components/schemas/commit'
+        attributes:
           type: string
           enum:
-          - read
-          - write
-          - admin
-          - none
-        group:
-          $ref: '#/components/schemas/group'
-        repository:
-          $ref: '#/components/schemas/repository'
+          - link
+          - executable
+          - subrepository
+          - binary
+          - lfs
+        escaped_path:
+          type: string
+          description: The escaped version of the path as it appears in a diff. If
+            the path does not require escaping this will be the same as path.
       required:
       - type
       additionalProperties: true
+    committer:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Committer
+        description: The committer of a change in a repository
+        properties:
+          raw:
+            type: string
+            description: The raw committer value from the repository. This may be
+              the only value available if the committer does not match a user in Bitbucket.
+          user:
+            $ref: '#/components/schemas/account'
+        additionalProperties: true
+    error:
+      type: object
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
+    group:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Group
+        description: A group object
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          owner:
+            $ref: '#/components/schemas/account'
+          workspace:
+            $ref: '#/components/schemas/workspace'
+          name:
+            type: string
+          slug:
+            type: string
+            description: 'The "sluggified" version of the group''s name. This contains
+              only ASCII
+
+              characters and can therefore be slightly different than the name'
+          full_slug:
+            type: string
+            description: 'The concatenation of the workspace''s slug and the group''s
+              slug,
+
+              separated with a colon (e.g. `acme:developers`)
+
+              '
+        additionalProperties: true
+    link:
+      type: object
+      title: Link
+      description: A link to a resource related to this object.
+      properties:
+        href:
+          type: string
+          format: uri
+        name:
+          type: string
+      additionalProperties: false
+    object:
+      type: object
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+      required:
+      - type
+      additionalProperties: true
+      discriminator:
+        propertyName: type
+    paginated_accounts:
+      type: object
+      title: Paginated Accounts
+      description: A paginated list of accounts.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/account'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
     paginated_files:
       type: object
       title: Paginated Files
@@ -2840,49 +3081,424 @@ components:
           minItems: 0
           uniqueItems: true
       additionalProperties: false
-    base_commit:
+    paginated_repositories:
+      type: object
+      title: Paginated Repositories
+      description: A paginated list of repositories.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/repository'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_repository_group_permissions:
+      type: object
+      title: Paginated Repository Group Permissions
+      description: A paginated list of repository group permissions.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/repository_group_permission'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_repository_permissions:
+      type: object
+      title: Paginated Repository Permissions
+      description: A paginated list of repository permissions.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/repository_permission'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_repository_user_permissions:
+      type: object
+      title: Paginated Repository User Permissions
+      description: A paginated list of repository user permissions.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/repository_user_permission'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_treeentries:
+      type: object
+      title: Paginated Tree Entry
+      description: A paginated list of commit_file and/or commit_directory objects.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/treeentry'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_webhook_subscriptions:
+      type: object
+      title: Paginated Webhook Subscriptions
+      description: A paginated list of webhook subscriptions
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/webhook_subscription'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    participant:
       allOf:
       - $ref: '#/components/schemas/object'
       - type: object
-        title: Base Commit
-        description: The common base type for both repository and snippet commits.
+        title: Participant
+        description: Object describing a user's role on resources like commits or
+          pull requests.
         properties:
-          hash:
+          user:
+            $ref: '#/components/schemas/account'
+          role:
             type: string
-            pattern: '[0-9a-f]{7,}?'
-          date:
+            enum:
+            - PARTICIPANT
+            - REVIEWER
+          approved:
+            type: boolean
+          state:
             type: string
+            enum:
+            - approved
+            - changes_requested
+            - null
+          participated_on:
+            type: string
+            description: The ISO8601 timestamp of the participant's action. For approvers,
+              this is the time of their approval. For commenters and pull request
+              reviewers who are not approvers, this is the time they last commented,
+              or null if they have not commented.
             format: date-time
-          author:
-            $ref: '#/components/schemas/author'
-          committer:
-            $ref: '#/components/schemas/committer'
-          message:
-            type: string
-          summary:
+        additionalProperties: true
+    project:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Project
+        description: "A Bitbucket project.\n            Projects are used by teams\
+          \ to organize repositories."
+        properties:
+          links:
             type: object
             properties:
-              raw:
-                type: string
-                description: The text as it was typed by a user.
-              markup:
-                type: string
-                description: The type of markup language the raw content is to be
-                  interpreted in.
-                enum:
-                - markdown
-                - creole
-                - plaintext
               html:
-                type: string
-                description: The user's content rendered as HTML.
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              avatar:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
             additionalProperties: false
-          parents:
-            type: array
-            items:
-              $ref: '#/components/schemas/base_commit'
-            minItems: 0
+          uuid:
+            type: string
+            description: The project's immutable id.
+          key:
+            type: string
+            description: The project's key.
+          owner:
+            $ref: '#/components/schemas/team'
+          name:
+            type: string
+            description: The name of the project.
+          description:
+            type: string
+          is_private:
+            type: boolean
+            description: '
+
+              Indicates whether the project is publicly accessible, or whether it
+              is
+
+              private to the team and consequently only visible to team members.
+
+              Note that private projects cannot contain public repositories.'
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+          has_publicly_visible_repos:
+            type: boolean
+            description: '
+
+              Indicates whether the project contains publicly visible repositories.
+
+              Note that private projects cannot contain public repositories.'
         additionalProperties: true
+    ref:
+      type: object
+      title: Ref
+      description: A ref object, representing a branch or tag in a repository.
+      properties:
+        type:
+          type: string
+        links:
+          type: object
+          properties:
+            self:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+            commits:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+            html:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+          additionalProperties: false
+        name:
+          type: string
+          description: The name of the ref.
+        target:
+          $ref: '#/components/schemas/commit'
+      required:
+      - type
+      additionalProperties: true
     repository:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -3078,19 +3694,281 @@ components:
           mainbranch:
             $ref: '#/components/schemas/branch'
         additionalProperties: true
-    object:
+    repository_group_permission:
       type: object
+      title: Repository Group Permission
+      description: A group's permission for a given repository.
+      properties:
+        type:
+          type: string
+        links:
+          type: object
+          properties:
+            self:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+          additionalProperties: false
+        permission:
+          type: string
+          enum:
+          - read
+          - write
+          - admin
+          - none
+        group:
+          $ref: '#/components/schemas/group'
+        repository:
+          $ref: '#/components/schemas/repository'
+      required:
+      - type
+      additionalProperties: true
+    repository_inheritance_state:
+      type: object
+      title: Repository Inheritance State
+      description: A json object representing the repository's inheritance state values
+      properties:
+        type:
+          type: string
+        override_settings:
+          type: object
+      required:
+      - type
+      additionalProperties: true
+    repository_permission:
+      type: object
+      title: Repository Permission
+      description: A user's permission for a given repository.
+      properties:
+        type:
+          type: string
+        permission:
+          type: string
+          enum:
+          - read
+          - write
+          - admin
+          - none
+        user:
+          $ref: '#/components/schemas/user'
+        repository:
+          $ref: '#/components/schemas/repository'
+      required:
+      - type
+      additionalProperties: true
+    repository_user_permission:
+      type: object
+      title: Repository User Permission
+      description: A user's direct permission for a given repository.
+      properties:
+        type:
+          type: string
+        permission:
+          type: string
+          enum:
+          - read
+          - write
+          - admin
+          - none
+        user:
+          $ref: '#/components/schemas/user'
+        repository:
+          $ref: '#/components/schemas/repository'
+        links:
+          type: object
+          properties:
+            self:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
+    team:
+      allOf:
+      - $ref: '#/components/schemas/account'
+      - type: object
+        title: Team
+        description: A team object.
+        properties:
+          links:
+            $ref: '#/components/schemas/team_links'
+        additionalProperties: true
+    team_links:
+      allOf:
+      - $ref: '#/components/schemas/account_links'
+      - type: object
+        title: Team Links
+        description: Links related to a Team.
+        properties:
+          self:
+            $ref: '#/components/schemas/link'
+          html:
+            $ref: '#/components/schemas/link'
+          members:
+            $ref: '#/components/schemas/link'
+          projects:
+            $ref: '#/components/schemas/link'
+          repositories:
+            $ref: '#/components/schemas/link'
+        additionalProperties: true
+    treeentry:
+      type: object
+      title: Tree Entry
       description: Base type for most resource objects. It defines the common `type`
         element that identifies an object's type. It also identifies the element as
         Swagger's `discriminator`.
       properties:
         type:
           type: string
+        path:
+          type: string
+          description: The path in the repository
+        commit:
+          $ref: '#/components/schemas/commit'
       required:
       - type
       additionalProperties: true
-      discriminator:
-        propertyName: type
+    user:
+      allOf:
+      - $ref: '#/components/schemas/account'
+      - type: object
+        title: User
+        description: A user object.
+        properties:
+          links:
+            $ref: '#/components/schemas/user_links'
+          account_id:
+            type: string
+            description: The user's Atlassian account ID.
+          account_status:
+            type: string
+            description: The status of the account. Currently the only possible value
+              is "active", but more values may be added in the future.
+          has_2fa_enabled:
+            type: boolean
+          nickname:
+            type: string
+            description: Account name defined by the owner. Should be used instead
+              of the "username" field. Note that "nickname" cannot be used in place
+              of "username" in URLs and queries, as "nickname" is not guaranteed to
+              be unique.
+          is_staff:
+            type: boolean
+        additionalProperties: true
+    user_links:
+      allOf:
+      - $ref: '#/components/schemas/account_links'
+      - type: object
+        title: User Links
+        description: Links related to a User.
+        properties:
+          self:
+            $ref: '#/components/schemas/link'
+          html:
+            $ref: '#/components/schemas/link'
+          repositories:
+            $ref: '#/components/schemas/link'
+        additionalProperties: true
+    webhook_subscription:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Webhook Subscription
+        description: A Webhook subscription.
+        properties:
+          uuid:
+            type: string
+            description: The webhook's id
+          url:
+            type: string
+            description: The URL events get delivered to.
+            format: uri
+          description:
+            type: string
+            description: A user-defined description of the webhook.
+          subject_type:
+            type: string
+            description: The type of entity. Set to either `repository` or `workspace`
+              based on where the subscription is defined.
+            enum:
+            - repository
+            - workspace
+          subject:
+            $ref: '#/components/schemas/object'
+          active:
+            type: boolean
+          created_at:
+            type: string
+            format: date-time
+          events:
+            type: array
+            description: The events this webhook is subscribed to.
+            items:
+              type: string
+              enum:
+              - issue:comment_created
+              - issue:created
+              - issue:updated
+              - pipeline:span_created
+              - project:updated
+              - pullrequest:approved
+              - pullrequest:changes_request_created
+              - pullrequest:changes_request_removed
+              - pullrequest:comment_created
+              - pullrequest:comment_deleted
+              - pullrequest:comment_reopened
+              - pullrequest:comment_resolved
+              - pullrequest:comment_updated
+              - pullrequest:created
+              - pullrequest:fulfilled
+              - pullrequest:push
+              - pullrequest:rejected
+              - pullrequest:unapproved
+              - pullrequest:updated
+              - repo:commit_comment_created
+              - repo:commit_status_created
+              - repo:commit_status_updated
+              - repo:created
+              - repo:deleted
+              - repo:fork
+              - repo:imported
+              - repo:push
+              - repo:transfer
+              - repo:updated
+            minItems: 1
+            uniqueItems: true
+          secret_set:
+            type: boolean
+            description: Indicates whether or not the hook has an associated secret.
+              It is not possible to see the hook's secret. This field is ignored during
+              updates.
+          secret:
+            type: string
+            description: The secret to associate with the hook. The secret is never
+              returned via the API. As such, this field is only used during updates.
+              The secret can be set to `null` or "" to remove the secret (or create
+              a hook with no secret). Leaving out the secret field during updates
+              will leave the secret unchanged. Leaving out the secret during creation
+              will create a hook with no secret.
+            minLength: 0
+            maxLength: 128
+        additionalProperties: true
     workspace:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -3231,882 +4109,4 @@ components:
           updated_on:
             type: string
             format: date-time
-        additionalProperties: true
-    bitbucket.apps.permissions.serializers.RepoPermissionUpdateSchema:
-      type: object
-      properties:
-        permission:
-          type: string
-          enum:
-          - read
-          - write
-          - admin
-      required:
-      - permission
-      additionalProperties: false
-    user_links:
-      allOf:
-      - $ref: '#/components/schemas/account_links'
-      - type: object
-        title: User Links
-        description: Links related to a User.
-        properties:
-          self:
-            $ref: '#/components/schemas/link'
-          html:
-            $ref: '#/components/schemas/link'
-          repositories:
-            $ref: '#/components/schemas/link'
-        additionalProperties: true
-    commit:
-      allOf:
-      - $ref: '#/components/schemas/base_commit'
-      - type: object
-        title: Commit
-        description: A repository commit object.
-        properties:
-          repository:
-            $ref: '#/components/schemas/repository'
-          participants:
-            type: array
-            items:
-              $ref: '#/components/schemas/participant'
-            minItems: 0
-        additionalProperties: true
-    repository_user_permission:
-      type: object
-      title: Repository User Permission
-      description: A user's direct permission for a given repository.
-      properties:
-        type:
-          type: string
-        permission:
-          type: string
-          enum:
-          - read
-          - write
-          - admin
-          - none
-        user:
-          $ref: '#/components/schemas/user'
-        repository:
-          $ref: '#/components/schemas/repository'
-        links:
-          type: object
-          properties:
-            self:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-          additionalProperties: false
-      required:
-      - type
-      additionalProperties: true
-    repository_inheritance_state:
-      type: object
-      title: Repository Inheritance State
-      description: A json object representing the repository's inheritance state values
-      properties:
-        type:
-          type: string
-        override_settings:
-          type: object
-      required:
-      - type
-      additionalProperties: true
-    paginated_webhook_subscriptions:
-      type: object
-      title: Paginated Webhook Subscriptions
-      description: A paginated list of webhook subscriptions
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/webhook_subscription'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    webhook_subscription:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Webhook Subscription
-        description: A Webhook subscription.
-        properties:
-          uuid:
-            type: string
-            description: The webhook's id
-          url:
-            type: string
-            description: The URL events get delivered to.
-            format: uri
-          description:
-            type: string
-            description: A user-defined description of the webhook.
-          subject_type:
-            type: string
-            description: The type of entity. Set to either `repository` or `workspace`
-              based on where the subscription is defined.
-            enum:
-            - repository
-            - workspace
-          subject:
-            $ref: '#/components/schemas/object'
-          active:
-            type: boolean
-          created_at:
-            type: string
-            format: date-time
-          events:
-            type: array
-            description: The events this webhook is subscribed to.
-            items:
-              type: string
-              enum:
-              - issue:comment_created
-              - issue:created
-              - issue:updated
-              - pipeline:span_created
-              - project:updated
-              - pullrequest:approved
-              - pullrequest:changes_request_created
-              - pullrequest:changes_request_removed
-              - pullrequest:comment_created
-              - pullrequest:comment_deleted
-              - pullrequest:comment_reopened
-              - pullrequest:comment_resolved
-              - pullrequest:comment_updated
-              - pullrequest:created
-              - pullrequest:fulfilled
-              - pullrequest:push
-              - pullrequest:rejected
-              - pullrequest:unapproved
-              - pullrequest:updated
-              - repo:commit_comment_created
-              - repo:commit_status_created
-              - repo:commit_status_updated
-              - repo:created
-              - repo:deleted
-              - repo:fork
-              - repo:imported
-              - repo:push
-              - repo:transfer
-              - repo:updated
-            minItems: 1
-            uniqueItems: true
-          secret_set:
-            type: boolean
-            description: Indicates whether or not the hook has an associated secret.
-              It is not possible to see the hook's secret. This field is ignored during
-              updates.
-          secret:
-            type: string
-            description: The secret to associate with the hook. The secret is never
-              returned via the API. As such, this field is only used during updates.
-              The secret can be set to `null` or "" to remove the secret (or create
-              a hook with no secret). Leaving out the secret field during updates
-              will leave the secret unchanged. Leaving out the secret during creation
-              will create a hook with no secret.
-            minLength: 0
-            maxLength: 128
-        additionalProperties: true
-    paginated_repository_group_permissions:
-      type: object
-      title: Paginated Repository Group Permissions
-      description: A paginated list of repository group permissions.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/repository_group_permission'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    link:
-      type: object
-      title: Link
-      description: A link to a resource related to this object.
-      properties:
-        href:
-          type: string
-          format: uri
-        name:
-          type: string
-      additionalProperties: false
-    paginated_repository_user_permissions:
-      type: object
-      title: Paginated Repository User Permissions
-      description: A paginated list of repository user permissions.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/repository_user_permission'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    account:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Account
-        description: An account object.
-        properties:
-          links:
-            $ref: '#/components/schemas/account_links'
-          created_on:
-            type: string
-            format: date-time
-          display_name:
-            type: string
-          uuid:
-            type: string
-        additionalProperties: true
-    participant:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Participant
-        description: Object describing a user's role on resources like commits or
-          pull requests.
-        properties:
-          user:
-            $ref: '#/components/schemas/account'
-          role:
-            type: string
-            enum:
-            - PARTICIPANT
-            - REVIEWER
-          approved:
-            type: boolean
-          state:
-            type: string
-            enum:
-            - approved
-            - changes_requested
-            - null
-          participated_on:
-            type: string
-            description: The ISO8601 timestamp of the participant's action. For approvers,
-              this is the time of their approval. For commenters and pull request
-              reviewers who are not approvers, this is the time they last commented,
-              or null if they have not commented.
-            format: date-time
-        additionalProperties: true
-    ref:
-      type: object
-      title: Ref
-      description: A ref object, representing a branch or tag in a repository.
-      properties:
-        type:
-          type: string
-        links:
-          type: object
-          properties:
-            self:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-            commits:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-            html:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-          additionalProperties: false
-        name:
-          type: string
-          description: The name of the ref.
-        target:
-          $ref: '#/components/schemas/commit'
-      required:
-      - type
-      additionalProperties: true
-    paginated_repositories:
-      type: object
-      title: Paginated Repositories
-      description: A paginated list of repositories.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/repository'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    team:
-      allOf:
-      - $ref: '#/components/schemas/account'
-      - type: object
-        title: Team
-        description: A team object.
-        properties:
-          links:
-            $ref: '#/components/schemas/team_links'
-        additionalProperties: true
-    group:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Group
-        description: A group object
-        properties:
-          links:
-            type: object
-            properties:
-              self:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              html:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-            additionalProperties: false
-          owner:
-            $ref: '#/components/schemas/account'
-          workspace:
-            $ref: '#/components/schemas/workspace'
-          name:
-            type: string
-          slug:
-            type: string
-            description: 'The "sluggified" version of the group''s name. This contains
-              only ASCII
-
-              characters and can therefore be slightly different than the name'
-          full_slug:
-            type: string
-            description: 'The concatenation of the workspace''s slug and the group''s
-              slug,
-
-              separated with a colon (e.g. `acme:developers`)
-
-              '
-        additionalProperties: true
-    paginated_accounts:
-      type: object
-      title: Paginated Accounts
-      description: A paginated list of accounts.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/account'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    team_links:
-      allOf:
-      - $ref: '#/components/schemas/account_links'
-      - type: object
-        title: Team Links
-        description: Links related to a Team.
-        properties:
-          self:
-            $ref: '#/components/schemas/link'
-          html:
-            $ref: '#/components/schemas/link'
-          members:
-            $ref: '#/components/schemas/link'
-          projects:
-            $ref: '#/components/schemas/link'
-          repositories:
-            $ref: '#/components/schemas/link'
-        additionalProperties: true
-    paginated_treeentries:
-      type: object
-      title: Paginated Tree Entry
-      description: A paginated list of commit_file and/or commit_directory objects.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/treeentry'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    paginated_repository_permissions:
-      type: object
-      title: Paginated Repository Permissions
-      description: A paginated list of repository permissions.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/repository_permission'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    treeentry:
-      type: object
-      title: Tree Entry
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-        path:
-          type: string
-          description: The path in the repository
-        commit:
-          $ref: '#/components/schemas/commit'
-      required:
-      - type
-      additionalProperties: true
-    repository_permission:
-      type: object
-      title: Repository Permission
-      description: A user's permission for a given repository.
-      properties:
-        type:
-          type: string
-        permission:
-          type: string
-          enum:
-          - read
-          - write
-          - admin
-          - none
-        user:
-          $ref: '#/components/schemas/user'
-        repository:
-          $ref: '#/components/schemas/repository'
-      required:
-      - type
-      additionalProperties: true
-    project:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Project
-        description: "A Bitbucket project.\n            Projects are used by teams\
-          \ to organize repositories."
-        properties:
-          links:
-            type: object
-            properties:
-              html:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              avatar:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-            additionalProperties: false
-          uuid:
-            type: string
-            description: The project's immutable id.
-          key:
-            type: string
-            description: The project's key.
-          owner:
-            $ref: '#/components/schemas/team'
-          name:
-            type: string
-            description: The name of the project.
-          description:
-            type: string
-          is_private:
-            type: boolean
-            description: '
-
-              Indicates whether the project is publicly accessible, or whether it
-              is
-
-              private to the team and consequently only visible to team members.
-
-              Note that private projects cannot contain public repositories.'
-          created_on:
-            type: string
-            format: date-time
-          updated_on:
-            type: string
-            format: date-time
-          has_publicly_visible_repos:
-            type: boolean
-            description: '
-
-              Indicates whether the project contains publicly visible repositories.
-
-              Note that private projects cannot contain public repositories.'
-        additionalProperties: true
-    committer:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Committer
-        description: The committer of a change in a repository
-        properties:
-          raw:
-            type: string
-            description: The raw committer value from the repository. This may be
-              the only value available if the committer does not match a user in Bitbucket.
-          user:
-            $ref: '#/components/schemas/account'
-        additionalProperties: true
-    error:
-      type: object
-      title: Error
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-            detail:
-              type: string
-            data:
-              type: object
-              description: Optional structured data that is endpoint-specific.
-              properties: {}
-              additionalProperties: true
-          required:
-          - message
-          additionalProperties: false
-      required:
-      - type
-      additionalProperties: true
-    commit_file:
-      type: object
-      title: Commit File
-      description: A file object, representing a file at a commit in a repository
-      properties:
-        type:
-          type: string
-        path:
-          type: string
-          description: The path in the repository
-        commit:
-          $ref: '#/components/schemas/commit'
-        attributes:
-          type: string
-          enum:
-          - link
-          - executable
-          - subrepository
-          - binary
-          - lfs
-        escaped_path:
-          type: string
-          description: The escaped version of the path as it appears in a diff. If
-            the path does not require escaping this will be the same as path.
-      required:
-      - type
-      additionalProperties: true
-    user:
-      allOf:
-      - $ref: '#/components/schemas/account'
-      - type: object
-        title: User
-        description: A user object.
-        properties:
-          links:
-            $ref: '#/components/schemas/user_links'
-          account_id:
-            type: string
-            description: The user's Atlassian account ID.
-          account_status:
-            type: string
-            description: The status of the account. Currently the only possible value
-              is "active", but more values may be added in the future.
-          has_2fa_enabled:
-            type: boolean
-          nickname:
-            type: string
-            description: Account name defined by the owner. Should be used instead
-              of the "username" field. Note that "nickname" cannot be used in place
-              of "username" in URLs and queries, as "nickname" is not guaranteed to
-              be unique.
-          is_staff:
-            type: boolean
         additionalProperties: true
