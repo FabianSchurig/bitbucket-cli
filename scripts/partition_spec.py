@@ -577,7 +577,9 @@ def build_schema(spec: dict, group: dict) -> dict:
     paths_explicit = extract_paths_explicit(spec, group["paths"])
 
     # Merge both (tag-based takes priority, explicit fills gaps)
-    out["paths"] = {**paths_explicit, **paths_by_tag}
+    # Sort paths alphabetically for deterministic output across runs.
+    merged = {**paths_explicit, **paths_by_tag}
+    out["paths"] = dict(sorted(merged.items()))
 
     if not out["paths"]:
         print(f"Warning: no paths found for group '{group['title']}'",
@@ -587,8 +589,9 @@ def build_schema(spec: dict, group: dict) -> dict:
     refs: set = set()
     collect_refs(out["paths"], spec, refs)
 
-    # Copy resolved schemas, including all transitively referenced ones
-    for ref in refs:
+    # Copy resolved schemas, including all transitively referenced ones.
+    # Sort refs for deterministic insertion order (Python sets are unordered).
+    for ref in sorted(refs):
         parts = ref.lstrip("#/").split("/")
         if len(parts) >= 3 and parts[0] == "components" and parts[1] == "schemas":
             schema_name = parts[2]

@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      PYTHONHASHSEED: "0" # Deterministic hash ordering for stable schema output
     steps:
       - uses: actions/checkout@v4
         with:
@@ -154,6 +156,6 @@ jobs:
           fi
 
           git commit -m "chore: schema sync ${VERSION}"
-          git tag "$VERSION"
+          git tag -a "$VERSION" -m "chore: schema sync ${VERSION}"
           git push --follow-tags
           # The tag push triggers the Release workflow (release.yml)
