@@ -21,7 +21,8 @@ jobs:
       - name: Push mirror
         run: |
           git remote add mirror "https://x-access-token:${TERRAFORM_REPO_TOKEN}@github.com/FabianSchurig/terraform-provider-bitbucket.git"
-          git push mirror --force --all
+          git fetch origin main
+          git push mirror origin/main:main --force
           git push mirror --force --tags
         env:
           TERRAFORM_REPO_TOKEN: ${{ secrets.TERRAFORM_REPO_TOKEN }}
