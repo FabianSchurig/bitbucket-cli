@@ -35,11 +35,10 @@ resource "bitbucket_current_user" "example" {
 
 ### Required
 
-### Optional
-
-- `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
-
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `created_on` (String) created_on
+- `display_name` (String) display_name
+- `uuid` (String) uuid

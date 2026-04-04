@@ -50,3 +50,15 @@ output "reports_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `created_on` (String) The timestamp when the report was created.
+- `updated_on` (String) The timestamp when the report was updated.
+- `details` (String) A string to describe the purpose of the report.
+- `external_id` (String) ID of the report provided by the report creator. It can be used to identify the report as an alternative to it's generated uuid. It is not used by Bitbucket, but only by the report creator for updating or deleting this specific report. Needs to be unique.
+- `link` (String) A URL linking to the results of the report in an external tool.
+- `logo_url` (String) A URL to the report logo. If none is provided, the default insights logo will be used.
+- `remote_link_enabled` (String) If enabled, a remote link is created in Jira for the work item associated with the commit the report belongs to.
+- `report_type` (String) The type of the report. [SECURITY, COVERAGE, TEST, BUG]
+- `reporter` (String) A string to describe the tool or company who created the report.
+- `result` (String) The state of the report. May be set to PENDING and later updated. [PASSED, FAILED, PENDING]
+- `title` (String) The title of the report.
+- `uuid` (String) The UUID that can be used to identify the report.

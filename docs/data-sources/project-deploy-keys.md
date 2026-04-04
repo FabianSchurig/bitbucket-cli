@@ -48,3 +48,16 @@ output "project_deploy_keys_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `added_on` (String) added_on
+- `comment` (String) The comment parsed from the deploy key (if present)
+- `key` (String) The deploy key value.
+- `label` (String) The user-defined label for the deploy key
+- `last_used` (String) last_used
+- `project_created_on` (String) project.created_on
+- `project_description` (String) project.description
+- `project_has_publicly_visible_repos` (String) 
+- `project_is_private` (String) 
+- `project_key` (String) The project's key.
+- `project_name` (String) The name of the project.
+- `project_updated_on` (String) project.updated_on
+- `project_uuid` (String) The project's immutable id.

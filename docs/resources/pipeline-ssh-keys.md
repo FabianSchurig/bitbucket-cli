@@ -46,7 +46,8 @@ resource "bitbucket_pipeline_ssh_keys" "example" {
 - `repo_slug` (String) Path parameter.
 
 ### Optional
-
+- `private_key` (String) The SSH private key. This value will be empty when retrieving the SSH key pair. (also computed from API response)
+- `public_key` (String) The SSH public key. (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

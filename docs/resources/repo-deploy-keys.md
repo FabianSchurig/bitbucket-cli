@@ -53,11 +53,12 @@ resource "bitbucket_repo_deploy_keys" "example" {
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
 
-### Optional
-
-- `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
-
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `added_on` (String) added_on
+- `comment` (String) The comment parsed from the deploy key (if present)
+- `key` (String) The deploy key value.
+- `label` (String) The user-defined label for the deploy key
+- `last_used` (String) last_used

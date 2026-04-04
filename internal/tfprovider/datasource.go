@@ -90,6 +90,26 @@ func (d *GenericDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 		}
 	}
 
+	// Add computed attributes from response fields.
+	for _, rf := range op.ResponseFields {
+		key := toSnakeCase(strings.ReplaceAll(rf.Path, ".", "_"))
+		// Skip reserved attributes and already-defined params.
+		if key == "id" || key == "api_response" {
+			continue
+		}
+		if _, exists := attrs[key]; exists {
+			continue
+		}
+		desc := rf.Desc
+		if desc == "" {
+			desc = rf.Path
+		}
+		attrs[key] = schema.StringAttribute{
+			Description: desc,
+			Computed:    true,
+		}
+	}
+
 	resp.Schema = schema.Schema{
 		Description: d.group.Description + " (data source - read-only)",
 		Attributes:  attrs,
@@ -175,6 +195,19 @@ func (d *GenericDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			if id := extractID(m); id != "" {
 				resp.Diagnostics.Append(resp.State.SetAttribute(ctx, attrPath("id"), types.StringValue(id))...)
 				idSet = true
+			}
+
+			// Extract response fields from the API response.
+			for _, rf := range op.ResponseFields {
+				key := toSnakeCase(strings.ReplaceAll(rf.Path, ".", "_"))
+				if key == "id" || key == "api_response" {
+					continue
+				}
+				val, ok := handlers.GetNested(m, rf.Path)
+				if !ok || val == nil {
+					continue
+				}
+				resp.Diagnostics.Append(resp.State.SetAttribute(ctx, attrPath(key), types.StringValue(fmt.Sprintf("%v", val)))...)
 			}
 		}
 		if !idSet {

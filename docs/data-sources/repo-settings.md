@@ -44,3 +44,4 @@ output "repo_settings_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `type` (String) type

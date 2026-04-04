@@ -51,7 +51,8 @@ resource "bitbucket_deployments" "example" {
 - `environment_uuid` (String) Path parameter.
 
 ### Optional
-
+- `name` (String) The name of the environment. (also computed from API response)
+- `uuid` (String) The UUID identifying the environment. (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

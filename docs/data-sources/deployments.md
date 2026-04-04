@@ -48,3 +48,5 @@ output "deployments_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `name` (String) The name of the environment.
+- `uuid` (String) The UUID identifying the environment.

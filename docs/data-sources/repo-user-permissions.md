@@ -48,3 +48,5 @@ output "repo_user_permissions_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `permission` (String) [read, write, admin, none]
+- `type` (String) type

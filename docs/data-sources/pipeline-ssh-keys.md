@@ -44,3 +44,5 @@ output "pipeline_ssh_keys_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `private_key` (String) The SSH private key. This value will be empty when retrieving the SSH key pair.
+- `public_key` (String) The SSH public key.

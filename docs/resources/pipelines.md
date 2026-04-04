@@ -48,10 +48,14 @@ resource "bitbucket_pipelines" "example" {
 - `pipeline_uuid` (String) Path parameter.
 
 ### Optional
-
+- `build_number` (String) The build number of the pipeline. (also computed from API response)
+- `build_seconds_used` (String) The number of build seconds used by this pipeline. (also computed from API response)
+- `completed_on` (String) The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress. (also computed from API response)
+- `uuid` (String) The UUID identifying the pipeline. (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `created_on` (String) The timestamp when the pipeline was created.

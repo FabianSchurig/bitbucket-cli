@@ -51,10 +51,19 @@ resource "bitbucket_project_user_permissions" "example" {
 - `workspace` (String) Path parameter.
 
 ### Optional
-
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `permission` (String) [read, write, create-repo, admin, none]
+- `project_created_on` (String) project.created_on
+- `project_description` (String) project.description
+- `project_has_publicly_visible_repos` (String) 
+- `project_is_private` (String) 
+- `project_key` (String) The project's key.
+- `project_name` (String) The name of the project.
+- `project_updated_on` (String) project.updated_on
+- `project_uuid` (String) The project's immutable id.
+- `type` (String) type

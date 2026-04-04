@@ -47,8 +47,23 @@ Available operations:
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 			Scopes: []string{
 				`read:project:bitbucket`,
 			},
@@ -64,8 +79,23 @@ Available operations:
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 			},
@@ -82,8 +112,23 @@ Available operations:
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: false,
 			Scopes: []string{
 				`read:project:bitbucket`,
 			},
@@ -100,8 +145,23 @@ Available operations:
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 			},
@@ -117,9 +177,10 @@ Available operations:
 				{Name: `project_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 			},
@@ -139,8 +200,12 @@ reviewers to pull requests for any repository within the project.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `reviewer_type`, Type: `string`, Desc: `reviewer_type`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   false,
+			Paginated: true,
 			Scopes: []string{
 				`read:pullrequest:bitbucket`,
 			},
@@ -158,8 +223,18 @@ reviewers to pull requests for any repository within the project.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `account_id`, Type: `string`, Desc: `The user's Atlassian account ID.`},
+				{Path: `account_status`, Type: `string`, Desc: `The status of the account. Currently the only possible value is "active", but more values may be added in the future.`},
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `display_name`, Type: `string`, Desc: `display_name`},
+				{Path: `has_2fa_enabled`, Type: `bool`, Desc: `has_2fa_enabled`},
+				{Path: `is_staff`, Type: `bool`, Desc: `is_staff`},
+				{Path: `nickname`, Type: `string`, Desc: `Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.`},
+				{Path: `uuid`, Type: `string`, Desc: `uuid`},
+			},
+			HasBody:   false,
+			Paginated: false,
 			Scopes: []string{
 				`read:pullrequest:bitbucket`,
 			},
@@ -177,8 +252,18 @@ reviewers to pull requests for any repository within the project.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `account_id`, Type: `string`, Desc: `The user's Atlassian account ID.`},
+				{Path: `account_status`, Type: `string`, Desc: `The status of the account. Currently the only possible value is "active", but more values may be added in the future.`},
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `display_name`, Type: `string`, Desc: `display_name`},
+				{Path: `has_2fa_enabled`, Type: `bool`, Desc: `has_2fa_enabled`},
+				{Path: `is_staff`, Type: `bool`, Desc: `is_staff`},
+				{Path: `nickname`, Type: `string`, Desc: `Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.`},
+				{Path: `uuid`, Type: `string`, Desc: `uuid`},
+			},
+			HasBody:   false,
+			Paginated: false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 			},
@@ -195,9 +280,10 @@ reviewers to pull requests for any repository within the project.`,
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 			},
@@ -217,8 +303,42 @@ This endpoint does not support BBQL features.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `group.full_slug`, Type: `string`, Desc: "The concatenation of the workspace's slug and the group's slug,\nseparated with a colon (e.g. `acme:developers`)\n"},
+				{Path: `group.name`, Type: `string`, Desc: `group.name`},
+				{Path: `group.slug`, Type: `string`, Desc: `The "sluggified" version of the group's name. This contains only ASCII
+characters and can therefore be slightly different than the name`},
+				{Path: `group.workspace.created_on`, Type: `string`, Desc: `group.workspace.created_on`},
+				{Path: `group.workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `group.workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `group.workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `group.workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `group.workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `group.workspace.updated_on`, Type: `string`, Desc: `group.workspace.updated_on`},
+				{Path: `group.workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
+				{Path: `project.created_on`, Type: `string`, Desc: `project.created_on`},
+				{Path: `project.description`, Type: `string`, Desc: `project.description`},
+				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `project.updated_on`, Type: `string`, Desc: `project.updated_on`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   false,
+			Paginated: true,
 			Scopes: []string{
 				`read:project:bitbucket`,
 			},
@@ -236,8 +356,42 @@ This endpoint does not support BBQL features.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `group.full_slug`, Type: `string`, Desc: "The concatenation of the workspace's slug and the group's slug,\nseparated with a colon (e.g. `acme:developers`)\n"},
+				{Path: `group.name`, Type: `string`, Desc: `group.name`},
+				{Path: `group.slug`, Type: `string`, Desc: `The "sluggified" version of the group's name. This contains only ASCII
+characters and can therefore be slightly different than the name`},
+				{Path: `group.workspace.created_on`, Type: `string`, Desc: `group.workspace.created_on`},
+				{Path: `group.workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `group.workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `group.workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `group.workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `group.workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `group.workspace.updated_on`, Type: `string`, Desc: `group.workspace.updated_on`},
+				{Path: `group.workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
+				{Path: `project.created_on`, Type: `string`, Desc: `project.created_on`},
+				{Path: `project.description`, Type: `string`, Desc: `project.description`},
+				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `project.updated_on`, Type: `string`, Desc: `project.updated_on`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   false,
+			Paginated: false,
 			Scopes: []string{
 				`read:project:bitbucket`,
 			},
@@ -255,8 +409,42 @@ This endpoint does not support BBQL features.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `group.full_slug`, Type: `string`, Desc: "The concatenation of the workspace's slug and the group's slug,\nseparated with a colon (e.g. `acme:developers`)\n"},
+				{Path: `group.name`, Type: `string`, Desc: `group.name`},
+				{Path: `group.slug`, Type: `string`, Desc: `The "sluggified" version of the group's name. This contains only ASCII
+characters and can therefore be slightly different than the name`},
+				{Path: `group.workspace.created_on`, Type: `string`, Desc: `group.workspace.created_on`},
+				{Path: `group.workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `group.workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `group.workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `group.workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `group.workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `group.workspace.updated_on`, Type: `string`, Desc: `group.workspace.updated_on`},
+				{Path: `group.workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
+				{Path: `project.created_on`, Type: `string`, Desc: `project.created_on`},
+				{Path: `project.description`, Type: `string`, Desc: `project.description`},
+				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `project.updated_on`, Type: `string`, Desc: `project.updated_on`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   true,
+			Paginated: false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 				`write:permission:bitbucket`,
@@ -276,9 +464,10 @@ Only users with admin permission for the project may access this resource.`,
 				{Name: `project_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 				`delete:permission:bitbucket`,
@@ -299,8 +488,25 @@ This endpoint does not support BBQL features.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
+				{Path: `project.created_on`, Type: `string`, Desc: `project.created_on`},
+				{Path: `project.description`, Type: `string`, Desc: `project.description`},
+				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `project.updated_on`, Type: `string`, Desc: `project.updated_on`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   false,
+			Paginated: true,
 			Scopes: []string{
 				`read:project:bitbucket`,
 			},
@@ -318,8 +524,25 @@ This endpoint does not support BBQL features.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
+				{Path: `project.created_on`, Type: `string`, Desc: `project.created_on`},
+				{Path: `project.description`, Type: `string`, Desc: `project.description`},
+				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `project.updated_on`, Type: `string`, Desc: `project.updated_on`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   false,
+			Paginated: false,
 			Scopes: []string{
 				`read:project:bitbucket`,
 			},
@@ -337,8 +560,25 @@ This endpoint does not support BBQL features.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
+				{Path: `project.created_on`, Type: `string`, Desc: `project.created_on`},
+				{Path: `project.description`, Type: `string`, Desc: `project.description`},
+				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `project.updated_on`, Type: `string`, Desc: `project.updated_on`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   true,
+			Paginated: false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 				`write:permission:bitbucket`,
@@ -361,9 +601,10 @@ This is to ensure integrations and add-ons are not allowed to change permissions
 				{Name: `selected_user_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 				`delete:permission:bitbucket`,
@@ -384,8 +625,23 @@ This is to ensure integrations and add-ons are not allowed to change permissions
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: true,
 			Scopes: []string{
 				`read:project:bitbucket`,
 			},
@@ -401,8 +657,23 @@ This is to ensure integrations and add-ons are not allowed to change permissions
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 			},
@@ -419,8 +690,23 @@ This is to ensure integrations and add-ons are not allowed to change permissions
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   false,
+			Paginated: false,
 			Scopes: []string{
 				`read:project:bitbucket`,
 			},
@@ -437,8 +723,23 @@ This is to ensure integrations and add-ons are not allowed to change permissions
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 			},
@@ -454,9 +755,10 @@ This is to ensure integrations and add-ons are not allowed to change permissions
 				{Name: `project_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 			},
@@ -476,8 +778,12 @@ reviewers to pull requests for any repository within the project.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `reviewer_type`, Type: `string`, Desc: `reviewer_type`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   false,
+			Paginated: true,
 			Scopes: []string{
 				`read:pullrequest:bitbucket`,
 			},
@@ -495,8 +801,18 @@ reviewers to pull requests for any repository within the project.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `account_id`, Type: `string`, Desc: `The user's Atlassian account ID.`},
+				{Path: `account_status`, Type: `string`, Desc: `The status of the account. Currently the only possible value is "active", but more values may be added in the future.`},
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `display_name`, Type: `string`, Desc: `display_name`},
+				{Path: `has_2fa_enabled`, Type: `bool`, Desc: `has_2fa_enabled`},
+				{Path: `is_staff`, Type: `bool`, Desc: `is_staff`},
+				{Path: `nickname`, Type: `string`, Desc: `Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.`},
+				{Path: `uuid`, Type: `string`, Desc: `uuid`},
+			},
+			HasBody:   false,
+			Paginated: false,
 			Scopes: []string{
 				`read:pullrequest:bitbucket`,
 			},
@@ -514,8 +830,18 @@ reviewers to pull requests for any repository within the project.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `account_id`, Type: `string`, Desc: `The user's Atlassian account ID.`},
+				{Path: `account_status`, Type: `string`, Desc: `The status of the account. Currently the only possible value is "active", but more values may be added in the future.`},
+				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `display_name`, Type: `string`, Desc: `display_name`},
+				{Path: `has_2fa_enabled`, Type: `bool`, Desc: `has_2fa_enabled`},
+				{Path: `is_staff`, Type: `bool`, Desc: `is_staff`},
+				{Path: `nickname`, Type: `string`, Desc: `Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.`},
+				{Path: `uuid`, Type: `string`, Desc: `uuid`},
+			},
+			HasBody:   false,
+			Paginated: false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 			},
@@ -532,9 +858,10 @@ reviewers to pull requests for any repository within the project.`,
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 			},
@@ -554,8 +881,42 @@ This endpoint does not support BBQL features.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `group.full_slug`, Type: `string`, Desc: "The concatenation of the workspace's slug and the group's slug,\nseparated with a colon (e.g. `acme:developers`)\n"},
+				{Path: `group.name`, Type: `string`, Desc: `group.name`},
+				{Path: `group.slug`, Type: `string`, Desc: `The "sluggified" version of the group's name. This contains only ASCII
+characters and can therefore be slightly different than the name`},
+				{Path: `group.workspace.created_on`, Type: `string`, Desc: `group.workspace.created_on`},
+				{Path: `group.workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `group.workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `group.workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `group.workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `group.workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `group.workspace.updated_on`, Type: `string`, Desc: `group.workspace.updated_on`},
+				{Path: `group.workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
+				{Path: `project.created_on`, Type: `string`, Desc: `project.created_on`},
+				{Path: `project.description`, Type: `string`, Desc: `project.description`},
+				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `project.updated_on`, Type: `string`, Desc: `project.updated_on`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   false,
+			Paginated: true,
 			Scopes: []string{
 				`read:project:bitbucket`,
 			},
@@ -573,8 +934,42 @@ This endpoint does not support BBQL features.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `group.full_slug`, Type: `string`, Desc: "The concatenation of the workspace's slug and the group's slug,\nseparated with a colon (e.g. `acme:developers`)\n"},
+				{Path: `group.name`, Type: `string`, Desc: `group.name`},
+				{Path: `group.slug`, Type: `string`, Desc: `The "sluggified" version of the group's name. This contains only ASCII
+characters and can therefore be slightly different than the name`},
+				{Path: `group.workspace.created_on`, Type: `string`, Desc: `group.workspace.created_on`},
+				{Path: `group.workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `group.workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `group.workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `group.workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `group.workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `group.workspace.updated_on`, Type: `string`, Desc: `group.workspace.updated_on`},
+				{Path: `group.workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
+				{Path: `project.created_on`, Type: `string`, Desc: `project.created_on`},
+				{Path: `project.description`, Type: `string`, Desc: `project.description`},
+				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `project.updated_on`, Type: `string`, Desc: `project.updated_on`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   false,
+			Paginated: false,
 			Scopes: []string{
 				`read:project:bitbucket`,
 			},
@@ -592,8 +987,42 @@ This endpoint does not support BBQL features.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `group.full_slug`, Type: `string`, Desc: "The concatenation of the workspace's slug and the group's slug,\nseparated with a colon (e.g. `acme:developers`)\n"},
+				{Path: `group.name`, Type: `string`, Desc: `group.name`},
+				{Path: `group.slug`, Type: `string`, Desc: `The "sluggified" version of the group's name. This contains only ASCII
+characters and can therefore be slightly different than the name`},
+				{Path: `group.workspace.created_on`, Type: `string`, Desc: `group.workspace.created_on`},
+				{Path: `group.workspace.forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
+
+* **allow_forks**: unrestricted forking
+* **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
+ [allow_forks, internal_only]`},
+				{Path: `group.workspace.is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+				{Path: `group.workspace.is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
+private to the members and consequently only visible to members.`},
+				{Path: `group.workspace.name`, Type: `string`, Desc: `The name of the workspace.`},
+				{Path: `group.workspace.slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+				{Path: `group.workspace.updated_on`, Type: `string`, Desc: `group.workspace.updated_on`},
+				{Path: `group.workspace.uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
+				{Path: `project.created_on`, Type: `string`, Desc: `project.created_on`},
+				{Path: `project.description`, Type: `string`, Desc: `project.description`},
+				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `project.updated_on`, Type: `string`, Desc: `project.updated_on`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   true,
+			Paginated: false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 				`write:permission:bitbucket`,
@@ -613,9 +1042,10 @@ Only users with admin permission for the project may access this resource.`,
 				{Name: `project_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 				`delete:permission:bitbucket`,
@@ -636,8 +1066,25 @@ This endpoint does not support BBQL features.`,
 				{Name: `pagelen`, In: `query`, Type: `integer`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  true,
+			ResponseFields: []BodyFieldDef{
+				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
+				{Path: `project.created_on`, Type: `string`, Desc: `project.created_on`},
+				{Path: `project.description`, Type: `string`, Desc: `project.description`},
+				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `project.updated_on`, Type: `string`, Desc: `project.updated_on`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   false,
+			Paginated: true,
 			Scopes: []string{
 				`read:project:bitbucket`,
 			},
@@ -655,8 +1102,25 @@ This endpoint does not support BBQL features.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
+				{Path: `project.created_on`, Type: `string`, Desc: `project.created_on`},
+				{Path: `project.description`, Type: `string`, Desc: `project.description`},
+				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `project.updated_on`, Type: `string`, Desc: `project.updated_on`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   false,
+			Paginated: false,
 			Scopes: []string{
 				`read:project:bitbucket`,
 			},
@@ -674,8 +1138,25 @@ This endpoint does not support BBQL features.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			ResponseFields: []BodyFieldDef{
+				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
+				{Path: `project.created_on`, Type: `string`, Desc: `project.created_on`},
+				{Path: `project.description`, Type: `string`, Desc: `project.description`},
+				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `project.updated_on`, Type: `string`, Desc: `project.updated_on`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `type`, Type: `string`, Desc: `type`},
+			},
+			HasBody:   true,
+			Paginated: false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 				`write:permission:bitbucket`,
@@ -698,9 +1179,10 @@ This is to ensure integrations and add-ons are not allowed to change permissions
 				{Name: `selected_user_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
 			Scopes: []string{
 				`admin:project:bitbucket`,
 				`delete:permission:bitbucket`,

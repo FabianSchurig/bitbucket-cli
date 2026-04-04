@@ -48,3 +48,12 @@ output "pipeline_schedules_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `created_on` (String) The timestamp when the schedule was created.
+- `updated_on` (String) The timestamp when the schedule was updated.
+- `uuid` (String) The UUID identifying the schedule.
+- `cron_pattern` (String) The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.
+- `enabled` (String) Whether the schedule is enabled.
+- `target_ref_name` (String) The name of the reference.
+- `target_ref_type` (String) The type of reference (branch only). [branch]
+- `target_selector_pattern` (String) The name of the matching pipeline definition.
+- `target_selector_type` (String) The type of selector. [branches, tags, bookmarks, default, custom]

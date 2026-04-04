@@ -43,7 +43,7 @@ resource "bitbucket_pipeline_config" "example" {
 - `repo_slug` (String) Path parameter.
 
 ### Optional
-
+- `enabled` (String) Whether Pipelines is enabled for the repository. (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

@@ -50,7 +50,6 @@ resource "bitbucket_properties" "example" {
 - `property_name` (String) Path parameter.
 
 ### Optional
-
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

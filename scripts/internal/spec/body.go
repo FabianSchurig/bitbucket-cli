@@ -50,6 +50,14 @@ func MakeBodyField(path, oaType, desc string) BodyField {
 
 const schemaRefPrefix = "#/components/schemas/"
 
+// FieldResolveOpts controls which properties are skipped during field resolution.
+type FieldResolveOpts struct {
+	SkipPropNames    map[string]bool
+	SkipPropertyRefs map[string]bool
+	SkipAllOfRefs    map[string]bool
+	RefIdOnlySchemas map[string]bool
+}
+
 // skipAllOfRefs lists schema names in allOf that should be skipped during
 // body field resolution (e.g., the generic "object" base schema).
 var skipAllOfRefs = map[string]bool{
@@ -87,8 +95,55 @@ var refIdOnlySchemas = map[string]bool{
 	"comment": true,
 }
 
+// responseSkipPropNames is more permissive than skipPropNames — response fields
+// like created_on, updated_on, comment_count etc. are useful computed values.
+var responseSkipPropNames = map[string]bool{
+	"links": true, "html": true, "rendered": true,
+}
+
+// responseSkipPropertyRefs skips complex entity refs in response fields.
+var responseSkipPropertyRefs = map[string]bool{
+	"account": true, "user": true, "team": true,
+	"repository": true, "link": true,
+	"account_links": true, "team_links": true, "user_links": true,
+	"comment_resolution": true, "commitstatus": true,
+	"pullrequest": true, "base_commit": true, "commit": true,
+}
+
+// BodyFieldOpts returns the default options for request body field resolution.
+func BodyFieldOpts() FieldResolveOpts {
+	return FieldResolveOpts{
+		SkipPropNames:    skipPropNames,
+		SkipPropertyRefs: skipPropertyRefs,
+		SkipAllOfRefs:    skipAllOfRefs,
+		RefIdOnlySchemas: refIdOnlySchemas,
+	}
+}
+
+// ResponseFieldOpts returns options for response field resolution (more permissive).
+func ResponseFieldOpts() FieldResolveOpts {
+	return FieldResolveOpts{
+		SkipPropNames:    responseSkipPropNames,
+		SkipPropertyRefs: responseSkipPropertyRefs,
+		SkipAllOfRefs:    skipAllOfRefs,
+		RefIdOnlySchemas: refIdOnlySchemas,
+	}
+}
+
 // ResolveBodyFields recursively resolves a $ref to a list of flattened body fields.
 func ResolveBodyFields(schemas map[string]any, ref, prefix string, visited map[string]bool) []BodyField {
+	return ResolveFields(schemas, ref, prefix, visited, BodyFieldOpts())
+}
+
+// ResolveResponseFields resolves a response schema $ref to a list of flattened fields
+// using more permissive skip lists (e.g., includes created_on, updated_on, etc.).
+func ResolveResponseFields(schemas map[string]any, ref, prefix string, visited map[string]bool) []BodyField {
+	return ResolveFields(schemas, ref, prefix, visited, ResponseFieldOpts())
+}
+
+// ResolveFields recursively resolves a $ref to a list of flattened fields
+// with configurable skip lists via opts.
+func ResolveFields(schemas map[string]any, ref, prefix string, visited map[string]bool, opts FieldResolveOpts) []BodyField {
 	name := strings.TrimPrefix(ref, schemaRefPrefix)
 	if visited[name] {
 		return nil
@@ -104,12 +159,12 @@ func ResolveBodyFields(schemas map[string]any, ref, prefix string, visited map[s
 	if !ok {
 		return nil
 	}
-	return resolveSchemaObj(schemas, schema, prefix, visited)
+	return resolveSchemaObj(schemas, schema, prefix, visited, opts)
 }
 
-func resolveSchemaObj(schemas map[string]any, schema map[string]any, prefix string, visited map[string]bool) []BodyField {
+func resolveSchemaObj(schemas map[string]any, schema map[string]any, prefix string, visited map[string]bool, opts FieldResolveOpts) []BodyField {
 	if allOfRaw, ok := schema["allOf"]; ok {
-		return resolveAllOf(schemas, allOfRaw, prefix, visited)
+		return resolveAllOf(schemas, allOfRaw, prefix, visited, opts)
 	}
 
 	propsRaw, ok := schema["properties"]
@@ -120,10 +175,10 @@ func resolveSchemaObj(schemas map[string]any, schema map[string]any, prefix stri
 	if !ok {
 		return nil
 	}
-	return flattenProperties(schemas, props, prefix, visited)
+	return flattenProperties(schemas, props, prefix, visited, opts)
 }
 
-func resolveAllOf(schemas map[string]any, allOfRaw any, prefix string, visited map[string]bool) []BodyField {
+func resolveAllOf(schemas map[string]any, allOfRaw any, prefix string, visited map[string]bool, opts FieldResolveOpts) []BodyField {
 	allOf, _ := allOfRaw.([]any)
 	var fields []BodyField
 	for _, entry := range allOf {
@@ -133,21 +188,21 @@ func resolveAllOf(schemas map[string]any, allOfRaw any, prefix string, visited m
 		}
 		ref, ok := m["$ref"].(string)
 		if !ok {
-			fields = append(fields, resolveSchemaObj(schemas, m, prefix, visited)...)
+			fields = append(fields, resolveSchemaObj(schemas, m, prefix, visited, opts)...)
 			continue
 		}
 		refName := strings.TrimPrefix(ref, schemaRefPrefix)
-		if !skipAllOfRefs[refName] {
-			fields = append(fields, ResolveBodyFields(schemas, ref, prefix, visited)...)
+		if !opts.SkipAllOfRefs[refName] {
+			fields = append(fields, ResolveFields(schemas, ref, prefix, visited, opts)...)
 		}
 	}
 	return fields
 }
 
-func flattenProperties(schemas map[string]any, props map[string]any, prefix string, visited map[string]bool) []BodyField {
+func flattenProperties(schemas map[string]any, props map[string]any, prefix string, visited map[string]bool, opts FieldResolveOpts) []BodyField {
 	var fields []BodyField
 	for name, propRaw := range props {
-		if skipPropNames[name] {
+		if opts.SkipPropNames[name] {
 			continue
 		}
 		prop, ok := propRaw.(map[string]any)
@@ -158,17 +213,17 @@ func flattenProperties(schemas map[string]any, props map[string]any, prefix stri
 		if prefix != "" {
 			path = prefix + "." + name
 		}
-		fields = append(fields, flattenProperty(schemas, name, path, prop, visited)...)
+		fields = append(fields, flattenProperty(schemas, name, path, prop, visited, opts)...)
 	}
 	return fields
 }
 
-func flattenProperty(schemas map[string]any, name, path string, prop map[string]any, visited map[string]bool) []BodyField {
+func flattenProperty(schemas map[string]any, name, path string, prop map[string]any, visited map[string]bool, opts FieldResolveOpts) []BodyField {
 	if ref, ok := prop["$ref"].(string); ok {
-		return resolveRefProperty(schemas, name, path, ref, visited)
+		return resolveRefProperty(schemas, name, path, ref, visited, opts)
 	}
 	if _, ok := prop["allOf"]; ok {
-		return resolveSchemaObj(schemas, prop, path, visited)
+		return resolveSchemaObj(schemas, prop, path, visited, opts)
 	}
 
 	typ, _ := prop["type"].(string)
@@ -180,21 +235,78 @@ func flattenProperty(schemas map[string]any, name, path string, prop map[string]
 		return []BodyField{MakeBodyField(path, typ, desc)}
 	case "object":
 		if subProps, ok := prop["properties"].(map[string]any); ok {
-			return flattenProperties(schemas, subProps, path, visited)
+			return flattenProperties(schemas, subProps, path, visited, opts)
 		}
 	}
 	return nil
 }
 
-func resolveRefProperty(schemas map[string]any, name, path, ref string, visited map[string]bool) []BodyField {
+func resolveRefProperty(schemas map[string]any, name, path, ref string, visited map[string]bool, opts FieldResolveOpts) []BodyField {
 	refName := strings.TrimPrefix(ref, schemaRefPrefix)
-	if skipPropertyRefs[refName] {
+	if opts.SkipPropertyRefs[refName] {
 		return nil
 	}
-	if refIdOnlySchemas[refName] || visited[refName] {
+	if opts.RefIdOnlySchemas[refName] || visited[refName] {
 		return []BodyField{MakeBodyField(path+".id", "integer", fmt.Sprintf("ID of referenced %s", name))}
 	}
-	return ResolveBodyFields(schemas, ref, path, visited)
+	return ResolveFields(schemas, ref, path, visited, opts)
+}
+
+// ResolveResponseRef extracts the response entity schema $ref from an operation.
+// For paginated responses, it digs into the values array items to get the
+// underlying entity schema. Returns empty string if no response schema found.
+func ResolveResponseRef(op *Op, schemas map[string]any) string {
+	if op == nil {
+		return ""
+	}
+	for _, code := range []string{"200", "201"} {
+		resp, ok := op.Responses[code]
+		if !ok {
+			continue
+		}
+		for _, mt := range resp.Content {
+			ref := mt.Schema.Ref
+			if ref == "" {
+				continue
+			}
+			// For paginated responses, extract the item schema from values array.
+			refName := strings.TrimPrefix(ref, schemaRefPrefix)
+			if strings.Contains(refName, "paginated_") || strings.HasSuffix(refName, "search_result_page") {
+				if itemRef := extractPaginatedItemRef(schemas, refName); itemRef != "" {
+					return itemRef
+				}
+			}
+			return ref
+		}
+	}
+	return ""
+}
+
+// extractPaginatedItemRef extracts the $ref from a paginated schema's
+// values.items field, e.g., paginated_projects → project.
+func extractPaginatedItemRef(schemas map[string]any, schemaName string) string {
+	raw, ok := schemas[schemaName]
+	if !ok {
+		return ""
+	}
+	schema, ok := raw.(map[string]any)
+	if !ok {
+		return ""
+	}
+	props, ok := schema["properties"].(map[string]any)
+	if !ok {
+		return ""
+	}
+	values, ok := props["values"].(map[string]any)
+	if !ok {
+		return ""
+	}
+	items, ok := values["items"].(map[string]any)
+	if !ok {
+		return ""
+	}
+	ref, _ := items["$ref"].(string)
+	return ref
 }
 
 func appendEnumValues(prop map[string]any, desc string) string {

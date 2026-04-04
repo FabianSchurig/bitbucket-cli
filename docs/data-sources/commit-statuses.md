@@ -50,3 +50,11 @@ output "commit_statuses_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `created_on` (String) created_on
+- `updated_on` (String) updated_on
+- `description` (String) A description of the build (e.g. "Unit tests in Bamboo")
+- `key` (String) An identifier for the status that's unique to
+- `name` (String) An identifier for the build itself, e.g. BB-DEPLOY-1
+- `refname` (String) 
+- `state` (String) Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]
+- `url` (String) A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time.

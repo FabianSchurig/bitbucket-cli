@@ -40,11 +40,15 @@ resource "bitbucket_workspaces" "example" {
 ### Required
 - `workspace` (String) Path parameter.
 
-### Optional
-
-- `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
-
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `created_on` (String) created_on
+- `forking_mode` (String) Controls the rules for forking repositories within this workspace.
+- `is_privacy_enforced` (String) Indicates whether the workspace enforces private content, or whether it allows public content.
+- `is_private` (String) Indicates whether the workspace is publicly accessible, or whether it is
+- `name` (String) The name of the workspace.
+- `slug` (String) The short label that identifies this workspace.
+- `updated_on` (String) updated_on
+- `uuid` (String) The workspace's immutable id.

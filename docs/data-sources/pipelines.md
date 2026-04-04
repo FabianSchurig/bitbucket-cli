@@ -48,3 +48,8 @@ output "pipelines_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `created_on` (String) The timestamp when the pipeline was created.
+- `build_number` (String) The build number of the pipeline.
+- `build_seconds_used` (String) The number of build seconds used by this pipeline.
+- `completed_on` (String) The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.
+- `uuid` (String) The UUID identifying the pipeline.

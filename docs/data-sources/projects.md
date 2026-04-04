@@ -46,3 +46,11 @@ output "projects_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `created_on` (String) created_on
+- `description` (String) description
+- `has_publicly_visible_repos` (String) 
+- `is_private` (String) 
+- `key` (String) The project's key.
+- `name` (String) The name of the project.
+- `updated_on` (String) updated_on
+- `uuid` (String) The project's immutable id.
