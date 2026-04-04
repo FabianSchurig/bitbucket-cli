@@ -14,6 +14,22 @@ Manages Bitbucket addon via the Bitbucket Cloud API.
 - **Delete**: Supported
 - **List**: Supported (via data source)
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Update | `PUT` | `/addon` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-addon/#api-addon-put) |
+| Delete | `DELETE` | `/addon` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-addon/#api-addon-delete) |
+| List | `GET` | `/addon/linkers` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-addon/#api-addon-linkers-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Update | — |
+| Delete | — |
+| List | — |
+
 ## Example Usage
 
 ```hcl

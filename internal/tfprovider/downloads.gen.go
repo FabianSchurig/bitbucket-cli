@@ -35,6 +35,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-downloads/#api-repositories-workspace-repo-slug-downloads-get`,
 		},
 		{
 			OperationID: `uploadADownloadArtifact`,
@@ -49,6 +53,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-downloads/#api-repositories-workspace-repo-slug-downloads-post`,
 		},
 		{
 			OperationID: `getADownloadArtifactLink`,
@@ -70,6 +78,10 @@ metadata.
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-downloads/#api-repositories-workspace-repo-slug-downloads-filename-get`,
 		},
 		{
 			OperationID: `deleteADownloadArtifact`,
@@ -85,6 +97,10 @@ metadata.
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-downloads/#api-repositories-workspace-repo-slug-downloads-filename-delete`,
 		},
 	}),
 	AllOps: []OperationDef{
@@ -101,6 +117,10 @@ metadata.
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-downloads/#api-repositories-workspace-repo-slug-downloads-get`,
 		},
 		{
 			OperationID: `uploadADownloadArtifact`,
@@ -115,6 +135,10 @@ metadata.
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-downloads/#api-repositories-workspace-repo-slug-downloads-post`,
 		},
 		{
 			OperationID: `getADownloadArtifactLink`,
@@ -136,6 +160,10 @@ metadata.
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-downloads/#api-repositories-workspace-repo-slug-downloads-filename-get`,
 		},
 		{
 			OperationID: `deleteADownloadArtifact`,
@@ -151,6 +179,10 @@ metadata.
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-downloads/#api-repositories-workspace-repo-slug-downloads-filename-delete`,
 		},
 	},
 }

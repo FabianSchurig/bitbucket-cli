@@ -9,6 +9,20 @@ description: |-
 
 Reads Bitbucket tags via the Bitbucket Cloud API.
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/refs/tags/{name}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-tags-name-get) |
+| List | `GET` | `/repositories/{workspace}/{repo_slug}/refs/tags` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-tags-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | `read:repository:bitbucket` |
+| List | `read:repository:bitbucket` |
+
 ## Example Usage
 
 ```hcl

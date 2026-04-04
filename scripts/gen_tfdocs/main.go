@@ -40,6 +40,16 @@ type GroupData struct {
 	HasIDParam  bool // true if "id" is a path parameter (avoids conflict with computed id)
 	Params      []string
 	ParamValues map[string]string
+	CRUDOps     []CRUDOpInfo // CRUD operation details (scopes, doc links)
+}
+
+// CRUDOpInfo holds details about a single CRUD operation for documentation.
+type CRUDOpInfo struct {
+	Label  string   // "Create", "Read", "Update", "Delete", "List"
+	Scopes []string // OAuth2 scopes required
+	DocURL string   // Atlassian REST API documentation URL
+	Method string   // HTTP method (GET, POST, etc.)
+	Path   string   // API path template
 }
 
 func exampleValue(param string) string {
@@ -140,6 +150,10 @@ func buildGroups() []GroupData {
 				hasIDParam = true
 			}
 		}
+
+		// Collect CRUD operation details (scopes, doc links).
+		crudOps := deriveCRUDOps(name, groupIndex)
+
 		groups = append(groups, GroupData{
 			Name:        name,
 			TFName:      "bitbucket_" + strings.ReplaceAll(name, "-", "_"),
@@ -151,6 +165,7 @@ func buildGroups() []GroupData {
 			HasIDParam:  hasIDParam,
 			Params:      params,
 			ParamValues: pv,
+			CRUDOps:     crudOps,
 		})
 	}
 	sort.Slice(groups, func(i, j int) bool { return groups[i].Name < groups[j].Name })
@@ -190,12 +205,54 @@ func deriveParams(name string, index map[string]tfprovider.ResourceGroup) []stri
 	return params
 }
 
+// deriveCRUDOps collects details (scopes, doc URL) for each CRUD operation.
+func deriveCRUDOps(name string, index map[string]tfprovider.ResourceGroup) []CRUDOpInfo {
+	rg, ok := index[name]
+	if !ok {
+		return nil
+	}
+
+	type entry struct {
+		label string
+		op    *tfprovider.OperationDef
+	}
+	entries := []entry{
+		{"Create", rg.Ops.Create},
+		{"Read", rg.Ops.Read},
+		{"Update", rg.Ops.Update},
+		{"Delete", rg.Ops.Delete},
+		{"List", rg.Ops.List},
+	}
+
+	var ops []CRUDOpInfo
+	for _, e := range entries {
+		if e.op == nil {
+			continue
+		}
+		ops = append(ops, CRUDOpInfo{
+			Label:  e.label,
+			Scopes: e.op.Scopes,
+			DocURL: e.op.DocURL,
+			Method: e.op.Method,
+			Path:   e.op.Path,
+		})
+	}
+	return ops
+}
+
 // ─── Templates ────────────────────────────────────────────────────────────────
 
 var funcMap = template.FuncMap{
 	"replace": strings.ReplaceAll,
 	"snakeCase": func(s string) string {
 		return strings.ReplaceAll(s, "-", "_")
+	},
+	"joinScopes": func(scopes []string) string {
+		quoted := make([]string, len(scopes))
+		for i, s := range scopes {
+			quoted[i] = "`" + s + "`"
+		}
+		return strings.Join(quoted, ", ")
 	},
 }
 
@@ -324,6 +381,24 @@ Manages Bitbucket {{.Name}} via the Bitbucket Cloud API.
 {{- if .HasList}}
 - **List**: Supported (via data source)
 {{- end}}
+{{- if .CRUDOps}}
+
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+{{- range .CRUDOps}}
+| {{.Label}} | ` + "`" + `{{.Method}}` + "`" + ` | ` + "`" + `{{.Path}}` + "`" + ` | {{if .DocURL}}[View]({{.DocURL}}){{end}} |
+{{- end}}
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+{{- range .CRUDOps}}
+| {{.Label}} | {{if .Scopes}}{{joinScopes .Scopes}}{{else}}—{{end}} |
+{{- end}}
+{{- end}}
 
 ## Example Usage
 
@@ -365,6 +440,28 @@ description: |-
 # {{.TFName}} (Data Source)
 
 Reads Bitbucket {{.Name}} via the Bitbucket Cloud API.
+{{- if .CRUDOps}}
+
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+{{- range .CRUDOps}}
+{{- if or (eq .Label "Read") (eq .Label "List")}}
+| {{.Label}} | ` + "`" + `{{.Method}}` + "`" + ` | ` + "`" + `{{.Path}}` + "`" + ` | {{if .DocURL}}[View]({{.DocURL}}){{end}} |
+{{- end}}
+{{- end}}
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+{{- range .CRUDOps}}
+{{- if or (eq .Label "Read") (eq .Label "List")}}
+| {{.Label}} | {{if .Scopes}}{{joinScopes .Scopes}}{{else}}—{{end}} |
+{{- end}}
+{{- end}}
+{{- end}}
 
 ## Example Usage
 

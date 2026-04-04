@@ -9,6 +9,20 @@ description: |-
 
 Reads Bitbucket user-emails via the Bitbucket Cloud API.
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/user/emails/{email}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-emails-email-get) |
+| List | `GET` | `/user/emails` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-users/#api-user-emails-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | `read:user:bitbucket` |
+| List | `read:user:bitbucket` |
+
 ## Example Usage
 
 ```hcl

@@ -49,6 +49,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-deploy-keys-get`,
 		},
 		{
 			OperationID: `addARepositoryDeployKey`,
@@ -63,6 +67,11 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+				`write:ssh-key:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-deploy-keys-post`,
 		},
 		{
 			OperationID: `getARepositoryDeployKey`,
@@ -78,6 +87,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-deploy-keys-key-id-get`,
 		},
 		{
 			OperationID: `updateARepositoryDeployKey`,
@@ -93,6 +106,11 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+				`write:ssh-key:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-deploy-keys-key-id-put`,
 		},
 		{
 			OperationID: `deleteARepositoryDeployKey`,
@@ -108,6 +126,11 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+				`delete:ssh-key:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-deploy-keys-key-id-delete`,
 		},
 		{
 			OperationID: `getDeploymentsForRepository`,
@@ -124,6 +147,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-deployments-get`,
 		},
 		{
 			OperationID: `getDeploymentForRepository`,
@@ -139,6 +166,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-deployments-deployment-uuid-get`,
 		},
 		{
 			OperationID: `getEnvironmentsForRepository`,
@@ -155,6 +186,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-get`,
 		},
 		{
 			OperationID: `createEnvironment`,
@@ -172,6 +207,10 @@ Available operations:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-post`,
 		},
 		{
 			OperationID: `getEnvironmentForRepository`,
@@ -187,6 +226,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-environment-uuid-get`,
 		},
 		{
 			OperationID: `deleteEnvironmentForRepository`,
@@ -202,6 +245,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-environment-uuid-delete`,
 		},
 		{
 			OperationID: `updateEnvironmentForRepository`,
@@ -217,6 +264,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-environment-uuid-changes-post`,
 		},
 		{
 			OperationID: `listProjectDeployKeys`,
@@ -233,6 +284,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-workspaces-workspace-projects-project-key-deploy-keys-get`,
 		},
 		{
 			OperationID: `createAProjectDeployKey`,
@@ -247,6 +302,11 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+				`write:ssh-key:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-workspaces-workspace-projects-project-key-deploy-keys-post`,
 		},
 		{
 			OperationID: `getAProjectDeployKey`,
@@ -262,6 +322,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-workspaces-workspace-projects-project-key-deploy-keys-key-id-get`,
 		},
 		{
 			OperationID: `deleteADeployKeyFromAProject`,
@@ -277,6 +341,11 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+				`delete:ssh-key:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-workspaces-workspace-projects-project-key-deploy-keys-key-id-delete`,
 		},
 	}),
 	AllOps: []OperationDef{
@@ -295,6 +364,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-deploy-keys-get`,
 		},
 		{
 			OperationID: `addARepositoryDeployKey`,
@@ -309,6 +382,11 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+				`write:ssh-key:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-deploy-keys-post`,
 		},
 		{
 			OperationID: `getARepositoryDeployKey`,
@@ -324,6 +402,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-deploy-keys-key-id-get`,
 		},
 		{
 			OperationID: `updateARepositoryDeployKey`,
@@ -339,6 +421,11 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+				`write:ssh-key:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-deploy-keys-key-id-put`,
 		},
 		{
 			OperationID: `deleteARepositoryDeployKey`,
@@ -354,6 +441,11 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+				`delete:ssh-key:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-deploy-keys-key-id-delete`,
 		},
 		{
 			OperationID: `getDeploymentsForRepository`,
@@ -370,6 +462,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-deployments-get`,
 		},
 		{
 			OperationID: `getDeploymentForRepository`,
@@ -385,6 +481,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-deployments-deployment-uuid-get`,
 		},
 		{
 			OperationID: `getEnvironmentsForRepository`,
@@ -401,6 +501,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-get`,
 		},
 		{
 			OperationID: `createEnvironment`,
@@ -418,6 +522,10 @@ Available operations:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-post`,
 		},
 		{
 			OperationID: `getEnvironmentForRepository`,
@@ -433,6 +541,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-environment-uuid-get`,
 		},
 		{
 			OperationID: `deleteEnvironmentForRepository`,
@@ -448,6 +560,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-environment-uuid-delete`,
 		},
 		{
 			OperationID: `updateEnvironmentForRepository`,
@@ -463,6 +579,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-environment-uuid-changes-post`,
 		},
 		{
 			OperationID: `listProjectDeployKeys`,
@@ -479,6 +599,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-workspaces-workspace-projects-project-key-deploy-keys-get`,
 		},
 		{
 			OperationID: `createAProjectDeployKey`,
@@ -493,6 +617,11 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+				`write:ssh-key:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-workspaces-workspace-projects-project-key-deploy-keys-post`,
 		},
 		{
 			OperationID: `getAProjectDeployKey`,
@@ -508,6 +637,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-workspaces-workspace-projects-project-key-deploy-keys-key-id-get`,
 		},
 		{
 			OperationID: `deleteADeployKeyFromAProject`,
@@ -523,6 +656,11 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+				`delete:ssh-key:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-workspaces-workspace-projects-project-key-deploy-keys-key-id-delete`,
 		},
 	},
 }

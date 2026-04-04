@@ -15,6 +15,24 @@ Manages Bitbucket downloads via the Bitbucket Cloud API.
 - **Delete**: Supported
 - **List**: Supported (via data source)
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Create | `POST` | `/repositories/{workspace}/{repo_slug}/downloads` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-downloads/#api-repositories-workspace-repo-slug-downloads-post) |
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/downloads/{filename}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-downloads/#api-repositories-workspace-repo-slug-downloads-filename-get) |
+| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/downloads/{filename}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-downloads/#api-repositories-workspace-repo-slug-downloads-filename-delete) |
+| List | `GET` | `/repositories/{workspace}/{repo_slug}/downloads` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-downloads/#api-repositories-workspace-repo-slug-downloads-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Create | `write:repository:bitbucket` |
+| Read | `read:repository:bitbucket` |
+| Delete | `write:repository:bitbucket` |
+| List | `read:repository:bitbucket` |
+
 ## Example Usage
 
 ```hcl

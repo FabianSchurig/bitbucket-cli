@@ -15,6 +15,24 @@ Manages Bitbucket commit-statuses via the Bitbucket Cloud API.
 - **Update**: Supported
 - **List**: Supported (via data source)
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Create | `POST` | `/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses/build` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commit-statuses/#api-repositories-workspace-repo-slug-commit-commit-statuses-build-post) |
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses/build/{key}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commit-statuses/#api-repositories-workspace-repo-slug-commit-commit-statuses-build-key-get) |
+| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses/build/{key}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commit-statuses/#api-repositories-workspace-repo-slug-commit-commit-statuses-build-key-put) |
+| List | `GET` | `/repositories/{workspace}/{repo_slug}/commit/{commit}/statuses` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commit-statuses/#api-repositories-workspace-repo-slug-commit-commit-statuses-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Create | `read:repository:bitbucket` |
+| Read | `read:repository:bitbucket` |
+| Update | `read:repository:bitbucket` |
+| List | `read:repository:bitbucket` |
+
 ## Example Usage
 
 ```hcl

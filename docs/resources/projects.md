@@ -16,6 +16,26 @@ Manages Bitbucket projects via the Bitbucket Cloud API.
 - **Delete**: Supported
 - **List**: Supported (via data source)
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Create | `POST` | `/workspaces/{workspace}/projects` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-post) |
+| Read | `GET` | `/workspaces/{workspace}/projects/{project_key}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-projects-project-key-get) |
+| Update | `PUT` | `/workspaces/{workspace}/projects/{project_key}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-put) |
+| Delete | `DELETE` | `/workspaces/{workspace}/projects/{project_key}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-delete) |
+| List | `GET` | `/workspaces/{workspace}/projects` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-projects-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Create | `admin:project:bitbucket` |
+| Read | `read:project:bitbucket` |
+| Update | `admin:project:bitbucket` |
+| Delete | `admin:project:bitbucket` |
+| List | `read:project:bitbucket` |
+
 ## Example Usage
 
 ```hcl

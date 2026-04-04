@@ -14,6 +14,22 @@ Manages Bitbucket pipeline-caches via the Bitbucket Cloud API.
 - **Delete**: Supported
 - **List**: Supported (via data source)
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines-config/caches/{cache_uuid}/content-uri` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-caches-cache-uuid-content-uri-get) |
+| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/pipelines-config/caches/{cache_uuid}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-caches-cache-uuid-delete) |
+| List | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines-config/caches` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-caches-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | `read:pipeline:bitbucket` |
+| Delete | `write:pipeline:bitbucket` |
+| List | `read:pipeline:bitbucket` |
+
 ## Example Usage
 
 ```hcl

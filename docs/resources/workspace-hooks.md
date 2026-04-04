@@ -16,6 +16,26 @@ Manages Bitbucket workspace-hooks via the Bitbucket Cloud API.
 - **Delete**: Supported
 - **List**: Supported (via data source)
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Create | `POST` | `/workspaces/{workspace}/hooks` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-webhooks/#api-workspaces-workspace-hooks-post) |
+| Read | `GET` | `/workspaces/{workspace}/hooks/{uid}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-webhooks/#api-workspaces-workspace-hooks-uid-get) |
+| Update | `PUT` | `/workspaces/{workspace}/hooks/{uid}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-webhooks/#api-workspaces-workspace-hooks-uid-put) |
+| Delete | `DELETE` | `/workspaces/{workspace}/hooks/{uid}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-webhooks/#api-workspaces-workspace-hooks-uid-delete) |
+| List | `GET` | `/workspaces/{workspace}/hooks` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-webhooks/#api-workspaces-workspace-hooks-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Create | `read:webhook:bitbucket`, `write:webhook:bitbucket` |
+| Read | `read:webhook:bitbucket` |
+| Update | `read:webhook:bitbucket`, `write:webhook:bitbucket` |
+| Delete | `delete:webhook:bitbucket` |
+| List | `read:webhook:bitbucket` |
+
 ## Example Usage
 
 ```hcl

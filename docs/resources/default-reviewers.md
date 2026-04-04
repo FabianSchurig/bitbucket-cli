@@ -15,6 +15,24 @@ Manages Bitbucket default-reviewers via the Bitbucket Cloud API.
 - **Delete**: Supported
 - **List**: Supported (via data source)
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Create | `PUT` | `/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-default-reviewers-target-username-put) |
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-default-reviewers-target-username-get) |
+| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-default-reviewers-target-username-delete) |
+| List | `GET` | `/repositories/{workspace}/{repo_slug}/default-reviewers` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-default-reviewers-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Create | `admin:repository:bitbucket` |
+| Read | `read:pullrequest:bitbucket` |
+| Delete | `admin:repository:bitbucket` |
+| List | `read:pullrequest:bitbucket` |
+
 ## Example Usage
 
 ```hcl

@@ -38,6 +38,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-repositories-workspace-repo-slug-branching-model-get`,
 		},
 		{
 			OperationID: `getTheBranchingModelConfigForARepository`,
@@ -52,6 +56,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-repositories-workspace-repo-slug-branching-model-settings-get`,
 		},
 		{
 			OperationID: `updateTheBranchingModelConfigForARepository`,
@@ -66,6 +74,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-repositories-workspace-repo-slug-branching-model-settings-put`,
 		},
 		{
 			OperationID: `getTheEffectiveOrCurrentlyAppliedBranchingModelForARepository`,
@@ -80,6 +92,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-repositories-workspace-repo-slug-effective-branching-model-get`,
 		},
 		{
 			OperationID: `getTheBranchingModelForAProject`,
@@ -94,6 +110,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-workspaces-workspace-projects-project-key-branching-model-get`,
 		},
 		{
 			OperationID: `getTheBranchingModelConfigForAProject`,
@@ -108,6 +128,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-workspaces-workspace-projects-project-key-branching-model-settings-get`,
 		},
 		{
 			OperationID: `updateTheBranchingModelConfigForAProject`,
@@ -122,6 +146,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-workspaces-workspace-projects-project-key-branching-model-settings-put`,
 		},
 	}),
 	AllOps: []OperationDef{
@@ -138,6 +166,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-repositories-workspace-repo-slug-branching-model-get`,
 		},
 		{
 			OperationID: `getTheBranchingModelConfigForARepository`,
@@ -152,6 +184,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-repositories-workspace-repo-slug-branching-model-settings-get`,
 		},
 		{
 			OperationID: `updateTheBranchingModelConfigForARepository`,
@@ -166,6 +202,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-repositories-workspace-repo-slug-branching-model-settings-put`,
 		},
 		{
 			OperationID: `getTheEffectiveOrCurrentlyAppliedBranchingModelForARepository`,
@@ -180,6 +220,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-repositories-workspace-repo-slug-effective-branching-model-get`,
 		},
 		{
 			OperationID: `getTheBranchingModelForAProject`,
@@ -194,6 +238,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-workspaces-workspace-projects-project-key-branching-model-get`,
 		},
 		{
 			OperationID: `getTheBranchingModelConfigForAProject`,
@@ -208,6 +256,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-workspaces-workspace-projects-project-key-branching-model-settings-get`,
 		},
 		{
 			OperationID: `updateTheBranchingModelConfigForAProject`,
@@ -222,6 +274,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-workspaces-workspace-projects-project-key-branching-model-settings-put`,
 		},
 	},
 }

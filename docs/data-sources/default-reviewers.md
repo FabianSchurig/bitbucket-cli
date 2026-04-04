@@ -9,6 +9,20 @@ description: |-
 
 Reads Bitbucket default-reviewers via the Bitbucket Cloud API.
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/default-reviewers/{target_username}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-default-reviewers-target-username-get) |
+| List | `GET` | `/repositories/{workspace}/{repo_slug}/default-reviewers` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-default-reviewers-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | `read:pullrequest:bitbucket` |
+| List | `read:pullrequest:bitbucket` |
+
 ## Example Usage
 
 ```hcl

@@ -46,6 +46,8 @@ type TFOpData struct {
 	BodyFields  []TFBodyFieldData
 	HasBody     bool
 	Paginated   bool
+	Scopes      []string
+	DocURL      string
 }
 
 type TFParamData struct {
@@ -99,6 +101,16 @@ var {{.VarName}} = ResourceGroup{
 			},
 			HasBody:   {{.HasBody}},
 			Paginated: {{.Paginated}},
+{{- if .Scopes}}
+			Scopes: []string{
+{{- range .Scopes}}
+				{{goStringLit .}},
+{{- end}}
+			},
+{{- end}}
+{{- if .DocURL}}
+			DocURL: {{goStringLit .DocURL}},
+{{- end}}
 		},
 {{- end}}
 	}),
@@ -122,6 +134,16 @@ var {{.VarName}} = ResourceGroup{
 			},
 			HasBody:   {{.HasBody}},
 			Paginated: {{.Paginated}},
+{{- if .Scopes}}
+			Scopes: []string{
+{{- range .Scopes}}
+				{{goStringLit .}},
+{{- end}}
+			},
+{{- end}}
+{{- if .DocURL}}
+			DocURL: {{goStringLit .DocURL}},
+{{- end}}
 		},
 {{- end}}
 	},
@@ -166,6 +188,8 @@ func operationToTFOp(op spec.OperationDef) TFOpData {
 		BodyFields:  bodyFields,
 		HasBody:     op.HasBody,
 		Paginated:   op.Paginated,
+		Scopes:      op.Scopes,
+		DocURL:      op.DocURL,
 	}
 }
 

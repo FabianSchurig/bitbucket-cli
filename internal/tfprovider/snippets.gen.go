@@ -57,6 +57,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-get`,
 		},
 		{
 			OperationID: `createASnippet`,
@@ -68,6 +72,11 @@ Available operations:
 			BodyFields:  []BodyFieldDef{},
 			HasBody:     true,
 			Paginated:   false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-post`,
 		},
 		{
 			OperationID: `listSnippetsInAWorkspace`,
@@ -84,6 +93,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-get`,
 		},
 		{
 			OperationID: `createASnippetForAWorkspace`,
@@ -97,6 +110,11 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    true,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-post`,
 		},
 		{
 			OperationID: `getASnippet`,
@@ -111,6 +129,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-get`,
 		},
 		{
 			OperationID: `updateASnippet`,
@@ -125,6 +147,11 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-put`,
 		},
 		{
 			OperationID: `deleteASnippet`,
@@ -139,6 +166,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`delete:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-delete`,
 		},
 		{
 			OperationID: `listCommentsOnASnippet`,
@@ -155,6 +186,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-comments-get`,
 		},
 		{
 			OperationID: `createACommentOnASnippet`,
@@ -173,6 +208,11 @@ Available operations:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-comments-post`,
 		},
 		{
 			OperationID: `getACommentOnASnippet`,
@@ -188,6 +228,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-comments-comment-id-get`,
 		},
 		{
 			OperationID: `updateACommentOnASnippet`,
@@ -207,6 +251,11 @@ Available operations:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-comments-comment-id-put`,
 		},
 		{
 			OperationID: `deleteACommentOnASnippet`,
@@ -224,6 +273,10 @@ Comments can only be removed by the comment author, snippet creator, or workspac
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-comments-comment-id-delete`,
 		},
 		{
 			OperationID: `listSnippetChanges`,
@@ -240,6 +293,10 @@ Comments can only be removed by the comment author, snippet creator, or workspac
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-commits-get`,
 		},
 		{
 			OperationID: `getAPreviousSnippetChange`,
@@ -255,6 +312,10 @@ Comments can only be removed by the comment author, snippet creator, or workspac
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-commits-revision-get`,
 		},
 		{
 			OperationID: `getASnippetsRawFileAtHead`,
@@ -272,6 +333,10 @@ out the versioned file links.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-files-path-get`,
 		},
 		{
 			OperationID: `checkIfTheCurrentUserIsWatchingASnippet`,
@@ -291,6 +356,10 @@ Hitting this endpoint anonymously always returns a 404.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-watch-get`,
 		},
 		{
 			OperationID: `watchASnippet`,
@@ -305,6 +374,10 @@ Hitting this endpoint anonymously always returns a 404.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-watch-put`,
 		},
 		{
 			OperationID: `stopWatchingASnippet`,
@@ -320,6 +393,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-watch-delete`,
 		},
 		{
 			OperationID: `listUsersWatchingASnippet`,
@@ -336,6 +413,7 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			DocURL:     `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-watchers-get`,
 		},
 		{
 			OperationID: `getAPreviousRevisionOfASnippet`,
@@ -351,6 +429,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-node-id-get`,
 		},
 		{
 			OperationID: `updateAPreviousRevisionOfASnippet`,
@@ -366,6 +448,11 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-node-id-put`,
 		},
 		{
 			OperationID: `deleteAPreviousRevisionOfASnippet`,
@@ -381,6 +468,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-node-id-delete`,
 		},
 		{
 			OperationID: `getASnippetsRawFile`,
@@ -397,6 +488,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-node-id-files-path-get`,
 		},
 		{
 			OperationID: `getSnippetChangesBetweenVersions`,
@@ -413,6 +508,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-revision-diff-get`,
 		},
 		{
 			OperationID: `getSnippetPatchBetweenVersions`,
@@ -428,6 +527,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-revision-patch-get`,
 		},
 	}),
 	AllOps: []OperationDef{
@@ -445,6 +548,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-get`,
 		},
 		{
 			OperationID: `createASnippet`,
@@ -456,6 +563,11 @@ to indicate success.`,
 			BodyFields:  []BodyFieldDef{},
 			HasBody:     true,
 			Paginated:   false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-post`,
 		},
 		{
 			OperationID: `listSnippetsInAWorkspace`,
@@ -472,6 +584,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-get`,
 		},
 		{
 			OperationID: `createASnippetForAWorkspace`,
@@ -485,6 +601,11 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    true,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-post`,
 		},
 		{
 			OperationID: `getASnippet`,
@@ -499,6 +620,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-get`,
 		},
 		{
 			OperationID: `updateASnippet`,
@@ -513,6 +638,11 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-put`,
 		},
 		{
 			OperationID: `deleteASnippet`,
@@ -527,6 +657,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`delete:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-delete`,
 		},
 		{
 			OperationID: `listCommentsOnASnippet`,
@@ -543,6 +677,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-comments-get`,
 		},
 		{
 			OperationID: `createACommentOnASnippet`,
@@ -561,6 +699,11 @@ to indicate success.`,
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-comments-post`,
 		},
 		{
 			OperationID: `getACommentOnASnippet`,
@@ -576,6 +719,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-comments-comment-id-get`,
 		},
 		{
 			OperationID: `updateACommentOnASnippet`,
@@ -595,6 +742,11 @@ to indicate success.`,
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-comments-comment-id-put`,
 		},
 		{
 			OperationID: `deleteACommentOnASnippet`,
@@ -612,6 +764,10 @@ Comments can only be removed by the comment author, snippet creator, or workspac
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-comments-comment-id-delete`,
 		},
 		{
 			OperationID: `listSnippetChanges`,
@@ -628,6 +784,10 @@ Comments can only be removed by the comment author, snippet creator, or workspac
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-commits-get`,
 		},
 		{
 			OperationID: `getAPreviousSnippetChange`,
@@ -643,6 +803,10 @@ Comments can only be removed by the comment author, snippet creator, or workspac
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-commits-revision-get`,
 		},
 		{
 			OperationID: `getASnippetsRawFileAtHead`,
@@ -660,6 +824,10 @@ out the versioned file links.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-files-path-get`,
 		},
 		{
 			OperationID: `checkIfTheCurrentUserIsWatchingASnippet`,
@@ -679,6 +847,10 @@ Hitting this endpoint anonymously always returns a 404.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-watch-get`,
 		},
 		{
 			OperationID: `watchASnippet`,
@@ -693,6 +865,10 @@ Hitting this endpoint anonymously always returns a 404.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-watch-put`,
 		},
 		{
 			OperationID: `stopWatchingASnippet`,
@@ -708,6 +884,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-watch-delete`,
 		},
 		{
 			OperationID: `listUsersWatchingASnippet`,
@@ -724,6 +904,7 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			DocURL:     `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-watchers-get`,
 		},
 		{
 			OperationID: `getAPreviousRevisionOfASnippet`,
@@ -739,6 +920,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-node-id-get`,
 		},
 		{
 			OperationID: `updateAPreviousRevisionOfASnippet`,
@@ -754,6 +939,11 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-node-id-put`,
 		},
 		{
 			OperationID: `deleteAPreviousRevisionOfASnippet`,
@@ -769,6 +959,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-node-id-delete`,
 		},
 		{
 			OperationID: `getASnippetsRawFile`,
@@ -785,6 +979,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-node-id-files-path-get`,
 		},
 		{
 			OperationID: `getSnippetChangesBetweenVersions`,
@@ -801,6 +999,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-revision-diff-get`,
 		},
 		{
 			OperationID: `getSnippetPatchBetweenVersions`,
@@ -816,6 +1018,10 @@ to indicate success.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:snippet:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-revision-patch-get`,
 		},
 	},
 }

@@ -43,6 +43,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-get`,
 		},
 		{
 			OperationID: `getReport`,
@@ -59,6 +63,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-get`,
 		},
 		{
 			OperationID: `createOrUpdateReport`,
@@ -86,6 +94,10 @@ Available operations:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-put`,
 		},
 		{
 			OperationID: `deleteReport`,
@@ -102,6 +114,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-delete`,
 		},
 		{
 			OperationID: `getAnnotationsForReport`,
@@ -120,6 +136,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-annotations-get`,
 		},
 		{
 			OperationID: `bulkCreateOrUpdateAnnotations`,
@@ -136,6 +156,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    true,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-annotations-post`,
 		},
 		{
 			OperationID: `getAnnotation`,
@@ -153,6 +177,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-annotations-annotationId-get`,
 		},
 		{
 			OperationID: `createOrUpdateAnnotation`,
@@ -180,6 +208,10 @@ Available operations:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-annotations-annotationId-put`,
 		},
 		{
 			OperationID: `deleteAnnotation`,
@@ -197,6 +229,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-annotations-annotationId-delete`,
 		},
 	}),
 	AllOps: []OperationDef{
@@ -216,6 +252,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-get`,
 		},
 		{
 			OperationID: `getReport`,
@@ -232,6 +272,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-get`,
 		},
 		{
 			OperationID: `createOrUpdateReport`,
@@ -259,6 +303,10 @@ Available operations:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-put`,
 		},
 		{
 			OperationID: `deleteReport`,
@@ -275,6 +323,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-delete`,
 		},
 		{
 			OperationID: `getAnnotationsForReport`,
@@ -293,6 +345,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-annotations-get`,
 		},
 		{
 			OperationID: `bulkCreateOrUpdateAnnotations`,
@@ -309,6 +365,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    true,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-annotations-post`,
 		},
 		{
 			OperationID: `getAnnotation`,
@@ -326,6 +386,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-annotations-annotationId-get`,
 		},
 		{
 			OperationID: `createOrUpdateAnnotation`,
@@ -353,6 +417,10 @@ Available operations:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-annotations-annotationId-put`,
 		},
 		{
 			OperationID: `deleteAnnotation`,
@@ -370,6 +438,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-commit-commit-reports-reportId-annotations-annotationId-delete`,
 		},
 	},
 }
