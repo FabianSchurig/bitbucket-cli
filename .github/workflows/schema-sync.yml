@@ -156,6 +156,6 @@ jobs:
           fi
 
           git commit -m "chore: schema sync ${VERSION}"
-          git tag "$VERSION"
+          git tag -a "$VERSION" -m "chore: schema sync ${VERSION}"
           git push --follow-tags
           # The tag push triggers the Release workflow (release.yml)

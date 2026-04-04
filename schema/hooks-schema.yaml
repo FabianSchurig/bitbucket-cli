@@ -8,6 +8,125 @@ info:
   x-cli-command-long: Commands for listing, creating, updating, and deleting Bitbucket
     webhooks.
 paths:
+  /hook_events:
+    get:
+      tags:
+      - Webhooks
+      description: 'Returns the webhook resource or subject types on which webhooks
+        can
+
+        be registered.
+
+
+        Each resource/subject type contains an `events` link that returns the
+
+        paginated list of specific events each individual subject type can
+
+        emit.
+
+
+        This endpoint is publicly accessible and does not require
+
+        authentication or scopes.'
+      summary: Get a webhook resource
+      responses:
+        '200':
+          description: A mapping of resource/subject types pointing to their individual
+            event types.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/subject_types'
+              examples:
+                response:
+                  value:
+                    repository:
+                      links:
+                        events:
+                          href: https://api.bitbucket.org/2.0/hook_events/repository
+                    workspace:
+                      links:
+                        events:
+                          href: https://api.bitbucket.org/2.0/hook_events/workspace
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+      operationId: getAWebhookResource
+    parameters: []
+  /hook_events/{subject_type}:
+    get:
+      tags:
+      - Webhooks
+      description: 'Returns a paginated list of all valid webhook events for the
+
+        specified entity.
+
+        **The team and user webhooks are deprecated, and you should use workspace
+        instead.
+
+        For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).**
+
+
+        This is public data that does not require any scopes or authentication.
+
+
+        NOTE: The example response is a truncated response object for the `workspace`
+        `subject_type`.
+
+        We return the same structure for the other `subject_type` objects.'
+      summary: List subscribable webhook types
+      responses:
+        '200':
+          description: A paginated list of webhook types available to subscribe on.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_hook_events'
+              examples:
+                response:
+                  value:
+                    page: 1
+                    pagelen: 30
+                    size: 4
+                    values:
+                    - category: Repository
+                      description: Whenever a repository push occurs
+                      event: repo:push
+                      label: Push
+                    - category: Repository
+                      description: Whenever a repository fork occurs
+                      event: repo:fork
+                      label: Fork
+                    - category: Repository
+                      description: Whenever a repository import occurs
+                      event: repo:imported
+                      label: Import
+                    - category: Pull Request
+                      label: Approved
+                      description: When someone has approved a pull request
+                      event: pullrequest:approved
+        '404':
+          description: If an invalid `{subject_type}` value was specified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2: []
+      - basic: []
+      - api_key: []
+      operationId: listSubscribableWebhookTypes
+    parameters:
+    - name: subject_type
+      in: path
+      description: A resource or subject type.
+      required: true
+      schema:
+        type: string
+        enum:
+        - repository
+        - workspace
   /repositories/{workspace}/{repo_slug}/hooks:
     get:
       tags:
@@ -573,127 +692,35 @@ paths:
       required: true
       schema:
         type: string
-  /hook_events:
-    get:
-      tags:
-      - Webhooks
-      description: 'Returns the webhook resource or subject types on which webhooks
-        can
-
-        be registered.
-
-
-        Each resource/subject type contains an `events` link that returns the
-
-        paginated list of specific events each individual subject type can
-
-        emit.
-
-
-        This endpoint is publicly accessible and does not require
-
-        authentication or scopes.'
-      summary: Get a webhook resource
-      responses:
-        '200':
-          description: A mapping of resource/subject types pointing to their individual
-            event types.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/subject_types'
-              examples:
-                response:
-                  value:
-                    repository:
-                      links:
-                        events:
-                          href: https://api.bitbucket.org/2.0/hook_events/repository
-                    workspace:
-                      links:
-                        events:
-                          href: https://api.bitbucket.org/2.0/hook_events/workspace
-      security:
-      - oauth2: []
-      - basic: []
-      - api_key: []
-      operationId: getAWebhookResource
-    parameters: []
-  /hook_events/{subject_type}:
-    get:
-      tags:
-      - Webhooks
-      description: 'Returns a paginated list of all valid webhook events for the
-
-        specified entity.
-
-        **The team and user webhooks are deprecated, and you should use workspace
-        instead.
-
-        For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).**
-
-
-        This is public data that does not require any scopes or authentication.
-
-
-        NOTE: The example response is a truncated response object for the `workspace`
-        `subject_type`.
-
-        We return the same structure for the other `subject_type` objects.'
-      summary: List subscribable webhook types
-      responses:
-        '200':
-          description: A paginated list of webhook types available to subscribe on.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paginated_hook_events'
-              examples:
-                response:
-                  value:
-                    page: 1
-                    pagelen: 30
-                    size: 4
-                    values:
-                    - category: Repository
-                      description: Whenever a repository push occurs
-                      event: repo:push
-                      label: Push
-                    - category: Repository
-                      description: Whenever a repository fork occurs
-                      event: repo:fork
-                      label: Fork
-                    - category: Repository
-                      description: Whenever a repository import occurs
-                      event: repo:imported
-                      label: Import
-                    - category: Pull Request
-                      label: Approved
-                      description: When someone has approved a pull request
-                      event: pullrequest:approved
-        '404':
-          description: If an invalid `{subject_type}` value was specified.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2: []
-      - basic: []
-      - api_key: []
-      operationId: listSubscribableWebhookTypes
-    parameters:
-    - name: subject_type
-      in: path
-      description: A resource or subject type.
-      required: true
-      schema:
-        type: string
-        enum:
-        - repository
-        - workspace
 components:
   schemas:
+    error:
+      type: object
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
     hook_event:
       type: object
       title: Hook Event
@@ -741,6 +768,144 @@ components:
         description:
           type: string
           description: More detailed description of the webhook event type.
+      additionalProperties: false
+    object:
+      type: object
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+      required:
+      - type
+      additionalProperties: true
+      discriminator:
+        propertyName: type
+    paginated_hook_events:
+      type: object
+      title: Paginated Hook Events
+      description: A paginated list of webhook types available to subscribe on.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/hook_event'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_webhook_subscriptions:
+      type: object
+      title: Paginated Webhook Subscriptions
+      description: A paginated list of webhook subscriptions
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/webhook_subscription'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    subject_types:
+      type: object
+      title: Subject Types
+      description: The mapping of resource/subject types pointing to their individual
+        event types.
+      properties:
+        repository:
+          type: object
+          properties:
+            events:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+          additionalProperties: false
+        workspace:
+          type: object
+          properties:
+            events:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+          additionalProperties: false
       additionalProperties: false
     webhook_subscription:
       allOf:
@@ -826,168 +991,3 @@ components:
             minLength: 0
             maxLength: 128
         additionalProperties: true
-    error:
-      type: object
-      title: Error
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-            detail:
-              type: string
-            data:
-              type: object
-              description: Optional structured data that is endpoint-specific.
-              properties: {}
-              additionalProperties: true
-          required:
-          - message
-          additionalProperties: false
-      required:
-      - type
-      additionalProperties: true
-    paginated_webhook_subscriptions:
-      type: object
-      title: Paginated Webhook Subscriptions
-      description: A paginated list of webhook subscriptions
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/webhook_subscription'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    subject_types:
-      type: object
-      title: Subject Types
-      description: The mapping of resource/subject types pointing to their individual
-        event types.
-      properties:
-        repository:
-          type: object
-          properties:
-            events:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-          additionalProperties: false
-        workspace:
-          type: object
-          properties:
-            events:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-          additionalProperties: false
-      additionalProperties: false
-    paginated_hook_events:
-      type: object
-      title: Paginated Hook Events
-      description: A paginated list of webhook types available to subscribe on.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/hook_event'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    object:
-      type: object
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-      required:
-      - type
-      additionalProperties: true
-      discriminator:
-        propertyName: type

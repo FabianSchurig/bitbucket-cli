@@ -167,6 +167,304 @@ paths:
       required: true
       schema:
         type: string
+  /users/{selected_user}/gpg-keys:
+    get:
+      tags:
+      - GPG
+      description: 'Returns a paginated list of the user''s GPG public keys.
+
+        The `key` and `subkeys` fields can also be requested from the endpoint.
+
+        See [Partial Responses](/cloud/bitbucket/rest/intro/#partial-response) for
+        more details.'
+      summary: List GPG keys
+      responses:
+        '200':
+          description: A list of the GPG keys associated with the account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_gpg_user_keys'
+              examples:
+                response:
+                  value:
+                    page: 1
+                    pagelen: 10
+                    size: 1
+                    values:
+                    - added_on: '2024-09-24T12:09:33.154081+00:00'
+                      created_on: '2018-03-20T13:09:04.207005+00:00'
+                      expires_on: null
+                      fingerprint: h4m26ppxrol7blr7spbc7lhyymokdbnkxd06kzrt
+                      key_id: ymokdbnkxd06kzrt
+                      last_used: '2024-09-25T15:18:05.196003+00:00'
+                      links:
+                        self:
+                          href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}/gpg-keys/H4M26PPXROL7BLR7SPBC7LHYYMOKDBNKXD06KZRT
+                      name: Alice's OpenPGP key
+                      owner:
+                        display_name: Mark Adams
+                        links:
+                          avatar:
+                            href: https://bitbucket.org/account/markadams-atl/avatar/32/
+                          html:
+                            href: https://bitbucket.org/markadams-atl/
+                          self:
+                            href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}
+                        type: user
+                        username: markadams-atl
+                        nickname: markadams-atl
+                        uuid: '{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}'
+                      parent_fingerprint: null
+                      type: gpg_key
+        '403':
+          description: If the specified user's keys are not accessible to the current
+            user
+        '404':
+          description: If the specified user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:gpg-key:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listGpgKeys
+    post:
+      tags:
+      - GPG
+      description: 'Adds a new GPG public key to the specified user account and returns
+        the resulting key.
+
+
+        Example:
+
+
+        ```
+
+        $ curl -X POST -H "Content-Type: application/json" -d
+
+        ''{"key": "<insert GPG Key>"}''
+
+        https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}/gpg-keys
+
+        ```'
+      summary: Add a new GPG key
+      responses:
+        '201':
+          description: The newly created GPG key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPG_account_key'
+              examples:
+                response:
+                  value:
+                    added_on: '2024-09-24T12:09:33.154081+00:00'
+                    created_on: '2018-03-20T13:09:04.207005+00:00'
+                    expires_on: null
+                    fingerprint: h4m26ppxrol7blr7spbc7lhyymokdbnkxd06kzrt
+                    key_id: ymokdbnkxd06kzrt
+                    last_used: '2024-09-25T15:18:05.196003+00:00'
+                    links:
+                      self:
+                        href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}/gpg-keys/H4M26PPXROL7BLR7SPBC7LHYYMOKDBNKXD06KZRT
+                    name: Alice's OpenPGP key
+                    owner:
+                      display_name: Mark Adams
+                      links:
+                        avatar:
+                          href: https://bitbucket.org/account/markadams-atl/avatar/32/
+                        html:
+                          href: https://bitbucket.org/markadams-atl/
+                        self:
+                          href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}
+                      type: user
+                      username: markadams-atl
+                      nickname: markadams-atl
+                      uuid: '{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}'
+                    parent_fingerprint: null
+                    type: gpg_key
+        '400':
+          description: If the submitted key or related value is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: If the current user does not have permission to add a key for
+            the specified user
+        '404':
+          description: If the specified user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GPG_account_key'
+        description: The new GPG key object.
+      security:
+      - oauth2:
+        - account:write
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:gpg-key:bitbucket
+        - write:gpg-key:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: addANewGpgKey
+    parameters:
+    - name: selected_user
+      in: path
+      description: 'This can either be an Atlassian Account ID OR the UUID of the
+        account,
+
+        surrounded by curly-braces, for example: `{account UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /users/{selected_user}/gpg-keys/{fingerprint}:
+    delete:
+      tags:
+      - GPG
+      description: Deletes a specific GPG public key from a user's account.
+      summary: Delete a GPG key
+      responses:
+        '204':
+          description: The key has been deleted
+        '400':
+          description: If the submitted key or related value is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: If the current user does not have permission to delete a key
+            for the specified user, or the submitted key is a subkey
+        '404':
+          description: If the specified key does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account:write
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - delete:gpg-key:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: deleteAGpgKey
+    get:
+      tags:
+      - GPG
+      description: 'Returns a specific GPG public key belonging to a user.
+
+        The `key` and `subkeys` fields can also be requested from the endpoint.
+
+        See [Partial Responses](/cloud/bitbucket/rest/intro/#partial-response) for
+        more details.'
+      summary: Get a GPG key
+      responses:
+        '200':
+          description: The specific GPG key matching the user and fingerprint.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPG_account_key'
+              examples:
+                response:
+                  value:
+                    added_on: '2024-09-24T12:09:33.154081+00:00'
+                    created_on: '2018-03-20T13:09:04.207005+00:00'
+                    expires_on: null
+                    fingerprint: h4m26ppxrol7blr7spbc7lhyymokdbnkxd06kzrt
+                    key_id: ymokdbnkxd06kzrt
+                    last_used: '2024-09-25T15:18:05.196003+00:00'
+                    links:
+                      self:
+                        href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}/gpg-keys/H4M26PPXROL7BLR7SPBC7LHYYMOKDBNKXD06KZRT
+                    name: Alice's OpenPGP key
+                    owner:
+                      display_name: Mark Adams
+                      links:
+                        avatar:
+                          href: https://bitbucket.org/account/markadams-atl/avatar/32/
+                        html:
+                          href: https://bitbucket.org/markadams-atl/
+                        self:
+                          href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}
+                      type: user
+                      username: markadams-atl
+                      nickname: markadams-atl
+                      uuid: '{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}'
+                    parent_fingerprint: null
+                    type: gpg_key
+        '403':
+          description: If the specified user's keys are not accessible to the current
+            user
+        '404':
+          description: If the specified user does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:gpg-key:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getAGpgKey
+    parameters:
+    - name: fingerprint
+      in: path
+      description: 'A GPG key fingerprint.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: selected_user
+      in: path
+      description: 'This can either be an Atlassian Account ID OR the UUID of the
+        account,
+
+        surrounded by curly-braces, for example: `{account UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
   /users/{selected_user}/ssh-keys:
     get:
       tags:
@@ -553,304 +851,6 @@ paths:
       required: true
       schema:
         type: string
-  /users/{selected_user}/gpg-keys:
-    get:
-      tags:
-      - GPG
-      description: 'Returns a paginated list of the user''s GPG public keys.
-
-        The `key` and `subkeys` fields can also be requested from the endpoint.
-
-        See [Partial Responses](/cloud/bitbucket/rest/intro/#partial-response) for
-        more details.'
-      summary: List GPG keys
-      responses:
-        '200':
-          description: A list of the GPG keys associated with the account.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paginated_gpg_user_keys'
-              examples:
-                response:
-                  value:
-                    page: 1
-                    pagelen: 10
-                    size: 1
-                    values:
-                    - added_on: '2024-09-24T12:09:33.154081+00:00'
-                      created_on: '2018-03-20T13:09:04.207005+00:00'
-                      expires_on: null
-                      fingerprint: h4m26ppxrol7blr7spbc7lhyymokdbnkxd06kzrt
-                      key_id: ymokdbnkxd06kzrt
-                      last_used: '2024-09-25T15:18:05.196003+00:00'
-                      links:
-                        self:
-                          href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}/gpg-keys/H4M26PPXROL7BLR7SPBC7LHYYMOKDBNKXD06KZRT
-                      name: Alice's OpenPGP key
-                      owner:
-                        display_name: Mark Adams
-                        links:
-                          avatar:
-                            href: https://bitbucket.org/account/markadams-atl/avatar/32/
-                          html:
-                            href: https://bitbucket.org/markadams-atl/
-                          self:
-                            href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}
-                        type: user
-                        username: markadams-atl
-                        nickname: markadams-atl
-                        uuid: '{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}'
-                      parent_fingerprint: null
-                      type: gpg_key
-        '403':
-          description: If the specified user's keys are not accessible to the current
-            user
-        '404':
-          description: If the specified user does not exist
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - account
-      - basic: []
-      - api_key: []
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:gpg-key:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: listGpgKeys
-    post:
-      tags:
-      - GPG
-      description: 'Adds a new GPG public key to the specified user account and returns
-        the resulting key.
-
-
-        Example:
-
-
-        ```
-
-        $ curl -X POST -H "Content-Type: application/json" -d
-
-        ''{"key": "<insert GPG Key>"}''
-
-        https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}/gpg-keys
-
-        ```'
-      summary: Add a new GPG key
-      responses:
-        '201':
-          description: The newly created GPG key.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GPG_account_key'
-              examples:
-                response:
-                  value:
-                    added_on: '2024-09-24T12:09:33.154081+00:00'
-                    created_on: '2018-03-20T13:09:04.207005+00:00'
-                    expires_on: null
-                    fingerprint: h4m26ppxrol7blr7spbc7lhyymokdbnkxd06kzrt
-                    key_id: ymokdbnkxd06kzrt
-                    last_used: '2024-09-25T15:18:05.196003+00:00'
-                    links:
-                      self:
-                        href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}/gpg-keys/H4M26PPXROL7BLR7SPBC7LHYYMOKDBNKXD06KZRT
-                    name: Alice's OpenPGP key
-                    owner:
-                      display_name: Mark Adams
-                      links:
-                        avatar:
-                          href: https://bitbucket.org/account/markadams-atl/avatar/32/
-                        html:
-                          href: https://bitbucket.org/markadams-atl/
-                        self:
-                          href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}
-                      type: user
-                      username: markadams-atl
-                      nickname: markadams-atl
-                      uuid: '{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}'
-                    parent_fingerprint: null
-                    type: gpg_key
-        '400':
-          description: If the submitted key or related value is invalid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '403':
-          description: If the current user does not have permission to add a key for
-            the specified user
-        '404':
-          description: If the specified user does not exist
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GPG_account_key'
-        description: The new GPG key object.
-      security:
-      - oauth2:
-        - account:write
-      - basic: []
-      - api_key: []
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:gpg-key:bitbucket
-        - write:gpg-key:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: addANewGpgKey
-    parameters:
-    - name: selected_user
-      in: path
-      description: 'This can either be an Atlassian Account ID OR the UUID of the
-        account,
-
-        surrounded by curly-braces, for example: `{account UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-  /users/{selected_user}/gpg-keys/{fingerprint}:
-    delete:
-      tags:
-      - GPG
-      description: Deletes a specific GPG public key from a user's account.
-      summary: Delete a GPG key
-      responses:
-        '204':
-          description: The key has been deleted
-        '400':
-          description: If the submitted key or related value is invalid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '403':
-          description: If the current user does not have permission to delete a key
-            for the specified user, or the submitted key is a subkey
-        '404':
-          description: If the specified key does not exist
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - account:write
-      - basic: []
-      - api_key: []
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - delete:gpg-key:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: deleteAGpgKey
-    get:
-      tags:
-      - GPG
-      description: 'Returns a specific GPG public key belonging to a user.
-
-        The `key` and `subkeys` fields can also be requested from the endpoint.
-
-        See [Partial Responses](/cloud/bitbucket/rest/intro/#partial-response) for
-        more details.'
-      summary: Get a GPG key
-      responses:
-        '200':
-          description: The specific GPG key matching the user and fingerprint.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GPG_account_key'
-              examples:
-                response:
-                  value:
-                    added_on: '2024-09-24T12:09:33.154081+00:00'
-                    created_on: '2018-03-20T13:09:04.207005+00:00'
-                    expires_on: null
-                    fingerprint: h4m26ppxrol7blr7spbc7lhyymokdbnkxd06kzrt
-                    key_id: ymokdbnkxd06kzrt
-                    last_used: '2024-09-25T15:18:05.196003+00:00'
-                    links:
-                      self:
-                        href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}/gpg-keys/H4M26PPXROL7BLR7SPBC7LHYYMOKDBNKXD06KZRT
-                    name: Alice's OpenPGP key
-                    owner:
-                      display_name: Mark Adams
-                      links:
-                        avatar:
-                          href: https://bitbucket.org/account/markadams-atl/avatar/32/
-                        html:
-                          href: https://bitbucket.org/markadams-atl/
-                        self:
-                          href: https://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}
-                      type: user
-                      username: markadams-atl
-                      nickname: markadams-atl
-                      uuid: '{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}'
-                    parent_fingerprint: null
-                    type: gpg_key
-        '403':
-          description: If the specified user's keys are not accessible to the current
-            user
-        '404':
-          description: If the specified user does not exist
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - account
-      - basic: []
-      - api_key: []
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:gpg-key:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: getAGpgKey
-    parameters:
-    - name: fingerprint
-      in: path
-      description: 'A GPG key fingerprint.
-
-        '
-      required: true
-      schema:
-        type: string
-    - name: selected_user
-      in: path
-      description: 'This can either be an Atlassian Account ID OR the UUID of the
-        account,
-
-        surrounded by curly-braces, for example: `{account UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
 components:
   schemas:
     GPG_account_key:
@@ -915,6 +915,58 @@ components:
                 additionalProperties: false
             additionalProperties: false
         additionalProperties: true
+    account:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Account
+        description: An account object.
+        properties:
+          links:
+            $ref: '#/components/schemas/account_links'
+          created_on:
+            type: string
+            format: date-time
+          display_name:
+            type: string
+          uuid:
+            type: string
+        additionalProperties: true
+    account_links:
+      type: object
+      title: Account Links
+      description: Links related to an Account.
+      properties:
+        avatar:
+          $ref: '#/components/schemas/link'
+      additionalProperties: true
+    error:
+      type: object
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
     link:
       type: object
       title: Link
@@ -926,14 +978,19 @@ components:
         name:
           type: string
       additionalProperties: false
-    account_links:
+    object:
       type: object
-      title: Account Links
-      description: Links related to an Account.
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
       properties:
-        avatar:
-          $ref: '#/components/schemas/link'
+        type:
+          type: string
+      required:
+      - type
       additionalProperties: true
+      discriminator:
+        propertyName: type
     paginated_gpg_user_keys:
       type: object
       title: Paginated GPG User Keys
@@ -978,66 +1035,6 @@ components:
           minItems: 0
           uniqueItems: true
       additionalProperties: false
-    error:
-      type: object
-      title: Error
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-            detail:
-              type: string
-            data:
-              type: object
-              description: Optional structured data that is endpoint-specific.
-              properties: {}
-              additionalProperties: true
-          required:
-          - message
-          additionalProperties: false
-      required:
-      - type
-      additionalProperties: true
-    account:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Account
-        description: An account object.
-        properties:
-          links:
-            $ref: '#/components/schemas/account_links'
-          created_on:
-            type: string
-            format: date-time
-          display_name:
-            type: string
-          uuid:
-            type: string
-        additionalProperties: true
-    ssh_account_key:
-      allOf:
-      - $ref: '#/components/schemas/ssh_key'
-      - type: object
-        title: SSH Account Key
-        description: Represents an SSH public key for a user.
-        properties:
-          owner:
-            $ref: '#/components/schemas/account'
-          expires_on:
-            type: string
-            format: date-time
-          fingerprint:
-            type: string
-            description: The SSH key fingerprint in SHA-256 format.
-        additionalProperties: true
     paginated_ssh_user_keys:
       type: object
       title: Paginated SSH User Keys
@@ -1082,6 +1079,22 @@ components:
           minItems: 0
           uniqueItems: true
       additionalProperties: false
+    ssh_account_key:
+      allOf:
+      - $ref: '#/components/schemas/ssh_key'
+      - type: object
+        title: SSH Account Key
+        description: Represents an SSH public key for a user.
+        properties:
+          owner:
+            $ref: '#/components/schemas/account'
+          expires_on:
+            type: string
+            format: date-time
+          fingerprint:
+            type: string
+            description: The SSH key fingerprint in SHA-256 format.
+        additionalProperties: true
     ssh_key:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -1123,16 +1136,3 @@ components:
                 additionalProperties: false
             additionalProperties: false
         additionalProperties: true
-    object:
-      type: object
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-      required:
-      - type
-      additionalProperties: true
-      discriminator:
-        propertyName: type

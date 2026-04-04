@@ -8,6 +8,127 @@ info:
   x-cli-command-long: Commands for listing, creating, updating, and managing issues,
     comments, attachments, components, milestones, and versions.
 paths:
+  /repositories/{workspace}/{repo_slug}/components:
+    get:
+      tags:
+      - Issue tracker
+      description: 'Returns the components that have been defined in the issue tracker.
+
+
+        This resource is only available on repositories that have the issue
+
+        tracker enabled.'
+      summary: List components
+      responses:
+        '200':
+          description: The components that have been defined in the issue tracker.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/paginated_components'
+        '404':
+          description: The specified repository does not exist or does not have the
+            issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: listComponents
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/components/{component_id}:
+    get:
+      tags:
+      - Issue tracker
+      description: Returns the specified issue tracker component object.
+      summary: Get a component for issues
+      responses:
+        '200':
+          description: The specified component object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/component'
+        '404':
+          description: The specified repository or component does not exist or does
+            not have the issue tracker enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: getAComponentForIssues
+    parameters:
+    - name: component_id
+      in: path
+      description: The component's id
+      required: true
+      schema:
+        type: integer
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
   /repositories/{workspace}/{repo_slug}/issues:
     get:
       tags:
@@ -113,6 +234,372 @@ paths:
       x-atlassian-auth-types:
       - api-token
       operationId: createAnIssue
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/export:
+    post:
+      tags:
+      - Issue tracker
+      description: 'A POST request to this endpoint initiates a new background celery
+        task that archives the repo''s issues.
+
+
+        When the job has been accepted, it will return a 202 (Accepted) along with
+        a unique url to this job in the
+
+        ''Location'' response header. This url is the endpoint for where the user
+        can obtain their zip files."'
+      summary: Export issues
+      responses:
+        '202':
+          description: The export job has been accepted
+        '401':
+          description: The request wasn't authenticated properly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: When the authenticated user does not have admin permission
+            on the repo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The repo does not exist or does not have an issue tracker
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/export_options'
+        description: The options to apply to the export. Available options include
+          `project_key` and `project_name` which, if specified, are used as the project
+          key and name in the exported Jira json format. Option `send_email` specifies
+          whether an email should be sent upon export result. Option `include_attachments`
+          specifies whether attachments are included in the export.
+      security:
+      - oauth2:
+        - issue
+        - repository:admin
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: exportIssues
+    parameters:
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/export/{repo_name}-issues-{task_id}.zip:
+    get:
+      tags:
+      - Issue tracker
+      description: 'This endpoint is used to poll for the progress of an issue export
+
+        job and return the zip file after the job is complete.
+
+        As long as the job is running, this will return a 202 response
+
+        with in the response body a description of the current status.
+
+
+        After the job has been scheduled, but before it starts executing, the endpoint
+
+        returns a 202 response with status `ACCEPTED`.
+
+
+        Once it starts running, it is a 202 response with status `STARTED` and progress
+        filled.
+
+
+        After it is finished, it becomes a 200 response with status `SUCCESS` or `FAILURE`.'
+      summary: Check issue export status
+      responses:
+        '202':
+          description: Export job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue_job_status'
+              examples:
+                response:
+                  value:
+                    type: issue_job_status
+                    status: ACCEPTED
+                    phase: Initializing
+                    total: 0
+                    count: 0
+                    pct: 0
+        '401':
+          description: The request wasn't authenticated properly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: When the authenticated user does not have admin permission
+            on the repo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: No export job has begun
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue
+        - repository:admin
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:issue:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: checkIssueExportStatus
+    parameters:
+    - name: repo_name
+      in: path
+      description: The name of the repo
+      required: true
+      schema:
+        type: string
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: task_id
+      in: path
+      description: The ID of the export task
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+  /repositories/{workspace}/{repo_slug}/issues/import:
+    get:
+      tags:
+      - Issue tracker
+      description: 'When using GET, this endpoint reports the status of the current
+        import task.
+
+
+        After the job has been scheduled, but before it starts executing, the endpoint
+
+        returns a 202 response with status `ACCEPTED`.
+
+
+        Once it starts running, it is a 202 response with status `STARTED` and progress
+        filled.
+
+
+        After it is finished, it becomes a 200 response with status `SUCCESS` or `FAILURE`.'
+      summary: Check issue import status
+      responses:
+        '200':
+          description: Import job complete with either FAILURE or SUCCESS status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue_job_status'
+        '202':
+          description: Import job started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue_job_status'
+              examples:
+                response:
+                  value:
+                    type: issue_job_status
+                    status: ACCEPTED
+                    phase: Attachments
+                    total: 15
+                    count: 0
+                    percent: 0
+        '401':
+          description: The request wasn't authenticated properly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: When the authenticated user does not have admin permission
+            on the repo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: No export job has begun
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue:write
+        - repository:admin
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - write:issue:bitbucket
+        - admin:repository:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: checkIssueImportStatus
+    post:
+      tags:
+      - Issue tracker
+      description: 'A POST request to this endpoint will import the zip file given
+        by the archive parameter into the repository. All
+
+        existing issues will be deleted and replaced by the contents of the imported
+        zip file.
+
+
+        Imports are done through a multipart/form-data POST. There is one valid and
+        required form field, with the name
+
+        "archive," which needs to be a file field:
+
+
+        ```
+
+        $ curl -u <username> -X POST -F archive=@/path/to/file.zip https://api.bitbucket.org/2.0/repositories/<owner_username>/<repo_slug>/issues/import
+
+        ```'
+      summary: Import issues
+      responses:
+        '202':
+          description: Import job accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/issue_job_status'
+              examples:
+                response:
+                  value:
+                    type: issue_job_status
+                    status: ACCEPTED
+                    phase: Attachments
+                    total: 15
+                    count: 0
+                    percent: 0
+        '401':
+          description: The request wasn't authenticated properly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: When the authenticated user does not have admin permission
+            on the repo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: No export job has begun
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: Import already running
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - issue:write
+        - repository:admin
+      - basic: []
+      - api_key: []
+      deprecated: true
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - write:issue:bitbucket
+        - admin:repository:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      operationId: importIssues
     parameters:
     - name: repo_slug
       in: path
@@ -1400,493 +1887,6 @@ paths:
       required: true
       schema:
         type: string
-  /repositories/{workspace}/{repo_slug}/issues/export:
-    post:
-      tags:
-      - Issue tracker
-      description: 'A POST request to this endpoint initiates a new background celery
-        task that archives the repo''s issues.
-
-
-        When the job has been accepted, it will return a 202 (Accepted) along with
-        a unique url to this job in the
-
-        ''Location'' response header. This url is the endpoint for where the user
-        can obtain their zip files."'
-      summary: Export issues
-      responses:
-        '202':
-          description: The export job has been accepted
-        '401':
-          description: The request wasn't authenticated properly
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '403':
-          description: When the authenticated user does not have admin permission
-            on the repo
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '404':
-          description: The repo does not exist or does not have an issue tracker
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/export_options'
-        description: The options to apply to the export. Available options include
-          `project_key` and `project_name` which, if specified, are used as the project
-          key and name in the exported Jira json format. Option `send_email` specifies
-          whether an email should be sent upon export result. Option `include_attachments`
-          specifies whether attachments are included in the export.
-      security:
-      - oauth2:
-        - issue
-        - repository:admin
-      - basic: []
-      - api_key: []
-      deprecated: true
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:issue:bitbucket
-      x-atlassian-auth-types:
-      - forge-oauth2
-      - api-token
-      operationId: exportIssues
-    parameters:
-    - name: repo_slug
-      in: path
-      description: 'This can either be the repository slug or the UUID of the repository,
-
-        surrounded by curly-braces, for example: `{repository UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-    - name: workspace
-      in: path
-      description: 'This can either be the workspace ID (slug) or the workspace UUID
-
-        surrounded by curly-braces, for example: `{workspace UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-  /repositories/{workspace}/{repo_slug}/issues/export/{repo_name}-issues-{task_id}.zip:
-    get:
-      tags:
-      - Issue tracker
-      description: 'This endpoint is used to poll for the progress of an issue export
-
-        job and return the zip file after the job is complete.
-
-        As long as the job is running, this will return a 202 response
-
-        with in the response body a description of the current status.
-
-
-        After the job has been scheduled, but before it starts executing, the endpoint
-
-        returns a 202 response with status `ACCEPTED`.
-
-
-        Once it starts running, it is a 202 response with status `STARTED` and progress
-        filled.
-
-
-        After it is finished, it becomes a 200 response with status `SUCCESS` or `FAILURE`.'
-      summary: Check issue export status
-      responses:
-        '202':
-          description: Export job accepted
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/issue_job_status'
-              examples:
-                response:
-                  value:
-                    type: issue_job_status
-                    status: ACCEPTED
-                    phase: Initializing
-                    total: 0
-                    count: 0
-                    pct: 0
-        '401':
-          description: The request wasn't authenticated properly
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '403':
-          description: When the authenticated user does not have admin permission
-            on the repo
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '404':
-          description: No export job has begun
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - issue
-        - repository:admin
-      - basic: []
-      - api_key: []
-      deprecated: true
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:issue:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: checkIssueExportStatus
-    parameters:
-    - name: repo_name
-      in: path
-      description: The name of the repo
-      required: true
-      schema:
-        type: string
-    - name: repo_slug
-      in: path
-      description: 'This can either be the repository slug or the UUID of the repository,
-
-        surrounded by curly-braces, for example: `{repository UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-    - name: task_id
-      in: path
-      description: The ID of the export task
-      required: true
-      schema:
-        type: string
-    - name: workspace
-      in: path
-      description: 'This can either be the workspace ID (slug) or the workspace UUID
-
-        surrounded by curly-braces, for example: `{workspace UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-  /repositories/{workspace}/{repo_slug}/issues/import:
-    get:
-      tags:
-      - Issue tracker
-      description: 'When using GET, this endpoint reports the status of the current
-        import task.
-
-
-        After the job has been scheduled, but before it starts executing, the endpoint
-
-        returns a 202 response with status `ACCEPTED`.
-
-
-        Once it starts running, it is a 202 response with status `STARTED` and progress
-        filled.
-
-
-        After it is finished, it becomes a 200 response with status `SUCCESS` or `FAILURE`.'
-      summary: Check issue import status
-      responses:
-        '200':
-          description: Import job complete with either FAILURE or SUCCESS status
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/issue_job_status'
-        '202':
-          description: Import job started
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/issue_job_status'
-              examples:
-                response:
-                  value:
-                    type: issue_job_status
-                    status: ACCEPTED
-                    phase: Attachments
-                    total: 15
-                    count: 0
-                    percent: 0
-        '401':
-          description: The request wasn't authenticated properly
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '403':
-          description: When the authenticated user does not have admin permission
-            on the repo
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '404':
-          description: No export job has begun
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - issue:write
-        - repository:admin
-      - basic: []
-      - api_key: []
-      deprecated: true
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - write:issue:bitbucket
-        - admin:repository:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: checkIssueImportStatus
-    post:
-      tags:
-      - Issue tracker
-      description: 'A POST request to this endpoint will import the zip file given
-        by the archive parameter into the repository. All
-
-        existing issues will be deleted and replaced by the contents of the imported
-        zip file.
-
-
-        Imports are done through a multipart/form-data POST. There is one valid and
-        required form field, with the name
-
-        "archive," which needs to be a file field:
-
-
-        ```
-
-        $ curl -u <username> -X POST -F archive=@/path/to/file.zip https://api.bitbucket.org/2.0/repositories/<owner_username>/<repo_slug>/issues/import
-
-        ```'
-      summary: Import issues
-      responses:
-        '202':
-          description: Import job accepted
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/issue_job_status'
-              examples:
-                response:
-                  value:
-                    type: issue_job_status
-                    status: ACCEPTED
-                    phase: Attachments
-                    total: 15
-                    count: 0
-                    percent: 0
-        '401':
-          description: The request wasn't authenticated properly
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '403':
-          description: When the authenticated user does not have admin permission
-            on the repo
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '404':
-          description: No export job has begun
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '409':
-          description: Import already running
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - issue:write
-        - repository:admin
-      - basic: []
-      - api_key: []
-      deprecated: true
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - write:issue:bitbucket
-        - admin:repository:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: importIssues
-    parameters:
-    - name: repo_slug
-      in: path
-      description: 'This can either be the repository slug or the UUID of the repository,
-
-        surrounded by curly-braces, for example: `{repository UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-    - name: workspace
-      in: path
-      description: 'This can either be the workspace ID (slug) or the workspace UUID
-
-        surrounded by curly-braces, for example: `{workspace UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-  /repositories/{workspace}/{repo_slug}/components:
-    get:
-      tags:
-      - Issue tracker
-      description: 'Returns the components that have been defined in the issue tracker.
-
-
-        This resource is only available on repositories that have the issue
-
-        tracker enabled.'
-      summary: List components
-      responses:
-        '200':
-          description: The components that have been defined in the issue tracker.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/paginated_components'
-        '404':
-          description: The specified repository does not exist or does not have the
-            issue tracker enabled.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - issue
-      - basic: []
-      - api_key: []
-      deprecated: true
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:issue:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: listComponents
-    parameters:
-    - name: repo_slug
-      in: path
-      description: 'This can either be the repository slug or the UUID of the repository,
-
-        surrounded by curly-braces, for example: `{repository UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-    - name: workspace
-      in: path
-      description: 'This can either be the workspace ID (slug) or the workspace UUID
-
-        surrounded by curly-braces, for example: `{workspace UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-  /repositories/{workspace}/{repo_slug}/components/{component_id}:
-    get:
-      tags:
-      - Issue tracker
-      description: Returns the specified issue tracker component object.
-      summary: Get a component for issues
-      responses:
-        '200':
-          description: The specified component object.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/component'
-        '404':
-          description: The specified repository or component does not exist or does
-            not have the issue tracker enabled.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - issue
-      - basic: []
-      - api_key: []
-      deprecated: true
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:issue:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: getAComponentForIssues
-    parameters:
-    - name: component_id
-      in: path
-      description: The component's id
-      required: true
-      schema:
-        type: integer
-    - name: repo_slug
-      in: path
-      description: 'This can either be the repository slug or the UUID of the repository,
-
-        surrounded by curly-braces, for example: `{repository UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-    - name: workspace
-      in: path
-      description: 'This can either be the workspace ID (slug) or the workspace UUID
-
-        surrounded by curly-braces, for example: `{workspace UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
   /repositories/{workspace}/{repo_slug}/milestones:
     get:
       tags:
@@ -2131,6 +2131,31 @@ paths:
         type: string
 components:
   schemas:
+    account:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Account
+        description: An account object.
+        properties:
+          links:
+            $ref: '#/components/schemas/account_links'
+          created_on:
+            type: string
+            format: date-time
+          display_name:
+            type: string
+          uuid:
+            type: string
+        additionalProperties: true
+    account_links:
+      type: object
+      title: Account Links
+      description: Links related to an Account.
+      properties:
+        avatar:
+          $ref: '#/components/schemas/link'
+      additionalProperties: true
     author:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -2145,84 +2170,49 @@ components:
           user:
             $ref: '#/components/schemas/account'
         additionalProperties: true
-    paginated_log_entries:
-      type: object
-      title: Paginated Log Entries
-      description: A paginated list of issue changes.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/issue_change'
-          minItems: 0
-      additionalProperties: false
-    milestone:
+    base_commit:
       allOf:
       - $ref: '#/components/schemas/object'
       - type: object
-        title: Milestone
-        description: A milestone as defined in a repository's issue tracker.
+        title: Base Commit
+        description: The common base type for both repository and snippet commits.
         properties:
-          links:
+          hash:
+            type: string
+            pattern: '[0-9a-f]{7,}?'
+          date:
+            type: string
+            format: date-time
+          author:
+            $ref: '#/components/schemas/author'
+          committer:
+            $ref: '#/components/schemas/committer'
+          message:
+            type: string
+          summary:
             type: object
             properties:
-              self:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
+              raw:
+                type: string
+                description: The text as it was typed by a user.
+              markup:
+                type: string
+                description: The type of markup language the raw content is to be
+                  interpreted in.
+                enum:
+                - markdown
+                - creole
+                - plaintext
+              html:
+                type: string
+                description: The user's content rendered as HTML.
             additionalProperties: false
-          name:
-            type: string
-          id:
-            type: integer
+          parents:
+            type: array
+            items:
+              $ref: '#/components/schemas/base_commit'
+            minItems: 0
         additionalProperties: true
-    account_links:
-      type: object
-      title: Account Links
-      description: Links related to an Account.
-      properties:
-        avatar:
-          $ref: '#/components/schemas/link'
-      additionalProperties: true
     branch:
       allOf:
       - $ref: '#/components/schemas/ref'
@@ -2248,50 +2238,394 @@ components:
             description: The default merge strategy for pull requests targeting this
               branch.
         additionalProperties: true
-    paginated_issues:
+    comment:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Comment
+        description: The base type for all comments. This type should be considered
+          abstract. Each of the "commentable" resources defines its own subtypes (e.g.
+          `issue_comment`).
+        properties:
+          id:
+            type: integer
+            format: int64
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+          content:
+            type: object
+            properties:
+              raw:
+                type: string
+                description: The text as it was typed by a user.
+              markup:
+                type: string
+                description: The type of markup language the raw content is to be
+                  interpreted in.
+                enum:
+                - markdown
+                - creole
+                - plaintext
+              html:
+                type: string
+                description: The user's content rendered as HTML.
+            additionalProperties: false
+          user:
+            $ref: '#/components/schemas/account'
+          deleted:
+            type: boolean
+          parent:
+            $ref: '#/components/schemas/comment'
+          inline:
+            type: object
+            properties:
+              from:
+                type: integer
+                description: The comment's anchor line in the old version of the file.
+                  If the comment is a multi-line comment, this is the ending line
+                  number in the old version of the file.
+                minimum: 1
+              to:
+                type: integer
+                description: The comment's anchor line in the new version of the file.
+                  If the comment is a multi-line comment, this is the ending line
+                  number in the new version of the file.
+                minimum: 1
+              start_from:
+                type: integer
+                description: The starting line number in the old version of the file,
+                  if the comment is a multi-line comment. This is null otherwise.
+                minimum: 1
+              start_to:
+                type: integer
+                description: The starting line number in the new version of the file,
+                  if the comment is a multi-line comment. This is null otherwise.
+                minimum: 1
+              path:
+                type: string
+                description: The path of the file this comment is anchored to.
+            required:
+            - path
+            additionalProperties: false
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              code:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+        additionalProperties: true
+    commit:
+      allOf:
+      - $ref: '#/components/schemas/base_commit'
+      - type: object
+        title: Commit
+        description: A repository commit object.
+        properties:
+          repository:
+            $ref: '#/components/schemas/repository'
+          participants:
+            type: array
+            items:
+              $ref: '#/components/schemas/participant'
+            minItems: 0
+        additionalProperties: true
+    committer:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Committer
+        description: The committer of a change in a repository
+        properties:
+          raw:
+            type: string
+            description: The raw committer value from the repository. This may be
+              the only value available if the committer does not match a user in Bitbucket.
+          user:
+            $ref: '#/components/schemas/account'
+        additionalProperties: true
+    component:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Component
+        description: A component as defined in a repository's issue tracker.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          name:
+            type: string
+          id:
+            type: integer
+        additionalProperties: true
+    error:
       type: object
-      title: Paginated Issues
-      description: A paginated list of issues.
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
       properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
+        type:
           type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
+    export_options:
+      type: object
+      title: Export Options
+      description: Options for issue export.
+      properties:
+        type:
           type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/issue'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
+        project_key:
+          type: string
+        project_name:
+          type: string
+        send_email:
+          type: boolean
+        include_attachments:
+          type: boolean
+      required:
+      - type
+      additionalProperties: true
+    issue:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Issue
+        description: An issue.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              comments:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              attachments:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              watch:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              vote:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          id:
+            type: integer
+          repository:
+            $ref: '#/components/schemas/repository'
+          title:
+            type: string
+          reporter:
+            $ref: '#/components/schemas/account'
+          assignee:
+            $ref: '#/components/schemas/account'
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+          edited_on:
+            type: string
+            format: date-time
+          state:
+            type: string
+            enum:
+            - submitted
+            - new
+            - open
+            - resolved
+            - on hold
+            - invalid
+            - duplicate
+            - wontfix
+            - closed
+          kind:
+            type: string
+            enum:
+            - bug
+            - enhancement
+            - proposal
+            - task
+          priority:
+            type: string
+            enum:
+            - trivial
+            - minor
+            - major
+            - critical
+            - blocker
+          milestone:
+            $ref: '#/components/schemas/milestone'
+          version:
+            $ref: '#/components/schemas/version'
+          component:
+            $ref: '#/components/schemas/component'
+          votes:
+            type: integer
+          content:
+            type: object
+            properties:
+              raw:
+                type: string
+                description: The text as it was typed by a user.
+              markup:
+                type: string
+                description: The type of markup language the raw content is to be
+                  interpreted in.
+                enum:
+                - markdown
+                - creole
+                - plaintext
+              html:
+                type: string
+                description: The user's content rendered as HTML.
+            additionalProperties: false
+        additionalProperties: true
+    issue_attachment:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Issue Attachment
+        description: An issue file attachment's meta data. Note this does not contain
+          the file's actual contents.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          name:
+            type: string
+        additionalProperties: true
     issue_change:
       type: object
       title: Issue Change
@@ -2431,12 +2765,63 @@ components:
       required:
       - type
       additionalProperties: true
-    version:
+    issue_comment:
+      allOf:
+      - $ref: '#/components/schemas/comment'
+      - type: object
+        title: Issue Comment
+        description: A issue comment.
+        properties:
+          issue:
+            $ref: '#/components/schemas/issue'
+        additionalProperties: true
+    issue_job_status:
+      type: object
+      title: Issue Job Status
+      description: The status of an import or export job
+      properties:
+        type:
+          type: string
+        status:
+          type: string
+          description: The status of the import/export job
+          enum:
+          - ACCEPTED
+          - STARTED
+          - RUNNING
+          - FAILURE
+        phase:
+          type: string
+          description: The phase of the import/export job
+        total:
+          type: integer
+          description: The total number of issues being imported/exported
+        count:
+          type: integer
+          description: The total number of issues already imported/exported
+        pct:
+          type: number
+          description: The percentage of issues already imported/exported
+          minimum: 0
+          maximum: 100
+      additionalProperties: false
+    link:
+      type: object
+      title: Link
+      description: A link to a resource related to this object.
+      properties:
+        href:
+          type: string
+          format: uri
+        name:
+          type: string
+      additionalProperties: false
+    milestone:
       allOf:
       - $ref: '#/components/schemas/object'
       - type: object
-        title: Version
-        description: A version as defined in a repository's issue tracker.
+        title: Milestone
+        description: A milestone as defined in a repository's issue tracker.
         properties:
           links:
             type: object
@@ -2458,49 +2843,479 @@ components:
           id:
             type: integer
         additionalProperties: true
-    base_commit:
+    object:
+      type: object
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+      required:
+      - type
+      additionalProperties: true
+      discriminator:
+        propertyName: type
+    paginated_components:
+      type: object
+      title: Paginated Components
+      description: A paginated list of issue tracker components.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/component'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_issue_attachments:
+      type: object
+      title: Paginated Issue Attachment
+      description: A paginated list of issue attachments.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/issue_attachment'
+          minItems: 0
+      additionalProperties: false
+    paginated_issue_comments:
+      type: object
+      title: Paginated Issue Comments
+      description: A paginated list of issue comments.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/issue_comment'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_issues:
+      type: object
+      title: Paginated Issues
+      description: A paginated list of issues.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/issue'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_log_entries:
+      type: object
+      title: Paginated Log Entries
+      description: A paginated list of issue changes.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/issue_change'
+          minItems: 0
+      additionalProperties: false
+    paginated_milestones:
+      type: object
+      title: Paginated Milestones
+      description: A paginated list of issue tracker milestones.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/milestone'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_versions:
+      type: object
+      title: Paginated Versions
+      description: A paginated list of issue tracker versions.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/version'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    participant:
       allOf:
       - $ref: '#/components/schemas/object'
       - type: object
-        title: Base Commit
-        description: The common base type for both repository and snippet commits.
+        title: Participant
+        description: Object describing a user's role on resources like commits or
+          pull requests.
         properties:
-          hash:
+          user:
+            $ref: '#/components/schemas/account'
+          role:
             type: string
-            pattern: '[0-9a-f]{7,}?'
-          date:
+            enum:
+            - PARTICIPANT
+            - REVIEWER
+          approved:
+            type: boolean
+          state:
             type: string
+            enum:
+            - approved
+            - changes_requested
+            - null
+          participated_on:
+            type: string
+            description: The ISO8601 timestamp of the participant's action. For approvers,
+              this is the time of their approval. For commenters and pull request
+              reviewers who are not approvers, this is the time they last commented,
+              or null if they have not commented.
             format: date-time
-          author:
-            $ref: '#/components/schemas/author'
-          committer:
-            $ref: '#/components/schemas/committer'
-          message:
-            type: string
-          summary:
+        additionalProperties: true
+    project:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Project
+        description: "A Bitbucket project.\n            Projects are used by teams\
+          \ to organize repositories."
+        properties:
+          links:
             type: object
             properties:
-              raw:
-                type: string
-                description: The text as it was typed by a user.
-              markup:
-                type: string
-                description: The type of markup language the raw content is to be
-                  interpreted in.
-                enum:
-                - markdown
-                - creole
-                - plaintext
               html:
-                type: string
-                description: The user's content rendered as HTML.
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              avatar:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
             additionalProperties: false
-          parents:
-            type: array
-            items:
-              $ref: '#/components/schemas/base_commit'
-            minItems: 0
+          uuid:
+            type: string
+            description: The project's immutable id.
+          key:
+            type: string
+            description: The project's key.
+          owner:
+            $ref: '#/components/schemas/team'
+          name:
+            type: string
+            description: The name of the project.
+          description:
+            type: string
+          is_private:
+            type: boolean
+            description: '
+
+              Indicates whether the project is publicly accessible, or whether it
+              is
+
+              private to the team and consequently only visible to team members.
+
+              Note that private projects cannot contain public repositories.'
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+          has_publicly_visible_repos:
+            type: boolean
+            description: '
+
+              Indicates whether the project contains publicly visible repositories.
+
+              Note that private projects cannot contain public repositories.'
         additionalProperties: true
+    ref:
+      type: object
+      title: Ref
+      description: A ref object, representing a branch or tag in a repository.
+      properties:
+        type:
+          type: string
+        links:
+          type: object
+          properties:
+            self:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+            commits:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+            html:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+          additionalProperties: false
+        name:
+          type: string
+          description: The name of the ref.
+        target:
+          $ref: '#/components/schemas/commit'
+      required:
+      - type
+      additionalProperties: true
     repository:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -2696,551 +3511,6 @@ components:
           mainbranch:
             $ref: '#/components/schemas/branch'
         additionalProperties: true
-    component:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Component
-        description: A component as defined in a repository's issue tracker.
-        properties:
-          links:
-            type: object
-            properties:
-              self:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-            additionalProperties: false
-          name:
-            type: string
-          id:
-            type: integer
-        additionalProperties: true
-    object:
-      type: object
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-      required:
-      - type
-      additionalProperties: true
-      discriminator:
-        propertyName: type
-    export_options:
-      type: object
-      title: Export Options
-      description: Options for issue export.
-      properties:
-        type:
-          type: string
-        project_key:
-          type: string
-        project_name:
-          type: string
-        send_email:
-          type: boolean
-        include_attachments:
-          type: boolean
-      required:
-      - type
-      additionalProperties: true
-    commit:
-      allOf:
-      - $ref: '#/components/schemas/base_commit'
-      - type: object
-        title: Commit
-        description: A repository commit object.
-        properties:
-          repository:
-            $ref: '#/components/schemas/repository'
-          participants:
-            type: array
-            items:
-              $ref: '#/components/schemas/participant'
-            minItems: 0
-        additionalProperties: true
-    issue:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Issue
-        description: An issue.
-        properties:
-          links:
-            type: object
-            properties:
-              self:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              html:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              comments:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              attachments:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              watch:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              vote:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-            additionalProperties: false
-          id:
-            type: integer
-          repository:
-            $ref: '#/components/schemas/repository'
-          title:
-            type: string
-          reporter:
-            $ref: '#/components/schemas/account'
-          assignee:
-            $ref: '#/components/schemas/account'
-          created_on:
-            type: string
-            format: date-time
-          updated_on:
-            type: string
-            format: date-time
-          edited_on:
-            type: string
-            format: date-time
-          state:
-            type: string
-            enum:
-            - submitted
-            - new
-            - open
-            - resolved
-            - on hold
-            - invalid
-            - duplicate
-            - wontfix
-            - closed
-          kind:
-            type: string
-            enum:
-            - bug
-            - enhancement
-            - proposal
-            - task
-          priority:
-            type: string
-            enum:
-            - trivial
-            - minor
-            - major
-            - critical
-            - blocker
-          milestone:
-            $ref: '#/components/schemas/milestone'
-          version:
-            $ref: '#/components/schemas/version'
-          component:
-            $ref: '#/components/schemas/component'
-          votes:
-            type: integer
-          content:
-            type: object
-            properties:
-              raw:
-                type: string
-                description: The text as it was typed by a user.
-              markup:
-                type: string
-                description: The type of markup language the raw content is to be
-                  interpreted in.
-                enum:
-                - markdown
-                - creole
-                - plaintext
-              html:
-                type: string
-                description: The user's content rendered as HTML.
-            additionalProperties: false
-        additionalProperties: true
-    comment:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Comment
-        description: The base type for all comments. This type should be considered
-          abstract. Each of the "commentable" resources defines its own subtypes (e.g.
-          `issue_comment`).
-        properties:
-          id:
-            type: integer
-            format: int64
-          created_on:
-            type: string
-            format: date-time
-          updated_on:
-            type: string
-            format: date-time
-          content:
-            type: object
-            properties:
-              raw:
-                type: string
-                description: The text as it was typed by a user.
-              markup:
-                type: string
-                description: The type of markup language the raw content is to be
-                  interpreted in.
-                enum:
-                - markdown
-                - creole
-                - plaintext
-              html:
-                type: string
-                description: The user's content rendered as HTML.
-            additionalProperties: false
-          user:
-            $ref: '#/components/schemas/account'
-          deleted:
-            type: boolean
-          parent:
-            $ref: '#/components/schemas/comment'
-          inline:
-            type: object
-            properties:
-              from:
-                type: integer
-                description: The comment's anchor line in the old version of the file.
-                  If the comment is a multi-line comment, this is the ending line
-                  number in the old version of the file.
-                minimum: 1
-              to:
-                type: integer
-                description: The comment's anchor line in the new version of the file.
-                  If the comment is a multi-line comment, this is the ending line
-                  number in the new version of the file.
-                minimum: 1
-              start_from:
-                type: integer
-                description: The starting line number in the old version of the file,
-                  if the comment is a multi-line comment. This is null otherwise.
-                minimum: 1
-              start_to:
-                type: integer
-                description: The starting line number in the new version of the file,
-                  if the comment is a multi-line comment. This is null otherwise.
-                minimum: 1
-              path:
-                type: string
-                description: The path of the file this comment is anchored to.
-            required:
-            - path
-            additionalProperties: false
-          links:
-            type: object
-            properties:
-              self:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              html:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              code:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-            additionalProperties: false
-        additionalProperties: true
-    paginated_components:
-      type: object
-      title: Paginated Components
-      description: A paginated list of issue tracker components.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/component'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    issue_job_status:
-      type: object
-      title: Issue Job Status
-      description: The status of an import or export job
-      properties:
-        type:
-          type: string
-        status:
-          type: string
-          description: The status of the import/export job
-          enum:
-          - ACCEPTED
-          - STARTED
-          - RUNNING
-          - FAILURE
-        phase:
-          type: string
-          description: The phase of the import/export job
-        total:
-          type: integer
-          description: The total number of issues being imported/exported
-        count:
-          type: integer
-          description: The total number of issues already imported/exported
-        pct:
-          type: number
-          description: The percentage of issues already imported/exported
-          minimum: 0
-          maximum: 100
-      additionalProperties: false
-    link:
-      type: object
-      title: Link
-      description: A link to a resource related to this object.
-      properties:
-        href:
-          type: string
-          format: uri
-        name:
-          type: string
-      additionalProperties: false
-    issue_attachment:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Issue Attachment
-        description: An issue file attachment's meta data. Note this does not contain
-          the file's actual contents.
-        properties:
-          links:
-            type: object
-            properties:
-              self:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-            additionalProperties: false
-          name:
-            type: string
-        additionalProperties: true
-    account:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Account
-        description: An account object.
-        properties:
-          links:
-            $ref: '#/components/schemas/account_links'
-          created_on:
-            type: string
-            format: date-time
-          display_name:
-            type: string
-          uuid:
-            type: string
-        additionalProperties: true
-    participant:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Participant
-        description: Object describing a user's role on resources like commits or
-          pull requests.
-        properties:
-          user:
-            $ref: '#/components/schemas/account'
-          role:
-            type: string
-            enum:
-            - PARTICIPANT
-            - REVIEWER
-          approved:
-            type: boolean
-          state:
-            type: string
-            enum:
-            - approved
-            - changes_requested
-            - null
-          participated_on:
-            type: string
-            description: The ISO8601 timestamp of the participant's action. For approvers,
-              this is the time of their approval. For commenters and pull request
-              reviewers who are not approvers, this is the time they last commented,
-              or null if they have not commented.
-            format: date-time
-        additionalProperties: true
-    ref:
-      type: object
-      title: Ref
-      description: A ref object, representing a branch or tag in a repository.
-      properties:
-        type:
-          type: string
-        links:
-          type: object
-          properties:
-            self:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-            commits:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-            html:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-          additionalProperties: false
-        name:
-          type: string
-          description: The name of the ref.
-        target:
-          $ref: '#/components/schemas/commit'
-      required:
-      - type
-      additionalProperties: true
     team:
       allOf:
       - $ref: '#/components/schemas/account'
@@ -3269,73 +3539,17 @@ components:
           repositories:
             $ref: '#/components/schemas/link'
         additionalProperties: true
-    paginated_versions:
-      type: object
-      title: Paginated Versions
-      description: A paginated list of issue tracker versions.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/version'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    project:
+    version:
       allOf:
       - $ref: '#/components/schemas/object'
       - type: object
-        title: Project
-        description: "A Bitbucket project.\n            Projects are used by teams\
-          \ to organize repositories."
+        title: Version
+        description: A version as defined in a repository's issue tracker.
         properties:
           links:
             type: object
             properties:
-              html:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              avatar:
+              self:
                 type: object
                 title: Link
                 description: A link to a resource related to this object.
@@ -3347,222 +3561,8 @@ components:
                     type: string
                 additionalProperties: false
             additionalProperties: false
-          uuid:
-            type: string
-            description: The project's immutable id.
-          key:
-            type: string
-            description: The project's key.
-          owner:
-            $ref: '#/components/schemas/team'
           name:
             type: string
-            description: The name of the project.
-          description:
-            type: string
-          is_private:
-            type: boolean
-            description: '
-
-              Indicates whether the project is publicly accessible, or whether it
-              is
-
-              private to the team and consequently only visible to team members.
-
-              Note that private projects cannot contain public repositories.'
-          created_on:
-            type: string
-            format: date-time
-          updated_on:
-            type: string
-            format: date-time
-          has_publicly_visible_repos:
-            type: boolean
-            description: '
-
-              Indicates whether the project contains publicly visible repositories.
-
-              Note that private projects cannot contain public repositories.'
-        additionalProperties: true
-    committer:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Committer
-        description: The committer of a change in a repository
-        properties:
-          raw:
-            type: string
-            description: The raw committer value from the repository. This may be
-              the only value available if the committer does not match a user in Bitbucket.
-          user:
-            $ref: '#/components/schemas/account'
-        additionalProperties: true
-    paginated_issue_attachments:
-      type: object
-      title: Paginated Issue Attachment
-      description: A paginated list of issue attachments.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/issue_attachment'
-          minItems: 0
-      additionalProperties: false
-    paginated_milestones:
-      type: object
-      title: Paginated Milestones
-      description: A paginated list of issue tracker milestones.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/milestone'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    error:
-      type: object
-      title: Error
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-            detail:
-              type: string
-            data:
-              type: object
-              description: Optional structured data that is endpoint-specific.
-              properties: {}
-              additionalProperties: true
-          required:
-          - message
-          additionalProperties: false
-      required:
-      - type
-      additionalProperties: true
-    paginated_issue_comments:
-      type: object
-      title: Paginated Issue Comments
-      description: A paginated list of issue comments.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/issue_comment'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    issue_comment:
-      allOf:
-      - $ref: '#/components/schemas/comment'
-      - type: object
-        title: Issue Comment
-        description: A issue comment.
-        properties:
-          issue:
-            $ref: '#/components/schemas/issue'
+          id:
+            type: integer
         additionalProperties: true
