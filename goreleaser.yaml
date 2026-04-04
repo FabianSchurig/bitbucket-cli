@@ -37,6 +37,21 @@ builds:
     ldflags:
       - -s -w -X main.version={{.Version}}
 
+  - id: bb-tf
+    main: ./cmd/bb-tf
+    binary: terraform-provider-bitbucket
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+
 archives:
   - format_overrides:
       - goos: windows

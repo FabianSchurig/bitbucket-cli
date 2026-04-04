@@ -2758,6 +2758,19 @@ paths:
         type: string
 components:
   schemas:
+    object:
+      type: object
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+      required:
+      - type
+      additionalProperties: true
+      discriminator:
+        propertyName: type
     pullrequest_comment:
       allOf:
       - $ref: '#/components/schemas/comment'
@@ -2772,6 +2785,260 @@ components:
           pending:
             type: boolean
         additionalProperties: true
+    error:
+      type: object
+      title: Error
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
+      required:
+      - type
+      additionalProperties: true
+    comment:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Comment
+        description: The base type for all comments. This type should be considered
+          abstract. Each of the "commentable" resources defines its own subtypes (e.g.
+          `issue_comment`).
+        properties:
+          id:
+            type: integer
+            format: int64
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+          content:
+            type: object
+            properties:
+              raw:
+                type: string
+                description: The text as it was typed by a user.
+              markup:
+                type: string
+                description: The type of markup language the raw content is to be
+                  interpreted in.
+                enum:
+                - markdown
+                - creole
+                - plaintext
+              html:
+                type: string
+                description: The user's content rendered as HTML.
+            additionalProperties: false
+          user:
+            $ref: '#/components/schemas/account'
+          deleted:
+            type: boolean
+          parent:
+            $ref: '#/components/schemas/comment'
+          inline:
+            type: object
+            properties:
+              from:
+                type: integer
+                description: The comment's anchor line in the old version of the file.
+                  If the comment is a multi-line comment, this is the ending line
+                  number in the old version of the file.
+                minimum: 1
+              to:
+                type: integer
+                description: The comment's anchor line in the new version of the file.
+                  If the comment is a multi-line comment, this is the ending line
+                  number in the new version of the file.
+                minimum: 1
+              start_from:
+                type: integer
+                description: The starting line number in the old version of the file,
+                  if the comment is a multi-line comment. This is null otherwise.
+                minimum: 1
+              start_to:
+                type: integer
+                description: The starting line number in the new version of the file,
+                  if the comment is a multi-line comment. This is null otherwise.
+                minimum: 1
+              path:
+                type: string
+                description: The path of the file this comment is anchored to.
+            required:
+            - path
+            additionalProperties: false
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              code:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+        additionalProperties: true
+    pullrequest_task_update:
+      type: object
+      title: Pull Request Task Update
+      description: A pullrequest task update
+      properties:
+        content:
+          type: object
+          title: Task Raw Content
+          description: task raw content
+          properties:
+            raw:
+              type: string
+              description: The task contents
+          required:
+          - raw
+          additionalProperties: false
+        state:
+          type: string
+          enum:
+          - RESOLVED
+          - UNRESOLVED
+      additionalProperties: false
+    user_links:
+      allOf:
+      - $ref: '#/components/schemas/account_links'
+      - type: object
+        title: User Links
+        description: Links related to a User.
+        properties:
+          self:
+            $ref: '#/components/schemas/link'
+          html:
+            $ref: '#/components/schemas/link'
+          repositories:
+            $ref: '#/components/schemas/link'
+        additionalProperties: true
+    pullrequest_merge_parameters:
+      type: object
+      title: Pull Request Merge Parameters
+      description: The metadata that describes a pull request merge.
+      properties:
+        type:
+          type: string
+        message:
+          type: string
+          description: The commit message that will be used on the resulting commit.
+            Note that the size of the message is limited to 128 KiB.
+        close_source_branch:
+          type: boolean
+          description: Whether the source branch should be deleted. If this is not
+            provided, we fallback to the value used when the pull request was created,
+            which defaults to False
+        merge_strategy:
+          type: string
+          description: The merge strategy that will be used to merge the pull request.
+          enum:
+          - merge_commit
+          - squash
+          - fast_forward
+          - squash_fast_forward
+          - rebase_fast_forward
+          - rebase_merge
+          default: merge_commit
+      required:
+      - type
+      additionalProperties: true
+    branch:
+      allOf:
+      - $ref: '#/components/schemas/ref'
+      - type: object
+        title: Branch
+        description: A branch object, representing a branch in a repository.
+        properties:
+          merge_strategies:
+            type: array
+            description: Available merge strategies for pull requests targeting this
+              branch.
+            items:
+              type: string
+              enum:
+              - merge_commit
+              - squash
+              - fast_forward
+              - squash_fast_forward
+              - rebase_fast_forward
+              - rebase_merge
+          default_merge_strategy:
+            type: string
+            description: The default merge strategy for pull requests targeting this
+              branch.
+        additionalProperties: true
+    account:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Account
+        description: An account object.
+        properties:
+          links:
+            $ref: '#/components/schemas/account_links'
+          created_on:
+            type: string
+            format: date-time
+          display_name:
+            type: string
+          uuid:
+            type: string
+        additionalProperties: true
+    account_links:
+      type: object
+      title: Account Links
+      description: Links related to an Account.
+      properties:
+        avatar:
+          $ref: '#/components/schemas/link'
+      additionalProperties: true
     team:
       allOf:
       - $ref: '#/components/schemas/account'
@@ -2781,6 +3048,115 @@ components:
         properties:
           links:
             $ref: '#/components/schemas/team_links'
+        additionalProperties: true
+    link:
+      type: object
+      title: Link
+      description: A link to a resource related to this object.
+      properties:
+        href:
+          type: string
+          format: uri
+        name:
+          type: string
+      additionalProperties: false
+    project:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Project
+        description: "A Bitbucket project.\n            Projects are used by teams\
+          \ to organize repositories."
+        properties:
+          links:
+            type: object
+            properties:
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              avatar:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          uuid:
+            type: string
+            description: The project's immutable id.
+          key:
+            type: string
+            description: The project's key.
+          owner:
+            $ref: '#/components/schemas/team'
+          name:
+            type: string
+            description: The name of the project.
+          description:
+            type: string
+          is_private:
+            type: boolean
+            description: '
+
+              Indicates whether the project is publicly accessible, or whether it
+              is
+
+              private to the team and consequently only visible to team members.
+
+              Note that private projects cannot contain public repositories.'
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+          has_publicly_visible_repos:
+            type: boolean
+            description: '
+
+              Indicates whether the project contains publicly visible repositories.
+
+              Note that private projects cannot contain public repositories.'
+        additionalProperties: true
+    user:
+      allOf:
+      - $ref: '#/components/schemas/account'
+      - type: object
+        title: User
+        description: A user object.
+        properties:
+          links:
+            $ref: '#/components/schemas/user_links'
+          account_id:
+            type: string
+            description: The user's Atlassian account ID.
+          account_status:
+            type: string
+            description: The status of the account. Currently the only possible value
+              is "active", but more values may be added in the future.
+          has_2fa_enabled:
+            type: boolean
+          nickname:
+            type: string
+            description: Account name defined by the owner. Should be used instead
+              of the "username" field. Note that "nickname" cannot be used in place
+              of "username" in URLs and queries, as "nickname" is not guaranteed to
+              be unique.
+          is_staff:
+            type: boolean
         additionalProperties: true
     pullrequest:
       allOf:
@@ -3070,87 +3446,6 @@ components:
             type: string
             description: Explains what the pull request does.
         additionalProperties: true
-    pullrequest_merge_parameters:
-      type: object
-      title: Pull Request Merge Parameters
-      description: The metadata that describes a pull request merge.
-      properties:
-        type:
-          type: string
-        message:
-          type: string
-          description: The commit message that will be used on the resulting commit.
-            Note that the size of the message is limited to 128 KiB.
-        close_source_branch:
-          type: boolean
-          description: Whether the source branch should be deleted. If this is not
-            provided, we fallback to the value used when the pull request was created,
-            which defaults to False
-        merge_strategy:
-          type: string
-          description: The merge strategy that will be used to merge the pull request.
-          enum:
-          - merge_commit
-          - squash
-          - fast_forward
-          - squash_fast_forward
-          - rebase_fast_forward
-          - rebase_merge
-          default: merge_commit
-      required:
-      - type
-      additionalProperties: true
-    pullrequest_endpoint:
-      type: object
-      title: Pull Request Endpoint
-      properties:
-        repository:
-          $ref: '#/components/schemas/repository'
-        branch:
-          $ref: '#/components/schemas/pullrequest_endpoint_branch'
-        commit:
-          type: object
-          title: Pull Request Commit
-          properties:
-            hash:
-              type: string
-              pattern: '[0-9a-f]{7,}?'
-          additionalProperties: false
-      additionalProperties: false
-    pullrequest_task:
-      allOf:
-      - $ref: '#/components/schemas/task'
-      - type: object
-        title: Pull Request Task
-        description: A pull request task.
-        properties:
-          links:
-            type: object
-            properties:
-              self:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              html:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-            additionalProperties: false
-        additionalProperties: false
     paginated_pullrequest_comments:
       type: object
       title: Paginated Pull Request Comments
@@ -3195,6 +3490,23 @@ components:
           minItems: 0
           uniqueItems: true
       additionalProperties: false
+    pullrequest_endpoint:
+      type: object
+      title: Pull Request Endpoint
+      properties:
+        repository:
+          $ref: '#/components/schemas/repository'
+        branch:
+          $ref: '#/components/schemas/pullrequest_endpoint_branch'
+        commit:
+          type: object
+          title: Pull Request Commit
+          properties:
+            hash:
+              type: string
+              pattern: '[0-9a-f]{7,}?'
+          additionalProperties: false
+      additionalProperties: false
     author:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -3209,14 +3521,639 @@ components:
           user:
             $ref: '#/components/schemas/account'
         additionalProperties: true
-    account_links:
+    ref:
       type: object
-      title: Account Links
-      description: Links related to an Account.
+      title: Ref
+      description: A ref object, representing a branch or tag in a repository.
       properties:
-        avatar:
-          $ref: '#/components/schemas/link'
+        type:
+          type: string
+        links:
+          type: object
+          properties:
+            self:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+            commits:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+            html:
+              type: object
+              title: Link
+              description: A link to a resource related to this object.
+              properties:
+                href:
+                  type: string
+                  format: uri
+                name:
+                  type: string
+              additionalProperties: false
+          additionalProperties: false
+        name:
+          type: string
+          description: The name of the ref.
+        target:
+          $ref: '#/components/schemas/commit'
+      required:
+      - type
       additionalProperties: true
+    commit:
+      allOf:
+      - $ref: '#/components/schemas/base_commit'
+      - type: object
+        title: Commit
+        description: A repository commit object.
+        properties:
+          repository:
+            $ref: '#/components/schemas/repository'
+          participants:
+            type: array
+            items:
+              $ref: '#/components/schemas/participant'
+            minItems: 0
+        additionalProperties: true
+    base_commit:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Base Commit
+        description: The common base type for both repository and snippet commits.
+        properties:
+          hash:
+            type: string
+            pattern: '[0-9a-f]{7,}?'
+          date:
+            type: string
+            format: date-time
+          author:
+            $ref: '#/components/schemas/author'
+          committer:
+            $ref: '#/components/schemas/committer'
+          message:
+            type: string
+          summary:
+            type: object
+            properties:
+              raw:
+                type: string
+                description: The text as it was typed by a user.
+              markup:
+                type: string
+                description: The type of markup language the raw content is to be
+                  interpreted in.
+                enum:
+                - markdown
+                - creole
+                - plaintext
+              html:
+                type: string
+                description: The user's content rendered as HTML.
+            additionalProperties: false
+          parents:
+            type: array
+            items:
+              $ref: '#/components/schemas/base_commit'
+            minItems: 0
+        additionalProperties: true
+    default_reviewer_and_type:
+      type: object
+      title: Default Reviewer and Type
+      description: Object containing a user that is a default reviewer and the type
+        of reviewer
+      properties:
+        type:
+          type: string
+        reviewer_type:
+          type: string
+        user:
+          $ref: '#/components/schemas/user'
+      required:
+      - type
+      additionalProperties: true
+    paginated_default_reviewer_and_type:
+      type: object
+      title: Paginated Default Reviewer and Type
+      description: A paginated list of default reviewers with reviewer type.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/default_reviewer_and_type'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    participant:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Participant
+        description: Object describing a user's role on resources like commits or
+          pull requests.
+        properties:
+          user:
+            $ref: '#/components/schemas/account'
+          role:
+            type: string
+            enum:
+            - PARTICIPANT
+            - REVIEWER
+          approved:
+            type: boolean
+          state:
+            type: string
+            enum:
+            - approved
+            - changes_requested
+            - null
+          participated_on:
+            type: string
+            description: The ISO8601 timestamp of the participant's action. For approvers,
+              this is the time of their approval. For commenters and pull request
+              reviewers who are not approvers, this is the time they last commented,
+              or null if they have not commented.
+            format: date-time
+        additionalProperties: true
+    commitstatus:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Commit Status
+        description: A commit status object.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              commit:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+          key:
+            type: string
+            description: "An identifier for the status that's unique to\n        its\
+              \ type (current \"build\" is the only supported type) and the vendor,\n\
+              \        e.g. BB-DEPLOY"
+          refname:
+            type: string
+            description: '
+
+              The name of the ref that pointed to this commit at the time the status
+
+              object was created. Note that this the ref may since have moved off
+              of
+
+              the commit. This optional field can be useful for build systems whose
+
+              build triggers and configuration are branch-dependent (e.g. a Pipeline
+
+              build).
+
+              It is legitimate for this field to not be set, or even apply (e.g. a
+
+              static linting job).'
+          url:
+            type: string
+            description: A URL linking back to the vendor or build system, for providing
+              more information about whatever process produced this status. Accepts
+              context variables `repository` and `commit` that Bitbucket will evaluate
+              at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name}
+              which Bitbucket will turn into https://foo.com/builds/foo/bar at render
+              time.
+          state:
+            type: string
+            description: Provides some indication of the status of this commit
+            enum:
+            - FAILED
+            - INPROGRESS
+            - STOPPED
+            - SUCCESSFUL
+          name:
+            type: string
+            description: An identifier for the build itself, e.g. BB-DEPLOY-1
+          description:
+            type: string
+            description: A description of the build (e.g. "Unit tests in Bamboo")
+          created_on:
+            type: string
+            format: date-time
+          updated_on:
+            type: string
+            format: date-time
+        required:
+        - key
+        - state
+        additionalProperties: true
+    pullrequest_task_create:
+      type: object
+      title: Pull Request Task Create
+      description: A pullrequest task create
+      properties:
+        content:
+          type: object
+          title: Task Raw Content
+          description: task raw content
+          properties:
+            raw:
+              type: string
+              description: The task contents
+          required:
+          - raw
+          additionalProperties: false
+        comment:
+          $ref: '#/components/schemas/comment'
+        pending:
+          type: boolean
+      required:
+      - content
+      additionalProperties: false
+    paginated_pullrequests:
+      type: object
+      title: Paginated Pull Requests
+      description: A paginated list of pullrequests.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/pullrequest'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    paginated_tasks:
+      type: object
+      title: Paginated Tasks
+      description: A paginated list of tasks.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/pullrequest_comment_task'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    pullrequest_task:
+      allOf:
+      - $ref: '#/components/schemas/task'
+      - type: object
+        title: Pull Request Task
+        description: A pull request task.
+        properties:
+          links:
+            type: object
+            properties:
+              self:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+              html:
+                type: object
+                title: Link
+                description: A link to a resource related to this object.
+                properties:
+                  href:
+                    type: string
+                    format: uri
+                  name:
+                    type: string
+                additionalProperties: false
+            additionalProperties: false
+        additionalProperties: false
+    pullrequest_comment_task:
+      allOf:
+      - $ref: '#/components/schemas/pullrequest_task'
+      - type: object
+        title: Pull Request Comment Task
+        description: A pullrequest comment task
+        properties:
+          comment:
+            $ref: '#/components/schemas/comment'
+        additionalProperties: false
+    paginated_accounts:
+      type: object
+      title: Paginated Accounts
+      description: A paginated list of accounts.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/account'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    comment_resolution:
+      type: object
+      title: Comment Resolution
+      description: The resolution object for a Comment.
+      properties:
+        type:
+          type: string
+        user:
+          $ref: '#/components/schemas/account'
+        created_on:
+          type: string
+          description: The ISO8601 timestamp the resolution was created.
+          format: date-time
+      required:
+      - type
+      additionalProperties: true
+    task:
+      type: object
+      title: Task
+      description: A task object.
+      properties:
+        id:
+          type: integer
+          format: int64
+        created_on:
+          type: string
+          format: date-time
+        updated_on:
+          type: string
+          format: date-time
+        state:
+          type: string
+          enum:
+          - RESOLVED
+          - UNRESOLVED
+        content:
+          type: object
+          properties:
+            raw:
+              type: string
+              description: The text as it was typed by a user.
+            markup:
+              type: string
+              description: The type of markup language the raw content is to be interpreted
+                in.
+              enum:
+              - markdown
+              - creole
+              - plaintext
+            html:
+              type: string
+              description: The user's content rendered as HTML.
+          additionalProperties: false
+        creator:
+          $ref: '#/components/schemas/account'
+        pending:
+          type: boolean
+        resolved_on:
+          type: string
+          description: The ISO8601 timestamp for when the task was resolved.
+          format: date-time
+        resolved_by:
+          $ref: '#/components/schemas/account'
+      required:
+      - created_on
+      - updated_on
+      - state
+      - content
+      - creator
+      additionalProperties: false
+    team_links:
+      allOf:
+      - $ref: '#/components/schemas/account_links'
+      - type: object
+        title: Team Links
+        description: Links related to a Team.
+        properties:
+          self:
+            $ref: '#/components/schemas/link'
+          html:
+            $ref: '#/components/schemas/link'
+          members:
+            $ref: '#/components/schemas/link'
+          projects:
+            $ref: '#/components/schemas/link'
+          repositories:
+            $ref: '#/components/schemas/link'
+        additionalProperties: true
+    paginated_commitstatuses:
+      type: object
+      title: Paginated Commit Statuses
+      description: A paginated list of commit status objects.
+      properties:
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+          minimum: 0
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+          minimum: 1
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+          minimum: 1
+        next:
+          type: string
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+          format: uri
+        previous:
+          type: string
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
+          format: uri
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/commitstatus'
+          minItems: 0
+          uniqueItems: true
+      additionalProperties: false
+    committer:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - type: object
+        title: Committer
+        description: The committer of a change in a repository
+        properties:
+          raw:
+            type: string
+            description: The raw committer value from the repository. This may be
+              the only value available if the committer does not match a user in Bitbucket.
+          user:
+            $ref: '#/components/schemas/account'
+        additionalProperties: true
     repository:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -3412,943 +4349,6 @@ components:
           mainbranch:
             $ref: '#/components/schemas/branch'
         additionalProperties: true
-    comment:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Comment
-        description: The base type for all comments. This type should be considered
-          abstract. Each of the "commentable" resources defines its own subtypes (e.g.
-          `issue_comment`).
-        properties:
-          id:
-            type: integer
-            format: int64
-          created_on:
-            type: string
-            format: date-time
-          updated_on:
-            type: string
-            format: date-time
-          content:
-            type: object
-            properties:
-              raw:
-                type: string
-                description: The text as it was typed by a user.
-              markup:
-                type: string
-                description: The type of markup language the raw content is to be
-                  interpreted in.
-                enum:
-                - markdown
-                - creole
-                - plaintext
-              html:
-                type: string
-                description: The user's content rendered as HTML.
-            additionalProperties: false
-          user:
-            $ref: '#/components/schemas/account'
-          deleted:
-            type: boolean
-          parent:
-            $ref: '#/components/schemas/comment'
-          inline:
-            type: object
-            properties:
-              from:
-                type: integer
-                description: The comment's anchor line in the old version of the file.
-                  If the comment is a multi-line comment, this is the ending line
-                  number in the old version of the file.
-                minimum: 1
-              to:
-                type: integer
-                description: The comment's anchor line in the new version of the file.
-                  If the comment is a multi-line comment, this is the ending line
-                  number in the new version of the file.
-                minimum: 1
-              start_from:
-                type: integer
-                description: The starting line number in the old version of the file,
-                  if the comment is a multi-line comment. This is null otherwise.
-                minimum: 1
-              start_to:
-                type: integer
-                description: The starting line number in the new version of the file,
-                  if the comment is a multi-line comment. This is null otherwise.
-                minimum: 1
-              path:
-                type: string
-                description: The path of the file this comment is anchored to.
-            required:
-            - path
-            additionalProperties: false
-          links:
-            type: object
-            properties:
-              self:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              html:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              code:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-            additionalProperties: false
-        additionalProperties: true
-    user:
-      allOf:
-      - $ref: '#/components/schemas/account'
-      - type: object
-        title: User
-        description: A user object.
-        properties:
-          links:
-            $ref: '#/components/schemas/user_links'
-          account_id:
-            type: string
-            description: The user's Atlassian account ID.
-          account_status:
-            type: string
-            description: The status of the account. Currently the only possible value
-              is "active", but more values may be added in the future.
-          has_2fa_enabled:
-            type: boolean
-          nickname:
-            type: string
-            description: Account name defined by the owner. Should be used instead
-              of the "username" field. Note that "nickname" cannot be used in place
-              of "username" in URLs and queries, as "nickname" is not guaranteed to
-              be unique.
-          is_staff:
-            type: boolean
-        additionalProperties: true
-    account:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Account
-        description: An account object.
-        properties:
-          links:
-            $ref: '#/components/schemas/account_links'
-          created_on:
-            type: string
-            format: date-time
-          display_name:
-            type: string
-          uuid:
-            type: string
-        additionalProperties: true
-    project:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Project
-        description: "A Bitbucket project.\n            Projects are used by teams\
-          \ to organize repositories."
-        properties:
-          links:
-            type: object
-            properties:
-              html:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              avatar:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-            additionalProperties: false
-          uuid:
-            type: string
-            description: The project's immutable id.
-          key:
-            type: string
-            description: The project's key.
-          owner:
-            $ref: '#/components/schemas/team'
-          name:
-            type: string
-            description: The name of the project.
-          description:
-            type: string
-          is_private:
-            type: boolean
-            description: '
-
-              Indicates whether the project is publicly accessible, or whether it
-              is
-
-              private to the team and consequently only visible to team members.
-
-              Note that private projects cannot contain public repositories.'
-          created_on:
-            type: string
-            format: date-time
-          updated_on:
-            type: string
-            format: date-time
-          has_publicly_visible_repos:
-            type: boolean
-            description: '
-
-              Indicates whether the project contains publicly visible repositories.
-
-              Note that private projects cannot contain public repositories.'
-        additionalProperties: true
-    object:
-      type: object
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-      required:
-      - type
-      additionalProperties: true
-      discriminator:
-        propertyName: type
-    pullrequest_task_create:
-      type: object
-      title: Pull Request Task Create
-      description: A pullrequest task create
-      properties:
-        content:
-          type: object
-          title: Task Raw Content
-          description: task raw content
-          properties:
-            raw:
-              type: string
-              description: The task contents
-          required:
-          - raw
-          additionalProperties: false
-        comment:
-          $ref: '#/components/schemas/comment'
-        pending:
-          type: boolean
-      required:
-      - content
-      additionalProperties: false
-    base_commit:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Base Commit
-        description: The common base type for both repository and snippet commits.
-        properties:
-          hash:
-            type: string
-            pattern: '[0-9a-f]{7,}?'
-          date:
-            type: string
-            format: date-time
-          author:
-            $ref: '#/components/schemas/author'
-          committer:
-            $ref: '#/components/schemas/committer'
-          message:
-            type: string
-          summary:
-            type: object
-            properties:
-              raw:
-                type: string
-                description: The text as it was typed by a user.
-              markup:
-                type: string
-                description: The type of markup language the raw content is to be
-                  interpreted in.
-                enum:
-                - markdown
-                - creole
-                - plaintext
-              html:
-                type: string
-                description: The user's content rendered as HTML.
-            additionalProperties: false
-          parents:
-            type: array
-            items:
-              $ref: '#/components/schemas/base_commit'
-            minItems: 0
-        additionalProperties: true
-    task:
-      type: object
-      title: Task
-      description: A task object.
-      properties:
-        id:
-          type: integer
-          format: int64
-        created_on:
-          type: string
-          format: date-time
-        updated_on:
-          type: string
-          format: date-time
-        state:
-          type: string
-          enum:
-          - RESOLVED
-          - UNRESOLVED
-        content:
-          type: object
-          properties:
-            raw:
-              type: string
-              description: The text as it was typed by a user.
-            markup:
-              type: string
-              description: The type of markup language the raw content is to be interpreted
-                in.
-              enum:
-              - markdown
-              - creole
-              - plaintext
-            html:
-              type: string
-              description: The user's content rendered as HTML.
-          additionalProperties: false
-        creator:
-          $ref: '#/components/schemas/account'
-        pending:
-          type: boolean
-        resolved_on:
-          type: string
-          description: The ISO8601 timestamp for when the task was resolved.
-          format: date-time
-        resolved_by:
-          $ref: '#/components/schemas/account'
-      required:
-      - created_on
-      - updated_on
-      - state
-      - content
-      - creator
-      additionalProperties: false
-    error:
-      type: object
-      title: Error
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-            detail:
-              type: string
-            data:
-              type: object
-              description: Optional structured data that is endpoint-specific.
-              properties: {}
-              additionalProperties: true
-          required:
-          - message
-          additionalProperties: false
-      required:
-      - type
-      additionalProperties: true
-    paginated_default_reviewer_and_type:
-      type: object
-      title: Paginated Default Reviewer and Type
-      description: A paginated list of default reviewers with reviewer type.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/default_reviewer_and_type'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    commit:
-      allOf:
-      - $ref: '#/components/schemas/base_commit'
-      - type: object
-        title: Commit
-        description: A repository commit object.
-        properties:
-          repository:
-            $ref: '#/components/schemas/repository'
-          participants:
-            type: array
-            items:
-              $ref: '#/components/schemas/participant'
-            minItems: 0
-        additionalProperties: true
-    commitstatus:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Commit Status
-        description: A commit status object.
-        properties:
-          links:
-            type: object
-            properties:
-              self:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-              commit:
-                type: object
-                title: Link
-                description: A link to a resource related to this object.
-                properties:
-                  href:
-                    type: string
-                    format: uri
-                  name:
-                    type: string
-                additionalProperties: false
-            additionalProperties: false
-          key:
-            type: string
-            description: "An identifier for the status that's unique to\n        its\
-              \ type (current \"build\" is the only supported type) and the vendor,\n\
-              \        e.g. BB-DEPLOY"
-          refname:
-            type: string
-            description: '
-
-              The name of the ref that pointed to this commit at the time the status
-
-              object was created. Note that this the ref may since have moved off
-              of
-
-              the commit. This optional field can be useful for build systems whose
-
-              build triggers and configuration are branch-dependent (e.g. a Pipeline
-
-              build).
-
-              It is legitimate for this field to not be set, or even apply (e.g. a
-
-              static linting job).'
-          url:
-            type: string
-            description: A URL linking back to the vendor or build system, for providing
-              more information about whatever process produced this status. Accepts
-              context variables `repository` and `commit` that Bitbucket will evaluate
-              at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name}
-              which Bitbucket will turn into https://foo.com/builds/foo/bar at render
-              time.
-          state:
-            type: string
-            description: Provides some indication of the status of this commit
-            enum:
-            - FAILED
-            - INPROGRESS
-            - STOPPED
-            - SUCCESSFUL
-          name:
-            type: string
-            description: An identifier for the build itself, e.g. BB-DEPLOY-1
-          description:
-            type: string
-            description: A description of the build (e.g. "Unit tests in Bamboo")
-          created_on:
-            type: string
-            format: date-time
-          updated_on:
-            type: string
-            format: date-time
-        required:
-        - key
-        - state
-        additionalProperties: true
-    committer:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Committer
-        description: The committer of a change in a repository
-        properties:
-          raw:
-            type: string
-            description: The raw committer value from the repository. This may be
-              the only value available if the committer does not match a user in Bitbucket.
-          user:
-            $ref: '#/components/schemas/account'
-        additionalProperties: true
-    default_reviewer_and_type:
-      type: object
-      title: Default Reviewer and Type
-      description: Object containing a user that is a default reviewer and the type
-        of reviewer
-      properties:
-        type:
-          type: string
-        reviewer_type:
-          type: string
-        user:
-          $ref: '#/components/schemas/user'
-      required:
-      - type
-      additionalProperties: true
-    pullrequest_task_update:
-      type: object
-      title: Pull Request Task Update
-      description: A pullrequest task update
-      properties:
-        content:
-          type: object
-          title: Task Raw Content
-          description: task raw content
-          properties:
-            raw:
-              type: string
-              description: The task contents
-          required:
-          - raw
-          additionalProperties: false
-        state:
-          type: string
-          enum:
-          - RESOLVED
-          - UNRESOLVED
-      additionalProperties: false
-    pullrequest_comment_task:
-      allOf:
-      - $ref: '#/components/schemas/pullrequest_task'
-      - type: object
-        title: Pull Request Comment Task
-        description: A pullrequest comment task
-        properties:
-          comment:
-            $ref: '#/components/schemas/comment'
-        additionalProperties: false
-    paginated_pullrequests:
-      type: object
-      title: Paginated Pull Requests
-      description: A paginated list of pullrequests.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/pullrequest'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    paginated_accounts:
-      type: object
-      title: Paginated Accounts
-      description: A paginated list of accounts.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/account'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    ref:
-      type: object
-      title: Ref
-      description: A ref object, representing a branch or tag in a repository.
-      properties:
-        type:
-          type: string
-        links:
-          type: object
-          properties:
-            self:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-            commits:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-            html:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
-          additionalProperties: false
-        name:
-          type: string
-          description: The name of the ref.
-        target:
-          $ref: '#/components/schemas/commit'
-      required:
-      - type
-      additionalProperties: true
-    participant:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - type: object
-        title: Participant
-        description: Object describing a user's role on resources like commits or
-          pull requests.
-        properties:
-          user:
-            $ref: '#/components/schemas/account'
-          role:
-            type: string
-            enum:
-            - PARTICIPANT
-            - REVIEWER
-          approved:
-            type: boolean
-          state:
-            type: string
-            enum:
-            - approved
-            - changes_requested
-            - null
-          participated_on:
-            type: string
-            description: The ISO8601 timestamp of the participant's action. For approvers,
-              this is the time of their approval. For commenters and pull request
-              reviewers who are not approvers, this is the time they last commented,
-              or null if they have not commented.
-            format: date-time
-        additionalProperties: true
-    user_links:
-      allOf:
-      - $ref: '#/components/schemas/account_links'
-      - type: object
-        title: User Links
-        description: Links related to a User.
-        properties:
-          self:
-            $ref: '#/components/schemas/link'
-          html:
-            $ref: '#/components/schemas/link'
-          repositories:
-            $ref: '#/components/schemas/link'
-        additionalProperties: true
-    paginated_tasks:
-      type: object
-      title: Paginated Tasks
-      description: A paginated list of tasks.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/pullrequest_comment_task'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
-    link:
-      type: object
-      title: Link
-      description: A link to a resource related to this object.
-      properties:
-        href:
-          type: string
-          format: uri
-        name:
-          type: string
-      additionalProperties: false
-    comment_resolution:
-      type: object
-      title: Comment Resolution
-      description: The resolution object for a Comment.
-      properties:
-        type:
-          type: string
-        user:
-          $ref: '#/components/schemas/account'
-        created_on:
-          type: string
-          description: The ISO8601 timestamp the resolution was created.
-          format: date-time
-      required:
-      - type
-      additionalProperties: true
-    team_links:
-      allOf:
-      - $ref: '#/components/schemas/account_links'
-      - type: object
-        title: Team Links
-        description: Links related to a Team.
-        properties:
-          self:
-            $ref: '#/components/schemas/link'
-          html:
-            $ref: '#/components/schemas/link'
-          members:
-            $ref: '#/components/schemas/link'
-          projects:
-            $ref: '#/components/schemas/link'
-          repositories:
-            $ref: '#/components/schemas/link'
-        additionalProperties: true
-    branch:
-      allOf:
-      - $ref: '#/components/schemas/ref'
-      - type: object
-        title: Branch
-        description: A branch object, representing a branch in a repository.
-        properties:
-          merge_strategies:
-            type: array
-            description: Available merge strategies for pull requests targeting this
-              branch.
-            items:
-              type: string
-              enum:
-              - merge_commit
-              - squash
-              - fast_forward
-              - squash_fast_forward
-              - rebase_fast_forward
-              - rebase_merge
-          default_merge_strategy:
-            type: string
-            description: The default merge strategy for pull requests targeting this
-              branch.
-        additionalProperties: true
-    paginated_commitstatuses:
-      type: object
-      title: Paginated Commit Statuses
-      description: A paginated list of commit status objects.
-      properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-          minimum: 1
-        next:
-          type: string
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/commitstatus'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
     pullrequest_endpoint_branch:
       type: object
       title: Pull Request Branch

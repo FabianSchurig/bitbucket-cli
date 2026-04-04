@@ -1,9 +1,12 @@
 # Binaries
 /bb-cli
 /bb-mcp
+/bb-tf
 /gen_commands
 /gen_mcptools
+/gen_tfdocs
 /main
+/terraform-provider-bitbucket
 
 # Build artifacts
 /dist/

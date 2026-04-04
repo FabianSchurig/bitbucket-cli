@@ -60,6 +60,7 @@ func NewWorkspacesCommand() *cobra.Command {
 		newWorkspacesUpdateAProjectForAWorkspaceCmd(),
 		newWorkspacesDeleteAProjectForAWorkspaceCmd(),
 		newWorkspacesListWorkspacePullRequestsForAUserCmd(),
+		newWorkspacesGetTheWorkspaceSystemGpgPublicKeysCmd(),
 	)
 
 	return cmd
@@ -1039,5 +1040,44 @@ func newWorkspacesListWorkspacePullRequestsForAUserCmd() *cobra.Command {
 	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
 	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
 	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+	return cmd
+}
+
+// newWorkspacesGetTheWorkspaceSystemGpgPublicKeysCmd returns the "workspaces get-the-workspace-system-gpg-public-keys" cobra command.
+// operationId: getTheWorkspaceSystemGpgPublicKeys
+func newWorkspacesGetTheWorkspaceSystemGpgPublicKeysCmd() *cobra.Command {
+	var (
+		workspace string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "get-the-workspace-system-gpg-public-keys",
+		Short: `Get the workspace system GPG public key(s)`,
+		Long: `Returns the system public GPG key(s). In most cases a single key is returned.
+During a key rotation period, two keys may be returned.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			pathParams := map[string]string{
+				"workspace": workspace,
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/workspaces/{workspace}/settings/gpg/public-key",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	return cmd
 }

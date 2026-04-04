@@ -629,83 +629,59 @@ paths:
       - api-token
 components:
   schemas:
-    report_annotation:
-      allOf:
-      - $ref: '#/components/schemas/object'
-      - additionalProperties: true
-        type: object
-        title: Report Annotation
-        description: A report for a commit.
-        properties:
-          external_id:
-            type: string
-            description: ID of the annotation provided by the annotation creator.
-              It can be used to identify the annotation as an alternative to it's
-              generated uuid. It is not used by Bitbucket, but only by the annotation
-              creator for updating or deleting this specific annotation. Needs to
-              be unique.
-          uuid:
-            type: string
-            description: The UUID that can be used to identify the annotation.
-          annotation_type:
-            enum:
-            - VULNERABILITY
-            - CODE_SMELL
-            - BUG
-            type: string
-            description: The type of the report.
-          path:
-            type: string
-            description: The path of the file on which this annotation should be placed.
-              This is the path of the file relative to the git repository. If no path
-              is provided, then it will appear in the overview modal on all pull requests
-              where the tip of the branch is the given commit, regardless of which
-              files were modified.
-          line:
-            type: integer
-            description: The line number that the annotation should belong to. If
-              no line number is provided, then it will default to 0 and in a pull
-              request it will appear at the top of the file specified by the path
-              field.
-            minimum: 1
-          summary:
-            type: string
-            description: The message to display to users.
-          details:
-            type: string
-            description: The details to show to users when clicking on the annotation.
-          result:
-            enum:
-            - PASSED
-            - FAILED
-            - SKIPPED
-            - IGNORED
-            type: string
-            description: The state of the report. May be set to PENDING and later
-              updated.
-          severity:
-            enum:
-            - CRITICAL
-            - HIGH
-            - MEDIUM
-            - LOW
-            type: string
-            description: The severity of the annotation.
-          link:
-            type: string
-            format: uri
-            description: A URL linking to the annotation in an external tool.
-          created_on:
-            type: string
-            format: date-time
-            description: The timestamp when the report was created.
-          updated_on:
-            type: string
-            format: date-time
-            description: The timestamp when the report was updated.
-      x-bb-default-fields:
-      - uuid
-      x-bb-url: /rest/2.0/accounts/{target_user.uuid}/repositories/{repository.uuid}/commits/{commit.hash}/reports/{reportUuid}/annotations/{uuid}
+    object:
+      type: object
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+      required:
+      - type
+      additionalProperties: true
+      discriminator:
+        propertyName: type
+    paginated_reports:
+      type: object
+      title: Paginated Reports
+      description: A paginated list of reports.
+      properties:
+        page:
+          type: integer
+          description: Page number of the current results. This is an optional element
+            that is not provided in all responses.
+        values:
+          type: array
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/report'
+          description: The values of the current page.
+        size:
+          type: integer
+          description: Total number of objects in the response. This is an optional
+            element that is not provided in all responses, as it can be expensive
+            to compute.
+        pagelen:
+          type: integer
+          description: Current number of objects on the existing page. The default
+            value is 10 with 100 being the maximum allowed value. Individual APIs
+            may enforce different values.
+        next:
+          type: string
+          format: uri
+          description: Link to the next page if it exists. The last page of a collection
+            does not have this value. Use this link to navigate the result set and
+            refrain from constructing your own URLs.
+        previous:
+          type: string
+          format: uri
+          description: Link to previous page if it exists. A collections first page
+            does not have this value. This is an optional element that is not provided
+            in all responses. Some result sets strictly support forward navigation
+            and never provide previous links. Clients must anticipate that backwards
+            navigation is not always available. Use this link to navigate the result
+            set and refrain from constructing your own URLs.
     error:
       type: object
       title: Error
@@ -871,56 +847,80 @@ components:
         value:
           type: object
           description: The value of the data element.
-    paginated_reports:
-      type: object
-      title: Paginated Reports
-      description: A paginated list of reports.
-      properties:
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-        values:
-          type: array
-          minItems: 0
-          items:
-            $ref: '#/components/schemas/report'
-          description: The values of the current page.
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-        pagelen:
-          type: integer
-          description: Current number of objects on the existing page. The default
-            value is 10 with 100 being the maximum allowed value. Individual APIs
-            may enforce different values.
-        next:
-          type: string
-          format: uri
-          description: Link to the next page if it exists. The last page of a collection
-            does not have this value. Use this link to navigate the result set and
-            refrain from constructing your own URLs.
-        previous:
-          type: string
-          format: uri
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-    object:
-      type: object
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-      required:
-      - type
-      additionalProperties: true
-      discriminator:
-        propertyName: type
+    report_annotation:
+      allOf:
+      - $ref: '#/components/schemas/object'
+      - additionalProperties: true
+        type: object
+        title: Report Annotation
+        description: A report for a commit.
+        properties:
+          external_id:
+            type: string
+            description: ID of the annotation provided by the annotation creator.
+              It can be used to identify the annotation as an alternative to it's
+              generated uuid. It is not used by Bitbucket, but only by the annotation
+              creator for updating or deleting this specific annotation. Needs to
+              be unique.
+          uuid:
+            type: string
+            description: The UUID that can be used to identify the annotation.
+          annotation_type:
+            enum:
+            - VULNERABILITY
+            - CODE_SMELL
+            - BUG
+            type: string
+            description: The type of the report.
+          path:
+            type: string
+            description: The path of the file on which this annotation should be placed.
+              This is the path of the file relative to the git repository. If no path
+              is provided, then it will appear in the overview modal on all pull requests
+              where the tip of the branch is the given commit, regardless of which
+              files were modified.
+          line:
+            type: integer
+            description: The line number that the annotation should belong to. If
+              no line number is provided, then it will default to 0 and in a pull
+              request it will appear at the top of the file specified by the path
+              field.
+            minimum: 1
+          summary:
+            type: string
+            description: The message to display to users.
+          details:
+            type: string
+            description: The details to show to users when clicking on the annotation.
+          result:
+            enum:
+            - PASSED
+            - FAILED
+            - SKIPPED
+            - IGNORED
+            type: string
+            description: The state of the report. May be set to PENDING and later
+              updated.
+          severity:
+            enum:
+            - CRITICAL
+            - HIGH
+            - MEDIUM
+            - LOW
+            type: string
+            description: The severity of the annotation.
+          link:
+            type: string
+            format: uri
+            description: A URL linking to the annotation in an external tool.
+          created_on:
+            type: string
+            format: date-time
+            description: The timestamp when the report was created.
+          updated_on:
+            type: string
+            format: date-time
+            description: The timestamp when the report was updated.
+      x-bb-default-fields:
+      - uuid
+      x-bb-url: /rest/2.0/accounts/{target_user.uuid}/repositories/{repository.uuid}/commits/{commit.hash}/reports/{reportUuid}/annotations/{uuid}

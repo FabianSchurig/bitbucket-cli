@@ -77,17 +77,24 @@ The `errcheck` linter enforces these rules in CI.
 ```
 cmd/bb-cli/main.go          # Entry point, root Cobra command (hand-written)
 cmd/bb-mcp/main.go          # Entry point, MCP server (hand-written)
+cmd/bb-tf/main.go            # Entry point, Terraform provider (hand-written)
 internal/client/             # HTTP client + auth (hand-written)
 internal/handlers/           # Generic HTTP dispatcher (hand-written)
 internal/output/             # Table/JSON/ID rendering (hand-written)
 internal/mcptools/handler.go # MCP tool handler (hand-written)
+internal/tfprovider/provider.go   # Terraform provider (hand-written)
+internal/tfprovider/resource.go   # Generic CRUD resource (hand-written)
+internal/tfprovider/datasource.go # Generic data source (hand-written)
+internal/tfprovider/helpers.go    # Shared types + CRUD mapping (hand-written)
 internal/commands/*.gen.go   # ⚠️ GENERATED — do not edit
 internal/mcptools/*.gen.go   # ⚠️ GENERATED — do not edit
+internal/tfprovider/*.gen.go # ⚠️ GENERATED — do not edit
 internal/generated/models.gen.go    # ⚠️ GENERATED — do not edit
 schema/*-schema.yaml                # ⚠️ GENERATED — do not edit
 scripts/internal/spec/       # Shared schema parsing (hand-written)
 scripts/gen_commands/         # CLI command generator
 scripts/gen_mcptools/         # MCP tool generator
+scripts/gen_terraform/        # Terraform resource generator
 scripts/                     # Schema enrichment/partition (Python)
 ```
 
@@ -97,6 +104,7 @@ The following files are **auto-generated** and must **never be edited by hand**:
 
 - `internal/commands/*.gen.go`
 - `internal/mcptools/*.gen.go`
+- `internal/tfprovider/*.gen.go`
 - `internal/generated/models.gen.go`
 - `schema/*-schema.yaml`
 
@@ -106,6 +114,7 @@ Changes will be overwritten by the next CI run. Instead, fix the source:
 |---------|--------|
 | Wrong command flags/descriptions | `scripts/gen_commands/main.go` |
 | Wrong MCP tool definitions | `scripts/gen_mcptools/main.go` |
+| Wrong Terraform resource definitions | `scripts/gen_terraform/main.go` |
 | Wrong model types | `oapi-codegen.yaml` or `scripts/partition_spec.py` |
 | Missing/wrong endpoints | `scripts/enrich_spec.py` or `scripts/partition_spec.py` |
 | Shared schema logic | `scripts/internal/spec/` |
@@ -136,6 +145,9 @@ go run scripts/gen_commands/main.go schema/pr-schema.yaml internal/commands/comm
 
 # MCP tools
 go run scripts/gen_mcptools/main.go schema/pr-schema.yaml internal/mcptools/pr.gen.go
+
+# Terraform resources
+go run scripts/gen_terraform/main.go schema/pr-schema.yaml internal/tfprovider/pr.gen.go
 
 # Or regenerate everything:
 make generate

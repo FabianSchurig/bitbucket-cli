@@ -409,33 +409,6 @@ paths:
         type: string
 components:
   schemas:
-    error:
-      type: object
-      title: Error
-      description: Base type for most resource objects. It defines the common `type`
-        element that identifies an object's type. It also identifies the element as
-        Swagger's `discriminator`.
-      properties:
-        type:
-          type: string
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-            detail:
-              type: string
-            data:
-              type: object
-              description: Optional structured data that is endpoint-specific.
-              properties: {}
-              additionalProperties: true
-          required:
-          - message
-          additionalProperties: false
-      required:
-      - type
-      additionalProperties: true
     commitstatus:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -524,6 +497,19 @@ components:
         - key
         - state
         additionalProperties: true
+    object:
+      type: object
+      description: Base type for most resource objects. It defines the common `type`
+        element that identifies an object's type. It also identifies the element as
+        Swagger's `discriminator`.
+      properties:
+        type:
+          type: string
+      required:
+      - type
+      additionalProperties: true
+      discriminator:
+        propertyName: type
     paginated_commitstatuses:
       type: object
       title: Paginated Commit Statuses
@@ -568,16 +554,30 @@ components:
           minItems: 0
           uniqueItems: true
       additionalProperties: false
-    object:
+    error:
       type: object
+      title: Error
       description: Base type for most resource objects. It defines the common `type`
         element that identifies an object's type. It also identifies the element as
         Swagger's `discriminator`.
       properties:
         type:
           type: string
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+            detail:
+              type: string
+            data:
+              type: object
+              description: Optional structured data that is endpoint-specific.
+              properties: {}
+              additionalProperties: true
+          required:
+          - message
+          additionalProperties: false
       required:
       - type
       additionalProperties: true
-      discriminator:
-        propertyName: type
