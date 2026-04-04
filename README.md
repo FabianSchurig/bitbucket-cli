@@ -86,7 +86,7 @@ go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-mcp@latest
 
 # Set Bitbucket auth
 export BITBUCKET_USERNAME=myuser
-export BITBUCKET_APP_PASSWORD=ATBBxxxxxxxx
+export BITBUCKET_API_TOKEN=ATBBxxxxxxxx
 
 # Run as stdio MCP server (default, for MCP clients like Claude Desktop)
 bb-mcp
@@ -106,7 +106,7 @@ Add to your `claude_desktop_config.json`:
       "command": "bb-mcp",
       "env": {
         "BITBUCKET_USERNAME": "myuser",
-        "BITBUCKET_APP_PASSWORD": "ATBBxxxxxxxx"
+        "BITBUCKET_API_TOKEN": "ATBBxxxxxxxx"
       }
     }
   }
@@ -181,20 +181,20 @@ docker pull ghcr.io/fabianschurig/bitbucket-cli:latest
 
 docker run --rm \
   -e BITBUCKET_USERNAME \
-  -e BITBUCKET_APP_PASSWORD \
+  -e BITBUCKET_API_TOKEN \
   ghcr.io/fabianschurig/bitbucket-cli pr list-pull-requests \
     --workspace myteam --repo-slug myrepo
 
 # MCP server (stdio, e.g. for Claude Desktop)
 docker run --rm -i \
   -e BITBUCKET_USERNAME \
-  -e BITBUCKET_APP_PASSWORD \
+  -e BITBUCKET_API_TOKEN \
   ghcr.io/fabianschurig/bitbucket-mcp
 
 # MCP server (SSE over HTTP)
 docker run --rm -p 8080:8080 \
   -e BITBUCKET_USERNAME \
-  -e BITBUCKET_APP_PASSWORD \
+  -e BITBUCKET_API_TOKEN \
   ghcr.io/fabianschurig/bitbucket-mcp --transport sse --addr :8080
 ```
 

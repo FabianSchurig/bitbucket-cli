@@ -19,7 +19,7 @@ import (
 func setupEnv(t *testing.T) {
 	t.Helper()
 	t.Setenv("BITBUCKET_USERNAME", "testuser")
-	t.Setenv("BITBUCKET_APP_PASSWORD", "testpass")
+	t.Setenv("BITBUCKET_API_TOKEN", "testpass")
 	t.Setenv("BITBUCKET_TOKEN", "")
 }
 
@@ -210,7 +210,7 @@ func TestToolHandler_MissingRequiredParam(t *testing.T) {
 
 func TestToolHandler_NoAuth(t *testing.T) {
 	// Clear all auth env vars.
-	for _, k := range []string{"BITBUCKET_USERNAME", "BITBUCKET_APP_PASSWORD", "BITBUCKET_TOKEN"} {
+	for _, k := range []string{"BITBUCKET_USERNAME", "BITBUCKET_API_TOKEN", "BITBUCKET_TOKEN"} {
 		if err := os.Unsetenv(k); err != nil {
 			t.Fatalf("unsetenv %s: %v", k, err)
 		}

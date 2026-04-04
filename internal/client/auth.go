@@ -18,7 +18,7 @@ type BBClient struct {
 // NewClient creates an authenticated Bitbucket API client.
 //
 // Authentication precedence:
-//  1. BITBUCKET_USERNAME + BITBUCKET_APP_PASSWORD → HTTP Basic Auth (most common)
+//  1. BITBUCKET_USERNAME + BITBUCKET_API_TOKEN → HTTP Basic Auth (most common)
 //  2. BITBUCKET_TOKEN (alone) → Bearer token (OAuth2)
 //
 // The base URL defaults to https://api.bitbucket.org/2.0 but can be
@@ -31,7 +31,7 @@ func NewClient() (*BBClient, error) {
 	c := resty.New().SetBaseURL(base)
 
 	username := os.Getenv("BITBUCKET_USERNAME")
-	password := os.Getenv("BITBUCKET_APP_PASSWORD")
+	password := os.Getenv("BITBUCKET_API_TOKEN")
 	token := os.Getenv("BITBUCKET_TOKEN")
 
 	switch {
@@ -41,7 +41,7 @@ func NewClient() (*BBClient, error) {
 		c.SetAuthToken(token) // Bearer
 	default:
 		return nil, fmt.Errorf(
-			"auth required: set BITBUCKET_USERNAME + BITBUCKET_APP_PASSWORD, or BITBUCKET_TOKEN",
+			"auth required: set BITBUCKET_USERNAME + BITBUCKET_API_TOKEN, or BITBUCKET_TOKEN",
 		)
 	}
 

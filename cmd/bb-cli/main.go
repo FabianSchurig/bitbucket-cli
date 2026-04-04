@@ -6,9 +6,9 @@
 //
 // Authentication:
 //
-//	App password (most common):
+//	API token (most common):
 //	  export BITBUCKET_USERNAME=myuser
-//	  export BITBUCKET_APP_PASSWORD=ATBBxxxxxxxx
+//	  export BITBUCKET_API_TOKEN=ATBBxxxxxxxx
 //
 //	OAuth2 access token:
 //	  export BITBUCKET_TOKEN=<token>
@@ -50,9 +50,9 @@ func newRootCmd() *cobra.Command {
 		Long: `bb-cli is a command-line interface for Bitbucket Cloud.
 
 Set authentication environment variables before running:
-  App passwords (most common):
+  API token (most common):
     BITBUCKET_USERNAME    your Bitbucket username
-    BITBUCKET_APP_PASSWORD  your app password
+    BITBUCKET_API_TOKEN   your API token
 
   OAuth2 access token:
     BITBUCKET_TOKEN       your OAuth2 access token`,

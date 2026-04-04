@@ -10,9 +10,9 @@
 //
 // Authentication:
 //
-//	App password (most common):
+//	API token (most common):
 //	  export BITBUCKET_USERNAME=myuser
-//	  export BITBUCKET_APP_PASSWORD=ATBBxxxxxxxx
+//	  export BITBUCKET_API_TOKEN=ATBBxxxxxxxx
 //
 //	OAuth2 access token:
 //	  export BITBUCKET_TOKEN=<token>
