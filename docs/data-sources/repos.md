@@ -71,12 +71,12 @@ output "repos_response" {
 
 - `project` (Object) project
   Nested schema:
-  - `uuid` (String) The project's immutable id.
   - `key` (String) The project's key.
   - `name` (String) The name of the project.
   - `is_private` (String) 
-  - `has_publicly_visible_repos` (String) 
+  - `uuid` (String) The project's immutable id.
   - `description` (String) description
+  - `has_publicly_visible_repos` (String) 
 
 - `scm` (String) [git]
 - `size` (String) size

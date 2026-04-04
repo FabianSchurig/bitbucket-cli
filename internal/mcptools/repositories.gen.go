@@ -136,18 +136,18 @@ administered through admin.atlassian.com.
 				{Path: `language`, Type: `string`, Desc: `language`},
 				{Path: `mainbranch.type`, Type: `string`, Desc: `type`},
 				{Path: `mainbranch.name`, Type: `string`, Desc: `The name of the ref.`},
-				{Path: `mainbranch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`},
 				{Path: `mainbranch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `mainbranch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`},
 				{Path: `name`, Type: `string`, Desc: `name`},
 				{Path: `owner.display_name`, Type: `string`, Desc: `display_name`},
 				{Path: `owner.uuid`, Type: `string`, Desc: `uuid`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.description`, Type: `string`, Desc: `description`},
 				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
 				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
-				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
-				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
-				{Path: `project.description`, Type: `string`, Desc: `description`},
 				{Path: `project.is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
@@ -194,22 +194,22 @@ administered through admin.atlassian.com.
 				{Path: `language`, Type: `string`, Desc: `language`},
 				{Path: `mainbranch.type`, Type: `string`, Desc: `type`},
 				{Path: `mainbranch.name`, Type: `string`, Desc: `The name of the ref.`},
-				{Path: `mainbranch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`},
 				{Path: `mainbranch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `mainbranch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`},
 				{Path: `name`, Type: `string`, Desc: `name`},
 				{Path: `owner.display_name`, Type: `string`, Desc: `display_name`},
 				{Path: `owner.uuid`, Type: `string`, Desc: `uuid`},
-				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
-				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
-				{Path: `project.description`, Type: `string`, Desc: `description`},
+				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
 				{Path: `project.is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.description`, Type: `string`, Desc: `description`},
 				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
-				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
 				{Path: `scm`, Type: `string`, Desc: `[git]`},
 				{Path: `size`, Type: `int`, Desc: `size`},
 				{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
@@ -313,19 +313,19 @@ administered through admin.atlassian.com.
 				{Path: `mainbranch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`},
 				{Path: `mainbranch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
 				{Path: `name`, Type: `string`, Desc: `name`},
-				{Path: `owner.uuid`, Type: `string`, Desc: `uuid`},
 				{Path: `owner.display_name`, Type: `string`, Desc: `display_name`},
-				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
-				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
-				{Path: `project.description`, Type: `string`, Desc: `description`},
+				{Path: `owner.uuid`, Type: `string`, Desc: `uuid`},
+				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
 				{Path: `project.is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
+				{Path: `project.uuid`, Type: `string`, Desc: `The project's immutable id.`},
+				{Path: `project.key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `project.description`, Type: `string`, Desc: `description`},
 				{Path: `project.has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
-				{Path: `project.name`, Type: `string`, Desc: `The name of the project.`},
 				{Path: `scm`, Type: `string`, Desc: `[git]`},
 				{Path: `size`, Type: `int`, Desc: `size`},
 				{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},

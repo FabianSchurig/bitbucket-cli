@@ -59,17 +59,17 @@ output "repo_group_permissions_response" {
 - `repository` (Object) repository
   Nested schema:
   - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
-  - `scm` (String) [git]
+  - `name` (String) name
   - `description` (String) description
-  - `size` (String) size
+  - `updated_on` (String) updated_on
   - `fork_policy` (String) 
   - `is_private` (String) is_private
-  - `name` (String) name
-  - `updated_on` (String) updated_on
+  - `scm` (String) [git]
   - `has_wiki` (String) 
   - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
-  - `created_on` (String) created_on
+  - `size` (String) size
   - `language` (String) language
   - `has_issues` (String) 
+  - `created_on` (String) created_on
 
 - `type` (String) type

@@ -57,9 +57,9 @@ output "tags_response" {
 
 - `target` (Object) target
   Nested schema:
-  - `message` (String) message
   - `parents` (String) parents (JSON array)
   - `hash` (String) hash
   - `date` (String) date
+  - `message` (String) message
 
 - `type` (String) type

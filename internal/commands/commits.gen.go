@@ -303,6 +303,7 @@ func newCommitsCreateCommentForACommitCmd() *cobra.Command {
 		bodyInlineStartFrom int
 		bodyInlineStartTo   int
 		bodyInlinePath      string
+		bodyParentId        int
 		body                string
 	)
 
@@ -365,6 +366,9 @@ func newCommitsCreateCommentForACommitCmd() *cobra.Command {
 				if bodyInlinePath != "" {
 					handlers.SetNested(bodyObj, "inline.path", bodyInlinePath)
 				}
+				if bodyParentId != 0 {
+					handlers.SetNested(bodyObj, "parent.id", bodyParentId)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -394,6 +398,7 @@ func newCommitsCreateCommentForACommitCmd() *cobra.Command {
 	cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
 	cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
 	cmd.Flags().StringVar(&bodyInlinePath, "inline-path", "", `The path of the file this comment is anchored to.`)
+	cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `id`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -462,17 +467,18 @@ func newCommitsUpdateACommitCommentCmd() *cobra.Command {
 		commit              string
 		repoSlug            string
 		workspace           string
+		bodyCommitMessage   string
 		bodyCommitParents   string
 		bodyCommitHash      string
 		bodyCommitDate      string
-		bodyCommitMessage   string
 		bodyContentRaw      string
 		bodyContentMarkup   string
+		bodyInlineFrom      int
+		bodyInlineTo        int
 		bodyInlineStartFrom int
 		bodyInlineStartTo   int
 		bodyInlinePath      string
-		bodyInlineFrom      int
-		bodyInlineTo        int
+		bodyParentId        int
 		body                string
 	)
 
@@ -506,6 +512,9 @@ func newCommitsUpdateACommitCommentCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyCommitMessage != "" {
+					handlers.SetNested(bodyObj, "commit.message", bodyCommitMessage)
+				}
 				if bodyCommitParents != "" {
 					handlers.SetNested(bodyObj, "commit.parents", bodyCommitParents)
 				}
@@ -515,14 +524,17 @@ func newCommitsUpdateACommitCommentCmd() *cobra.Command {
 				if bodyCommitDate != "" {
 					handlers.SetNested(bodyObj, "commit.date", bodyCommitDate)
 				}
-				if bodyCommitMessage != "" {
-					handlers.SetNested(bodyObj, "commit.message", bodyCommitMessage)
-				}
 				if bodyContentRaw != "" {
 					handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
 				}
 				if bodyContentMarkup != "" {
 					handlers.SetNested(bodyObj, "content.markup", bodyContentMarkup)
+				}
+				if bodyInlineFrom != 0 {
+					handlers.SetNested(bodyObj, "inline.from", bodyInlineFrom)
+				}
+				if bodyInlineTo != 0 {
+					handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
 				}
 				if bodyInlineStartFrom != 0 {
 					handlers.SetNested(bodyObj, "inline.start_from", bodyInlineStartFrom)
@@ -533,11 +545,8 @@ func newCommitsUpdateACommitCommentCmd() *cobra.Command {
 				if bodyInlinePath != "" {
 					handlers.SetNested(bodyObj, "inline.path", bodyInlinePath)
 				}
-				if bodyInlineFrom != 0 {
-					handlers.SetNested(bodyObj, "inline.from", bodyInlineFrom)
-				}
-				if bodyInlineTo != 0 {
-					handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
+				if bodyParentId != 0 {
+					handlers.SetNested(bodyObj, "parent.id", bodyParentId)
 				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
@@ -558,17 +567,18 @@ func newCommitsUpdateACommitCommentCmd() *cobra.Command {
 	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyCommitMessage, "commit-message", "", `message`)
 	cmd.Flags().StringVar(&bodyCommitParents, "commit-parents", "", `parents (JSON array)`)
 	cmd.Flags().StringVar(&bodyCommitHash, "commit-hash", "", `hash`)
 	cmd.Flags().StringVar(&bodyCommitDate, "commit-date", "", `date`)
-	cmd.Flags().StringVar(&bodyCommitMessage, "commit-message", "", `message`)
 	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
 	cmd.Flags().StringVar(&bodyContentMarkup, "content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
+	cmd.Flags().IntVar(&bodyInlineFrom, "inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
+	cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
 	cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
 	cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
 	cmd.Flags().StringVar(&bodyInlinePath, "inline-path", "", `The path of the file this comment is anchored to.`)
-	cmd.Flags().IntVar(&bodyInlineFrom, "inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
-	cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
+	cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `id`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }

@@ -62,25 +62,30 @@ resource "bitbucket_pr_comments" "example" {
 
 - `inline` (Object) inline (also computed from API response)
   Nested schema:
+  - `start_from` (String) The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.
   - `start_to` (String) The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.
   - `path` (String) The path of the file this comment is anchored to.
   - `from` (String) The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.
   - `to` (String) The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.
-  - `start_from` (String) The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.
+
+- `parent` (Object) parent (also computed from API response)
+  Nested schema:
+  - `id` (String) id
 
 - `pending` (String) pending (also computed from API response)
 - `pullrequest` (Object) pullrequest (also computed from API response)
   Nested schema:
+  - `state` (String) The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]
+  - `close_source_branch` (String) A boolean flag indicating if merging the pull request closes the source branch.
+  - `draft` (String) A boolean flag indicating whether the pull request is a draft.
   - `reviewers` (List of Object) The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.
-    - `uuid` (String) uuid
     - `created_on` (String) created_on
     - `display_name` (String) display_name
-  - `state` (String) The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]
+    - `uuid` (String) uuid
   - `description` (String) Explains what the pull request does.
   - `title` (String) Title of the pull request.
-  - `close_source_branch` (String) A boolean flag indicating if merging the pull request closes the source branch.
   - `reason` (String) Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.
-  - `draft` (String) A boolean flag indicating whether the pull request is a draft.
+  - `id` (String) The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.
 
 - `resolution` (Object) The resolution object for a Comment. (also computed from API response)
   Nested schema:

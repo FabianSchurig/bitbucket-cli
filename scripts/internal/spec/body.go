@@ -395,12 +395,26 @@ func flattenProperty(schemas map[string]any, name, path string, prop map[string]
 
 func resolveRefProperty(schemas map[string]any, name, path, ref string, prop map[string]any, visited map[string]bool, opts FieldResolveOpts) []BodyField {
 	if opts.MaxRefDepth <= 0 {
+		if idField, ok := resolveReferencedIDField(schemas, ref); ok {
+			desc, _ := prop["description"].(string)
+			if desc == "" {
+				desc = name
+			}
+			return []BodyField{{
+				Path: path, FlagName: BodyFlagName(path), GoName: BodyGoName(path),
+				GoType: "string", Default: `""`, Desc: desc,
+				IsObject: true, ItemFields: []BodyField{idField},
+			}}
+		}
 		return nil
 	}
 	deeper := opts
 	deeper.MaxRefDepth = opts.MaxRefDepth - 1
 	// Resolve with empty prefix so item fields have relative paths.
 	nested := ResolveFields(schemas, ref, "", visited, deeper)
+	if idField, ok := resolveReferencedIDField(schemas, ref); ok && !hasBodyFieldPath(nested, idField.Path) {
+		nested = append(nested, idField)
+	}
 	if len(nested) == 0 {
 		return nil
 	}
@@ -422,6 +436,80 @@ func resolveRefProperty(schemas map[string]any, name, path, ref string, prop map
 		GoType: "string", Default: `""`, Desc: desc,
 		IsObject: true, ItemFields: nested,
 	}}
+}
+
+func hasBodyFieldPath(fields []BodyField, path string) bool {
+	for _, field := range fields {
+		if field.Path == path {
+			return true
+		}
+	}
+	return false
+}
+
+func resolveReferencedIDField(schemas map[string]any, ref string) (BodyField, bool) {
+	prop, ok := resolveSchemaProperty(schemas, ref, "id", map[string]bool{})
+	if !ok {
+		return BodyField{}, false
+	}
+	propType, _ := prop["type"].(string)
+	if propType == "" {
+		propType = "string"
+	}
+	desc, _ := prop["description"].(string)
+	return MakeBodyField("id", propType, desc), true
+}
+
+func resolveSchemaProperty(schemas map[string]any, ref, propName string, seen map[string]bool) (map[string]any, bool) {
+	name := strings.TrimPrefix(ref, schemaRefPrefix)
+	if seen[name] {
+		return nil, false
+	}
+	seen[name] = true
+	defer delete(seen, name)
+
+	raw, ok := schemas[name]
+	if !ok {
+		return nil, false
+	}
+	schema, ok := raw.(map[string]any)
+	if !ok {
+		return nil, false
+	}
+	return findSchemaProperty(schemas, schema, propName, seen)
+}
+
+func findSchemaProperty(schemas map[string]any, schema map[string]any, propName string, seen map[string]bool) (map[string]any, bool) {
+	if propsRaw, ok := schema["properties"]; ok {
+		if props, ok := propsRaw.(map[string]any); ok {
+			if propRaw, ok := props[propName]; ok {
+				if prop, ok := propRaw.(map[string]any); ok {
+					return prop, true
+				}
+			}
+		}
+	}
+	allOfRaw, ok := schema["allOf"]
+	if !ok {
+		return nil, false
+	}
+	allOf, _ := allOfRaw.([]any)
+	for _, entry := range allOf {
+		m, ok := entry.(map[string]any)
+		if !ok {
+			continue
+		}
+		if ref, ok := m["$ref"].(string); ok {
+			if prop, found := resolveSchemaProperty(schemas, ref, propName, seen); found {
+				return prop, true
+			}
+			continue
+		}
+		if prop, found := findSchemaProperty(schemas, m, propName, seen); found {
+			return prop, true
+		}
+	}
+	return nil, false
 }
 
 // ResolveResponseRef extracts the response entity schema $ref from an operation.

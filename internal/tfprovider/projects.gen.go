@@ -98,9 +98,9 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `key`, Type: `string`, Desc: `The project's key.`},
 				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
 				{Path: `owner`, Type: `string`, Desc: `owner`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
@@ -336,26 +336,26 @@ This endpoint does not support BBQL features.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `group`, Type: `string`, Desc: `group`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `name`},
 					{Path: `slug`, Type: `string`, Desc: `The "sluggified" version of the group's name. This contains only ASCII
 characters and can therefore be slightly different than the name`},
 					{Path: `full_slug`, Type: `string`, Desc: "The concatenation of the workspace's slug and the group's slug,\nseparated with a colon (e.g. `acme:developers`)\n"},
-					{Path: `name`, Type: `string`, Desc: `name`},
 				}},
 				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
-Indicates whether the project contains publicly visible repositories.
-Note that private projects cannot contain public repositories.`},
-					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
-					{Path: `key`, Type: `string`, Desc: `The project's key.`},
-					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
-					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
 			},
@@ -380,26 +380,26 @@ Note that private projects cannot contain public repositories.`},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `group`, Type: `string`, Desc: `group`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `name`},
 					{Path: `slug`, Type: `string`, Desc: `The "sluggified" version of the group's name. This contains only ASCII
 characters and can therefore be slightly different than the name`},
 					{Path: `full_slug`, Type: `string`, Desc: "The concatenation of the workspace's slug and the group's slug,\nseparated with a colon (e.g. `acme:developers`)\n"},
+					{Path: `name`, Type: `string`, Desc: `name`},
 				}},
 				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
-					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 					{Path: `key`, Type: `string`, Desc: `The project's key.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
-					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
 			},
@@ -424,25 +424,25 @@ Note that private projects cannot contain public repositories.`},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `group`, Type: `string`, Desc: `group`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `name`},
 					{Path: `slug`, Type: `string`, Desc: `The "sluggified" version of the group's name. This contains only ASCII
 characters and can therefore be slightly different than the name`},
 					{Path: `full_slug`, Type: `string`, Desc: "The concatenation of the workspace's slug and the group's slug,\nseparated with a colon (e.g. `acme:developers`)\n"},
+					{Path: `name`, Type: `string`, Desc: `name`},
 				}},
 				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
 					{Path: `key`, Type: `string`, Desc: `The project's key.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
-					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
-Note that private projects cannot contain public repositories.`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
-Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
@@ -495,19 +495,19 @@ This endpoint does not support BBQL features.`,
 			ResponseFields: []BodyFieldDef{
 				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
-Indicates whether the project contains publicly visible repositories.
-Note that private projects cannot contain public repositories.`},
-					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
-					{Path: `key`, Type: `string`, Desc: `The project's key.`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -543,16 +543,16 @@ Note that private projects cannot contain public repositories.`},
 			ResponseFields: []BodyFieldDef{
 				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 					{Path: `key`, Type: `string`, Desc: `The project's key.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
-					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
@@ -562,11 +562,11 @@ Note that private projects cannot contain public repositories.`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `account_id`, Type: `string`, Desc: `The user's Atlassian account ID.`},
-					{Path: `account_status`, Type: `string`, Desc: `The status of the account. Currently the only possible value is "active", but more values may be added in the future.`},
 					{Path: `has_2fa_enabled`, Type: `bool`, Desc: `has_2fa_enabled`},
 					{Path: `nickname`, Type: `string`, Desc: `Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.`},
 					{Path: `is_staff`, Type: `bool`, Desc: `is_staff`},
+					{Path: `account_id`, Type: `string`, Desc: `The user's Atlassian account ID.`},
+					{Path: `account_status`, Type: `string`, Desc: `The status of the account. Currently the only possible value is "active", but more values may be added in the future.`},
 				}},
 			},
 			HasBody:   false,
@@ -591,19 +591,19 @@ Note that private projects cannot contain public repositories.`},
 			ResponseFields: []BodyFieldDef{
 				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
-Indicates whether the project contains publicly visible repositories.
-Note that private projects cannot contain public repositories.`},
-					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
-					{Path: `key`, Type: `string`, Desc: `The project's key.`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -715,9 +715,9 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `key`, Type: `string`, Desc: `The project's key.`},
 				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
 				{Path: `owner`, Type: `string`, Desc: `owner`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
@@ -953,26 +953,26 @@ This endpoint does not support BBQL features.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `group`, Type: `string`, Desc: `group`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `name`},
 					{Path: `slug`, Type: `string`, Desc: `The "sluggified" version of the group's name. This contains only ASCII
 characters and can therefore be slightly different than the name`},
 					{Path: `full_slug`, Type: `string`, Desc: "The concatenation of the workspace's slug and the group's slug,\nseparated with a colon (e.g. `acme:developers`)\n"},
-					{Path: `name`, Type: `string`, Desc: `name`},
 				}},
 				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
-Indicates whether the project contains publicly visible repositories.
-Note that private projects cannot contain public repositories.`},
-					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
-					{Path: `key`, Type: `string`, Desc: `The project's key.`},
-					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
-					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
 			},
@@ -997,26 +997,26 @@ Note that private projects cannot contain public repositories.`},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `group`, Type: `string`, Desc: `group`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `name`},
 					{Path: `slug`, Type: `string`, Desc: `The "sluggified" version of the group's name. This contains only ASCII
 characters and can therefore be slightly different than the name`},
 					{Path: `full_slug`, Type: `string`, Desc: "The concatenation of the workspace's slug and the group's slug,\nseparated with a colon (e.g. `acme:developers`)\n"},
+					{Path: `name`, Type: `string`, Desc: `name`},
 				}},
 				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
-					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 					{Path: `key`, Type: `string`, Desc: `The project's key.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
-					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
 			},
@@ -1041,25 +1041,25 @@ Note that private projects cannot contain public repositories.`},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `group`, Type: `string`, Desc: `group`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `name`},
 					{Path: `slug`, Type: `string`, Desc: `The "sluggified" version of the group's name. This contains only ASCII
 characters and can therefore be slightly different than the name`},
 					{Path: `full_slug`, Type: `string`, Desc: "The concatenation of the workspace's slug and the group's slug,\nseparated with a colon (e.g. `acme:developers`)\n"},
+					{Path: `name`, Type: `string`, Desc: `name`},
 				}},
 				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
 					{Path: `key`, Type: `string`, Desc: `The project's key.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
-					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
-Note that private projects cannot contain public repositories.`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
-Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
@@ -1112,19 +1112,19 @@ This endpoint does not support BBQL features.`,
 			ResponseFields: []BodyFieldDef{
 				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
-Indicates whether the project contains publicly visible repositories.
-Note that private projects cannot contain public repositories.`},
-					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
-					{Path: `key`, Type: `string`, Desc: `The project's key.`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1160,16 +1160,16 @@ Note that private projects cannot contain public repositories.`},
 			ResponseFields: []BodyFieldDef{
 				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 					{Path: `key`, Type: `string`, Desc: `The project's key.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
-					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
@@ -1179,11 +1179,11 @@ Note that private projects cannot contain public repositories.`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `account_id`, Type: `string`, Desc: `The user's Atlassian account ID.`},
-					{Path: `account_status`, Type: `string`, Desc: `The status of the account. Currently the only possible value is "active", but more values may be added in the future.`},
 					{Path: `has_2fa_enabled`, Type: `bool`, Desc: `has_2fa_enabled`},
 					{Path: `nickname`, Type: `string`, Desc: `Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.`},
 					{Path: `is_staff`, Type: `bool`, Desc: `is_staff`},
+					{Path: `account_id`, Type: `string`, Desc: `The user's Atlassian account ID.`},
+					{Path: `account_status`, Type: `string`, Desc: `The status of the account. Currently the only possible value is "active", but more values may be added in the future.`},
 				}},
 			},
 			HasBody:   false,
@@ -1208,19 +1208,19 @@ Note that private projects cannot contain public repositories.`},
 			ResponseFields: []BodyFieldDef{
 				{Path: `permission`, Type: `string`, Desc: `[read, write, create-repo, admin, none]`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
-Indicates whether the project contains publicly visible repositories.
-Note that private projects cannot contain public repositories.`},
-					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
-					{Path: `key`, Type: `string`, Desc: `The project's key.`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{

@@ -58,10 +58,10 @@ resource "bitbucket_tags" "example" {
 
 - `target` (Object) target (also computed from API response)
   Nested schema:
-  - `message` (String) message
   - `parents` (String) parents (JSON array)
   - `hash` (String) hash
   - `date` (String) date
+  - `message` (String) message
 
 - `type` (String) type (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.

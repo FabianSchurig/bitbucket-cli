@@ -52,16 +52,16 @@ output "workspace_runners_response" {
 - `name` (String) The name of the runner.
 - `oauth_client` (Object) oauth_client
   Nested schema:
-  - `id` (String) The OAuth client ID.
   - `secret` (String) The OAuth client secret. This is an optional element that is only provided once.
   - `token_endpoint` (String) The OAuth token endpoint URL.
   - `audience` (String) The intended audience for the OAuth token.
+  - `id` (String) The OAuth client ID.
 
 - `state` (Object) state
   Nested schema:
+  - `status` (String) The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]
   - `updated_on` (String) The timestamp when the runner state was last updated.
   - `cordoned` (String) Whether the runner is cordoned (prevented from accepting new steps).
-  - `status` (String) The current status of the runner. [UNREGISTERED, ONLINE, OFFLINE, DISABLED, ENABLED, UNHEALTHY]
 
 - `updated_on` (String) The timestamp when the runner was last updated.
 - `uuid` (String) The UUID identifying the runner.

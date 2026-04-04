@@ -117,9 +117,9 @@ tracker enabled.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `assignee`, Type: `string`, Desc: `assignee`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 				{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `name`, Type: `string`, Desc: `name`},
@@ -144,11 +144,11 @@ tracker enabled.`,
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
 					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `size`, Type: `int`, Desc: `size`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -157,10 +157,9 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
@@ -171,7 +170,8 @@ The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 				}},
 				{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 				{Path: `title`, Type: `string`, Desc: `title`},
@@ -206,15 +206,17 @@ administered through admin.atlassian.com.
 				}},
 				{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				}},
 				{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
 				{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
 				{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 				{Path: `reporter`, Type: `string`, Desc: `reporter`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -222,8 +224,7 @@ administered through admin.atlassian.com.
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
-					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -232,10 +233,8 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
@@ -246,13 +245,17 @@ The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
 					{Path: `scm`, Type: `string`, Desc: `[git]`},
-					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `description`, Type: `string`, Desc: `description`},
 				}},
 				{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 				{Path: `title`, Type: `string`, Desc: `title`},
 				{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `votes`, Type: `int`, Desc: `votes`},
 			},
@@ -280,15 +283,15 @@ administered through admin.atlassian.com.
 				}},
 				{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 				{Path: `reporter`, Type: `string`, Desc: `reporter`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
 					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `size`, Type: `int`, Desc: `size`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -297,10 +300,9 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
@@ -311,8 +313,9 @@ The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
-					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
 				}},
 				{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 				{Path: `title`, Type: `string`, Desc: `title`},
@@ -467,12 +470,6 @@ When the job has been accepted, it will return a 202 (Accepted) along with a uni
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
-					{Path: `language`, Type: `string`, Desc: `language`},
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
-					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -481,10 +478,9 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
@@ -495,6 +491,13 @@ The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `size`, Type: `int`, Desc: `size`},
 				}},
 				{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 				{Path: `title`, Type: `string`, Desc: `title`},
@@ -531,8 +534,8 @@ administered through admin.atlassian.com.
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `id`, Type: `int`, Desc: `id`},
 					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
@@ -548,15 +551,17 @@ administered through admin.atlassian.com.
 				}},
 				{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 				{Path: `reporter`, Type: `string`, Desc: `reporter`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
 					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `size`, Type: `int`, Desc: `size`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -565,10 +570,9 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
@@ -579,15 +583,14 @@ The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
-					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 				{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 				{Path: `title`, Type: `string`, Desc: `title`},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `name`},
 					{Path: `id`, Type: `int`, Desc: `id`},
+					{Path: `name`, Type: `string`, Desc: `name`},
 				}},
 				{Path: `votes`, Type: `int`, Desc: `votes`},
 			},
@@ -736,27 +739,7 @@ As a result, the link should not be persisted, stored, or shared.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `changes`, Type: `string`, Desc: `changes`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `assignee`, Type: `string`, Desc: `assignee`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
-					{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
-					{Path: `title`, Type: `string`, Desc: `title`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
 					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
-					{Path: `kind`, Type: `string`, Desc: `kind`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
-					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
@@ -772,22 +755,51 @@ As a result, the link should not be persisted, stored, or shared.`,
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
+					{Path: `assignee`, Type: `string`, Desc: `assignee`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
+					{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
+					{Path: `title`, Type: `string`, Desc: `title`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
+					{Path: `kind`, Type: `string`, Desc: `kind`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `id`, Type: `int`, Desc: `id`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
-					{Path: `id`, Type: `int`, Desc: `id`},
 					{Path: `title`, Type: `string`, Desc: `title`},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
-					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
-					{Path: `votes`, Type: `int`, Desc: `votes`},
 				}},
 				{Path: `message`, Type: `string`, Desc: `message`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
@@ -829,29 +841,29 @@ As a result, the link should not be persisted, stored, or shared.`,
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `new`, Type: `string`, Desc: `new`},
+						{Path: `old`, Type: `string`, Desc: `old`},
+					}},
 					{Path: `title`, Type: `string`, Desc: `title`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
-					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
 					{Path: `kind`, Type: `string`, Desc: `kind`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
+						{Path: `old`, Type: `string`, Desc: `old`},
 					}},
-					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `new`, Type: `string`, Desc: `new`},
+						{Path: `old`, Type: `string`, Desc: `old`},
 					}},
 					{Path: `priority`, Type: `string`, Desc: `priority`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
 					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
+						{Path: `old`, Type: `string`, Desc: `old`},
 					}},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
@@ -859,16 +871,26 @@ As a result, the link should not be persisted, stored, or shared.`,
 					}},
 				}},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
-					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
 					{Path: `title`, Type: `string`, Desc: `title`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `message`, Type: `string`, Desc: `message`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
@@ -879,13 +901,21 @@ As a result, the link should not be persisted, stored, or shared.`,
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `changes`, Type: `string`, Desc: `changes`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
+					{Path: `priority`, Type: `string`, Desc: `priority`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
 					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
+						{Path: `old`, Type: `string`, Desc: `old`},
 					}},
 					{Path: `assignee`, Type: `string`, Desc: `assignee`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
@@ -895,11 +925,11 @@ As a result, the link should not be persisted, stored, or shared.`,
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
-					{Path: `title`, Type: `string`, Desc: `title`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
-					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `title`, Type: `string`, Desc: `title`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
@@ -907,30 +937,31 @@ As a result, the link should not be persisted, stored, or shared.`,
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
-					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
-					{Path: `priority`, Type: `string`, Desc: `priority`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
-					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
 					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `id`, Type: `int`, Desc: `id`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
-					{Path: `id`, Type: `int`, Desc: `id`},
 					{Path: `title`, Type: `string`, Desc: `title`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
-					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
 				}},
 				{Path: `message`, Type: `string`, Desc: `message`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
@@ -970,14 +1001,6 @@ tracker enabled.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `changes`, Type: `string`, Desc: `changes`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `kind`, Type: `string`, Desc: `kind`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
-					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
 					{Path: `priority`, Type: `string`, Desc: `priority`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
@@ -998,7 +1021,15 @@ tracker enabled.`,
 						{Path: `new`, Type: `string`, Desc: `new`},
 						{Path: `old`, Type: `string`, Desc: `old`},
 					}},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
 					{Path: `title`, Type: `string`, Desc: `title`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
+					{Path: `kind`, Type: `string`, Desc: `kind`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
@@ -1009,23 +1040,32 @@ tracker enabled.`,
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `title`, Type: `string`, Desc: `title`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `id`, Type: `int`, Desc: `id`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
-					{Path: `id`, Type: `int`, Desc: `id`},
-					{Path: `title`, Type: `string`, Desc: `title`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
-					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
-					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
-					{Path: `votes`, Type: `int`, Desc: `votes`},
 				}},
 				{Path: `message`, Type: `string`, Desc: `message`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				}},
 				{Path: `name`, Type: `string`, Desc: `name`},
 				{Path: `type`, Type: `string`, Desc: `type`},
@@ -1066,32 +1106,44 @@ tracker enabled.`,
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
-					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				}},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `title`, Type: `string`, Desc: `title`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
 					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `id`, Type: `int`, Desc: `id`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
+				}},
+				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
-					{Path: `title`, Type: `string`, Desc: `title`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
-					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 			},
 			HasBody:   false,
@@ -1118,23 +1170,36 @@ tracker enabled.`,
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				}},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
 					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
-					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				}},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
 					{Path: `title`, Type: `string`, Desc: `title`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
-					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `id`, Type: `int`, Desc: `id`},
+				}},
+				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 			},
 			ResponseFields: []BodyFieldDef{},
@@ -1168,32 +1233,44 @@ tracker enabled.`,
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
-					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `title`, Type: `string`, Desc: `title`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
-					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
-					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
 					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `id`, Type: `int`, Desc: `id`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
+					{Path: `title`, Type: `string`, Desc: `title`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				}},
+				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 			},
 			HasBody:   false,
@@ -1221,23 +1298,36 @@ tracker enabled.`,
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				}},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
 					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 				}},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
 					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
-					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
 					{Path: `title`, Type: `string`, Desc: `title`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `id`, Type: `int`, Desc: `id`},
+				}},
+				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 			},
 			ResponseFields: []BodyFieldDef{
@@ -1257,24 +1347,36 @@ tracker enabled.`,
 				}},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
+					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					}},
 					{Path: `title`, Type: `string`, Desc: `title`},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
-					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
-					{Path: `votes`, Type: `int`, Desc: `votes`},
-					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
 					}},
+					{Path: `votes`, Type: `int`, Desc: `votes`},
+				}},
+				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 			},
 			HasBody:   true,
@@ -1608,9 +1710,9 @@ tracker enabled.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `assignee`, Type: `string`, Desc: `assignee`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 				{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `name`, Type: `string`, Desc: `name`},
@@ -1635,11 +1737,11 @@ tracker enabled.`,
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
 					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `size`, Type: `int`, Desc: `size`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -1648,10 +1750,9 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
@@ -1662,7 +1763,8 @@ The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 				}},
 				{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 				{Path: `title`, Type: `string`, Desc: `title`},
@@ -1697,15 +1799,17 @@ administered through admin.atlassian.com.
 				}},
 				{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				}},
 				{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
 				{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
 				{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 				{Path: `reporter`, Type: `string`, Desc: `reporter`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1713,8 +1817,7 @@ administered through admin.atlassian.com.
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
-					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `size`, Type: `int`, Desc: `size`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -1723,10 +1826,8 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
@@ -1737,13 +1838,17 @@ The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
 					{Path: `scm`, Type: `string`, Desc: `[git]`},
-					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `description`, Type: `string`, Desc: `description`},
 				}},
 				{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 				{Path: `title`, Type: `string`, Desc: `title`},
 				{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `votes`, Type: `int`, Desc: `votes`},
 			},
@@ -1771,15 +1876,15 @@ administered through admin.atlassian.com.
 				}},
 				{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 				{Path: `reporter`, Type: `string`, Desc: `reporter`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
 					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `size`, Type: `int`, Desc: `size`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -1788,10 +1893,9 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
@@ -1802,8 +1906,9 @@ The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
-					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
 				}},
 				{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 				{Path: `title`, Type: `string`, Desc: `title`},
@@ -1958,12 +2063,6 @@ When the job has been accepted, it will return a 202 (Accepted) along with a uni
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
-					{Path: `language`, Type: `string`, Desc: `language`},
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
-					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -1972,10 +2071,9 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
@@ -1986,6 +2084,13 @@ The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `size`, Type: `int`, Desc: `size`},
 				}},
 				{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 				{Path: `title`, Type: `string`, Desc: `title`},
@@ -2022,8 +2127,8 @@ administered through admin.atlassian.com.
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `id`, Type: `int`, Desc: `id`},
 					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
@@ -2039,15 +2144,17 @@ administered through admin.atlassian.com.
 				}},
 				{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 				{Path: `reporter`, Type: `string`, Desc: `reporter`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
 					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `size`, Type: `int`, Desc: `size`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -2056,10 +2163,9 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
@@ -2070,15 +2176,14 @@ The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
-					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 				{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 				{Path: `title`, Type: `string`, Desc: `title`},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `name`},
 					{Path: `id`, Type: `int`, Desc: `id`},
+					{Path: `name`, Type: `string`, Desc: `name`},
 				}},
 				{Path: `votes`, Type: `int`, Desc: `votes`},
 			},
@@ -2227,27 +2332,7 @@ As a result, the link should not be persisted, stored, or shared.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `changes`, Type: `string`, Desc: `changes`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `assignee`, Type: `string`, Desc: `assignee`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
-					{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
-					{Path: `title`, Type: `string`, Desc: `title`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
 					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
-					{Path: `kind`, Type: `string`, Desc: `kind`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
-					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
@@ -2263,22 +2348,51 @@ As a result, the link should not be persisted, stored, or shared.`,
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
+					{Path: `assignee`, Type: `string`, Desc: `assignee`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
+					{Path: `state`, Type: `string`, Desc: `state`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
+					{Path: `title`, Type: `string`, Desc: `title`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
+					{Path: `kind`, Type: `string`, Desc: `kind`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `id`, Type: `int`, Desc: `id`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
-					{Path: `id`, Type: `int`, Desc: `id`},
 					{Path: `title`, Type: `string`, Desc: `title`},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
-					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
-					{Path: `votes`, Type: `int`, Desc: `votes`},
 				}},
 				{Path: `message`, Type: `string`, Desc: `message`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
@@ -2320,29 +2434,29 @@ As a result, the link should not be persisted, stored, or shared.`,
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `new`, Type: `string`, Desc: `new`},
+						{Path: `old`, Type: `string`, Desc: `old`},
+					}},
 					{Path: `title`, Type: `string`, Desc: `title`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
-					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
 					{Path: `kind`, Type: `string`, Desc: `kind`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
+						{Path: `old`, Type: `string`, Desc: `old`},
 					}},
-					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `new`, Type: `string`, Desc: `new`},
+						{Path: `old`, Type: `string`, Desc: `old`},
 					}},
 					{Path: `priority`, Type: `string`, Desc: `priority`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
 					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
+						{Path: `old`, Type: `string`, Desc: `old`},
 					}},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
@@ -2350,16 +2464,26 @@ As a result, the link should not be persisted, stored, or shared.`,
 					}},
 				}},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
-					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
 					{Path: `title`, Type: `string`, Desc: `title`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `message`, Type: `string`, Desc: `message`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
@@ -2370,13 +2494,21 @@ As a result, the link should not be persisted, stored, or shared.`,
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `changes`, Type: `string`, Desc: `changes`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
+					{Path: `priority`, Type: `string`, Desc: `priority`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
 					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
+						{Path: `old`, Type: `string`, Desc: `old`},
 					}},
 					{Path: `assignee`, Type: `string`, Desc: `assignee`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
@@ -2386,11 +2518,11 @@ As a result, the link should not be persisted, stored, or shared.`,
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
-					{Path: `title`, Type: `string`, Desc: `title`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
-					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `title`, Type: `string`, Desc: `title`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
@@ -2398,30 +2530,31 @@ As a result, the link should not be persisted, stored, or shared.`,
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
-					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
-					{Path: `priority`, Type: `string`, Desc: `priority`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
-					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
 					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `id`, Type: `int`, Desc: `id`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
-					{Path: `id`, Type: `int`, Desc: `id`},
 					{Path: `title`, Type: `string`, Desc: `title`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
-					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
 				}},
 				{Path: `message`, Type: `string`, Desc: `message`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
@@ -2461,14 +2594,6 @@ tracker enabled.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `changes`, Type: `string`, Desc: `changes`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `kind`, Type: `string`, Desc: `kind`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
-					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `old`, Type: `string`, Desc: `old`},
-						{Path: `new`, Type: `string`, Desc: `new`},
-					}},
 					{Path: `priority`, Type: `string`, Desc: `priority`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
@@ -2489,7 +2614,15 @@ tracker enabled.`,
 						{Path: `new`, Type: `string`, Desc: `new`},
 						{Path: `old`, Type: `string`, Desc: `old`},
 					}},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
 					{Path: `title`, Type: `string`, Desc: `title`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `old`, Type: `string`, Desc: `old`},
+						{Path: `new`, Type: `string`, Desc: `new`},
+					}},
+					{Path: `kind`, Type: `string`, Desc: `kind`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `old`, Type: `string`, Desc: `old`},
 						{Path: `new`, Type: `string`, Desc: `new`},
 					}},
@@ -2500,23 +2633,32 @@ tracker enabled.`,
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `title`, Type: `string`, Desc: `title`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `id`, Type: `int`, Desc: `id`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
-					{Path: `id`, Type: `int`, Desc: `id`},
-					{Path: `title`, Type: `string`, Desc: `title`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
-					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
-					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
-					{Path: `votes`, Type: `int`, Desc: `votes`},
 				}},
 				{Path: `message`, Type: `string`, Desc: `message`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				}},
 				{Path: `name`, Type: `string`, Desc: `name`},
 				{Path: `type`, Type: `string`, Desc: `type`},
@@ -2557,32 +2699,44 @@ tracker enabled.`,
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
-					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				}},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `title`, Type: `string`, Desc: `title`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
 					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `id`, Type: `int`, Desc: `id`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
+				}},
+				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
-					{Path: `title`, Type: `string`, Desc: `title`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
-					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 			},
 			HasBody:   false,
@@ -2609,23 +2763,36 @@ tracker enabled.`,
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				}},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
 					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
-					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 				}},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
 					{Path: `title`, Type: `string`, Desc: `title`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
-					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `id`, Type: `int`, Desc: `id`},
+				}},
+				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 			},
 			ResponseFields: []BodyFieldDef{},
@@ -2659,32 +2826,44 @@ tracker enabled.`,
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
-					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `title`, Type: `string`, Desc: `title`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
-					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
-					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
 					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `id`, Type: `int`, Desc: `id`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
+					{Path: `title`, Type: `string`, Desc: `title`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				}},
+				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 			},
 			HasBody:   false,
@@ -2712,23 +2891,36 @@ tracker enabled.`,
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 				}},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
 					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 				}},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
 					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
-					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					}},
 					{Path: `title`, Type: `string`, Desc: `title`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `votes`, Type: `int`, Desc: `votes`},
+					{Path: `id`, Type: `int`, Desc: `id`},
+				}},
+				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 			},
 			ResponseFields: []BodyFieldDef{
@@ -2748,24 +2940,36 @@ tracker enabled.`,
 				}},
 				{Path: `issue`, Type: `string`, Desc: `issue`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
+					{Path: `version`, Type: `string`, Desc: `version`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `component`, Type: `string`, Desc: `component`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
+					}},
+					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
+					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
+					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
+					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					}},
 					{Path: `title`, Type: `string`, Desc: `title`},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `state`, Type: `string`, Desc: `[submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]`},
 					{Path: `kind`, Type: `string`, Desc: `[bug, enhancement, proposal, task]`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `priority`, Type: `string`, Desc: `[trivial, minor, major, critical, blocker]`},
-					{Path: `edited_on`, Type: `string`, Desc: `edited_on`},
-					{Path: `votes`, Type: `int`, Desc: `votes`},
-					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					{Path: `milestone`, Type: `string`, Desc: `milestone`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `id`, Type: `int`, Desc: `id`},
 					}},
+					{Path: `votes`, Type: `int`, Desc: `votes`},
+				}},
+				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 			},
 			HasBody:   true,

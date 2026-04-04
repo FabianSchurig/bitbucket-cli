@@ -617,6 +617,10 @@ func readListNested(ctx context.Context, source stateAccessor, attrName string, 
 	if d.HasError() || list.IsNull() || list.IsUnknown() {
 		return nil
 	}
+	return readListNestedValue(list, itemFields)
+}
+
+func readListNestedValue(list types.List, itemFields []BodyFieldDef) []map[string]any {
 	elements := list.Elements()
 	if len(elements) == 0 {
 		return nil
@@ -632,8 +636,8 @@ func readListNested(ctx context.Context, source stateAccessor, attrName string, 
 		for _, f := range itemFields {
 			key := toSnakeCase(strings.ReplaceAll(f.Path, ".", "_"))
 			if v, exists := objAttrs[key]; exists {
-				if sv, ok := v.(types.String); ok && !sv.IsNull() && !sv.IsUnknown() && sv.ValueString() != "" {
-					item[f.Path] = sv.ValueString()
+				if value, ok := readAttrValue(v, f); ok {
+					item[f.Path] = value
 				}
 			}
 		}
@@ -662,15 +666,8 @@ func readSingleNested(ctx context.Context, source stateAccessor, attrName string
 		if !exists {
 			continue
 		}
-		if f.IsObject && len(f.ItemFields) > 0 {
-			if innerObj, ok := v.(types.Object); ok && !innerObj.IsNull() && !innerObj.IsUnknown() {
-				inner := readObjectAttrs(innerObj, f.ItemFields)
-				if len(inner) > 0 {
-					result[f.Path] = inner
-				}
-			}
-		} else if sv, ok := v.(types.String); ok && !sv.IsNull() && !sv.IsUnknown() && sv.ValueString() != "" {
-			result[f.Path] = sv.ValueString()
+		if value, ok := readAttrValue(v, f); ok {
+			result[f.Path] = value
 		}
 	}
 	if len(result) == 0 {
@@ -690,18 +687,52 @@ func readObjectAttrs(obj types.Object, itemFields []BodyFieldDef) map[string]any
 		if !exists {
 			continue
 		}
-		if f.IsObject && len(f.ItemFields) > 0 {
-			if innerObj, ok := v.(types.Object); ok && !innerObj.IsNull() && !innerObj.IsUnknown() {
-				inner := readObjectAttrs(innerObj, f.ItemFields)
-				if len(inner) > 0 {
-					result[f.Path] = inner
-				}
-			}
-		} else if sv, ok := v.(types.String); ok && !sv.IsNull() && !sv.IsUnknown() && sv.ValueString() != "" {
-			result[f.Path] = sv.ValueString()
+		if value, ok := readAttrValue(v, f); ok {
+			result[f.Path] = value
 		}
 	}
 	return result
+}
+
+func readAttrValue(v attr.Value, f BodyFieldDef) (any, bool) {
+	if f.IsObject && len(f.ItemFields) > 0 {
+		innerObj, ok := v.(types.Object)
+		if !ok || innerObj.IsNull() || innerObj.IsUnknown() {
+			return nil, false
+		}
+		inner := readObjectAttrs(innerObj, f.ItemFields)
+		if len(inner) == 0 {
+			return nil, false
+		}
+		return inner, true
+	}
+	if f.IsArray && len(f.ItemFields) > 0 {
+		list, ok := v.(types.List)
+		if !ok || list.IsNull() || list.IsUnknown() {
+			return nil, false
+		}
+		items := readListNestedValue(list, f.ItemFields)
+		if len(items) == 0 {
+			return nil, false
+		}
+		return items, true
+	}
+	if f.IsArray {
+		list, ok := v.(types.List)
+		if !ok || list.IsNull() || list.IsUnknown() {
+			return nil, false
+		}
+		items := readSimpleListValue(list)
+		if len(items) == 0 {
+			return nil, false
+		}
+		return items, true
+	}
+	sv, ok := v.(types.String)
+	if !ok || sv.IsNull() || sv.IsUnknown() || sv.ValueString() == "" {
+		return nil, false
+	}
+	return sv.ValueString(), true
 }
 
 // readSimpleList reads a ListAttribute (list of strings) from state and returns
@@ -713,6 +744,10 @@ func readSimpleList(ctx context.Context, source stateAccessor, attrName string, 
 	if d.HasError() || list.IsNull() || list.IsUnknown() {
 		return nil
 	}
+	return readSimpleListValue(list)
+}
+
+func readSimpleListValue(list types.List) []string {
 	elements := list.Elements()
 	if len(elements) == 0 {
 		return nil
@@ -917,15 +952,7 @@ func buildListFromResponse(arr []any, itemFields []BodyFieldDef) types.List {
 				objAttrs[key] = attrNullValue(f)
 				continue
 			}
-			if f.IsObject && len(f.ItemFields) > 0 {
-				if sub, ok := v.(map[string]any); ok {
-					objAttrs[key] = buildObjectFromResponse(sub, f.ItemFields)
-				} else {
-					objAttrs[key] = attrNullValue(f)
-				}
-			} else {
-				objAttrs[key] = types.StringValue(fmt.Sprintf("%v", v))
-			}
+			objAttrs[key] = buildAttrValueFromResponse(v, f)
 		}
 		elements = append(elements, types.ObjectValueMust(attrTypes, objAttrs))
 	}
@@ -944,29 +971,34 @@ func buildObjectFromResponse(m map[string]any, itemFields []BodyFieldDef) types.
 			objAttrs[key] = attrNullValue(f)
 			continue
 		}
-		if f.IsObject && len(f.ItemFields) > 0 {
-			if sub, ok := v.(map[string]any); ok {
-				objAttrs[key] = buildObjectFromResponse(sub, f.ItemFields)
-			} else {
-				objAttrs[key] = attrNullValue(f)
-			}
-		} else if f.IsArray && len(f.ItemFields) > 0 {
-			if arr, ok := v.([]any); ok {
-				objAttrs[key] = buildListFromResponse(arr, f.ItemFields)
-			} else {
-				objAttrs[key] = attrNullValue(f)
-			}
-		} else if f.IsArray {
-			if arr, ok := v.([]any); ok {
-				objAttrs[key] = buildSimpleListFromResponse(arr)
-			} else {
-				objAttrs[key] = attrNullValue(f)
-			}
-		} else {
-			objAttrs[key] = types.StringValue(fmt.Sprintf("%v", v))
-		}
+		objAttrs[key] = buildAttrValueFromResponse(v, f)
 	}
 	return types.ObjectValueMust(attrTypes, objAttrs)
+}
+
+func buildAttrValueFromResponse(v any, f BodyFieldDef) attr.Value {
+	if f.IsObject && len(f.ItemFields) > 0 {
+		sub, ok := v.(map[string]any)
+		if !ok {
+			return attrNullValue(f)
+		}
+		return buildObjectFromResponse(sub, f.ItemFields)
+	}
+	if f.IsArray && len(f.ItemFields) > 0 {
+		arr, ok := v.([]any)
+		if !ok {
+			return attrNullValue(f)
+		}
+		return buildListFromResponse(arr, f.ItemFields)
+	}
+	if f.IsArray {
+		arr, ok := v.([]any)
+		if !ok {
+			return attrNullValue(f)
+		}
+		return buildSimpleListFromResponse(arr)
+	}
+	return types.StringValue(fmt.Sprintf("%v", v))
 }
 
 // attrNullValue returns the appropriate null value for a field's type.

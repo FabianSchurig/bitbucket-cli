@@ -48,8 +48,8 @@ Available operations:
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `events`, Type: `string`, Desc: `A link to a resource related to this object.`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `name`, Type: `string`, Desc: `name`},
 						{Path: `href`, Type: `string`, Desc: `href`},
+						{Path: `name`, Type: `string`, Desc: `name`},
 					}},
 				}},
 			},
@@ -404,8 +404,8 @@ workspace.`,
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `events`, Type: `string`, Desc: `A link to a resource related to this object.`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `name`, Type: `string`, Desc: `name`},
 						{Path: `href`, Type: `string`, Desc: `href`},
+						{Path: `name`, Type: `string`, Desc: `name`},
 					}},
 				}},
 			},

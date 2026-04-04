@@ -62,25 +62,25 @@ resource "bitbucket_pipelines" "example" {
 
 - `repository` (Object) repository (also computed from API response)
   Nested schema:
-  - `is_private` (String) is_private
-  - `size` (String) size
-  - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+  - `scm` (String) [git]
   - `language` (String) language
   - `has_issues` (String) 
   - `fork_policy` (String) 
-  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+  - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+  - `is_private` (String) is_private
   - `name` (String) name
-  - `has_wiki` (String) 
-  - `scm` (String) [git]
   - `description` (String) description
+  - `size` (String) size
+  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+  - `has_wiki` (String) 
 
 - `uuid` (String) The UUID identifying the pipeline. (also computed from API response)
 - `variables` (List of Object) The variables for the pipeline. (also computed from API response)
   Nested schema:
-  - `secured` (String) If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.
   - `uuid` (String) The UUID identifying the variable.
   - `key` (String) The unique name of the variable.
   - `value` (String) The value of the variable. If the variable is secured, this will be empty.
+  - `secured` (String) If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.
 
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 

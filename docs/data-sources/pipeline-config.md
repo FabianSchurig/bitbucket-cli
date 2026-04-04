@@ -47,15 +47,15 @@ output "pipeline_config_response" {
 - `enabled` (String) Whether Pipelines is enabled for the repository.
 - `repository` (Object) repository
   Nested schema:
-  - `is_private` (String) is_private
-  - `size` (String) size
-  - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+  - `scm` (String) [git]
   - `language` (String) language
   - `has_issues` (String) 
   - `fork_policy` (String) 
-  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+  - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+  - `is_private` (String) is_private
   - `name` (String) name
-  - `has_wiki` (String) 
-  - `scm` (String) [git]
   - `description` (String) description
+  - `size` (String) size
+  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+  - `has_wiki` (String) 
 

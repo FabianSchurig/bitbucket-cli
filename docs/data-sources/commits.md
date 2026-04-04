@@ -63,29 +63,29 @@ output "commits_response" {
 - `parents` (String) parents (JSON array)
 - `participants` (List of Object) participants
   Nested schema:
+  - `participated_on` (String) The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.
   - `role` (String) [PARTICIPANT, REVIEWER]
   - `approved` (String) approved
   - `state` (String) [approved, changes_requested, <nil>]
-  - `participated_on` (String) The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.
 
 - `repository` (Object) repository
   Nested schema:
-  - `scm` (String) [git]
-  - `created_on` (String) created_on
-  - `updated_on` (String) updated_on
-  - `language` (String) language
-  - `has_wiki` (String) 
   - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+  - `name` (String) name
+  - `updated_on` (String) updated_on
   - `is_private` (String) is_private
   - `description` (String) description
-  - `size` (String) size
-  - `has_issues` (String) 
-  - `fork_policy` (String) 
   - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
-  - `name` (String) name
+  - `scm` (String) [git]
+  - `created_on` (String) created_on
+  - `has_issues` (String) 
+  - `size` (String) size
+  - `language` (String) language
+  - `has_wiki` (String) 
+  - `fork_policy` (String) 
 
 - `summary` (Object) summary
   Nested schema:
-  - `markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
   - `raw` (String) The text as it was typed by a user.
+  - `markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
 

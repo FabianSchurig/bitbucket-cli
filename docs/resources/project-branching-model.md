@@ -53,8 +53,8 @@ resource "bitbucket_project_branching_model" "example" {
 
 - `development` (Object) development
   Nested schema:
-  - `use_mainbranch` (String) Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`).
   - `name` (String) Name of the target branch. If inherited by a repository, it will default to the main branch if the specified branch does not exist.
+  - `use_mainbranch` (String) Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`).
 
 - `production` (Object) production
   Nested schema:

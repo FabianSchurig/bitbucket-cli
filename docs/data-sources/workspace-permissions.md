@@ -52,12 +52,12 @@ output "workspace_permissions_response" {
 
 - `workspace` (Object) workspace
   Nested schema:
-  - `is_private` (String) Indicates whether the workspace is publicly accessible, or whether it is
-  - `is_privacy_enforced` (String) Indicates whether the workspace enforces private content, or whether it allows public content.
-  - `forking_mode` (String) Controls the rules for forking repositories within this workspace.
   - `uuid` (String) The workspace's immutable id.
+  - `is_privacy_enforced` (String) Indicates whether the workspace enforces private content, or whether it allows public content.
+  - `created_on` (String) created_on
   - `name` (String) The name of the workspace.
   - `slug` (String) The short label that identifies this workspace.
-  - `created_on` (String) created_on
+  - `is_private` (String) Indicates whether the workspace is publicly accessible, or whether it is
+  - `forking_mode` (String) Controls the rules for forking repositories within this workspace.
   - `updated_on` (String) updated_on
 

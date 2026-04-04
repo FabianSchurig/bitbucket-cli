@@ -60,19 +60,19 @@ resource "bitbucket_repo_user_permissions" "example" {
 - `permission` (String) [read, write, admin, none]
 - `repository` (Object) repository
   Nested schema:
-  - `language` (String) language
-  - `has_issues` (String) 
-  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
-  - `scm` (String) [git]
-  - `description` (String) description
-  - `size` (String) size
-  - `fork_policy` (String) 
   - `is_private` (String) is_private
-  - `name` (String) name
-  - `updated_on` (String) updated_on
+  - `scm` (String) [git]
   - `has_wiki` (String) 
   - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+  - `size` (String) size
+  - `language` (String) language
+  - `has_issues` (String) 
   - `created_on` (String) created_on
+  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+  - `name` (String) name
+  - `description` (String) description
+  - `updated_on` (String) updated_on
+  - `fork_policy` (String) 
 
 - `type` (String) type
 - `user` (Object) user
@@ -80,9 +80,9 @@ resource "bitbucket_repo_user_permissions" "example" {
   - `created_on` (String) created_on
   - `display_name` (String) display_name
   - `uuid` (String) uuid
-  - `nickname` (String) Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.
-  - `is_staff` (String) is_staff
   - `account_id` (String) The user's Atlassian account ID.
   - `account_status` (String) The status of the account. Currently the only possible value is "active", but more values may be added in the future.
   - `has_2fa_enabled` (String) has_2fa_enabled
+  - `nickname` (String) Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.
+  - `is_staff` (String) is_staff
 

@@ -40,21 +40,21 @@ Available operations:
 				{Path: `content_matches`, Type: `string`, Desc: `content_matches`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `lines`, Type: `string`, Desc: `lines`, IsArray: true, ItemFields: []BodyFieldDef{
 						{Path: `segments`, Type: `string`, Desc: `segments`, IsArray: true, ItemFields: []BodyFieldDef{
-							{Path: `match`, Type: `bool`, Desc: `match`},
 							{Path: `text`, Type: `string`, Desc: `text`},
+							{Path: `match`, Type: `bool`, Desc: `match`},
 						}},
 						{Path: `line`, Type: `int`, Desc: `line`},
 					}},
 				}},
 				{Path: `file`, Type: `string`, Desc: `A file object, representing a file at a commit in a repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
 					{Path: `path`, Type: `string`, Desc: `The path in the repository`},
 					{Path: `attributes`, Type: `string`, Desc: `[link, executable, subrepository, binary, lfs]`},
 					{Path: `escaped_path`, Type: `string`, Desc: `The escaped version of the path as it appears in a diff. If the path does not require escaping this will be the same as path.`},
+					{Path: `type`, Type: `string`, Desc: `type`},
 				}},
 				{Path: `path_matches`, Type: `string`, Desc: `path_matches`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `match`, Type: `bool`, Desc: `match`},
 					{Path: `text`, Type: `string`, Desc: `text`},
+					{Path: `match`, Type: `bool`, Desc: `match`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
 			},
@@ -90,10 +90,10 @@ Available operations:
 					}},
 				}},
 				{Path: `file`, Type: `string`, Desc: `A file object, representing a file at a commit in a repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
-					{Path: `path`, Type: `string`, Desc: `The path in the repository`},
 					{Path: `attributes`, Type: `string`, Desc: `[link, executable, subrepository, binary, lfs]`},
 					{Path: `escaped_path`, Type: `string`, Desc: `The escaped version of the path as it appears in a diff. If the path does not require escaping this will be the same as path.`},
+					{Path: `type`, Type: `string`, Desc: `type`},
+					{Path: `path`, Type: `string`, Desc: `The path in the repository`},
 				}},
 				{Path: `path_matches`, Type: `string`, Desc: `path_matches`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `text`, Type: `string`, Desc: `text`},
@@ -171,21 +171,21 @@ Available operations:
 				{Path: `content_matches`, Type: `string`, Desc: `content_matches`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `lines`, Type: `string`, Desc: `lines`, IsArray: true, ItemFields: []BodyFieldDef{
 						{Path: `segments`, Type: `string`, Desc: `segments`, IsArray: true, ItemFields: []BodyFieldDef{
-							{Path: `match`, Type: `bool`, Desc: `match`},
 							{Path: `text`, Type: `string`, Desc: `text`},
+							{Path: `match`, Type: `bool`, Desc: `match`},
 						}},
 						{Path: `line`, Type: `int`, Desc: `line`},
 					}},
 				}},
 				{Path: `file`, Type: `string`, Desc: `A file object, representing a file at a commit in a repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
 					{Path: `path`, Type: `string`, Desc: `The path in the repository`},
 					{Path: `attributes`, Type: `string`, Desc: `[link, executable, subrepository, binary, lfs]`},
 					{Path: `escaped_path`, Type: `string`, Desc: `The escaped version of the path as it appears in a diff. If the path does not require escaping this will be the same as path.`},
+					{Path: `type`, Type: `string`, Desc: `type`},
 				}},
 				{Path: `path_matches`, Type: `string`, Desc: `path_matches`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `match`, Type: `bool`, Desc: `match`},
 					{Path: `text`, Type: `string`, Desc: `text`},
+					{Path: `match`, Type: `bool`, Desc: `match`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
 			},
@@ -221,10 +221,10 @@ Available operations:
 					}},
 				}},
 				{Path: `file`, Type: `string`, Desc: `A file object, representing a file at a commit in a repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
-					{Path: `path`, Type: `string`, Desc: `The path in the repository`},
 					{Path: `attributes`, Type: `string`, Desc: `[link, executable, subrepository, binary, lfs]`},
 					{Path: `escaped_path`, Type: `string`, Desc: `The escaped version of the path as it appears in a diff. If the path does not require escaping this will be the same as path.`},
+					{Path: `type`, Type: `string`, Desc: `type`},
+					{Path: `path`, Type: `string`, Desc: `The path in the repository`},
 				}},
 				{Path: `path_matches`, Type: `string`, Desc: `path_matches`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `text`, Type: `string`, Desc: `text`},

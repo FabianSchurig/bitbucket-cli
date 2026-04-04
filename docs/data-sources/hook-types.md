@@ -51,6 +51,6 @@ output "hook_types_response" {
 - `workspace` (Object) workspace
   Nested schema:
   - `events` (Object) A link to a resource related to this object.
-    - `name` (String) name
     - `href` (String) href
+    - `name` (String) name
 

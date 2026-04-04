@@ -54,6 +54,6 @@ resource "bitbucket_hook_types" "example" {
 - `workspace` (Object) workspace
   Nested schema:
   - `events` (Object) A link to a resource related to this object.
-    - `name` (String) name
     - `href` (String) href
+    - `name` (String) name
 

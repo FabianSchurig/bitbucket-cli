@@ -62,18 +62,18 @@ Available operations:
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
+					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
-					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
-					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
-					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
-					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 			},
 			HasBody:   false,
@@ -128,18 +128,18 @@ private to the members and consequently only visible to members.`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
+					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
-					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
-					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
-					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
-					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
 			},
@@ -388,19 +388,19 @@ workspace.`,
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
-					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
-					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
-					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
 				}},
 			},
 			HasBody:   false,
@@ -429,18 +429,18 @@ private to the members and consequently only visible to members.`},
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
 					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
-					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
 			},
 			HasBody:   false,
@@ -470,19 +470,19 @@ private to the members and consequently only visible to members.`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
 					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
-					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 			},
 			HasBody:   false,
@@ -509,9 +509,6 @@ private to the members and consequently only visible to members.`},
 			ResponseFields: []BodyFieldDef{
 				{Path: `permission`, Type: `string`, Desc: `[read, write, admin, none]`},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -520,23 +517,26 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
-					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `has_wiki`, Type: `bool`, Desc: `
 The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -575,26 +575,6 @@ administered through admin.atlassian.com.
 			ResponseFields: []BodyFieldDef{
 				{Path: `permission`, Type: `string`, Desc: `[read, write, admin, none]`},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
-					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
-					{Path: `has_issues`, Type: `bool`, Desc: `
-The issue tracker for this repository is enabled. Issue Tracker
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
-					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -603,17 +583,37 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					{Path: `account_id`, Type: `string`, Desc: `The user's Atlassian account ID.`},
 					{Path: `account_status`, Type: `string`, Desc: `The status of the account. Currently the only possible value is "active", but more values may be added in the future.`},
 					{Path: `has_2fa_enabled`, Type: `bool`, Desc: `has_2fa_enabled`},
 					{Path: `nickname`, Type: `string`, Desc: `Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.`},
 					{Path: `is_staff`, Type: `bool`, Desc: `is_staff`},
-					{Path: `account_id`, Type: `string`, Desc: `The user's Atlassian account ID.`},
 				}},
 			},
 			HasBody:   false,
@@ -846,17 +846,17 @@ Note that private projects cannot contain public repositories.`},
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
-					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 				{Path: `source`, Type: `string`, Desc: `source`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -921,18 +921,18 @@ During a key rotation period, two keys may be returned.`,
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
+					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
-					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
-					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
-					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
-					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 			},
 			HasBody:   false,
@@ -987,18 +987,18 @@ private to the members and consequently only visible to members.`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
+					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
-					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
-					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
-					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
-					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
 			},
@@ -1247,19 +1247,19 @@ workspace.`,
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
-					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
-					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
-					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
+					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
 				}},
 			},
 			HasBody:   false,
@@ -1288,18 +1288,18 @@ private to the members and consequently only visible to members.`},
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
 					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
-					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
 			},
 			HasBody:   false,
@@ -1329,19 +1329,19 @@ private to the members and consequently only visible to members.`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the workspace.`},
 					{Path: `slug`, Type: `string`, Desc: `The short label that identifies this workspace.`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
-					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The workspace's immutable id.`},
+					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 			},
 			HasBody:   false,
@@ -1368,9 +1368,6 @@ private to the members and consequently only visible to members.`},
 			ResponseFields: []BodyFieldDef{
 				{Path: `permission`, Type: `string`, Desc: `[read, write, admin, none]`},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -1379,23 +1376,26 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
-					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `has_wiki`, Type: `bool`, Desc: `
 The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1434,26 +1434,6 @@ administered through admin.atlassian.com.
 			ResponseFields: []BodyFieldDef{
 				{Path: `permission`, Type: `string`, Desc: `[read, write, admin, none]`},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
-					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
-					{Path: `has_issues`, Type: `bool`, Desc: `
-The issue tracker for this repository is enabled. Issue Tracker
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
-					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -1462,17 +1442,37 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 				}},
 				{Path: `type`, Type: `string`, Desc: `type`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					{Path: `account_id`, Type: `string`, Desc: `The user's Atlassian account ID.`},
 					{Path: `account_status`, Type: `string`, Desc: `The status of the account. Currently the only possible value is "active", but more values may be added in the future.`},
 					{Path: `has_2fa_enabled`, Type: `bool`, Desc: `has_2fa_enabled`},
 					{Path: `nickname`, Type: `string`, Desc: `Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.`},
 					{Path: `is_staff`, Type: `bool`, Desc: `is_staff`},
-					{Path: `account_id`, Type: `string`, Desc: `The user's Atlassian account ID.`},
 				}},
 			},
 			HasBody:   false,
@@ -1705,17 +1705,17 @@ Note that private projects cannot contain public repositories.`},
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
-					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 				{Path: `source`, Type: `string`, Desc: `source`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{

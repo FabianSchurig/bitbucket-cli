@@ -86,9 +86,9 @@ resource "bitbucket_pr" "example" {
 
 - `closed_by` (Object) closed_by
   Nested schema:
+  - `created_on` (String) created_on
   - `display_name` (String) display_name
   - `uuid` (String) uuid
-  - `created_on` (String) created_on
 
 - `comment_count` (String) The number of comments for a specific pull request.
 - `created_on` (String) The ISO8601 timestamp the request was created.
@@ -106,8 +106,8 @@ resource "bitbucket_pr" "example" {
 - `queued` (String) A boolean flag indicating whether the pull request is queued
 - `summary` (Object) summary
   Nested schema:
-  - `raw` (String) The text as it was typed by a user.
   - `markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
+  - `raw` (String) The text as it was typed by a user.
 
 - `task_count` (String) The number of open tasks for a specific pull request.
 - `updated_on` (String) The ISO8601 timestamp the request was last updated.

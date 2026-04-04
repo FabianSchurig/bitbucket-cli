@@ -65,12 +65,12 @@ resource "bitbucket_forked_repository" "example" {
 
 - `project` (Object) project (also computed from API response)
   Nested schema:
-  - `is_private` (String) 
-  - `has_publicly_visible_repos` (String) 
   - `description` (String) description
-  - `uuid` (String) The project's immutable id.
+  - `has_publicly_visible_repos` (String) 
   - `key` (String) The project's key.
   - `name` (String) The name of the project.
+  - `is_private` (String) 
+  - `uuid` (String) The project's immutable id.
 
 - `scm` (String) [git] (also computed from API response)
 - `size` (String) size (also computed from API response)

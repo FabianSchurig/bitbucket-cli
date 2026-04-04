@@ -52,13 +52,13 @@ output "project_user_permissions_response" {
 - `permission` (String) [read, write, create-repo, admin, none]
 - `project` (Object) project
   Nested schema:
-  - `uuid` (String) The project's immutable id.
   - `key` (String) The project's key.
   - `name` (String) The name of the project.
-  - `description` (String) description
   - `is_private` (String) 
-  - `updated_on` (String) updated_on
   - `created_on` (String) created_on
+  - `uuid` (String) The project's immutable id.
+  - `description` (String) description
+  - `updated_on` (String) updated_on
   - `has_publicly_visible_repos` (String) 
 
 - `type` (String) type
@@ -67,9 +67,9 @@ output "project_user_permissions_response" {
   - `created_on` (String) created_on
   - `display_name` (String) display_name
   - `uuid` (String) uuid
-  - `account_id` (String) The user's Atlassian account ID.
-  - `account_status` (String) The status of the account. Currently the only possible value is "active", but more values may be added in the future.
   - `has_2fa_enabled` (String) has_2fa_enabled
   - `nickname` (String) Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.
   - `is_staff` (String) is_staff
+  - `account_id` (String) The user's Atlassian account ID.
+  - `account_status` (String) The status of the account. Currently the only possible value is "active", but more values may be added in the future.
 
