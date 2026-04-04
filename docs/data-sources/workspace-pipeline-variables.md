@@ -9,6 +9,20 @@ description: |-
 
 Reads Bitbucket workspace-pipeline-variables via the Bitbucket Cloud API.
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/workspaces/{workspace}/pipelines-config/variables/{variable_uuid}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-variables-variable-uuid-get) |
+| List | `GET` | `/workspaces/{workspace}/pipelines-config/variables` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-variables-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | `read:pipeline:bitbucket` |
+| List | `read:pipeline:bitbucket` |
+
 ## Example Usage
 
 ```hcl

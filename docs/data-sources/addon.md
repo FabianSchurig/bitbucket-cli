@@ -9,6 +9,18 @@ description: |-
 
 Reads Bitbucket addon via the Bitbucket Cloud API.
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| List | `GET` | `/addon/linkers` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-addon/#api-addon-linkers-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| List | — |
+
 ## Example Usage
 
 ```hcl

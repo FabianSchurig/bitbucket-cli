@@ -13,6 +13,20 @@ Manages Bitbucket branching-model via the Bitbucket Cloud API.
 - **Read**: Supported
 - **Update**: Supported
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/branching-model` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-repositories-workspace-repo-slug-branching-model-get) |
+| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/branching-model/settings` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-repositories-workspace-repo-slug-branching-model-settings-put) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | `read:repository:bitbucket` |
+| Update | `admin:repository:bitbucket` |
+
 ## Example Usage
 
 ```hcl

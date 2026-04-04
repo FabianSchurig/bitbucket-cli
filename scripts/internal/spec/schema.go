@@ -37,13 +37,21 @@ type PathItem struct {
 
 // Op represents a single OpenAPI operation (e.g., GET /pullrequests).
 type Op struct {
-	OperationID string       `yaml:"operationId"`
-	Summary     string       `yaml:"summary"`
-	Description string       `yaml:"description"`
-	Tags        []string     `yaml:"tags"`
-	Parameters  []Parameter  `yaml:"parameters"`
-	RequestBody *RequestBody `yaml:"requestBody"`
-	Responses   Responses    `yaml:"responses"`
+	OperationID  string             `yaml:"operationId"`
+	Summary      string             `yaml:"summary"`
+	Description  string             `yaml:"description"`
+	Tags         []string           `yaml:"tags"`
+	Parameters   []Parameter        `yaml:"parameters"`
+	RequestBody  *RequestBody       `yaml:"requestBody"`
+	Responses    Responses          `yaml:"responses"`
+	OAuth2Scopes []OAuth2ScopeEntry `yaml:"x-atlassian-oauth2-scopes"`
+}
+
+// OAuth2ScopeEntry represents an x-atlassian-oauth2-scopes entry.
+type OAuth2ScopeEntry struct {
+	State  string   `yaml:"state"`
+	Scheme string   `yaml:"scheme"`
+	Scopes []string `yaml:"scopes"`
 }
 
 // Parameter represents an OpenAPI parameter (path, query, etc.).

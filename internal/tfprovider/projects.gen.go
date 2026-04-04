@@ -49,6 +49,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-projects-get`,
 		},
 		{
 			OperationID: `createAProjectInAWorkspace`,
@@ -62,6 +66,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    true,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-post`,
 		},
 		{
 			OperationID: `getAProjectForAWorkspace`,
@@ -76,6 +84,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-projects-project-key-get`,
 		},
 		{
 			OperationID: `updateAProjectForAWorkspace`,
@@ -90,6 +102,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    true,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-put`,
 		},
 		{
 			OperationID: `deleteAProjectForAWorkspace`,
@@ -104,6 +120,10 @@ Available operations:
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-delete`,
 		},
 		{
 			OperationID: `listTheDefaultReviewersInAProject`,
@@ -121,6 +141,10 @@ reviewers to pull requests for any repository within the project.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:pullrequest:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-default-reviewers-get`,
 		},
 		{
 			OperationID: `getWorkspacesProjectsDefault-Reviewers`,
@@ -136,6 +160,10 @@ reviewers to pull requests for any repository within the project.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:pullrequest:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-default-reviewers-selected-user-get`,
 		},
 		{
 			OperationID: `addTheSpecificUserAsADefaultReviewerForTheProject`,
@@ -151,6 +179,10 @@ reviewers to pull requests for any repository within the project.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-default-reviewers-selected-user-put`,
 		},
 		{
 			OperationID: `removeTheSpecificUserFromTheProjectsDefaultReviewers`,
@@ -166,6 +198,10 @@ reviewers to pull requests for any repository within the project.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-default-reviewers-selected-user-delete`,
 		},
 		{
 			OperationID: `listExplicitGroupPermissionsForAProject`,
@@ -183,6 +219,10 @@ This endpoint does not support BBQL features.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-groups-get`,
 		},
 		{
 			OperationID: `getAnExplicitGroupPermissionForAProject`,
@@ -198,6 +238,10 @@ This endpoint does not support BBQL features.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-groups-group-slug-get`,
 		},
 		{
 			OperationID: `updateAnExplicitGroupPermissionForAProject`,
@@ -213,6 +257,11 @@ This endpoint does not support BBQL features.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    true,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+				`write:permission:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-groups-group-slug-put`,
 		},
 		{
 			OperationID: `deleteAnExplicitGroupPermissionForAProject`,
@@ -230,6 +279,11 @@ Only users with admin permission for the project may access this resource.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+				`delete:permission:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-groups-group-slug-delete`,
 		},
 		{
 			OperationID: `listExplicitUserPermissionsForAProject`,
@@ -247,6 +301,10 @@ This endpoint does not support BBQL features.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-users-get`,
 		},
 		{
 			OperationID: `getAnExplicitUserPermissionForAProject`,
@@ -262,6 +320,10 @@ This endpoint does not support BBQL features.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-users-selected-user-id-get`,
 		},
 		{
 			OperationID: `updateAnExplicitUserPermissionForAProject`,
@@ -277,6 +339,11 @@ This endpoint does not support BBQL features.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    true,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+				`write:permission:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-users-selected-user-id-put`,
 		},
 		{
 			OperationID: `deleteAnExplicitUserPermissionForAProject`,
@@ -297,6 +364,11 @@ This is to ensure integrations and add-ons are not allowed to change permissions
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+				`delete:permission:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-users-selected-user-id-delete`,
 		},
 	}),
 	AllOps: []OperationDef{
@@ -314,6 +386,10 @@ This is to ensure integrations and add-ons are not allowed to change permissions
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-projects-get`,
 		},
 		{
 			OperationID: `createAProjectInAWorkspace`,
@@ -327,6 +403,10 @@ This is to ensure integrations and add-ons are not allowed to change permissions
 			BodyFields: []BodyFieldDef{},
 			HasBody:    true,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-post`,
 		},
 		{
 			OperationID: `getAProjectForAWorkspace`,
@@ -341,6 +421,10 @@ This is to ensure integrations and add-ons are not allowed to change permissions
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-projects-project-key-get`,
 		},
 		{
 			OperationID: `updateAProjectForAWorkspace`,
@@ -355,6 +439,10 @@ This is to ensure integrations and add-ons are not allowed to change permissions
 			BodyFields: []BodyFieldDef{},
 			HasBody:    true,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-put`,
 		},
 		{
 			OperationID: `deleteAProjectForAWorkspace`,
@@ -369,6 +457,10 @@ This is to ensure integrations and add-ons are not allowed to change permissions
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-delete`,
 		},
 		{
 			OperationID: `listTheDefaultReviewersInAProject`,
@@ -386,6 +478,10 @@ reviewers to pull requests for any repository within the project.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:pullrequest:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-default-reviewers-get`,
 		},
 		{
 			OperationID: `getWorkspacesProjectsDefault-Reviewers`,
@@ -401,6 +497,10 @@ reviewers to pull requests for any repository within the project.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:pullrequest:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-default-reviewers-selected-user-get`,
 		},
 		{
 			OperationID: `addTheSpecificUserAsADefaultReviewerForTheProject`,
@@ -416,6 +516,10 @@ reviewers to pull requests for any repository within the project.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-default-reviewers-selected-user-put`,
 		},
 		{
 			OperationID: `removeTheSpecificUserFromTheProjectsDefaultReviewers`,
@@ -431,6 +535,10 @@ reviewers to pull requests for any repository within the project.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-default-reviewers-selected-user-delete`,
 		},
 		{
 			OperationID: `listExplicitGroupPermissionsForAProject`,
@@ -448,6 +556,10 @@ This endpoint does not support BBQL features.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-groups-get`,
 		},
 		{
 			OperationID: `getAnExplicitGroupPermissionForAProject`,
@@ -463,6 +575,10 @@ This endpoint does not support BBQL features.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-groups-group-slug-get`,
 		},
 		{
 			OperationID: `updateAnExplicitGroupPermissionForAProject`,
@@ -478,6 +594,11 @@ This endpoint does not support BBQL features.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    true,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+				`write:permission:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-groups-group-slug-put`,
 		},
 		{
 			OperationID: `deleteAnExplicitGroupPermissionForAProject`,
@@ -495,6 +616,11 @@ Only users with admin permission for the project may access this resource.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+				`delete:permission:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-groups-group-slug-delete`,
 		},
 		{
 			OperationID: `listExplicitUserPermissionsForAProject`,
@@ -512,6 +638,10 @@ This endpoint does not support BBQL features.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-users-get`,
 		},
 		{
 			OperationID: `getAnExplicitUserPermissionForAProject`,
@@ -527,6 +657,10 @@ This endpoint does not support BBQL features.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:project:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-users-selected-user-id-get`,
 		},
 		{
 			OperationID: `updateAnExplicitUserPermissionForAProject`,
@@ -542,6 +676,11 @@ This endpoint does not support BBQL features.`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    true,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+				`write:permission:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-users-selected-user-id-put`,
 		},
 		{
 			OperationID: `deleteAnExplicitUserPermissionForAProject`,
@@ -562,6 +701,11 @@ This is to ensure integrations and add-ons are not allowed to change permissions
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`admin:project:bitbucket`,
+				`delete:permission:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-projects/#api-workspaces-workspace-projects-project-key-permissions-config-users-selected-user-id-delete`,
 		},
 	},
 }

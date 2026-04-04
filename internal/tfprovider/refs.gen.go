@@ -55,6 +55,10 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-get`,
 		},
 		{
 			OperationID: `listOpenBranches`,
@@ -73,6 +77,10 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-branches-get`,
 		},
 		{
 			OperationID: `createABranch`,
@@ -87,6 +95,11 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:repository:bitbucket`,
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-branches-post`,
 		},
 		{
 			OperationID: `getABranch`,
@@ -109,6 +122,10 @@ refs/heads).`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-branches-name-get`,
 		},
 		{
 			OperationID: `deleteABranch`,
@@ -130,6 +147,10 @@ refs/heads).`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-branches-name-delete`,
 		},
 		{
 			OperationID: `listTags`,
@@ -158,6 +179,10 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-tags-get`,
 		},
 		{
 			OperationID: `createATag`,
@@ -178,6 +203,11 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`write:repository:bitbucket`,
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-tags-post`,
 		},
 		{
 			OperationID: `getATag`,
@@ -193,6 +223,10 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-tags-name-get`,
 		},
 		{
 			OperationID: `deleteATag`,
@@ -210,6 +244,10 @@ The tag name should not include any prefixes (e.g. refs/tags).`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-tags-name-delete`,
 		},
 	}),
 	AllOps: []OperationDef{
@@ -241,6 +279,10 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-get`,
 		},
 		{
 			OperationID: `listOpenBranches`,
@@ -259,6 +301,10 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-branches-get`,
 		},
 		{
 			OperationID: `createABranch`,
@@ -273,6 +319,11 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:repository:bitbucket`,
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-branches-post`,
 		},
 		{
 			OperationID: `getABranch`,
@@ -295,6 +346,10 @@ refs/heads).`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-branches-name-get`,
 		},
 		{
 			OperationID: `deleteABranch`,
@@ -316,6 +371,10 @@ refs/heads).`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-branches-name-delete`,
 		},
 		{
 			OperationID: `listTags`,
@@ -344,6 +403,10 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-tags-get`,
 		},
 		{
 			OperationID: `createATag`,
@@ -364,6 +427,11 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`write:repository:bitbucket`,
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-tags-post`,
 		},
 		{
 			OperationID: `getATag`,
@@ -379,6 +447,10 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-tags-name-get`,
 		},
 		{
 			OperationID: `deleteATag`,
@@ -396,6 +468,10 @@ The tag name should not include any prefixes (e.g. refs/tags).`,
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,
 			Paginated:  false,
+			Scopes: []string{
+				`write:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-refs/#api-repositories-workspace-repo-slug-refs-tags-name-delete`,
 		},
 	},
 }

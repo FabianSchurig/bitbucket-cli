@@ -9,6 +9,20 @@ description: |-
 
 Reads Bitbucket snippets via the Bitbucket Cloud API.
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/snippets/{workspace}/{encoded_id}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-get) |
+| List | `GET` | `/snippets` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | `read:snippet:bitbucket` |
+| List | `read:snippet:bitbucket` |
+
 ## Example Usage
 
 ```hcl
