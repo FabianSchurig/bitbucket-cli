@@ -291,13 +291,13 @@ docker run --rm \
 # MCP server (stdio, e.g. for Claude Desktop)
 docker run --rm -i \
   -e BITBUCKET_USERNAME \
-  -e BITBUCKET_API_TOKEN \
+  -e BITBUCKET_TOKEN \
   ghcr.io/fabianschurig/bitbucket-mcp
 
 # MCP server (SSE over HTTP)
 docker run --rm -p 8080:8080 \
   -e BITBUCKET_USERNAME \
-  -e BITBUCKET_API_TOKEN \
+  -e BITBUCKET_TOKEN \
   ghcr.io/fabianschurig/bitbucket-mcp --transport sse --addr :8080
 ```
 
