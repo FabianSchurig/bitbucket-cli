@@ -13,8 +13,8 @@ type BodyField struct {
 	GoType     string      // "string", "int", "bool"
 	Default    string      // Go zero-value literal
 	Desc       string      // human-readable description
-	IsArray    bool        // true when the field is an array of objects
-	ItemFields []BodyField // nested fields for array item objects (only when IsArray)
+	IsArray    bool        // true when the field is an array
+	ItemFields []BodyField // nested fields for array item objects (empty for simple arrays)
 }
 
 // ─── Body field helpers ───────────────────────────────────────────────────────

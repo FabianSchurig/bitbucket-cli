@@ -51,8 +51,8 @@ type BodyFieldDef struct {
 	Path       string // dot-separated path (e.g., "source.branch.name")
 	Type       string // "string", "integer", "boolean"
 	Desc       string
-	IsArray    bool           // true when the field is an array of objects
-	ItemFields []BodyFieldDef // nested fields for array item objects (only when IsArray)
+	IsArray    bool           // true when the field is an array
+	ItemFields []BodyFieldDef // nested fields for array item objects (empty for simple arrays)
 }
 
 // CRUDOps maps CRUD operations to their OperationDef. All fields are optional —
@@ -137,10 +137,11 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 					Required:    true,
 				}
 			} else {
+				isComputed := p.In == "path"
 				attrs[attrName] = schema.StringAttribute{
 					Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
 					Optional:    true,
-					Computed:    true,
+					Computed:    isComputed,
 				}
 			}
 		}
@@ -676,14 +677,17 @@ func (r *GenericResource) populateComputedParams(ctx context.Context, m map[stri
 
 			// Skip if the user already provided this value.
 			var existing types.String
-			if d := source.GetAttribute(ctx, attrPath(attrName), &existing); !d.HasError() {
-				if !existing.IsNull() && !existing.IsUnknown() && existing.ValueString() != "" {
-					continue
-				}
+			d := source.GetAttribute(ctx, attrPath(attrName), &existing)
+			diags.Append(d...)
+			if d.HasError() {
+				continue
+			}
+			if !existing.IsNull() && !existing.IsUnknown() && existing.ValueString() != "" {
+				continue
 			}
 
 			// Try to extract the param value from the API response.
-			if val, ok := m[p.Name]; ok && val != nil {
+			if val, ok := responseParamValue(m, p.Name); ok && val != "" {
 				diags.Append(target.SetAttribute(ctx, attrPath(attrName), types.StringValue(fmt.Sprintf("%v", val)))...)
 			}
 		}
@@ -811,4 +815,28 @@ func extractID(m map[string]any) string {
 		}
 	}
 	return ""
+}
+
+func responseParamValue(m map[string]any, paramName string) (string, bool) {
+	tryKeys := []string{paramName}
+	if strings.HasSuffix(paramName, "_uuid") {
+		base := strings.TrimSuffix(paramName, "_uuid")
+		tryKeys = append(tryKeys, base, "uuid")
+	}
+	if strings.HasSuffix(paramName, "_id") {
+		base := strings.TrimSuffix(paramName, "_id")
+		tryKeys = append(tryKeys, base, "id")
+	}
+	for _, key := range tryKeys {
+		if key == "" {
+			continue
+		}
+		if v, ok := m[key]; ok && v != nil {
+			return fmt.Sprintf("%v", v), true
+		}
+	}
+	if id := extractID(m); id != "" {
+		return id, true
+	}
+	return "", false
 }
