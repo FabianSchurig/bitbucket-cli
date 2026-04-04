@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_commit_statuses Resource - bitbucket"
-subcategory: ""
+subcategory: "Commit Statuses"
 description: |-
   Manages Bitbucket commit-statuses via the Bitbucket Cloud API.
 ---

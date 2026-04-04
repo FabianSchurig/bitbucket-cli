@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_repo_group_permissions Data Source - bitbucket"
-subcategory: ""
+subcategory: "Repositories"
 description: |-
   Reads Bitbucket repo-group-permissions via the Bitbucket Cloud API.
 ---

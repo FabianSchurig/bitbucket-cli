@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_branching_model Data Source - bitbucket"
-subcategory: ""
+subcategory: "Branching Model"
 description: |-
   Reads Bitbucket branching-model via the Bitbucket Cloud API.
 ---

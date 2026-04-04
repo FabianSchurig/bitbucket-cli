@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_project_branching_model Resource - bitbucket"
-subcategory: ""
+subcategory: "Branching Model"
 description: |-
   Manages Bitbucket project-branching-model via the Bitbucket Cloud API.
 ---

@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_reports Data Source - bitbucket"
-subcategory: ""
+subcategory: "Reports"
 description: |-
   Reads Bitbucket reports via the Bitbucket Cloud API.
 ---

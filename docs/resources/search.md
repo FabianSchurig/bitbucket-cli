@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_search Resource - bitbucket"
-subcategory: ""
+subcategory: "Code Search"
 description: |-
   Manages Bitbucket search via the Bitbucket Cloud API.
 ---

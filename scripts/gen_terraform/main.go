@@ -28,6 +28,7 @@ type TFResourceData struct {
 	VarName     string // e.g., "PRResourceGroup"
 	TypeName    string // e.g., "pr"
 	Description string
+	Category    string // human-readable API group (e.g., "Pull Requests")
 	Operations  []TFOpData
 	CRUDCreate  string // OperationID or empty
 	CRUDRead    string
@@ -84,6 +85,7 @@ func init() {
 var {{.VarName}} = ResourceGroup{
 	TypeName:    {{goStringLit .TypeName}},
 	Description: {{goStringLit .Description}},
+	Category:    {{goStringLit .Category}},
 	Ops: MapCRUDOps({{goStringLit .TypeName}}, []OperationDef{
 {{- range .Operations}}
 		{
@@ -281,6 +283,7 @@ func main() {
 	}
 
 	cmdName, cmdUse, cmdShort, _ := spec.CommandMeta(schema.Info)
+	category := spec.CommandCategory(schema.Info)
 
 	operations := spec.BuildOperations(schema)
 	tfOps := make([]TFOpData, 0, len(operations))
@@ -293,6 +296,7 @@ func main() {
 		VarName:     cmdName + "ResourceGroup",
 		TypeName:    cmdUse,
 		Description: buildDescription(cmdShort, tfOps),
+		Category:    category,
 		Operations:  tfOps,
 	}
 

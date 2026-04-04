@@ -27,6 +27,7 @@ Available operations:
 - getALinkerValue: Get a linker value [GET]
 - deleteALinkerValue: Delete a linker value [DELETE]
 `,
+	Category: `Addon`,
 	Ops: MapCRUDOps(`addon`, []OperationDef{
 		{
 			OperationID:    `updateAnInstalledApp`,

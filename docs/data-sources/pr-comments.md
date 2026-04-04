@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pr_comments Data Source - bitbucket"
-subcategory: ""
+subcategory: "Pull Requests"
 description: |-
   Reads Bitbucket pr-comments via the Bitbucket Cloud API.
 ---

@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipelines Data Source - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Reads Bitbucket pipelines via the Bitbucket Cloud API.
 ---

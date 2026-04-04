@@ -85,6 +85,7 @@ Available operations:
 - updatePipelineVariableForWorkspace: Update variable for a workspace [PUT]
 - deletePipelineVariableForWorkspace: Delete a variable for a workspace [DELETE]
 `,
+	Category: `Pipelines`,
 	Ops: MapCRUDOps(`pipelines`, []OperationDef{
 		{
 			OperationID: `getDeploymentVariables`,
@@ -235,10 +236,10 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
-					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
 					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 				}},
 			},
 			HasBody:   false,
@@ -576,10 +577,10 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
-					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
 					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 				}},
 			},
 			HasBody:   false,
@@ -2036,10 +2037,10 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
-					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
 					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 				}},
 			},
 			HasBody:   false,
@@ -2377,10 +2378,10 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
-					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
 					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
 				}},
 			},
 			HasBody:   false,

@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_downloads Resource - bitbucket"
-subcategory: ""
+subcategory: "Downloads"
 description: |-
   Manages Bitbucket downloads via the Bitbucket Cloud API.
 ---

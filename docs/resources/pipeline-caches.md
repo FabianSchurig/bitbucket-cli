@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipeline_caches Resource - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Manages Bitbucket pipeline-caches via the Bitbucket Cloud API.
 ---

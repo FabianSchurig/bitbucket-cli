@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_default_reviewers Data Source - bitbucket"
-subcategory: ""
+subcategory: "Pull Requests"
 description: |-
   Reads Bitbucket default-reviewers via the Bitbucket Cloud API.
 ---

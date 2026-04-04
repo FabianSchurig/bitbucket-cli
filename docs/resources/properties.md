@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_properties Resource - bitbucket"
-subcategory: ""
+subcategory: "Properties"
 description: |-
   Manages Bitbucket properties via the Bitbucket Cloud API.
 ---

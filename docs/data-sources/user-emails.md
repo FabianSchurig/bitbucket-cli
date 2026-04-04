@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_user_emails Data Source - bitbucket"
-subcategory: ""
+subcategory: "Users"
 description: |-
   Reads Bitbucket user-emails via the Bitbucket Cloud API.
 ---

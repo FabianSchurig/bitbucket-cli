@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pr_comments Resource - bitbucket"
-subcategory: ""
+subcategory: "Pull Requests"
 description: |-
   Manages Bitbucket pr-comments via the Bitbucket Cloud API.
 ---

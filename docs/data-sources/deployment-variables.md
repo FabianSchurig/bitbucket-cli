@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_deployment_variables Data Source - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Reads Bitbucket deployment-variables via the Bitbucket Cloud API.
 ---

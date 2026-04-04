@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipeline_oidc Resource - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Manages Bitbucket pipeline-oidc via the Bitbucket Cloud API.
 ---

@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipeline_variables Data Source - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Reads Bitbucket pipeline-variables via the Bitbucket Cloud API.
 ---

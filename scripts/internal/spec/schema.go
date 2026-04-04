@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -180,4 +181,16 @@ func CommandMeta(info map[string]any) (name, use, short, long string) {
 		long = "Commands for listing, creating, reading, and merging Bitbucket pull requests."
 	}
 	return
+}
+
+// CommandCategory derives a human-readable category from the schema info title.
+// It strips the "Bitbucket " prefix and " CLI" suffix (e.g., "Bitbucket Pull Requests CLI" → "Pull Requests").
+func CommandCategory(info map[string]any) string {
+	title, _ := info["title"].(string)
+	title = strings.TrimPrefix(title, "Bitbucket ")
+	title = strings.TrimSuffix(title, " CLI")
+	if title == "" {
+		return "Other"
+	}
+	return title
 }

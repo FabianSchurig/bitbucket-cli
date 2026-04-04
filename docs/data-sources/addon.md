@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_addon Data Source - bitbucket"
-subcategory: ""
+subcategory: "Addon"
 description: |-
   Reads Bitbucket addon via the Bitbucket Cloud API.
 ---

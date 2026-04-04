@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_project_deploy_keys Data Source - bitbucket"
-subcategory: ""
+subcategory: "Deployments"
 description: |-
   Reads Bitbucket project-deploy-keys via the Bitbucket Cloud API.
 ---

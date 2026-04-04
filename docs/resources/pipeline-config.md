@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipeline_config Resource - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Manages Bitbucket pipeline-config via the Bitbucket Cloud API.
 ---

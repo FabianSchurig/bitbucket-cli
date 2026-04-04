@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_workspace_hooks Resource - bitbucket"
-subcategory: ""
+subcategory: "Workspaces"
 description: |-
   Manages Bitbucket workspace-hooks via the Bitbucket Cloud API.
 ---

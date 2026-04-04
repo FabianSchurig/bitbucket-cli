@@ -39,6 +39,7 @@ Available operations:
 - listWorkspacePullRequestsForAUser: List workspace pull requests for a user [GET]
 - getTheWorkspaceSystemGpgPublicKeys: Get the workspace system GPG public key(s) [GET]
 `,
+	Category: `Workspaces`,
 	Ops: MapCRUDOps(`workspaces`, []OperationDef{
 		{
 			OperationID: `listWorkspacesForTheCurrentUser`,

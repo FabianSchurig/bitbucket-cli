@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_projects Data Source - bitbucket"
-subcategory: ""
+subcategory: "Projects"
 description: |-
   Reads Bitbucket projects via the Bitbucket Cloud API.
 ---

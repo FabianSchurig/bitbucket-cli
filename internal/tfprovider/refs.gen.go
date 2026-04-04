@@ -26,6 +26,7 @@ Available operations:
 - getATag: Get a tag [GET]
 - deleteATag: Delete a tag [DELETE]
 `,
+	Category: `Refs`,
 	Ops: MapCRUDOps(`refs`, []OperationDef{
 		{
 			OperationID: `listBranchesAndTags`,

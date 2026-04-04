@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_workspace_permissions Resource - bitbucket"
-subcategory: ""
+subcategory: "Workspaces"
 description: |-
   Manages Bitbucket workspace-permissions via the Bitbucket Cloud API.
 ---

@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_workspaces Data Source - bitbucket"
-subcategory: ""
+subcategory: "Workspaces"
 description: |-
   Reads Bitbucket workspaces via the Bitbucket Cloud API.
 ---

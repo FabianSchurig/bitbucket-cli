@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipeline_known_hosts Resource - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Manages Bitbucket pipeline-known-hosts via the Bitbucket Cloud API.
 ---

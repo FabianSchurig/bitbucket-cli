@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_current_user Data Source - bitbucket"
-subcategory: ""
+subcategory: "Users"
 description: |-
   Reads Bitbucket current-user via the Bitbucket Cloud API.
 ---

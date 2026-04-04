@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_repos Data Source - bitbucket"
-subcategory: ""
+subcategory: "Repositories"
 description: |-
   Reads Bitbucket repos via the Bitbucket Cloud API.
 ---

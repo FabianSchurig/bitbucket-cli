@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_repos Resource - bitbucket"
-subcategory: ""
+subcategory: "Repositories"
 description: |-
   Manages Bitbucket repos via the Bitbucket Cloud API.
 ---

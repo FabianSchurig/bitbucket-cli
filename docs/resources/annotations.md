@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_annotations Resource - bitbucket"
-subcategory: ""
+subcategory: "Reports"
 description: |-
   Manages Bitbucket annotations via the Bitbucket Cloud API.
 ---

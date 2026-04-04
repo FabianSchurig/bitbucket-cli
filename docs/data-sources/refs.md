@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_refs Data Source - bitbucket"
-subcategory: ""
+subcategory: "Refs"
 description: |-
   Reads Bitbucket refs via the Bitbucket Cloud API.
 ---

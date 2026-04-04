@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_tags Data Source - bitbucket"
-subcategory: ""
+subcategory: "Refs"
 description: |-
   Reads Bitbucket tags via the Bitbucket Cloud API.
 ---

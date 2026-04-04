@@ -50,6 +50,7 @@ Available operations:
 - listDefinedVersionsForIssues: List defined versions for issues [GET]
 - getADefinedVersionForIssues: Get a defined version for issues [GET]
 `,
+	Category: `Issues`,
 	Ops: MapCRUDOps(`issues`, []OperationDef{
 		{
 			OperationID: `listComponents`,

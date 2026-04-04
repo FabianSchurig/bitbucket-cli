@@ -32,6 +32,7 @@ import (
 type GroupData struct {
 	Name             string
 	TFName           string // e.g., "bitbucket_repos"
+	Subcategory      string // API group category for Terraform Registry sidebar grouping
 	HasCreate        bool
 	HasRead          bool
 	HasUpdate        bool
@@ -65,6 +66,12 @@ type CRUDOpInfo struct {
 	DocURL string   // Atlassian REST API documentation URL
 	Method string   // HTTP method (GET, POST, etc.)
 	Path   string   // API path template
+}
+
+// CategoryGroup groups resources by their API subcategory for the index page.
+type CategoryGroup struct {
+	Category string
+	Groups   []GroupData
 }
 
 func exampleValue(param string) string {
@@ -200,6 +207,7 @@ func buildGroups() []GroupData {
 		groups = append(groups, GroupData{
 			Name:             name,
 			TFName:           "bitbucket_" + strings.ReplaceAll(name, "-", "_"),
+			Subcategory:      groupIndex[name].Category,
 			HasCreate:        crud.Create != "",
 			HasRead:          crud.Read != "",
 			HasUpdate:        crud.Update != "",
@@ -220,6 +228,27 @@ func buildGroups() []GroupData {
 	}
 	sort.Slice(groups, func(i, j int) bool { return groups[i].Name < groups[j].Name })
 	return groups
+}
+
+// groupByCategory organises a flat slice of groups into CategoryGroup entries
+// sorted by category name, with resources sorted alphabetically within each.
+func groupByCategory(groups []GroupData) []CategoryGroup {
+	catMap := make(map[string][]GroupData)
+	for _, g := range groups {
+		cat := g.Subcategory
+		if cat == "" {
+			cat = "Other"
+		}
+		catMap[cat] = append(catMap[cat], g)
+	}
+
+	cats := make([]CategoryGroup, 0, len(catMap))
+	for cat, gs := range catMap {
+		sort.Slice(gs, func(i, j int) bool { return gs[i].Name < gs[j].Name })
+		cats = append(cats, CategoryGroup{Category: cat, Groups: gs})
+	}
+	sort.Slice(cats, func(i, j int) bool { return cats[i].Category < cats[j].Category })
+	return cats
 }
 
 // deriveParams extracts path parameters from a resource group, split into
@@ -599,13 +628,16 @@ output "repo_info" {
 
 This provider auto-generates resources and data sources for all Bitbucket API
 operation groups. Each resource group maps to a set of CRUD operations.
+{{range .CategoryGroups}}
+
+### {{.Category}}
 
 | Resource | Data Source | CRUD |
 |----------|-------------|------|
 {{- range .Groups}}
 | ` + "`" + `{{.TFName}}` + "`" + ` | ` + "`" + `{{.TFName}}` + "`" + ` | {{if .HasCreate}}C{{end}}{{if .HasRead}}R{{end}}{{if .HasUpdate}}U{{end}}{{if .HasDelete}}D{{end}}{{if .HasList}}L{{end}} |
 {{- end}}
-
+{{end}}
 All resources share the same generic schema pattern:
 
 - **Path parameters** become required/optional string attributes
@@ -618,7 +650,7 @@ All resources share the same generic schema pattern:
 
 const resourceDocTemplate = `---
 page_title: "{{.TFName}} Resource - bitbucket"
-subcategory: ""
+subcategory: "{{.Subcategory}}"
 description: |-
   Manages Bitbucket {{.Name}} via the Bitbucket Cloud API.
 ---
@@ -710,7 +742,7 @@ resource "{{.TFName}}" "example" {
 
 const dataSourceDocTemplate = `---
 page_title: "{{.TFName}} Data Source - bitbucket"
-subcategory: ""
+subcategory: "{{.Subcategory}}"
 description: |-
   Reads Bitbucket {{.Name}} via the Bitbucket Cloud API.
 ---
@@ -951,7 +983,10 @@ func main() {
 	}
 
 	// Generate provider doc.
-	writeTemplate("docs/index.md", providerDocTemplate, map[string]any{"Groups": groups})
+	writeTemplate("docs/index.md", providerDocTemplate, map[string]any{
+		"Groups":         groups,
+		"CategoryGroups": groupByCategory(groups),
+	})
 
 	// Generate provider example.
 	writeFile("examples/provider/provider.tf", exampleProviderTemplate)

@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipeline_schedules Resource - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Manages Bitbucket pipeline-schedules via the Bitbucket Cloud API.
 ---

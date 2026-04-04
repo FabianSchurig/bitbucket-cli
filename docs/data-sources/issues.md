@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_issues Data Source - bitbucket"
-subcategory: ""
+subcategory: "Issues"
 description: |-
   Reads Bitbucket issues via the Bitbucket Cloud API.
 ---

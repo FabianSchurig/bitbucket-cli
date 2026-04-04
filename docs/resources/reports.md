@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_reports Resource - bitbucket"
-subcategory: ""
+subcategory: "Reports"
 description: |-
   Manages Bitbucket reports via the Bitbucket Cloud API.
 ---

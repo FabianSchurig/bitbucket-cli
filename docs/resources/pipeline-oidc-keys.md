@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipeline_oidc_keys Resource - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Manages Bitbucket pipeline-oidc-keys via the Bitbucket Cloud API.
 ---

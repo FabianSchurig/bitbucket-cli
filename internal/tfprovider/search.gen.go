@@ -20,6 +20,7 @@ Available operations:
 - searchAccount: Search for code in a user's repositories [GET]
 - searchWorkspace: Search for code in a workspace [GET]
 `,
+	Category: `Code Search`,
 	Ops: MapCRUDOps(`search`, []OperationDef{
 		{
 			OperationID: `searchTeam`,
@@ -38,11 +39,11 @@ Available operations:
 				{Path: `content_match_count`, Type: `int`, Desc: `content_match_count`},
 				{Path: `content_matches`, Type: `string`, Desc: `content_matches`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `lines`, Type: `string`, Desc: `lines`, IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `line`, Type: `int`, Desc: `line`},
 						{Path: `segments`, Type: `string`, Desc: `segments`, IsArray: true, ItemFields: []BodyFieldDef{
 							{Path: `text`, Type: `string`, Desc: `text`},
 							{Path: `match`, Type: `bool`, Desc: `match`},
 						}},
+						{Path: `line`, Type: `int`, Desc: `line`},
 					}},
 				}},
 				{Path: `file.attributes`, Type: `string`, Desc: `[link, executable, subrepository, binary, lfs]`},
@@ -79,11 +80,11 @@ Available operations:
 				{Path: `content_match_count`, Type: `int`, Desc: `content_match_count`},
 				{Path: `content_matches`, Type: `string`, Desc: `content_matches`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `lines`, Type: `string`, Desc: `lines`, IsArray: true, ItemFields: []BodyFieldDef{
+						{Path: `line`, Type: `int`, Desc: `line`},
 						{Path: `segments`, Type: `string`, Desc: `segments`, IsArray: true, ItemFields: []BodyFieldDef{
 							{Path: `text`, Type: `string`, Desc: `text`},
 							{Path: `match`, Type: `bool`, Desc: `match`},
 						}},
-						{Path: `line`, Type: `int`, Desc: `line`},
 					}},
 				}},
 				{Path: `file.attributes`, Type: `string`, Desc: `[link, executable, subrepository, binary, lfs]`},
@@ -163,11 +164,11 @@ Available operations:
 				{Path: `content_match_count`, Type: `int`, Desc: `content_match_count`},
 				{Path: `content_matches`, Type: `string`, Desc: `content_matches`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `lines`, Type: `string`, Desc: `lines`, IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `line`, Type: `int`, Desc: `line`},
 						{Path: `segments`, Type: `string`, Desc: `segments`, IsArray: true, ItemFields: []BodyFieldDef{
 							{Path: `text`, Type: `string`, Desc: `text`},
 							{Path: `match`, Type: `bool`, Desc: `match`},
 						}},
+						{Path: `line`, Type: `int`, Desc: `line`},
 					}},
 				}},
 				{Path: `file.attributes`, Type: `string`, Desc: `[link, executable, subrepository, binary, lfs]`},
@@ -204,11 +205,11 @@ Available operations:
 				{Path: `content_match_count`, Type: `int`, Desc: `content_match_count`},
 				{Path: `content_matches`, Type: `string`, Desc: `content_matches`, IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `lines`, Type: `string`, Desc: `lines`, IsArray: true, ItemFields: []BodyFieldDef{
+						{Path: `line`, Type: `int`, Desc: `line`},
 						{Path: `segments`, Type: `string`, Desc: `segments`, IsArray: true, ItemFields: []BodyFieldDef{
 							{Path: `text`, Type: `string`, Desc: `text`},
 							{Path: `match`, Type: `bool`, Desc: `match`},
 						}},
-						{Path: `line`, Type: `int`, Desc: `line`},
 					}},
 				}},
 				{Path: `file.attributes`, Type: `string`, Desc: `[link, executable, subrepository, binary, lfs]`},

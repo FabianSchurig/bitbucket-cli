@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_repo_runners Data Source - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Reads Bitbucket repo-runners via the Bitbucket Cloud API.
 ---

@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_workspace_runners Resource - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Manages Bitbucket workspace-runners via the Bitbucket Cloud API.
 ---

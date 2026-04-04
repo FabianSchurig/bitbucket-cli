@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_gpg_keys Resource - bitbucket"
-subcategory: ""
+subcategory: "Users"
 description: |-
   Manages Bitbucket gpg-keys via the Bitbucket Cloud API.
 ---

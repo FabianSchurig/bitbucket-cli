@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_repo_user_permissions Resource - bitbucket"
-subcategory: ""
+subcategory: "Repositories"
 description: |-
   Manages Bitbucket repo-user-permissions via the Bitbucket Cloud API.
 ---

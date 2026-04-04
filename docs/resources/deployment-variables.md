@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_deployment_variables Resource - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Manages Bitbucket deployment-variables via the Bitbucket Cloud API.
 ---

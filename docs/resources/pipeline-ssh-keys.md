@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipeline_ssh_keys Resource - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Manages Bitbucket pipeline-ssh-keys via the Bitbucket Cloud API.
 ---

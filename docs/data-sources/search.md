@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_search Data Source - bitbucket"
-subcategory: ""
+subcategory: "Code Search"
 description: |-
   Reads Bitbucket search via the Bitbucket Cloud API.
 ---

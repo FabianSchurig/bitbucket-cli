@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_repo_runners Resource - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Manages Bitbucket repo-runners via the Bitbucket Cloud API.
 ---

@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_issue_comments Data Source - bitbucket"
-subcategory: ""
+subcategory: "Issues"
 description: |-
   Reads Bitbucket issue-comments via the Bitbucket Cloud API.
 ---

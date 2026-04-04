@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_downloads Data Source - bitbucket"
-subcategory: ""
+subcategory: "Downloads"
 description: |-
   Reads Bitbucket downloads via the Bitbucket Cloud API.
 ---

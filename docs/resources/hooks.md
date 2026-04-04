@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_hooks Resource - bitbucket"
-subcategory: ""
+subcategory: "Webhooks"
 description: |-
   Manages Bitbucket hooks via the Bitbucket Cloud API.
 ---

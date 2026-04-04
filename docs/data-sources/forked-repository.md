@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_forked_repository Data Source - bitbucket"
-subcategory: ""
+subcategory: "Repositories"
 description: |-
   Reads Bitbucket forked-repository via the Bitbucket Cloud API.
 ---

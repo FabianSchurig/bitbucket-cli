@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_properties Data Source - bitbucket"
-subcategory: ""
+subcategory: "Properties"
 description: |-
   Reads Bitbucket properties via the Bitbucket Cloud API.
 ---

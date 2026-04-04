@@ -29,6 +29,7 @@ Available operations:
 - updateUserHostedPropertyValue: Update a user application property [PUT]
 - deleteUserHostedPropertyValue: Delete a user application property [DELETE]
 `,
+	Category: `Properties`,
 	Ops: MapCRUDOps(`properties`, []OperationDef{
 		{
 			OperationID: `getCommitHostedPropertyValue`,

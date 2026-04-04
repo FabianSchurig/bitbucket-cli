@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_project_group_permissions Data Source - bitbucket"
-subcategory: ""
+subcategory: "Projects"
 description: |-
   Reads Bitbucket project-group-permissions via the Bitbucket Cloud API.
 ---

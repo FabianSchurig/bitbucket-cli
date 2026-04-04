@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_pipelines Resource - bitbucket"
-subcategory: ""
+subcategory: "Pipelines"
 description: |-
   Manages Bitbucket pipelines via the Bitbucket Cloud API.
 ---

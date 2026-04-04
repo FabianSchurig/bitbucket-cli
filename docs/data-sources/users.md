@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_users Data Source - bitbucket"
-subcategory: ""
+subcategory: "Users"
 description: |-
   Reads Bitbucket users via the Bitbucket Cloud API.
 ---
