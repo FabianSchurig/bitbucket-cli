@@ -14,24 +14,23 @@ variable "workspace" {
   default = "test-workspace"
 }
 
-variable "key_id" {
-  type    = string
-  default = "123"
-}
-
 variable "selected_user" {
   type    = string
   default = "jdoe"
 }
 
+variable "key_id" {
+  type    = string
+  default = "123"
+}
+
 provider "bitbucket" {}
 
 data "bitbucket_ssh_keys" "test" {
-  key_id = var.key_id
   selected_user = var.selected_user
+  key_id = var.key_id
 }
 
 resource "bitbucket_ssh_keys" "test" {
-  key_id = var.key_id
   selected_user = var.selected_user
 }

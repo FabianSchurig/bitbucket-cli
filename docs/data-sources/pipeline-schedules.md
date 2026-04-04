@@ -29,7 +29,6 @@ Reads Bitbucket pipeline-schedules via the Bitbucket Cloud API.
 data "bitbucket_pipeline_schedules" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
-  schedule_uuid = "{schedule-uuid}"
 }
 
 output "pipeline_schedules_response" {
@@ -42,7 +41,9 @@ output "pipeline_schedules_response" {
 ### Required
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
-- `schedule_uuid` (String) Path parameter.
+
+### Optional
+- `schedule_uuid` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

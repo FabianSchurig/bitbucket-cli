@@ -11,8 +11,8 @@ run "read_hooks" {
 
   variables {
     repo_slug = "my-repo"
-    uid = "webhook-uuid"
     workspace = "my-workspace"
+    uid = "webhook-uuid"
   }
 
   # Data source read should succeed with mock provider
@@ -27,7 +27,6 @@ run "create_hooks" {
 
   variables {
     repo_slug = "my-repo"
-    uid = "webhook-uuid"
     workspace = "my-workspace"
   }
 

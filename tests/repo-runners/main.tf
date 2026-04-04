@@ -35,5 +35,4 @@ data "bitbucket_repo_runners" "test" {
 resource "bitbucket_repo_runners" "test" {
   workspace = var.workspace
   repo_slug = var.repo_slug
-  runner_uuid = var.runner_uuid
 }

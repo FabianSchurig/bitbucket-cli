@@ -22,11 +22,10 @@ variable "project_key" {
 provider "bitbucket" {}
 
 data "bitbucket_projects" "test" {
-  project_key = var.project_key
   workspace = var.workspace
+  project_key = var.project_key
 }
 
 resource "bitbucket_projects" "test" {
-  project_key = var.project_key
   workspace = var.workspace
 }

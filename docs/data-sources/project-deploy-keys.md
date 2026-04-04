@@ -27,7 +27,6 @@ Reads Bitbucket project-deploy-keys via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_project_deploy_keys" "example" {
-  key_id = "123"
   project_key = "PROJ"
   workspace = "my-workspace"
 }
@@ -40,9 +39,11 @@ output "project_deploy_keys_response" {
 ## Schema
 
 ### Required
-- `key_id` (String) Path parameter.
 - `project_key` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `key_id` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

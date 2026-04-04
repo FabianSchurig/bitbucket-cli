@@ -31,7 +31,6 @@ data "bitbucket_annotations" "example" {
   repo_slug = "my-repo"
   commit = "abc123def"
   report_id = "report-uuid"
-  annotation_id = "{annotation-id}"
 }
 
 output "annotations_response" {
@@ -46,7 +45,9 @@ output "annotations_response" {
 - `repo_slug` (String) Path parameter.
 - `commit` (String) Path parameter.
 - `report_id` (String) Path parameter.
-- `annotation_id` (String) Path parameter.
+
+### Optional
+- `annotation_id` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

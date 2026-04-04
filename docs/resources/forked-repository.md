@@ -51,6 +51,7 @@ resource "bitbucket_forked_repository" "example" {
 - `is_private` (String) is_private (also computed from API response)
 - `language` (String) language (also computed from API response)
 - `mainbranch_default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch. (also computed from API response)
+- `mainbranch_merge_strategies` (List of String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge] (also computed from API response)
 - `mainbranch_name` (String) The name of the ref. (also computed from API response)
 - `mainbranch_type` (String) mainbranch.type (also computed from API response)
 - `name` (String) name (also computed from API response)

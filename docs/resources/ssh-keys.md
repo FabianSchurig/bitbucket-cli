@@ -40,7 +40,6 @@ Manages Bitbucket ssh-keys via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_ssh_keys" "example" {
-  key_id = "123"
   selected_user = "jdoe"
 }
 ```
@@ -48,10 +47,10 @@ resource "bitbucket_ssh_keys" "example" {
 ## Schema
 
 ### Required
-- `key_id` (String) Path parameter.
 - `selected_user` (String) Path parameter.
 
 ### Optional
+- `key_id` (String) Path parameter (auto-populated from API response).
 - `comment` (String) The comment parsed from the SSH key (if present) (also computed from API response)
 - `expires_on` (String) expires_on (also computed from API response)
 - `fingerprint` (String) The SSH key fingerprint in SHA-256 format. (also computed from API response)

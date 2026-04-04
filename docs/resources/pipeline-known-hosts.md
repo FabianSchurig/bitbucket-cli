@@ -42,7 +42,6 @@ Manages Bitbucket pipeline-known-hosts via the Bitbucket Cloud API.
 resource "bitbucket_pipeline_known_hosts" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
-  known_host_uuid = "{known-host-uuid}"
 }
 ```
 
@@ -51,9 +50,9 @@ resource "bitbucket_pipeline_known_hosts" "example" {
 ### Required
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
-- `known_host_uuid` (String) Path parameter.
 
 ### Optional
+- `known_host_uuid` (String) Path parameter (auto-populated from API response).
 - `hostname` (String) The hostname of the known host. (also computed from API response)
 - `public_key_key` (String) The base64 encoded public key. (also computed from API response)
 - `public_key_key_type` (String) The type of the public key. (also computed from API response)

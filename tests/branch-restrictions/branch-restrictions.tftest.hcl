@@ -10,9 +10,9 @@ run "read_branch_restrictions" {
   command = apply
 
   variables {
-    param_id = "1"
     repo_slug = "my-repo"
     workspace = "my-workspace"
+    param_id = "1"
   }
 
   # Data source read should succeed with mock provider
@@ -26,7 +26,6 @@ run "create_branch_restrictions" {
   command = apply
 
   variables {
-    param_id = "1"
     repo_slug = "my-repo"
     workspace = "my-workspace"
   }

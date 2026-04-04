@@ -14,11 +14,6 @@ variable "workspace" {
   default = "test-workspace"
 }
 
-variable "comment_id" {
-  type    = string
-  default = "1"
-}
-
 variable "pull_request_id" {
   type    = string
   default = "1"
@@ -29,17 +24,21 @@ variable "repo_slug" {
   default = "my-repo"
 }
 
+variable "comment_id" {
+  type    = string
+  default = "1"
+}
+
 provider "bitbucket" {}
 
 data "bitbucket_pr_comments" "test" {
-  comment_id = var.comment_id
   pull_request_id = var.pull_request_id
   repo_slug = var.repo_slug
   workspace = var.workspace
+  comment_id = var.comment_id
 }
 
 resource "bitbucket_pr_comments" "test" {
-  comment_id = var.comment_id
   pull_request_id = var.pull_request_id
   repo_slug = var.repo_slug
   workspace = var.workspace

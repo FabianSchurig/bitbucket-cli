@@ -27,7 +27,6 @@ Reads Bitbucket tags via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_tags" "example" {
-  name = "main"
   repo_slug = "my-repo"
   workspace = "my-workspace"
 }
@@ -40,9 +39,11 @@ output "tags_response" {
 ## Schema
 
 ### Required
-- `name` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `name` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 
@@ -50,6 +51,5 @@ output "tags_response" {
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `date` (String) The date that the tag was created, if available
 - `message` (String) The message associated with the tag, if available.
-- `name` (String) The name of the ref.
 - `tagger_raw` (String) The raw author value from the repository. This may be the only value available if the author does not match a user in Bitbucket.
 - `type` (String) type

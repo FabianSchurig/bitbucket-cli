@@ -27,7 +27,6 @@ Reads Bitbucket issues via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_issues" "example" {
-  issue_id = "1"
   repo_slug = "my-repo"
   workspace = "my-workspace"
 }
@@ -40,9 +39,11 @@ output "issues_response" {
 ## Schema
 
 ### Required
-- `issue_id` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `issue_id` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

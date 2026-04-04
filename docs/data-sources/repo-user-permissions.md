@@ -28,7 +28,6 @@ Reads Bitbucket repo-user-permissions via the Bitbucket Cloud API.
 ```hcl
 data "bitbucket_repo_user_permissions" "example" {
   repo_slug = "my-repo"
-  selected_user_id = "{user-uuid}"
   workspace = "my-workspace"
 }
 
@@ -41,8 +40,10 @@ output "repo_user_permissions_response" {
 
 ### Required
 - `repo_slug` (String) Path parameter.
-- `selected_user_id` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `selected_user_id` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

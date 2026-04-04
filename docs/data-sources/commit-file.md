@@ -48,5 +48,4 @@ output "commit_file_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `path` (String) The path in the repository
 - `type` (String) type

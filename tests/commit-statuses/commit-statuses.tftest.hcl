@@ -11,9 +11,9 @@ run "read_commit_statuses" {
 
   variables {
     commit = "abc123def"
-    key = "build-key"
     repo_slug = "my-repo"
     workspace = "my-workspace"
+    key = "build-key"
   }
 
   # Data source read should succeed with mock provider
@@ -28,7 +28,6 @@ run "create_commit_statuses" {
 
   variables {
     commit = "abc123def"
-    key = "build-key"
     repo_slug = "my-repo"
     workspace = "my-workspace"
   }

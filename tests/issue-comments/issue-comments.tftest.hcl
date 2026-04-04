@@ -10,10 +10,10 @@ run "read_issue_comments" {
   command = apply
 
   variables {
-    comment_id = "1"
     issue_id = "1"
     repo_slug = "my-repo"
     workspace = "my-workspace"
+    comment_id = "1"
   }
 
   # Data source read should succeed with mock provider
@@ -27,7 +27,6 @@ run "create_issue_comments" {
   command = apply
 
   variables {
-    comment_id = "1"
     issue_id = "1"
     repo_slug = "my-repo"
     workspace = "my-workspace"

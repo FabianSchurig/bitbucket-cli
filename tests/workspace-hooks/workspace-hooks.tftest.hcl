@@ -10,8 +10,8 @@ run "read_workspace_hooks" {
   command = apply
 
   variables {
-    uid = "webhook-uuid"
     workspace = "my-workspace"
+    uid = "webhook-uuid"
   }
 
   # Data source read should succeed with mock provider
@@ -25,7 +25,6 @@ run "create_workspace_hooks" {
   command = apply
 
   variables {
-    uid = "webhook-uuid"
     workspace = "my-workspace"
   }
 

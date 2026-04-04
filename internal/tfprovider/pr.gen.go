@@ -75,14 +75,39 @@ Available operations:
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -252,14 +277,39 @@ new pull request that is created.`,
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -290,11 +340,18 @@ new pull request that is created.`,
 				{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -306,14 +363,39 @@ new pull request that is created.`,
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -368,14 +450,39 @@ new pull request that is created.`,
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -411,11 +518,18 @@ Only open pull requests can be mutated.`,
 				{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -427,14 +541,39 @@ Only open pull requests can be mutated.`,
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -788,14 +927,39 @@ branch when the pull requests gets accepted.`,
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -879,14 +1043,39 @@ with the revspec that corresponds to the pull request.`,
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -1217,14 +1406,39 @@ will cause the task to appear below the comment on a pull request when viewed in
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -1263,14 +1477,39 @@ will cause the task to appear below the comment on a pull request when viewed in
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -1440,14 +1679,39 @@ new pull request that is created.`,
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -1478,11 +1742,18 @@ new pull request that is created.`,
 				{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -1494,14 +1765,39 @@ new pull request that is created.`,
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -1556,14 +1852,39 @@ new pull request that is created.`,
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -1599,11 +1920,18 @@ Only open pull requests can be mutated.`,
 				{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -1615,14 +1943,39 @@ Only open pull requests can be mutated.`,
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -1976,14 +2329,39 @@ branch when the pull requests gets accepted.`,
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -2067,14 +2445,39 @@ with the revspec that corresponds to the pull request.`,
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -2405,14 +2808,39 @@ will cause the task to appear below the comment on a pull request when viewed in
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `destination.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `destination.branch.name`, Type: `string`, Desc: `destination.branch.name`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `destination.commit.hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
 				{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				{Path: `merge_commit.hash`, Type: `string`, Desc: `merge_commit.hash`},
+				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
+        Collaborators are user that:
+
+        * are added to the pull request as a reviewer (part of the reviewers
+          list)
+        * are not explicit reviewers, but have commented on the pull request
+        * are not explicit reviewers, but have approved the pull request
+
+        Each user is wrapped in an object that indicates the user's role and
+        whether they have approved the pull request. For performance reasons,
+        the API only returns this list when an API requests a pull request by
+        id.
+        `, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
+				}},
 				{Path: `source.branch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy, when this endpoint is the destination of the pull request.`},
+				{Path: `source.branch.merge_strategies`, Type: `string`, Desc: `Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `source.branch.name`, Type: `string`, Desc: `source.branch.name`},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `source.commit.hash`},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},

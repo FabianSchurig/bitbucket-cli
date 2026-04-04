@@ -10,10 +10,10 @@ run "read_commit_file" {
   command = apply
 
   variables {
-    commit = "abc123def"
-    path = "README.md"
     repo_slug = "my-repo"
     workspace = "my-workspace"
+    commit = "abc123def"
+    path = "README.md"
   }
 
   # Data source read should succeed with mock provider
@@ -27,8 +27,6 @@ run "create_commit_file" {
   command = apply
 
   variables {
-    commit = "abc123def"
-    path = "README.md"
     repo_slug = "my-repo"
     workspace = "my-workspace"
   }

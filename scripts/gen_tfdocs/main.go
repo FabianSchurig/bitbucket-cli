@@ -30,27 +30,32 @@ import (
 // ─── Template data ────────────────────────────────────────────────────────────
 
 type GroupData struct {
-	Name           string
-	TFName         string // e.g., "bitbucket_repos"
-	HasCreate      bool
-	HasRead        bool
-	HasUpdate      bool
-	HasDelete      bool
-	HasList        bool
-	HasIDParam     bool // true if "id" is a path parameter (avoids conflict with computed id)
-	HasBody        bool // true if any CRUD op accepts a body
-	Params         []string
-	ParamValues    map[string]string
-	BodyFields     []FieldDoc   // writable body fields (Optional)
-	ResponseFields []FieldDoc   // computed response fields (Computed)
-	OverlapFields  []FieldDoc   // fields that are both writable and computed (Optional+Computed)
-	CRUDOps        []CRUDOpInfo // CRUD operation details (scopes, doc links)
+	Name             string
+	TFName           string // e.g., "bitbucket_repos"
+	HasCreate        bool
+	HasRead          bool
+	HasUpdate        bool
+	HasDelete        bool
+	HasList          bool
+	HasIDParam       bool // true if "id" is a path parameter (avoids conflict with computed id)
+	HasBody          bool // true if any CRUD op accepts a body
+	Params           []string
+	ComputedParams   []string // params from non-primary ops (Optional+Computed)
+	DSRequiredParams []string // data source Required params (from List or Read base path)
+	DSOptionalParams []string // data source Optional params (Read-only, not in List)
+	ParamValues      map[string]string
+	BodyFields       []FieldDoc   // writable body fields (Optional)
+	ResponseFields   []FieldDoc   // computed response fields (Computed)
+	OverlapFields    []FieldDoc   // fields that are both writable and computed (Optional+Computed)
+	CRUDOps          []CRUDOpInfo // CRUD operation details (scopes, doc links)
 }
 
 // FieldDoc describes a Terraform attribute for documentation.
 type FieldDoc struct {
-	Name string // Terraform attribute name (snake_case)
-	Desc string // Human-readable description
+	Name       string     // Terraform attribute name (snake_case)
+	Desc       string     // Human-readable description
+	IsArray    bool       // true when the field is a list-nested attribute
+	ItemFields []FieldDoc // nested fields for array items
 }
 
 // CRUDOpInfo holds details about a single CRUD operation for documentation.
@@ -149,77 +154,171 @@ func buildGroups() []GroupData {
 
 	var groups []GroupData
 	for name, crud := range tfprovider.CRUDConfig {
-		// Derive path params from the best available operation (Read > Create > List).
-		params := deriveParams(name, groupIndex)
+		// Derive path params: required (from primary op) and computed (from secondary ops).
+		requiredParams, computedParams := deriveParams(name, groupIndex)
+
+		// Derive data source params: required vs optional.
+		dsRequiredParams, dsOptionalParams := deriveDSParams(name, groupIndex)
 
 		pv := make(map[string]string)
 		hasIDParam := false
-		for _, p := range params {
+		for _, p := range requiredParams {
 			pv[p] = exampleValue(p)
 			if p == "param_id" {
 				hasIDParam = true
+			}
+		}
+		for _, p := range computedParams {
+			pv[p] = exampleValue(p)
+			if p == "param_id" {
+				hasIDParam = true
+			}
+		}
+		// Add data source optional params to example values.
+		for _, p := range dsOptionalParams {
+			if _, exists := pv[p]; !exists {
+				pv[p] = exampleValue(p)
 			}
 		}
 
 		// Derive body fields, response fields, and overlaps.
 		bodyFields, responseFields, overlapFields, hasBody := deriveFields(name, groupIndex)
 
+		// Remove body/overlap/response fields that collide with computed params
+		// (e.g., "name" may be both a computed path param and a body field).
+		computedSet := make(map[string]bool)
+		for _, p := range computedParams {
+			computedSet[p] = true
+		}
+		bodyFields = filterFields(bodyFields, computedSet)
+		overlapFields = filterFields(overlapFields, computedSet)
+		responseFields = filterFields(responseFields, computedSet)
+
 		// Collect CRUD operation details (scopes, doc links).
 		crudOps := deriveCRUDOps(name, groupIndex)
 
 		groups = append(groups, GroupData{
-			Name:           name,
-			TFName:         "bitbucket_" + strings.ReplaceAll(name, "-", "_"),
-			HasCreate:      crud.Create != "",
-			HasRead:        crud.Read != "",
-			HasUpdate:      crud.Update != "",
-			HasDelete:      crud.Delete != "",
-			HasList:        crud.List != "",
-			HasIDParam:     hasIDParam,
-			HasBody:        hasBody,
-			Params:         params,
-			ParamValues:    pv,
-			BodyFields:     bodyFields,
-			ResponseFields: responseFields,
-			OverlapFields:  overlapFields,
-			CRUDOps:        crudOps,
+			Name:             name,
+			TFName:           "bitbucket_" + strings.ReplaceAll(name, "-", "_"),
+			HasCreate:        crud.Create != "",
+			HasRead:          crud.Read != "",
+			HasUpdate:        crud.Update != "",
+			HasDelete:        crud.Delete != "",
+			HasList:          crud.List != "",
+			HasIDParam:       hasIDParam,
+			HasBody:          hasBody,
+			Params:           requiredParams,
+			ComputedParams:   computedParams,
+			DSRequiredParams: dsRequiredParams,
+			DSOptionalParams: dsOptionalParams,
+			ParamValues:      pv,
+			BodyFields:       bodyFields,
+			ResponseFields:   responseFields,
+			OverlapFields:    overlapFields,
+			CRUDOps:          crudOps,
 		})
 	}
 	sort.Slice(groups, func(i, j int) bool { return groups[i].Name < groups[j].Name })
 	return groups
 }
 
-// deriveParams extracts the required path parameters from a resource group's
-// primary operation (Read preferred, then Create, then List). This avoids
-// having to maintain a separate paramConfig map.
-func deriveParams(name string, index map[string]tfprovider.ResourceGroup) []string {
+// deriveParams extracts path parameters from a resource group, split into
+// required params (from the primary Create/Read op) and computed params
+// (from secondary ops like Read/Update/Delete that are not in the primary op).
+func deriveParams(name string, index map[string]tfprovider.ResourceGroup) (required, computed []string) {
 	rg, ok := index[name]
 	if !ok {
-		return nil
+		return nil, nil
 	}
 
-	// Pick the best operation to derive params from.
-	var op *tfprovider.OperationDef
-	switch {
-	case rg.Ops.Read != nil:
-		op = rg.Ops.Read
-	case rg.Ops.Create != nil:
-		op = rg.Ops.Create
-	case rg.Ops.List != nil:
-		op = rg.Ops.List
-	case rg.Ops.Update != nil:
-		op = rg.Ops.Update
-	default:
-		return nil
-	}
-
-	var params []string
-	for _, p := range op.Params {
-		if p.In == "path" {
-			params = append(params, tfprovider.ParamAttrName(p.Name))
+	// Determine the primary operation: Create if available, else Read.
+	primaryOp := rg.Ops.Create
+	if primaryOp == nil {
+		primaryOp = rg.Ops.Read
+		if primaryOp == nil {
+			primaryOp = rg.Ops.List
 		}
 	}
-	return params
+	if primaryOp == nil {
+		return nil, nil
+	}
+
+	// Collect required params from the primary op.
+	primarySet := map[string]bool{}
+	for _, p := range primaryOp.Params {
+		if p.In == "path" {
+			attrName := tfprovider.ParamAttrName(p.Name)
+			primarySet[attrName] = true
+			required = append(required, attrName)
+		}
+	}
+
+	// Collect computed params from all other CRUD ops that are not in the primary op.
+	computedSeen := map[string]bool{}
+	crudOps := []*tfprovider.OperationDef{rg.Ops.Create, rg.Ops.Read, rg.Ops.Update, rg.Ops.Delete, rg.Ops.List}
+	for _, op := range crudOps {
+		if op == nil {
+			continue
+		}
+		for _, p := range op.Params {
+			if p.In != "path" {
+				continue
+			}
+			attrName := tfprovider.ParamAttrName(p.Name)
+			if !primarySet[attrName] && !computedSeen[attrName] {
+				computedSeen[attrName] = true
+				computed = append(computed, attrName)
+			}
+		}
+	}
+	return required, computed
+}
+
+// deriveDSParams determines which path params are Required vs Optional for data sources.
+// Params in BOTH Read and List → Required. Params only in Read → Optional (user can omit to list).
+func deriveDSParams(name string, index map[string]tfprovider.ResourceGroup) (required, optional []string) {
+	rg, ok := index[name]
+	if !ok {
+		return nil, nil
+	}
+
+	readOp := rg.Ops.Read
+	listOp := rg.Ops.List
+	if readOp == nil {
+		readOp = listOp
+	}
+	if readOp == nil {
+		return nil, nil
+	}
+
+	// Collect path params from List op.
+	listParams := map[string]bool{}
+	if listOp != nil {
+		for _, p := range listOp.Params {
+			if p.In == "path" && p.Required {
+				listParams[p.Name] = true
+			}
+		}
+	}
+
+	seen := map[string]bool{}
+	for _, p := range readOp.Params {
+		if p.In != "path" {
+			continue
+		}
+		attrName := tfprovider.ParamAttrName(p.Name)
+		if seen[attrName] {
+			continue
+		}
+		seen[attrName] = true
+		// Required if in both Read and List (or no List op exists).
+		if listOp == nil || listParams[p.Name] {
+			required = append(required, attrName)
+		} else {
+			optional = append(optional, attrName)
+		}
+	}
+	return required, optional
 }
 
 // deriveFields extracts body fields, response fields, and their overlaps
@@ -231,7 +330,7 @@ func deriveFields(name string, index map[string]tfprovider.ResourceGroup) (bodyF
 	}
 
 	// Collect body fields from all CRUD ops.
-	bodyFieldMap := make(map[string]string) // key → description
+	bodyFieldMap := make(map[string]bodyFieldInfo) // key → field info
 	crudOps := []*tfprovider.OperationDef{rg.Ops.Create, rg.Ops.Read, rg.Ops.Update, rg.Ops.Delete, rg.Ops.List}
 	for _, op := range crudOps {
 		if op == nil {
@@ -247,13 +346,13 @@ func deriveFields(name string, index map[string]tfprovider.ResourceGroup) (bodyF
 				if desc == "" {
 					desc = bf.Path
 				}
-				bodyFieldMap[key] = desc
+				bodyFieldMap[key] = bodyFieldInfo{desc: desc, isArray: bf.IsArray, itemFields: bf.ItemFields}
 			}
 		}
 	}
 
 	// Collect response fields from Read (or Create) operation.
-	responseFieldMap := make(map[string]string)
+	responseFieldMap := make(map[string]bodyFieldInfo)
 	responseOp := rg.Ops.Read
 	if responseOp == nil {
 		responseOp = rg.Ops.Create
@@ -268,23 +367,23 @@ func deriveFields(name string, index map[string]tfprovider.ResourceGroup) (bodyF
 			if desc == "" {
 				desc = rf.Path
 			}
-			responseFieldMap[key] = desc
+			responseFieldMap[key] = bodyFieldInfo{desc: desc, isArray: rf.IsArray, itemFields: rf.ItemFields}
 		}
 	}
 
 	// Categorize into body-only, response-only, and overlap.
 	overlapSet := make(map[string]bool)
-	for key, desc := range bodyFieldMap {
+	for key, info := range bodyFieldMap {
 		if _, isResp := responseFieldMap[key]; isResp {
-			overlapFields = append(overlapFields, FieldDoc{Name: key, Desc: truncateDesc(desc)})
+			overlapFields = append(overlapFields, makeFieldDoc(key, info))
 			overlapSet[key] = true
 		} else {
-			bodyFields = append(bodyFields, FieldDoc{Name: key, Desc: truncateDesc(desc)})
+			bodyFields = append(bodyFields, makeFieldDoc(key, info))
 		}
 	}
-	for key, desc := range responseFieldMap {
+	for key, info := range responseFieldMap {
 		if !overlapSet[key] {
-			responseFields = append(responseFields, FieldDoc{Name: key, Desc: truncateDesc(desc)})
+			responseFields = append(responseFields, makeFieldDoc(key, info))
 		}
 	}
 
@@ -302,6 +401,27 @@ func snakeCaseField(path string) string {
 	return strings.ToLower(s)
 }
 
+// bodyFieldInfo carries metadata needed to build FieldDoc from a BodyFieldDef.
+type bodyFieldInfo struct {
+	desc       string
+	isArray    bool
+	itemFields []tfprovider.BodyFieldDef
+}
+
+// makeFieldDoc converts a bodyFieldInfo into a FieldDoc, including nested fields.
+func makeFieldDoc(key string, info bodyFieldInfo) FieldDoc {
+	fd := FieldDoc{Name: key, Desc: truncateDesc(info.desc), IsArray: info.isArray}
+	for _, item := range info.itemFields {
+		ikey := snakeCaseField(item.Path)
+		idesc := item.Desc
+		if idesc == "" {
+			idesc = item.Path
+		}
+		fd.ItemFields = append(fd.ItemFields, FieldDoc{Name: ikey, Desc: truncateDesc(idesc)})
+	}
+	return fd
+}
+
 // truncateDesc returns a single-line description for documentation.
 func truncateDesc(desc string) string {
 	// Take first line only.
@@ -310,6 +430,20 @@ func truncateDesc(desc string) string {
 	}
 	desc = strings.TrimSpace(desc)
 	return desc
+}
+
+// filterFields removes FieldDoc entries whose Name matches any key in the exclude set.
+func filterFields(fields []FieldDoc, exclude map[string]bool) []FieldDoc {
+	if len(exclude) == 0 {
+		return fields
+	}
+	var result []FieldDoc
+	for _, f := range fields {
+		if !exclude[f.Name] {
+			result = append(result, f)
+		}
+	}
+	return result
 }
 
 // deriveCRUDOps collects details (scopes, doc URL) for each CRUD operation.
@@ -360,6 +494,26 @@ var funcMap = template.FuncMap{
 			quoted[i] = "`" + s + "`"
 		}
 		return strings.Join(quoted, ", ")
+	},
+	"fieldType": func(f FieldDoc) string {
+		if f.IsArray && len(f.ItemFields) > 0 {
+			return "List of Object"
+		}
+		if f.IsArray {
+			return "List of String"
+		}
+		return "String"
+	},
+	"renderNestedFields": func(fields []FieldDoc) string {
+		if len(fields) == 0 {
+			return ""
+		}
+		var sb strings.Builder
+		sb.WriteString("\n  Nested schema:\n")
+		for _, f := range fields {
+			sb.WriteString("  - `" + f.Name + "` (String) " + f.Desc + "\n")
+		}
+		return sb.String()
 	},
 }
 
@@ -526,15 +680,18 @@ resource "{{.TFName}}" "example" {
 {{- range .Params}}
 - ` + "`" + `{{.}}` + "`" + ` (String) Path parameter.
 {{- end}}
-{{- if or .OverlapFields .BodyFields .HasBody}}
+{{- if or .OverlapFields .BodyFields .HasBody .ComputedParams}}
 
 ### Optional
 {{- end}}
+{{- range .ComputedParams}}
+- ` + "`" + `{{.}}` + "`" + ` (String) Path parameter (auto-populated from API response).
+{{- end}}
 {{- range .OverlapFields}}
-- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}} (also computed from API response)
+- ` + "`" + `{{.Name}}` + "`" + ` ({{fieldType .}}) {{.Desc}} (also computed from API response){{renderNestedFields .ItemFields}}
 {{- end}}
 {{- range .BodyFields}}
-- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}}
+- ` + "`" + `{{.Name}}` + "`" + ` ({{fieldType .}}) {{.Desc}}{{renderNestedFields .ItemFields}}
 {{- end}}
 {{- if .HasBody}}
 - ` + "`" + `request_body` + "`" + ` (String) Raw JSON request body for create/update operations. Use ` + "`" + `jsonencode({...})` + "`" + ` to pass fields not exposed as individual attributes.
@@ -547,7 +704,7 @@ resource "{{.TFName}}" "example" {
 {{- end}}
 - ` + "`" + `api_response` + "`" + ` (String) The raw JSON response from the Bitbucket API.
 {{- range .ResponseFields}}
-- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}}
+- ` + "`" + `{{.Name}}` + "`" + ` ({{fieldType .}}) {{.Desc}}{{renderNestedFields .ItemFields}}
 {{- end}}
 `
 
@@ -588,7 +745,7 @@ Reads Bitbucket {{.Name}} via the Bitbucket Cloud API.
 
 ` + "```" + `hcl
 data "{{.TFName}}" "example" {
-{{- range .Params}}
+{{- range .DSRequiredParams}}
   {{.}} = "{{index $.ParamValues .}}"
 {{- end}}
 }
@@ -602,8 +759,15 @@ output "{{snakeCase .Name}}_response" {
 
 ### Required
 
-{{- range .Params}}
+{{- range .DSRequiredParams}}
 - ` + "`" + `{{.}}` + "`" + ` (String) Path parameter.
+{{- end}}
+{{- if .DSOptionalParams}}
+
+### Optional
+{{- end}}
+{{- range .DSOptionalParams}}
+- ` + "`" + `{{.}}` + "`" + ` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 {{- end}}
 
 ### Read-Only
@@ -611,10 +775,10 @@ output "{{snakeCase .Name}}_response" {
 - ` + "`" + `id` + "`" + ` (String) Resource identifier.
 - ` + "`" + `api_response` + "`" + ` (String) The raw JSON response from the Bitbucket API.
 {{- range .ResponseFields}}
-- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}}
+- ` + "`" + `{{.Name}}` + "`" + ` ({{fieldType .}}) {{.Desc}}{{renderNestedFields .ItemFields}}
 {{- end}}
 {{- range .OverlapFields}}
-- ` + "`" + `{{.Name}}` + "`" + ` (String) {{.Desc}}
+- ` + "`" + `{{.Name}}` + "`" + ` ({{fieldType .}}) {{.Desc}}{{renderNestedFields .ItemFields}}
 {{- end}}
 `
 
@@ -640,7 +804,7 @@ const exampleResourceTemplate = `resource "{{.TFName}}" "example" {
 `
 
 const exampleDataSourceTemplate = `data "{{.TFName}}" "example" {
-{{- range .Params}}
+{{- range .DSRequiredParams}}
   {{.}} = "{{index $.ParamValues .}}"
 {{- end}}
 }
@@ -667,6 +831,9 @@ run "read_{{snakeCase .Name}}" {
 
   variables {
 {{- range .Params}}
+    {{.}} = "{{index $.ParamValues .}}"
+{{- end}}
+{{- range .ComputedParams}}
     {{.}} = "{{index $.ParamValues .}}"
 {{- end}}
   }
@@ -719,7 +886,16 @@ variable "workspace" {
   default = "test-workspace"
 }
 
-{{- range .Params}}
+{{- range .DSRequiredParams}}
+{{- if ne . "workspace"}}
+
+variable "{{.}}" {
+  type    = string
+  default = "{{index $.ParamValues .}}"
+}
+{{- end}}
+{{- end}}
+{{- range .DSOptionalParams}}
 {{- if ne . "workspace"}}
 
 variable "{{.}}" {
@@ -732,7 +908,10 @@ variable "{{.}}" {
 provider "bitbucket" {}
 
 data "{{.TFName}}" "test" {
-{{- range .Params}}
+{{- range .DSRequiredParams}}
+  {{.}} = var.{{.}}
+{{- end}}
+{{- range .DSOptionalParams}}
   {{.}} = var.{{.}}
 {{- end}}
 }

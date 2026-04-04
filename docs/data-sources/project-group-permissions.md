@@ -27,7 +27,6 @@ Reads Bitbucket project-group-permissions via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_project_group_permissions" "example" {
-  group_slug = "developers"
   project_key = "PROJ"
   workspace = "my-workspace"
 }
@@ -40,9 +39,11 @@ output "project_group_permissions_response" {
 ## Schema
 
 ### Required
-- `group_slug` (String) Path parameter.
 - `project_key` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `group_slug` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

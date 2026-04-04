@@ -228,8 +228,18 @@ for specific details.
 				{Path: `build_number`, Type: `int`, Desc: `The build number of the pipeline.`},
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
+				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
+				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+				}},
 			},
 			HasBody:   false,
 			Paginated: true,
@@ -252,14 +262,34 @@ for specific details.
 				{Path: `build_number`, Type: `int`, Desc: `The build number of the pipeline.`},
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
+				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
+				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+				}},
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `build_number`, Type: `int`, Desc: `The build number of the pipeline.`},
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
+				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
+				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+				}},
 			},
 			HasBody:   true,
 			Paginated: false,
@@ -376,6 +406,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -409,6 +440,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -444,6 +476,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -478,6 +511,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -535,8 +569,18 @@ for specific details.
 				{Path: `build_number`, Type: `int`, Desc: `The build number of the pipeline.`},
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
+				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
+				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+				}},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -565,6 +609,14 @@ for specific details.
 				{Path: `image.name`, Type: `string`, Desc: `The name of the image. If the image is hosted on DockerHub the short name can be used, otherwise the fully qualified name is required here.`},
 				{Path: `image.password`, Type: `string`, Desc: `The password needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
 				{Path: `image.username`, Type: `string`, Desc: `The username needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+				{Path: `script_commands`, Type: `string`, Desc: `The list of build commands. These commands are executed in the build container.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the command.`},
+					{Path: `command`, Type: `string`, Desc: `The executable command.`},
+				}},
+				{Path: `setup_commands`, Type: `string`, Desc: `The list of commands that are executed as part of the setup phase of the build. These commands are executed outside the build container.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the command.`},
+					{Path: `command`, Type: `string`, Desc: `The executable command.`},
+				}},
 				{Path: `started_on`, Type: `string`, Desc: `The timestamp when the step execution was started. This is not set when the step hasn't executed yet.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the step.`},
 			},
@@ -594,6 +646,14 @@ for specific details.
 				{Path: `image.name`, Type: `string`, Desc: `The name of the image. If the image is hosted on DockerHub the short name can be used, otherwise the fully qualified name is required here.`},
 				{Path: `image.password`, Type: `string`, Desc: `The password needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
 				{Path: `image.username`, Type: `string`, Desc: `The username needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+				{Path: `script_commands`, Type: `string`, Desc: `The list of build commands. These commands are executed in the build container.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the command.`},
+					{Path: `command`, Type: `string`, Desc: `The executable command.`},
+				}},
+				{Path: `setup_commands`, Type: `string`, Desc: `The list of commands that are executed as part of the setup phase of the build. These commands are executed outside the build container.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the command.`},
+					{Path: `command`, Type: `string`, Desc: `The executable command.`},
+				}},
 				{Path: `started_on`, Type: `string`, Desc: `The timestamp when the step execution was started. This is not set when the step hasn't executed yet.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the step.`},
 			},
@@ -1567,6 +1627,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -1599,6 +1660,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -1633,6 +1695,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -1666,6 +1729,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -1965,8 +2029,18 @@ for specific details.
 				{Path: `build_number`, Type: `int`, Desc: `The build number of the pipeline.`},
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
+				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
+				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+				}},
 			},
 			HasBody:   false,
 			Paginated: true,
@@ -1989,14 +2063,34 @@ for specific details.
 				{Path: `build_number`, Type: `int`, Desc: `The build number of the pipeline.`},
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
+				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
+				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+				}},
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `build_number`, Type: `int`, Desc: `The build number of the pipeline.`},
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
+				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
+				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+				}},
 			},
 			HasBody:   true,
 			Paginated: false,
@@ -2113,6 +2207,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -2146,6 +2241,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -2181,6 +2277,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -2215,6 +2312,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -2272,8 +2370,18 @@ for specific details.
 				{Path: `build_number`, Type: `int`, Desc: `The build number of the pipeline.`},
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
+				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
+				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+				}},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -2302,6 +2410,14 @@ for specific details.
 				{Path: `image.name`, Type: `string`, Desc: `The name of the image. If the image is hosted on DockerHub the short name can be used, otherwise the fully qualified name is required here.`},
 				{Path: `image.password`, Type: `string`, Desc: `The password needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
 				{Path: `image.username`, Type: `string`, Desc: `The username needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+				{Path: `script_commands`, Type: `string`, Desc: `The list of build commands. These commands are executed in the build container.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the command.`},
+					{Path: `command`, Type: `string`, Desc: `The executable command.`},
+				}},
+				{Path: `setup_commands`, Type: `string`, Desc: `The list of commands that are executed as part of the setup phase of the build. These commands are executed outside the build container.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the command.`},
+					{Path: `command`, Type: `string`, Desc: `The executable command.`},
+				}},
 				{Path: `started_on`, Type: `string`, Desc: `The timestamp when the step execution was started. This is not set when the step hasn't executed yet.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the step.`},
 			},
@@ -2331,6 +2447,14 @@ for specific details.
 				{Path: `image.name`, Type: `string`, Desc: `The name of the image. If the image is hosted on DockerHub the short name can be used, otherwise the fully qualified name is required here.`},
 				{Path: `image.password`, Type: `string`, Desc: `The password needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
 				{Path: `image.username`, Type: `string`, Desc: `The username needed to authenticate with the Docker registry. Only required when using a private Docker image.`},
+				{Path: `script_commands`, Type: `string`, Desc: `The list of build commands. These commands are executed in the build container.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the command.`},
+					{Path: `command`, Type: `string`, Desc: `The executable command.`},
+				}},
+				{Path: `setup_commands`, Type: `string`, Desc: `The list of commands that are executed as part of the setup phase of the build. These commands are executed outside the build container.`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the command.`},
+					{Path: `command`, Type: `string`, Desc: `The executable command.`},
+				}},
 				{Path: `started_on`, Type: `string`, Desc: `The timestamp when the step execution was started. This is not set when the step hasn't executed yet.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the step.`},
 			},
@@ -3304,6 +3428,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -3336,6 +3461,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -3370,6 +3496,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -3403,6 +3530,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},

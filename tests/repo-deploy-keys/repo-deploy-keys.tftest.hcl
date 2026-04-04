@@ -10,9 +10,9 @@ run "read_repo_deploy_keys" {
   command = apply
 
   variables {
-    key_id = "123"
     repo_slug = "my-repo"
     workspace = "my-workspace"
+    key_id = "123"
   }
 
   # Data source read should succeed with mock provider
@@ -26,7 +26,6 @@ run "create_repo_deploy_keys" {
   command = apply
 
   variables {
-    key_id = "123"
     repo_slug = "my-repo"
     workspace = "my-workspace"
   }

@@ -28,7 +28,6 @@ run "create_repo_runners" {
   variables {
     workspace = "my-workspace"
     repo_slug = "my-repo"
-    runner_uuid = "{runner-uuid}"
   }
 
   # Resource create should succeed with mock provider

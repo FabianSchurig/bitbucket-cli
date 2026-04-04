@@ -81,6 +81,7 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `type`, Type: `string`, Desc: `type`},
 			},
@@ -104,6 +105,7 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `type`, Type: `string`, Desc: `type`},
 			},
@@ -136,6 +138,7 @@ refs/heads).`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `type`, Type: `string`, Desc: `type`},
 			},
@@ -347,6 +350,7 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `type`, Type: `string`, Desc: `type`},
 			},
@@ -370,6 +374,7 @@ Bitbucket will apply natural sorting and interpret numerical values as numbers i
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `type`, Type: `string`, Desc: `type`},
 			},
@@ -402,6 +407,7 @@ refs/heads).`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
+				{Path: `merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the ref.`},
 				{Path: `type`, Type: `string`, Desc: `type`},
 			},

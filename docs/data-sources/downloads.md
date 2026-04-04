@@ -27,7 +27,6 @@ Reads Bitbucket downloads via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_downloads" "example" {
-  filename = "artifact.zip"
   repo_slug = "my-repo"
   workspace = "my-workspace"
 }
@@ -40,9 +39,11 @@ output "downloads_response" {
 ## Schema
 
 ### Required
-- `filename` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `filename` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

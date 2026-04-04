@@ -27,7 +27,6 @@ Reads Bitbucket workspaces via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_workspaces" "example" {
-  workspace = "my-workspace"
 }
 
 output "workspaces_response" {
@@ -38,7 +37,9 @@ output "workspaces_response" {
 ## Schema
 
 ### Required
-- `workspace` (String) Path parameter.
+
+### Optional
+- `workspace` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

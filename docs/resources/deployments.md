@@ -39,7 +39,6 @@ Manages Bitbucket deployments via the Bitbucket Cloud API.
 resource "bitbucket_deployments" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
-  environment_uuid = "env-uuid"
 }
 ```
 
@@ -48,9 +47,9 @@ resource "bitbucket_deployments" "example" {
 ### Required
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
-- `environment_uuid` (String) Path parameter.
 
 ### Optional
+- `environment_uuid` (String) Path parameter (auto-populated from API response).
 - `name` (String) The name of the environment. (also computed from API response)
 - `uuid` (String) The UUID identifying the environment. (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.

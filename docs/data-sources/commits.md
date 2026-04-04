@@ -27,7 +27,6 @@ Reads Bitbucket commits via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_commits" "example" {
-  commit = "abc123def"
   repo_slug = "my-repo"
   workspace = "my-workspace"
 }
@@ -40,9 +39,11 @@ output "commits_response" {
 ## Schema
 
 ### Required
-- `commit` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `commit` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 
@@ -53,5 +54,13 @@ output "commits_response" {
 - `date` (String) date
 - `hash` (String) hash
 - `message` (String) message
+- `parents` (String) parents (JSON array)
+- `participants` (List of Object) participants
+  Nested schema:
+  - `role` (String) [PARTICIPANT, REVIEWER]
+  - `approved` (String) approved
+  - `state` (String) [approved, changes_requested, <nil>]
+  - `participated_on` (String) The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.
+
 - `summary_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
 - `summary_raw` (String) The text as it was typed by a user.

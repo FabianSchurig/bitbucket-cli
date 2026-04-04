@@ -28,7 +28,6 @@ Reads Bitbucket commit-statuses via the Bitbucket Cloud API.
 ```hcl
 data "bitbucket_commit_statuses" "example" {
   commit = "abc123def"
-  key = "build-key"
   repo_slug = "my-repo"
   workspace = "my-workspace"
 }
@@ -42,9 +41,11 @@ output "commit_statuses_response" {
 
 ### Required
 - `commit` (String) Path parameter.
-- `key` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `key` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 
@@ -53,7 +54,6 @@ output "commit_statuses_response" {
 - `created_on` (String) created_on
 - `updated_on` (String) updated_on
 - `description` (String) A description of the build (e.g. "Unit tests in Bamboo")
-- `key` (String) An identifier for the status that's unique to
 - `name` (String) An identifier for the build itself, e.g. BB-DEPLOY-1
 - `refname` (String) 
 - `state` (String) Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]

@@ -3,7 +3,6 @@ data "bitbucket_annotations" "example" {
   repo_slug = "my-repo"
   commit = "abc123def"
   report_id = "report-uuid"
-  annotation_id = "{annotation-id}"
 }
 
 output "annotations_response" {

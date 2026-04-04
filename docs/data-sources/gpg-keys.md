@@ -27,7 +27,6 @@ Reads Bitbucket gpg-keys via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_gpg_keys" "example" {
-  fingerprint = "AA:BB:CC:DD"
   selected_user = "jdoe"
 }
 
@@ -39,8 +38,10 @@ output "gpg_keys_response" {
 ## Schema
 
 ### Required
-- `fingerprint` (String) Path parameter.
 - `selected_user` (String) Path parameter.
+
+### Optional
+- `fingerprint` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 
@@ -50,9 +51,9 @@ output "gpg_keys_response" {
 - `added_on` (String) added_on
 - `comment` (String) The comment parsed from the GPG key (if present)
 - `expires_on` (String) expires_on
-- `fingerprint` (String) The GPG key fingerprint.
 - `key` (String) The GPG key value in X format.
 - `key_id` (String) The unique identifier for the GPG key
 - `last_used` (String) last_used
 - `name` (String) The user-defined label for the GPG key
 - `parent_fingerprint` (String) The fingerprint of the parent key. This value is null unless the current key is a subkey.
+- `subkeys` (String) subkeys (JSON array)

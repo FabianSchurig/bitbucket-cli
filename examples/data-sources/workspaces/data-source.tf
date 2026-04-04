@@ -1,5 +1,4 @@
 data "bitbucket_workspaces" "example" {
-  workspace = "my-workspace"
 }
 
 output "workspaces_response" {

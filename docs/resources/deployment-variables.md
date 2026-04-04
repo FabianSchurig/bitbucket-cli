@@ -51,6 +51,7 @@ resource "bitbucket_deployment_variables" "example" {
 - `environment_uuid` (String) Path parameter.
 
 ### Optional
+- `variable_uuid` (String) Path parameter (auto-populated from API response).
 - `key` (String) The unique name of the variable. (also computed from API response)
 - `secured` (String) If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API. (also computed from API response)
 - `uuid` (String) The UUID identifying the variable. (also computed from API response)

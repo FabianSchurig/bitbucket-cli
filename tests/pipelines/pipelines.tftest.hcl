@@ -28,7 +28,6 @@ run "create_pipelines" {
   variables {
     workspace = "my-workspace"
     repo_slug = "my-repo"
-    pipeline_uuid = "pipeline-uuid"
   }
 
   # Resource create should succeed with mock provider

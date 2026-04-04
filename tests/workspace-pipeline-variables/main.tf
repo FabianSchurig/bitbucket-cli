@@ -28,5 +28,4 @@ data "bitbucket_workspace_pipeline_variables" "test" {
 
 resource "bitbucket_workspace_pipeline_variables" "test" {
   workspace = var.workspace
-  variable_uuid = var.variable_uuid
 }

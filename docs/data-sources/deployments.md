@@ -29,7 +29,6 @@ Reads Bitbucket deployments via the Bitbucket Cloud API.
 data "bitbucket_deployments" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
-  environment_uuid = "env-uuid"
 }
 
 output "deployments_response" {
@@ -42,7 +41,9 @@ output "deployments_response" {
 ### Required
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
-- `environment_uuid` (String) Path parameter.
+
+### Optional
+- `environment_uuid` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

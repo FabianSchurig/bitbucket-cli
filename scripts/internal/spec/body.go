@@ -7,12 +7,14 @@ import (
 
 // BodyField describes a flattened request body field for code generation.
 type BodyField struct {
-	Path     string // dot-separated path, e.g., "content.raw"
-	FlagName string // CLI flag name, e.g., "content-raw"
-	GoName   string // Go variable name, e.g., "bodyContentRaw"
-	GoType   string // "string", "int", "bool"
-	Default  string // Go zero-value literal
-	Desc     string // human-readable description
+	Path       string      // dot-separated path, e.g., "content.raw"
+	FlagName   string      // CLI flag name, e.g., "content-raw"
+	GoName     string      // Go variable name, e.g., "bodyContentRaw"
+	GoType     string      // "string", "int", "bool"
+	Default    string      // Go zero-value literal
+	Desc       string      // human-readable description
+	IsArray    bool        // true when the field is an array
+	ItemFields []BodyField // nested fields for array item objects (empty for simple arrays)
 }
 
 // ─── Body field helpers ───────────────────────────────────────────────────────
@@ -110,6 +112,24 @@ var responseSkipPropertyRefs = map[string]bool{
 	"pullrequest": true, "base_commit": true, "commit": true,
 }
 
+// arrayItemSkipPropNames lists properties to skip when resolving array item fields.
+// More permissive than body opts — includes identifiers like id, uuid — but still
+// skips complex objects like links.
+var arrayItemSkipPropNames = map[string]bool{
+	"links": true, "html": true, "rendered": true,
+}
+
+// arrayItemSkipPropertyRefs lists schema refs to skip within array items.
+// Skips complex nested entities to keep the nested schema shallow.
+var arrayItemSkipPropertyRefs = map[string]bool{
+	"repository": true, "link": true,
+	"account_links": true, "team_links": true, "user_links": true,
+	"comment_resolution": true, "commitstatus": true,
+	"pullrequest": true, "base_commit": true, "commit": true,
+	"account": true, "user": true, "team": true,
+	"workspace": true,
+}
+
 // BodyFieldOpts returns the default options for request body field resolution.
 func BodyFieldOpts() FieldResolveOpts {
 	return FieldResolveOpts{
@@ -125,6 +145,17 @@ func ResponseFieldOpts() FieldResolveOpts {
 	return FieldResolveOpts{
 		SkipPropNames:    responseSkipPropNames,
 		SkipPropertyRefs: responseSkipPropertyRefs,
+		SkipAllOfRefs:    skipAllOfRefs,
+		RefIdOnlySchemas: refIdOnlySchemas,
+	}
+}
+
+// ArrayItemFieldOpts returns options for resolving fields inside array item schemas.
+// More permissive than body opts (includes id, uuid, etc.) but skips complex refs.
+func ArrayItemFieldOpts() FieldResolveOpts {
+	return FieldResolveOpts{
+		SkipPropNames:    arrayItemSkipPropNames,
+		SkipPropertyRefs: arrayItemSkipPropertyRefs,
 		SkipAllOfRefs:    skipAllOfRefs,
 		RefIdOnlySchemas: refIdOnlySchemas,
 	}
@@ -237,6 +268,104 @@ func flattenProperty(schemas map[string]any, name, path string, prop map[string]
 		if subProps, ok := prop["properties"].(map[string]any); ok {
 			return flattenProperties(schemas, subProps, path, visited, opts)
 		}
+	case "array":
+		items, _ := prop["items"].(map[string]any)
+		if items != nil {
+			itemOpts := ArrayItemFieldOpts()
+			// Copy the parent visited map to prevent infinite recursion with
+			// self-referencing schemas (e.g., base_commit.parents → base_commit).
+			itemVisited := make(map[string]bool, len(visited))
+			for k, v := range visited {
+				itemVisited[k] = v
+			}
+
+			// Try to resolve array item fields from $ref.
+			if ref, ok := items["$ref"].(string); ok {
+				itemFields := ResolveFields(schemas, ref, "", itemVisited, itemOpts)
+				if len(itemFields) > 0 {
+					if desc == "" {
+						desc = name
+					}
+					return []BodyField{{
+						Path:       path,
+						FlagName:   BodyFlagName(path),
+						GoName:     BodyGoName(path),
+						GoType:     "string",
+						Default:    `""`,
+						Desc:       desc,
+						IsArray:    true,
+						ItemFields: itemFields,
+					}}
+				}
+			}
+
+			// Try inline object definition: items: {type: object, properties: {...}}
+			if itemType, _ := items["type"].(string); itemType == "object" {
+				if subProps, ok := items["properties"].(map[string]any); ok {
+					itemFields := flattenProperties(schemas, subProps, "", itemVisited, itemOpts)
+					if len(itemFields) > 0 {
+						if desc == "" {
+							desc = name
+						}
+						return []BodyField{{
+							Path:       path,
+							FlagName:   BodyFlagName(path),
+							GoName:     BodyGoName(path),
+							GoType:     "string",
+							Default:    `""`,
+							Desc:       desc,
+							IsArray:    true,
+							ItemFields: itemFields,
+						}}
+					}
+				}
+				// Inline object with allOf.
+				if _, ok := items["allOf"]; ok {
+					itemFields := resolveSchemaObj(schemas, items, "", itemVisited, itemOpts)
+					if len(itemFields) > 0 {
+						if desc == "" {
+							desc = name
+						}
+						return []BodyField{{
+							Path:       path,
+							FlagName:   BodyFlagName(path),
+							GoName:     BodyGoName(path),
+							GoType:     "string",
+							Default:    `""`,
+							Desc:       desc,
+							IsArray:    true,
+							ItemFields: itemFields,
+						}}
+					}
+				}
+			}
+
+			// Simple type arrays (string, integer, boolean) — no nested fields.
+			if itemType, _ := items["type"].(string); itemType == "string" || itemType == "integer" || itemType == "boolean" {
+				if desc == "" {
+					desc = name
+				}
+				itemDesc := appendEnumValues(items, "")
+				if itemDesc != "" {
+					desc = desc + " " + itemDesc
+				}
+				return []BodyField{{
+					Path:     path,
+					FlagName: BodyFlagName(path),
+					GoName:   BodyGoName(path),
+					GoType:   "string",
+					Default:  `""`,
+					Desc:     desc,
+					IsArray:  true,
+					// ItemFields is nil — signals a simple list (List of String).
+				}}
+			}
+		}
+		// Fallback: expose array as a single string field accepting a JSON array.
+		if desc == "" {
+			desc = name
+		}
+		return []BodyField{MakeBodyField(path, "string", desc+" (JSON array)")}
 	}
 	return nil
 }

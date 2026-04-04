@@ -40,7 +40,6 @@ Manages Bitbucket projects via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_projects" "example" {
-  project_key = "PROJ"
   workspace = "my-workspace"
 }
 ```
@@ -48,10 +47,10 @@ resource "bitbucket_projects" "example" {
 ## Schema
 
 ### Required
-- `project_key` (String) Path parameter.
 - `workspace` (String) Path parameter.
 
 ### Optional
+- `project_key` (String) Path parameter (auto-populated from API response).
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

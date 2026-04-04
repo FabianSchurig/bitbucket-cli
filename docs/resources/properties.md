@@ -56,3 +56,4 @@ resource "bitbucket_properties" "example" {
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `_attributes` (List of String) _attributes [public, read_only]

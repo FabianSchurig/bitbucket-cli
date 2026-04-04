@@ -37,7 +37,6 @@ Manages Bitbucket downloads via the Bitbucket Cloud API.
 
 ```hcl
 resource "bitbucket_downloads" "example" {
-  filename = "artifact.zip"
   repo_slug = "my-repo"
   workspace = "my-workspace"
 }
@@ -46,9 +45,11 @@ resource "bitbucket_downloads" "example" {
 ## Schema
 
 ### Required
-- `filename` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `filename` (String) Path parameter (auto-populated from API response).
 
 ### Read-Only
 

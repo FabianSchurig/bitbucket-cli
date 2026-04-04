@@ -28,7 +28,6 @@ run "create_deployments" {
   variables {
     workspace = "my-workspace"
     repo_slug = "my-repo"
-    environment_uuid = "env-uuid"
   }
 
   # Resource create should succeed with mock provider

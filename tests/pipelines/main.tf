@@ -35,5 +35,4 @@ data "bitbucket_pipelines" "test" {
 resource "bitbucket_pipelines" "test" {
   workspace = var.workspace
   repo_slug = var.repo_slug
-  pipeline_uuid = var.pipeline_uuid
 }

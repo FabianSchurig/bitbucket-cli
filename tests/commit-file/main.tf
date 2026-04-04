@@ -39,8 +39,6 @@ data "bitbucket_commit_file" "test" {
 }
 
 resource "bitbucket_commit_file" "test" {
-  commit = var.commit
-  path = var.path
   repo_slug = var.repo_slug
   workspace = var.workspace
 }

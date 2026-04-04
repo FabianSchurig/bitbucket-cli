@@ -28,7 +28,6 @@ Reads Bitbucket workspace-runners via the Bitbucket Cloud API.
 ```hcl
 data "bitbucket_workspace_runners" "example" {
   workspace = "my-workspace"
-  runner_uuid = "{runner-uuid}"
 }
 
 output "workspace_runners_response" {
@@ -40,13 +39,16 @@ output "workspace_runners_response" {
 
 ### Required
 - `workspace` (String) Path parameter.
-- `runner_uuid` (String) Path parameter.
+
+### Optional
+- `runner_uuid` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) The timestamp when the runner was created.
+- `labels` (List of String) Labels assigned to the runner for identification and routing.
 - `name` (String) The name of the runner.
 - `oauth_client_audience` (String) The intended audience for the OAuth token.
 - `oauth_client_id` (String) The OAuth client ID.

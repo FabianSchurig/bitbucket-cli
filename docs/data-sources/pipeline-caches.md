@@ -29,7 +29,6 @@ Reads Bitbucket pipeline-caches via the Bitbucket Cloud API.
 data "bitbucket_pipeline_caches" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
-  cache_uuid = "{cache-uuid}"
 }
 
 output "pipeline_caches_response" {
@@ -42,7 +41,9 @@ output "pipeline_caches_response" {
 ### Required
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
-- `cache_uuid` (String) Path parameter.
+
+### Optional
+- `cache_uuid` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

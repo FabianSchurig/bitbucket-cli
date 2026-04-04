@@ -27,7 +27,6 @@ Reads Bitbucket repo-deploy-keys via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_repo_deploy_keys" "example" {
-  key_id = "123"
   repo_slug = "my-repo"
   workspace = "my-workspace"
 }
@@ -40,9 +39,11 @@ output "repo_deploy_keys_response" {
 ## Schema
 
 ### Required
-- `key_id` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `key_id` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

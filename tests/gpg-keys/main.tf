@@ -14,24 +14,23 @@ variable "workspace" {
   default = "test-workspace"
 }
 
-variable "fingerprint" {
-  type    = string
-  default = "AA:BB:CC:DD"
-}
-
 variable "selected_user" {
   type    = string
   default = "jdoe"
 }
 
+variable "fingerprint" {
+  type    = string
+  default = "AA:BB:CC:DD"
+}
+
 provider "bitbucket" {}
 
 data "bitbucket_gpg_keys" "test" {
-  fingerprint = var.fingerprint
   selected_user = var.selected_user
+  fingerprint = var.fingerprint
 }
 
 resource "bitbucket_gpg_keys" "test" {
-  fingerprint = var.fingerprint
   selected_user = var.selected_user
 }

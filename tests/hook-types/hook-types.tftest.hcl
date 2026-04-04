@@ -10,6 +10,7 @@ run "read_hook_types" {
   command = apply
 
   variables {
+    subject_type = "repository"
   }
 
   # Data source read should succeed with mock provider

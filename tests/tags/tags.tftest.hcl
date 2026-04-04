@@ -10,9 +10,9 @@ run "read_tags" {
   command = apply
 
   variables {
-    name = "main"
     repo_slug = "my-repo"
     workspace = "my-workspace"
+    name = "main"
   }
 
   # Data source read should succeed with mock provider
@@ -26,7 +26,6 @@ run "create_tags" {
   command = apply
 
   variables {
-    name = "main"
     repo_slug = "my-repo"
     workspace = "my-workspace"
   }

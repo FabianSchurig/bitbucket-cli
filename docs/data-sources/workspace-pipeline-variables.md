@@ -28,7 +28,6 @@ Reads Bitbucket workspace-pipeline-variables via the Bitbucket Cloud API.
 ```hcl
 data "bitbucket_workspace_pipeline_variables" "example" {
   workspace = "my-workspace"
-  variable_uuid = "{variable-uuid}"
 }
 
 output "workspace_pipeline_variables_response" {
@@ -40,7 +39,9 @@ output "workspace_pipeline_variables_response" {
 
 ### Required
 - `workspace` (String) Path parameter.
-- `variable_uuid` (String) Path parameter.
+
+### Optional
+- `variable_uuid` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 
