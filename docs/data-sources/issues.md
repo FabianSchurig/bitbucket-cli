@@ -29,7 +29,6 @@ Reads Bitbucket issues via the Bitbucket Cloud API.
 data "bitbucket_issues" "example" {
   repo_slug = "my-repo"
   workspace = "my-workspace"
-  issue_id = "1"
 }
 
 output "issues_response" {
@@ -42,7 +41,9 @@ output "issues_response" {
 ### Required
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
-- `issue_id` (String) Path parameter.
+
+### Optional
+- `issue_id` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

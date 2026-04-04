@@ -24,18 +24,12 @@ variable "environment_uuid" {
   default = "env-uuid"
 }
 
-variable "variable_uuid" {
-  type    = string
-  default = "{variable-uuid}"
-}
-
 provider "bitbucket" {}
 
 data "bitbucket_deployment_variables" "test" {
   workspace = var.workspace
   repo_slug = var.repo_slug
   environment_uuid = var.environment_uuid
-  variable_uuid = var.variable_uuid
 }
 
 resource "bitbucket_deployment_variables" "test" {

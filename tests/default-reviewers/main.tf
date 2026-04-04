@@ -28,8 +28,8 @@ provider "bitbucket" {}
 
 data "bitbucket_default_reviewers" "test" {
   repo_slug = var.repo_slug
-  target_username = var.target_username
   workspace = var.workspace
+  target_username = var.target_username
 }
 
 resource "bitbucket_default_reviewers" "test" {

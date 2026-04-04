@@ -28,7 +28,6 @@ Reads Bitbucket project-default-reviewers via the Bitbucket Cloud API.
 ```hcl
 data "bitbucket_project_default_reviewers" "example" {
   project_key = "PROJ"
-  selected_user = "jdoe"
   workspace = "my-workspace"
 }
 
@@ -41,8 +40,10 @@ output "project_default_reviewers_response" {
 
 ### Required
 - `project_key` (String) Path parameter.
-- `selected_user` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `selected_user` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

@@ -56,7 +56,7 @@ output "forked_repository_response" {
 - `is_private` (String) is_private
 - `language` (String) language
 - `mainbranch_default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch.
-- `mainbranch_merge_strategies` (String) Available merge strategies for pull requests targeting this branch. (JSON array)
+- `mainbranch_merge_strategies` (List of String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
 - `mainbranch_name` (String) The name of the ref.
 - `mainbranch_type` (String) mainbranch.type
 - `name` (String) name

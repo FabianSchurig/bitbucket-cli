@@ -27,7 +27,6 @@ Reads Bitbucket workspace-members via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_workspace_members" "example" {
-  member = "{member-uuid}"
   workspace = "my-workspace"
 }
 
@@ -39,8 +38,10 @@ output "workspace_members_response" {
 ## Schema
 
 ### Required
-- `member` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `member` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

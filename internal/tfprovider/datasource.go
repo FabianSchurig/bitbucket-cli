@@ -53,6 +53,18 @@ func (d *GenericDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 		return
 	}
 
+	// Build a set of path params from the List operation (if available).
+	// Params in List are the "base" required params. Params only in Read
+	// (like IDs) are Optional — if not provided, the List op is used instead.
+	listPathParams := map[string]bool{}
+	if d.group.Ops.List != nil {
+		for _, p := range d.group.Ops.List.Params {
+			if p.In == "path" && p.Required {
+				listPathParams[p.Name] = true
+			}
+		}
+	}
+
 	// Add parameters as attributes.
 	paramSeen := map[string]bool{}
 	for _, p := range op.Params {
@@ -65,10 +77,15 @@ func (d *GenericDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 		if _, exists := attrs[attrName]; exists {
 			continue
 		}
+		isRequired := p.Required && p.In == "path"
+		// If this path param is only in Read (not in List), make it Optional.
+		if isRequired && d.group.Ops.List != nil && !listPathParams[p.Name] {
+			isRequired = false
+		}
 		attrs[attrName] = schema.StringAttribute{
 			Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
-			Required:    p.Required && p.In == "path",
-			Optional:    !p.Required || p.In != "path",
+			Required:    isRequired,
+			Optional:    !isRequired,
 		}
 	}
 
@@ -112,6 +129,13 @@ func (d *GenericDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 					Attributes: buildDSNestedItemAttrs(rf.ItemFields),
 				},
 			}
+		} else if rf.IsArray {
+			// Simple list (e.g., list of strings).
+			attrs[key] = schema.ListAttribute{
+				Description: desc,
+				Computed:    true,
+				ElementType: types.StringType,
+			}
 		} else {
 			attrs[key] = schema.StringAttribute{
 				Description: desc,
@@ -144,7 +168,9 @@ func (d *GenericDataSource) Configure(_ context.Context, req datasource.Configur
 
 // Read fetches data from the Bitbucket API.
 func (d *GenericDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	op := d.readOp()
+	// Choose operation: if Read op exists and all its path params are provided,
+	// use Read. Otherwise fall back to List (if available).
+	op := d.selectReadOp(ctx, req)
 	if op == nil {
 		resp.Diagnostics.AddError("Read not supported",
 			fmt.Sprintf("Data source %s has no read operation", d.group.TypeName))
@@ -225,6 +251,14 @@ func (d *GenericDataSource) Read(ctx context.Context, req datasource.ReadRequest
 					}
 					continue
 				}
+				// For simple list fields, build a string list.
+				if rf.IsArray {
+					if arr, ok := val.([]any); ok {
+						listVal := buildSimpleListFromResponse(arr)
+						resp.Diagnostics.Append(resp.State.SetAttribute(ctx, attrPath(key), listVal)...)
+					}
+					continue
+				}
 				// For complex values (arrays, maps), serialize as JSON.
 				var strVal string
 				switch val.(type) {
@@ -258,12 +292,42 @@ func (d *GenericDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	}
 }
 
-// readOp returns the best operation for reading data (Read or List).
+// readOp returns the best operation for building the data source schema (Read or List).
 func (d *GenericDataSource) readOp() *OperationDef {
 	if d.group.Ops.Read != nil {
 		return d.group.Ops.Read
 	}
 	return d.group.Ops.List
+}
+
+// selectReadOp chooses which operation to use at runtime:
+// If all of Read's required path params are provided, use Read.
+// Otherwise fall back to List (if available).
+func (d *GenericDataSource) selectReadOp(ctx context.Context, req datasource.ReadRequest) *OperationDef {
+	readOp := d.group.Ops.Read
+	if readOp != nil {
+		allProvided := true
+		for _, p := range readOp.Params {
+			if p.In != "path" || !p.Required {
+				continue
+			}
+			attrName := ParamAttrName(p.Name)
+			var val types.String
+			dd := req.Config.GetAttribute(ctx, attrPath(attrName), &val)
+			if dd.HasError() || val.IsNull() || val.IsUnknown() || val.ValueString() == "" {
+				allProvided = false
+				break
+			}
+		}
+		if allProvided {
+			return readOp
+		}
+	}
+	// Fall back to List if Read params were incomplete.
+	if d.group.Ops.List != nil {
+		return d.group.Ops.List
+	}
+	return readOp // If no List, use Read anyway (errors will be reported for missing params).
 }
 
 // buildDSNestedItemAttrs creates data source schema attributes for array item fields.

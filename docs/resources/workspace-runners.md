@@ -57,7 +57,7 @@ resource "bitbucket_workspace_runners" "example" {
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) The timestamp when the runner was created.
-- `labels` (String) Labels assigned to the runner for identification and routing. (JSON array)
+- `labels` (List of String) Labels assigned to the runner for identification and routing.
 - `name` (String) The name of the runner.
 - `oauth_client_audience` (String) The intended audience for the OAuth token.
 - `oauth_client_id` (String) The OAuth client ID.

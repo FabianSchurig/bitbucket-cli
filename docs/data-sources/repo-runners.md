@@ -29,7 +29,6 @@ Reads Bitbucket repo-runners via the Bitbucket Cloud API.
 data "bitbucket_repo_runners" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
-  runner_uuid = "{runner-uuid}"
 }
 
 output "repo_runners_response" {
@@ -42,14 +41,16 @@ output "repo_runners_response" {
 ### Required
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
-- `runner_uuid` (String) Path parameter.
+
+### Optional
+- `runner_uuid` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) The timestamp when the runner was created.
-- `labels` (String) Labels assigned to the runner for identification and routing. (JSON array)
+- `labels` (List of String) Labels assigned to the runner for identification and routing.
 - `name` (String) The name of the runner.
 - `oauth_client_audience` (String) The intended audience for the OAuth token.
 - `oauth_client_id` (String) The OAuth client ID.

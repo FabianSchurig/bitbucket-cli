@@ -65,9 +65,9 @@ resource "bitbucket_branch_restrictions" "example" {
 - `pattern` (String) Apply the restriction to branches that match this pattern. Active when `branch_match_kind` is `glob`. Will be empty when `branch_match_kind` is `branching_model`. (also computed from API response)
 - `users` (List of Object) users (also computed from API response)
   Nested schema:
+  - `created_on` (String) created_on
   - `display_name` (String) display_name
   - `uuid` (String) uuid
-  - `created_on` (String) created_on
 
 - `value` (String) Value with kind-specific semantics: (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.

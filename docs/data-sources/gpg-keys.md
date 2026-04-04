@@ -28,7 +28,6 @@ Reads Bitbucket gpg-keys via the Bitbucket Cloud API.
 ```hcl
 data "bitbucket_gpg_keys" "example" {
   selected_user = "jdoe"
-  fingerprint = "AA:BB:CC:DD"
 }
 
 output "gpg_keys_response" {
@@ -40,7 +39,9 @@ output "gpg_keys_response" {
 
 ### Required
 - `selected_user` (String) Path parameter.
-- `fingerprint` (String) Path parameter.
+
+### Optional
+- `fingerprint` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

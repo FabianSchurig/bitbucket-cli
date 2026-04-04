@@ -28,7 +28,6 @@ Reads Bitbucket projects via the Bitbucket Cloud API.
 ```hcl
 data "bitbucket_projects" "example" {
   workspace = "my-workspace"
-  project_key = "PROJ"
 }
 
 output "projects_response" {
@@ -40,7 +39,9 @@ output "projects_response" {
 
 ### Required
 - `workspace` (String) Path parameter.
-- `project_key` (String) Path parameter.
+
+### Optional
+- `project_key` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

@@ -29,7 +29,6 @@ Reads Bitbucket pipeline-variables via the Bitbucket Cloud API.
 data "bitbucket_pipeline_variables" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
-  variable_uuid = "{variable-uuid}"
 }
 
 output "pipeline_variables_response" {
@@ -42,7 +41,9 @@ output "pipeline_variables_response" {
 ### Required
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
-- `variable_uuid` (String) Path parameter.
+
+### Optional
+- `variable_uuid` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

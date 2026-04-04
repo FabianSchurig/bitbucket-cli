@@ -48,4 +48,4 @@ output "properties_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `_attributes` (String) _attributes (JSON array)
+- `_attributes` (List of String) _attributes [public, read_only]

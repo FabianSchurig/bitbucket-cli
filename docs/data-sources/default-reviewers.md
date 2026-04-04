@@ -28,7 +28,6 @@ Reads Bitbucket default-reviewers via the Bitbucket Cloud API.
 ```hcl
 data "bitbucket_default_reviewers" "example" {
   repo_slug = "my-repo"
-  target_username = "jdoe"
   workspace = "my-workspace"
 }
 
@@ -41,8 +40,10 @@ output "default_reviewers_response" {
 
 ### Required
 - `repo_slug` (String) Path parameter.
-- `target_username` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `target_username` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

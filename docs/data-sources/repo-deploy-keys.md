@@ -29,7 +29,6 @@ Reads Bitbucket repo-deploy-keys via the Bitbucket Cloud API.
 data "bitbucket_repo_deploy_keys" "example" {
   repo_slug = "my-repo"
   workspace = "my-workspace"
-  key_id = "123"
 }
 
 output "repo_deploy_keys_response" {
@@ -42,7 +41,9 @@ output "repo_deploy_keys_response" {
 ### Required
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
-- `key_id` (String) Path parameter.
+
+### Optional
+- `key_id` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

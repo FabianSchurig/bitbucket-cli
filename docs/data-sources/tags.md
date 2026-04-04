@@ -29,7 +29,6 @@ Reads Bitbucket tags via the Bitbucket Cloud API.
 data "bitbucket_tags" "example" {
   repo_slug = "my-repo"
   workspace = "my-workspace"
-  name = "main"
 }
 
 output "tags_response" {
@@ -42,7 +41,9 @@ output "tags_response" {
 ### Required
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
-- `name` (String) Path parameter.
+
+### Optional
+- `name` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

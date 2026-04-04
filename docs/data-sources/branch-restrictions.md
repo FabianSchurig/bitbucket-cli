@@ -29,7 +29,6 @@ Reads Bitbucket branch-restrictions via the Bitbucket Cloud API.
 data "bitbucket_branch_restrictions" "example" {
   repo_slug = "my-repo"
   workspace = "my-workspace"
-  param_id = "1"
 }
 
 output "branch_restrictions_response" {
@@ -42,7 +41,9 @@ output "branch_restrictions_response" {
 ### Required
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
-- `param_id` (String) Path parameter.
+
+### Optional
+- `param_id` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 
@@ -60,8 +61,8 @@ output "branch_restrictions_response" {
 - `pattern` (String) Apply the restriction to branches that match this pattern. Active when `branch_match_kind` is `glob`. Will be empty when `branch_match_kind` is `branching_model`.
 - `users` (List of Object) users
   Nested schema:
+  - `created_on` (String) created_on
   - `display_name` (String) display_name
   - `uuid` (String) uuid
-  - `created_on` (String) created_on
 
 - `value` (String) Value with kind-specific semantics:

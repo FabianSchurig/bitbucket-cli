@@ -29,7 +29,6 @@ Reads Bitbucket downloads via the Bitbucket Cloud API.
 data "bitbucket_downloads" "example" {
   repo_slug = "my-repo"
   workspace = "my-workspace"
-  filename = "artifact.zip"
 }
 
 output "downloads_response" {
@@ -42,7 +41,9 @@ output "downloads_response" {
 ### Required
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
-- `filename` (String) Path parameter.
+
+### Optional
+- `filename` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

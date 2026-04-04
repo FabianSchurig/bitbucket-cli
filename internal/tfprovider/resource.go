@@ -171,6 +171,13 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						Attributes: buildNestedItemAttrs(bf.ItemFields),
 					},
 				}
+			} else if bf.IsArray {
+				// Simple list (e.g., list of strings).
+				attrs[key] = schema.ListAttribute{
+					Description: desc,
+					Optional:    true,
+					ElementType: types.StringType,
+				}
 			} else {
 				attrs[key] = schema.StringAttribute{
 					Description: desc,
@@ -220,6 +227,12 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						}
 						attrs[key] = sa
 					}
+				case schema.ListAttribute:
+					if !sa.Computed && !sa.Required {
+						sa.Computed = true
+						sa.Description = desc
+						attrs[key] = sa
+					}
 				}
 			} else if !paramSeen[key] {
 				// New response-only field.
@@ -230,6 +243,13 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: buildNestedItemAttrs(rf.ItemFields),
 						},
+					}
+				} else if rf.IsArray {
+					// Simple list (e.g., list of strings).
+					attrs[key] = schema.ListAttribute{
+						Description: desc,
+						Computed:    true,
+						ElementType: types.StringType,
 					}
 				} else {
 					attrs[key] = schema.StringAttribute{
@@ -487,6 +507,12 @@ func (r *GenericResource) buildBody(ctx context.Context, op *OperationDef, sourc
 				if arr != nil {
 					handlers.SetNested(bodyObj, bf.Path, arr)
 				}
+			} else if bf.IsArray {
+				// Read simple list attribute (e.g., list of strings).
+				arr := readSimpleList(ctx, source, attrName, diags)
+				if arr != nil {
+					handlers.SetNested(bodyObj, bf.Path, arr)
+				}
 			} else {
 				var val types.String
 				d := source.GetAttribute(ctx, attrPath(attrName), &val)
@@ -555,6 +581,28 @@ func readListNested(ctx context.Context, source stateAccessor, attrName string, 
 	return result
 }
 
+// readSimpleList reads a ListAttribute (list of strings) from state and returns
+// it as a []string suitable for JSON marshaling. Returns nil if null/unknown/empty.
+func readSimpleList(ctx context.Context, source stateAccessor, attrName string, diags *diag.Diagnostics) []string {
+	var list types.List
+	d := source.GetAttribute(ctx, attrPath(attrName), &list)
+	diags.Append(d...)
+	if d.HasError() || list.IsNull() || list.IsUnknown() {
+		return nil
+	}
+	elements := list.Elements()
+	if len(elements) == 0 {
+		return nil
+	}
+	var result []string
+	for _, elem := range elements {
+		if sv, ok := elem.(types.String); ok && !sv.IsNull() && !sv.IsUnknown() {
+			result = append(result, sv.ValueString())
+		}
+	}
+	return result
+}
+
 // copyAttributes copies all param and body field values from source to target state.
 // It copies from ALL CRUD operations so that attributes defined by one operation
 // (e.g., Read's path params) are preserved when another operation (e.g., Create) runs.
@@ -584,8 +632,8 @@ func (r *GenericResource) copyAttributes(ctx context.Context, _ *OperationDef, s
 				continue
 			}
 			seen[attrName] = true
-			if bf.IsArray && len(bf.ItemFields) > 0 {
-				// For list-nested attributes, skip copying from source.
+			if bf.IsArray {
+				// For list attributes (both nested and simple), skip copying from source.
 				// The response-populated value from extractResponseFields
 				// should be preserved (it has all computed sub-fields).
 				continue
@@ -687,6 +735,14 @@ func (r *GenericResource) extractResponseFields(ctx context.Context, m map[strin
 			}
 			continue
 		}
+		// For simple list fields (list of strings), build a string list.
+		if rf.IsArray {
+			if arr, ok := val.([]any); ok {
+				listVal := buildSimpleListFromResponse(arr)
+				diags.Append(target.SetAttribute(ctx, attrPath(key), listVal)...)
+			}
+			continue
+		}
 		// For complex values (arrays, maps), serialize as JSON.
 		var strVal string
 		switch val.(type) {
@@ -731,6 +787,19 @@ func buildListFromResponse(arr []any, itemFields []BodyFieldDef) types.List {
 		elements = append(elements, types.ObjectValueMust(attrTypes, objAttrs))
 	}
 	return types.ListValueMust(objType, elements)
+}
+
+// buildSimpleListFromResponse converts a JSON array of simple values into a
+// types.List of strings, suitable for a schema.ListAttribute{ElementType: types.StringType}.
+func buildSimpleListFromResponse(arr []any) types.List {
+	if len(arr) == 0 {
+		return types.ListValueMust(types.StringType, []attr.Value{})
+	}
+	elements := make([]attr.Value, 0, len(arr))
+	for _, item := range arr {
+		elements = append(elements, types.StringValue(fmt.Sprintf("%v", item)))
+	}
+	return types.ListValueMust(types.StringType, elements)
 }
 
 // extractID tries to extract an identifier from an API response map.

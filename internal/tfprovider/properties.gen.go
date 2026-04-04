@@ -45,7 +45,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
-				{Path: `_attributes`, Type: `string`, Desc: `_attributes (JSON array)`},
+				{Path: `_attributes`, Type: `string`, Desc: `_attributes [public, read_only]`, IsArray: true},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -103,7 +103,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
-				{Path: `_attributes`, Type: `string`, Desc: `_attributes (JSON array)`},
+				{Path: `_attributes`, Type: `string`, Desc: `_attributes [public, read_only]`, IsArray: true},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -160,7 +160,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
-				{Path: `_attributes`, Type: `string`, Desc: `_attributes (JSON array)`},
+				{Path: `_attributes`, Type: `string`, Desc: `_attributes [public, read_only]`, IsArray: true},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -217,7 +217,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
-				{Path: `_attributes`, Type: `string`, Desc: `_attributes (JSON array)`},
+				{Path: `_attributes`, Type: `string`, Desc: `_attributes [public, read_only]`, IsArray: true},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -274,7 +274,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
-				{Path: `_attributes`, Type: `string`, Desc: `_attributes (JSON array)`},
+				{Path: `_attributes`, Type: `string`, Desc: `_attributes [public, read_only]`, IsArray: true},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -332,7 +332,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
-				{Path: `_attributes`, Type: `string`, Desc: `_attributes (JSON array)`},
+				{Path: `_attributes`, Type: `string`, Desc: `_attributes [public, read_only]`, IsArray: true},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -389,7 +389,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
-				{Path: `_attributes`, Type: `string`, Desc: `_attributes (JSON array)`},
+				{Path: `_attributes`, Type: `string`, Desc: `_attributes [public, read_only]`, IsArray: true},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -446,7 +446,7 @@ Available operations:
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
-				{Path: `_attributes`, Type: `string`, Desc: `_attributes (JSON array)`},
+				{Path: `_attributes`, Type: `string`, Desc: `_attributes [public, read_only]`, IsArray: true},
 			},
 			HasBody:   false,
 			Paginated: false,

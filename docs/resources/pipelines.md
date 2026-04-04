@@ -52,8 +52,8 @@ resource "bitbucket_pipelines" "example" {
 - `completed_on` (String) The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress. (also computed from API response)
 - `configuration_sources` (List of Object) An ordered list of sources of the pipeline configuration (also computed from API response)
   Nested schema:
-  - `uri` (String) Link to the configuration source view or its immediate content
   - `source` (String) Identifier of the configuration source
+  - `uri` (String) Link to the configuration source view or its immediate content
 
 - `uuid` (String) The UUID identifying the pipeline. (also computed from API response)
 - `variables` (List of Object) The variables for the pipeline. (also computed from API response)

@@ -263,8 +263,8 @@ for specific details.
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
 				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
@@ -285,10 +285,10 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
-					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
 					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 				}},
 			},
 			HasBody:   true,
@@ -406,7 +406,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -440,7 +440,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -476,7 +476,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -511,7 +511,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -576,10 +576,10 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
-					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
 					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 				}},
 			},
 			HasBody:   false,
@@ -1627,7 +1627,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -1660,7 +1660,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -1695,7 +1695,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -1729,7 +1729,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -2064,8 +2064,8 @@ for specific details.
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
 				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
 				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
@@ -2086,10 +2086,10 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
-					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
 					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 				}},
 			},
 			HasBody:   true,
@@ -2207,7 +2207,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -2241,7 +2241,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -2277,7 +2277,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -2312,7 +2312,7 @@ for specific details.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -2377,10 +2377,10 @@ for specific details.
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
-					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 					{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
 					{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+					{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
 				}},
 			},
 			HasBody:   false,
@@ -3428,7 +3428,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -3461,7 +3461,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -3496,7 +3496,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},
@@ -3530,7 +3530,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the runner was created.`},
-				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing. (JSON array)`},
+				{Path: `labels`, Type: `string`, Desc: `Labels assigned to the runner for identification and routing.`, IsArray: true},
 				{Path: `name`, Type: `string`, Desc: `The name of the runner.`},
 				{Path: `oauth_client.audience`, Type: `string`, Desc: `The intended audience for the OAuth token.`},
 				{Path: `oauth_client.id`, Type: `string`, Desc: `The OAuth client ID.`},

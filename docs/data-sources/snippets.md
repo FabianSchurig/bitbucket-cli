@@ -27,8 +27,6 @@ Reads Bitbucket snippets via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_snippets" "example" {
-  encoded_id = "snippet-id"
-  workspace = "my-workspace"
 }
 
 output "snippets_response" {
@@ -39,8 +37,10 @@ output "snippets_response" {
 ## Schema
 
 ### Required
-- `encoded_id` (String) Path parameter.
-- `workspace` (String) Path parameter.
+
+### Optional
+- `encoded_id` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
+- `workspace` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

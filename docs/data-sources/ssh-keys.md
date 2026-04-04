@@ -28,7 +28,6 @@ Reads Bitbucket ssh-keys via the Bitbucket Cloud API.
 ```hcl
 data "bitbucket_ssh_keys" "example" {
   selected_user = "jdoe"
-  key_id = "123"
 }
 
 output "ssh_keys_response" {
@@ -40,7 +39,9 @@ output "ssh_keys_response" {
 
 ### Required
 - `selected_user` (String) Path parameter.
-- `key_id` (String) Path parameter.
+
+### Optional
+- `key_id` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

@@ -27,7 +27,6 @@ Reads Bitbucket user-emails via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_user_emails" "example" {
-  email = "user@example.com"
 }
 
 output "user_emails_response" {
@@ -38,7 +37,9 @@ output "user_emails_response" {
 ## Schema
 
 ### Required
-- `email` (String) Path parameter.
+
+### Optional
+- `email` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

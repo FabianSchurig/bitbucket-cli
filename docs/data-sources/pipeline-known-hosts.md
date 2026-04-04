@@ -29,7 +29,6 @@ Reads Bitbucket pipeline-known-hosts via the Bitbucket Cloud API.
 data "bitbucket_pipeline_known_hosts" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
-  known_host_uuid = "{known-host-uuid}"
 }
 
 output "pipeline_known_hosts_response" {
@@ -42,7 +41,9 @@ output "pipeline_known_hosts_response" {
 ### Required
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
-- `known_host_uuid` (String) Path parameter.
+
+### Optional
+- `known_host_uuid` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

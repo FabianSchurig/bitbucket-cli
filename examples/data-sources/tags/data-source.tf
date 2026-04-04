@@ -1,7 +1,6 @@
 data "bitbucket_tags" "example" {
   repo_slug = "my-repo"
   workspace = "my-workspace"
-  name = "main"
 }
 
 output "tags_response" {

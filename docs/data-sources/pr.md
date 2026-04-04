@@ -29,7 +29,6 @@ Reads Bitbucket pr via the Bitbucket Cloud API.
 data "bitbucket_pr" "example" {
   repo_slug = "my-repo"
   workspace = "my-workspace"
-  pull_request_id = "1"
 }
 
 output "pr_response" {
@@ -42,7 +41,9 @@ output "pr_response" {
 ### Required
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
-- `pull_request_id` (String) Path parameter.
+
+### Optional
+- `pull_request_id` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 
@@ -53,10 +54,10 @@ output "pr_response" {
 - `merge_commit_hash` (String) merge_commit.hash
 - `participants` (List of Object) The list of users that are collaborating on this pull request.
   Nested schema:
+  - `participated_on` (String) The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.
   - `role` (String) [PARTICIPANT, REVIEWER]
   - `approved` (String) approved
   - `state` (String) [approved, changes_requested, <nil>]
-  - `participated_on` (String) The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.
 
 - `queued` (String) A boolean flag indicating whether the pull request is queued
 - `summary_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
@@ -66,7 +67,7 @@ output "pr_response" {
 - `close_source_branch` (String) A boolean flag indicating if merging the pull request closes the source branch.
 - `description` (String) Explains what the pull request does.
 - `destination_branch_default_merge_strategy` (String) The default merge strategy, when this endpoint is the destination of the pull request.
-- `destination_branch_merge_strategies` (String) Available merge strategies, when this endpoint is the destination of the pull request. (JSON array)
+- `destination_branch_merge_strategies` (List of String) Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
 - `destination_branch_name` (String) destination.branch.name
 - `destination_commit_hash` (String) destination.commit.hash
 - `draft` (String) A boolean flag indicating whether the pull request is a draft.
@@ -78,7 +79,7 @@ output "pr_response" {
   - `uuid` (String) uuid
 
 - `source_branch_default_merge_strategy` (String) The default merge strategy, when this endpoint is the destination of the pull request.
-- `source_branch_merge_strategies` (String) Available merge strategies, when this endpoint is the destination of the pull request. (JSON array)
+- `source_branch_merge_strategies` (List of String) Available merge strategies, when this endpoint is the destination of the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
 - `source_branch_name` (String) source.branch.name
 - `source_commit_hash` (String) source.commit.hash
 - `state` (String) The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]

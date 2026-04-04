@@ -22,6 +22,6 @@ variable "member" {
 provider "bitbucket" {}
 
 data "bitbucket_workspace_members" "test" {
-  member = var.member
   workspace = var.workspace
+  member = var.member
 }

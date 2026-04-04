@@ -28,7 +28,6 @@ Reads Bitbucket workspace-hooks via the Bitbucket Cloud API.
 ```hcl
 data "bitbucket_workspace_hooks" "example" {
   workspace = "my-workspace"
-  uid = "webhook-uuid"
 }
 
 output "workspace_hooks_response" {
@@ -40,7 +39,9 @@ output "workspace_hooks_response" {
 
 ### Required
 - `workspace` (String) Path parameter.
-- `uid` (String) Path parameter.
+
+### Optional
+- `uid` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 
@@ -49,7 +50,7 @@ output "workspace_hooks_response" {
 - `active` (String) active
 - `created_at` (String) created_at
 - `description` (String) A user-defined description of the webhook.
-- `events` (String) The events this webhook is subscribed to. (JSON array)
+- `events` (List of String) The events this webhook is subscribed to. [issue:comment_created, issue:created, issue:updated, pipeline:span_created, project:updated, pullrequest:approved, pullrequest:changes_request_created, pullrequest:changes_request_removed, pullrequest:comment_created, pullrequest:comment_deleted, pullrequest:comment_reopened, pullrequest:comment_resolved, pullrequest:comment_updated, pullrequest:created, pullrequest:fulfilled, pullrequest:push, pullrequest:rejected, pullrequest:unapproved, pullrequest:updated, repo:commit_comment_created, repo:commit_status_created, repo:commit_status_updated, repo:created, repo:deleted, repo:fork, repo:imported, repo:push, repo:transfer, repo:updated]
 - `secret` (String) The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or "" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.
 - `secret_set` (String) Indicates whether or not the hook has an associated secret. It is not possible to see the hook's secret. This field is ignored during updates.
 - `subject_type` (String) The type of entity. Set to either `repository` or `workspace` based on where the subscription is defined. [repository, workspace]

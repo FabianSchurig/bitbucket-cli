@@ -1,6 +1,5 @@
 data "bitbucket_projects" "example" {
   workspace = "my-workspace"
-  project_key = "PROJ"
 }
 
 output "projects_response" {

@@ -30,7 +30,6 @@ data "bitbucket_pr_comments" "example" {
   pull_request_id = "1"
   repo_slug = "my-repo"
   workspace = "my-workspace"
-  comment_id = "1"
 }
 
 output "pr_comments_response" {
@@ -44,7 +43,9 @@ output "pr_comments_response" {
 - `pull_request_id` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
-- `comment_id` (String) Path parameter.
+
+### Optional
+- `comment_id` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

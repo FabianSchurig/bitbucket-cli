@@ -56,5 +56,5 @@ resource "bitbucket_refs" "example" {
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch.
-- `merge_strategies` (String) Available merge strategies for pull requests targeting this branch. (JSON array)
+- `merge_strategies` (List of String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
 - `type` (String) type

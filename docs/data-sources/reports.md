@@ -30,7 +30,6 @@ data "bitbucket_reports" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
   commit = "abc123def"
-  report_id = "report-uuid"
 }
 
 output "reports_response" {
@@ -44,7 +43,9 @@ output "reports_response" {
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `commit` (String) Path parameter.
-- `report_id` (String) Path parameter.
+
+### Optional
+- `report_id` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

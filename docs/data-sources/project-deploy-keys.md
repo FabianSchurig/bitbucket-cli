@@ -29,7 +29,6 @@ Reads Bitbucket project-deploy-keys via the Bitbucket Cloud API.
 data "bitbucket_project_deploy_keys" "example" {
   project_key = "PROJ"
   workspace = "my-workspace"
-  key_id = "123"
 }
 
 output "project_deploy_keys_response" {
@@ -42,7 +41,9 @@ output "project_deploy_keys_response" {
 ### Required
 - `project_key` (String) Path parameter.
 - `workspace` (String) Path parameter.
-- `key_id` (String) Path parameter.
+
+### Optional
+- `key_id` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 

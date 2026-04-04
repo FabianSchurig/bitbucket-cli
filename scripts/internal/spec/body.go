@@ -271,10 +271,16 @@ func flattenProperty(schemas map[string]any, name, path string, prop map[string]
 	case "array":
 		items, _ := prop["items"].(map[string]any)
 		if items != nil {
+			itemOpts := ArrayItemFieldOpts()
+			// Copy the parent visited map to prevent infinite recursion with
+			// self-referencing schemas (e.g., base_commit.parents → base_commit).
+			itemVisited := make(map[string]bool, len(visited))
+			for k, v := range visited {
+				itemVisited[k] = v
+			}
+
 			// Try to resolve array item fields from $ref.
 			if ref, ok := items["$ref"].(string); ok {
-				itemOpts := ArrayItemFieldOpts()
-				itemVisited := make(map[string]bool)
 				itemFields := ResolveFields(schemas, ref, "", itemVisited, itemOpts)
 				if len(itemFields) > 0 {
 					if desc == "" {
@@ -291,6 +297,68 @@ func flattenProperty(schemas map[string]any, name, path string, prop map[string]
 						ItemFields: itemFields,
 					}}
 				}
+			}
+
+			// Try inline object definition: items: {type: object, properties: {...}}
+			if itemType, _ := items["type"].(string); itemType == "object" {
+				if subProps, ok := items["properties"].(map[string]any); ok {
+					itemFields := flattenProperties(schemas, subProps, "", itemVisited, itemOpts)
+					if len(itemFields) > 0 {
+						if desc == "" {
+							desc = name
+						}
+						return []BodyField{{
+							Path:       path,
+							FlagName:   BodyFlagName(path),
+							GoName:     BodyGoName(path),
+							GoType:     "string",
+							Default:    `""`,
+							Desc:       desc,
+							IsArray:    true,
+							ItemFields: itemFields,
+						}}
+					}
+				}
+				// Inline object with allOf.
+				if _, ok := items["allOf"]; ok {
+					itemFields := resolveSchemaObj(schemas, items, "", itemVisited, itemOpts)
+					if len(itemFields) > 0 {
+						if desc == "" {
+							desc = name
+						}
+						return []BodyField{{
+							Path:       path,
+							FlagName:   BodyFlagName(path),
+							GoName:     BodyGoName(path),
+							GoType:     "string",
+							Default:    `""`,
+							Desc:       desc,
+							IsArray:    true,
+							ItemFields: itemFields,
+						}}
+					}
+				}
+			}
+
+			// Simple type arrays (string, integer, boolean) — no nested fields.
+			if itemType, _ := items["type"].(string); itemType == "string" || itemType == "integer" || itemType == "boolean" {
+				if desc == "" {
+					desc = name
+				}
+				itemDesc := appendEnumValues(items, "")
+				if itemDesc != "" {
+					desc = desc + " " + itemDesc
+				}
+				return []BodyField{{
+					Path:     path,
+					FlagName: BodyFlagName(path),
+					GoName:   BodyGoName(path),
+					GoType:   "string",
+					Default:  `""`,
+					Desc:     desc,
+					IsArray:  true,
+					// ItemFields is nil — signals a simple list (List of String).
+				}}
 			}
 		}
 		// Fallback: expose array as a single string field accepting a JSON array.

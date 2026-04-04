@@ -27,7 +27,6 @@ Reads Bitbucket repos via the Bitbucket Cloud API.
 
 ```hcl
 data "bitbucket_repos" "example" {
-  repo_slug = "my-repo"
   workspace = "my-workspace"
 }
 
@@ -39,8 +38,10 @@ output "repos_response" {
 ## Schema
 
 ### Required
-- `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+
+### Optional
+- `repo_slug` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 
@@ -58,7 +59,7 @@ output "repos_response" {
 - `is_private` (String) is_private
 - `language` (String) language
 - `mainbranch_default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch.
-- `mainbranch_merge_strategies` (String) Available merge strategies for pull requests targeting this branch. (JSON array)
+- `mainbranch_merge_strategies` (List of String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
 - `mainbranch_name` (String) The name of the ref.
 - `mainbranch_type` (String) mainbranch.type
 - `name` (String) name

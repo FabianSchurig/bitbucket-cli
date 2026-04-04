@@ -29,7 +29,6 @@ Reads Bitbucket refs via the Bitbucket Cloud API.
 data "bitbucket_refs" "example" {
   repo_slug = "my-repo"
   workspace = "my-workspace"
-  name = "main"
 }
 
 output "refs_response" {
@@ -42,12 +41,14 @@ output "refs_response" {
 ### Required
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
-- `name` (String) Path parameter.
+
+### Optional
+- `name` (String) Path parameter. Provide to fetch a specific resource; omit to list all.
 
 ### Read-Only
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch.
-- `merge_strategies` (String) Available merge strategies for pull requests targeting this branch. (JSON array)
+- `merge_strategies` (List of String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
 - `type` (String) type

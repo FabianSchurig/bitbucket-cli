@@ -14,20 +14,20 @@ variable "workspace" {
   default = "test-workspace"
 }
 
-variable "group_slug" {
-  type    = string
-  default = "developers"
-}
-
 variable "repo_slug" {
   type    = string
   default = "my-repo"
 }
 
+variable "group_slug" {
+  type    = string
+  default = "developers"
+}
+
 provider "bitbucket" {}
 
 data "bitbucket_repo_group_permissions" "test" {
-  group_slug = var.group_slug
   repo_slug = var.repo_slug
   workspace = var.workspace
+  group_slug = var.group_slug
 }

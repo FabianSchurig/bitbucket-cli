@@ -28,8 +28,8 @@ provider "bitbucket" {}
 
 data "bitbucket_project_default_reviewers" "test" {
   project_key = var.project_key
-  selected_user = var.selected_user
   workspace = var.workspace
+  selected_user = var.selected_user
 }
 
 resource "bitbucket_project_default_reviewers" "test" {

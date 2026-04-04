@@ -14,11 +14,6 @@ variable "workspace" {
   default = "test-workspace"
 }
 
-variable "repo_slug" {
-  type    = string
-  default = "my-repo"
-}
-
 variable "commit" {
   type    = string
   default = "abc123def"
@@ -29,13 +24,18 @@ variable "path" {
   default = "README.md"
 }
 
+variable "repo_slug" {
+  type    = string
+  default = "my-repo"
+}
+
 provider "bitbucket" {}
 
 data "bitbucket_commit_file" "test" {
-  repo_slug = var.repo_slug
-  workspace = var.workspace
   commit = var.commit
   path = var.path
+  repo_slug = var.repo_slug
+  workspace = var.workspace
 }
 
 resource "bitbucket_commit_file" "test" {
