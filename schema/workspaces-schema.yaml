@@ -1716,6 +1716,61 @@ paths:
       required: true
       schema:
         type: string
+  /workspaces/{workspace}/settings/gpg/public-key:
+    get:
+      tags:
+      - Workspaces
+      description: 'Returns the system public GPG key(s). In most cases a single key
+        is returned.
+
+        During a key rotation period, two keys may be returned.'
+      summary: Get the workspace system GPG public key(s)
+      responses:
+        '200':
+          description: The system public GPG key(s).
+        '401':
+          description: The request wasn't authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: The requesting user is not a workspace member.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: The workspace does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - account
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:workspace:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: getTheWorkspaceSystemGpgPublicKeys
+    parameters:
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
 components:
   schemas:
     account:
@@ -2620,30 +2675,6 @@ components:
               pattern: '[0-9a-f]{7,}?'
           additionalProperties: false
       additionalProperties: false
-    pullrequest_endpoint_branch:
-      type: object
-      title: Pull Request Branch
-      properties:
-        name:
-          type: string
-        merge_strategies:
-          type: array
-          description: Available merge strategies, when this endpoint is the destination
-            of the pull request.
-          items:
-            type: string
-            enum:
-            - merge_commit
-            - squash
-            - fast_forward
-            - squash_fast_forward
-            - rebase_fast_forward
-            - rebase_merge
-        default_merge_strategy:
-          type: string
-          description: The default merge strategy, when this endpoint is the destination
-            of the pull request.
-      additionalProperties: false
     ref:
       type: object
       title: Ref
@@ -3289,3 +3320,27 @@ components:
           workspace:
             $ref: '#/components/schemas/workspace'
         additionalProperties: true
+    pullrequest_endpoint_branch:
+      type: object
+      title: Pull Request Branch
+      properties:
+        name:
+          type: string
+        merge_strategies:
+          type: array
+          description: Available merge strategies, when this endpoint is the destination
+            of the pull request.
+          items:
+            type: string
+            enum:
+            - merge_commit
+            - squash
+            - fast_forward
+            - squash_fast_forward
+            - rebase_fast_forward
+            - rebase_merge
+        default_merge_strategy:
+          type: string
+          description: The default merge strategy, when this endpoint is the destination
+            of the pull request.
+      additionalProperties: false
