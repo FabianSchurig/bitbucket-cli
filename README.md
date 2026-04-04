@@ -1,5 +1,14 @@
 # bitbucket-cli
 
+[![CI](https://github.com/FabianSchurig/bitbucket-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/FabianSchurig/bitbucket-cli/actions/workflows/ci.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/FabianSchurig/bitbucket-cli)](https://github.com/FabianSchurig/bitbucket-cli/releases)
+[![Terraform Registry](https://img.shields.io/badge/terraform-registry-623CE4)](https://registry.terraform.io/providers/FabianSchurig/bitbucket/latest)
+[![Sonar Quality Gate](https://sonarcloud.io/api/project_badges/quality_gate?project=FabianSchurig_bitbucket-cli)](https://sonarcloud.io/summary/new_code?id=FabianSchurig_bitbucket-cli)
+[![Sonar Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=FabianSchurig_bitbucket-cli&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=FabianSchurig_bitbucket-cli)
+[![Sonar Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=FabianSchurig_bitbucket-cli&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=FabianSchurig_bitbucket-cli)
+[![Sonar Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=FabianSchurig_bitbucket-cli&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=FabianSchurig_bitbucket-cli)
+[![Sonar Security Rating](https://sonarcloud.io/api/project_badges/measure?project=FabianSchurig_bitbucket-cli&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=FabianSchurig_bitbucket-cli)
+
 Low-maintenance Bitbucket Cloud tooling built from the live OpenAPI spec: a CLI for software engineers, an MCP server for AI agents, and a Terraform provider for DevSecOps teams.
 
 > [!IMPORTANT]
