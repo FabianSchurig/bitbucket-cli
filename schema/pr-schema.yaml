@@ -3870,30 +3870,6 @@ components:
               pattern: '[0-9a-f]{7,}?'
           additionalProperties: false
       additionalProperties: false
-    pullrequest_endpoint_branch:
-      type: object
-      title: Pull Request Branch
-      properties:
-        name:
-          type: string
-        merge_strategies:
-          type: array
-          description: Available merge strategies, when this endpoint is the destination
-            of the pull request.
-          items:
-            type: string
-            enum:
-            - merge_commit
-            - squash
-            - fast_forward
-            - squash_fast_forward
-            - rebase_fast_forward
-            - rebase_merge
-        default_merge_strategy:
-          type: string
-          description: The default merge strategy, when this endpoint is the destination
-            of the pull request.
-      additionalProperties: false
     pullrequest_merge_parameters:
       type: object
       title: Pull Request Merge Parameters
@@ -4373,3 +4349,27 @@ components:
           repositories:
             $ref: '#/components/schemas/link'
         additionalProperties: true
+    pullrequest_endpoint_branch:
+      type: object
+      title: Pull Request Branch
+      properties:
+        name:
+          type: string
+        merge_strategies:
+          type: array
+          description: Available merge strategies, when this endpoint is the destination
+            of the pull request.
+          items:
+            type: string
+            enum:
+            - merge_commit
+            - squash
+            - fast_forward
+            - squash_fast_forward
+            - rebase_fast_forward
+            - rebase_merge
+        default_merge_strategy:
+          type: string
+          description: The default merge strategy, when this endpoint is the destination
+            of the pull request.
+      additionalProperties: false
