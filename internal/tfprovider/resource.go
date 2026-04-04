@@ -48,8 +48,8 @@ type ParamDef struct {
 
 // BodyFieldDef describes a flattened request body field.
 type BodyFieldDef struct {
-	Path       string         // dot-separated path (e.g., "source.branch.name")
-	Type       string         // "string", "integer", "boolean"
+	Path       string // dot-separated path (e.g., "source.branch.name")
+	Type       string // "string", "integer", "boolean"
 	Desc       string
 	IsArray    bool           // true when the field is an array of objects
 	ItemFields []BodyFieldDef // nested fields for array item objects (only when IsArray)
@@ -131,18 +131,18 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				continue
 			}
 			isRequired := primaryRequired[p.Name]
-		if isRequired {
-			attrs[attrName] = schema.StringAttribute{
-				Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
-				Required:    true,
+			if isRequired {
+				attrs[attrName] = schema.StringAttribute{
+					Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
+					Required:    true,
+				}
+			} else {
+				attrs[attrName] = schema.StringAttribute{
+					Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
+					Optional:    true,
+					Computed:    true,
+				}
 			}
-		} else {
-			attrs[attrName] = schema.StringAttribute{
-				Description: fmt.Sprintf("%s parameter (%s)", p.Name, p.In),
-				Optional:    true,
-				Computed:    true,
-			}
-		}
 		}
 	}
 

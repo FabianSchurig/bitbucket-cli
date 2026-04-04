@@ -178,7 +178,7 @@ func bodyFieldLit(bf TFBodyFieldData) string {
 func renderBodyFieldDef(bf TFBodyFieldData, indent string) string {
 	var sb strings.Builder
 	sb.WriteString("{")
-	sb.WriteString(fmt.Sprintf("Path: %s, Type: %s, Desc: %s", spec.GoStringLit(bf.Path), spec.GoStringLit(bf.Type), spec.GoStringLit(bf.Desc)))
+	fmt.Fprintf(&sb, "Path: %s, Type: %s, Desc: %s", spec.GoStringLit(bf.Path), spec.GoStringLit(bf.Type), spec.GoStringLit(bf.Desc))
 	if bf.IsArray {
 		sb.WriteString(", IsArray: true")
 		if len(bf.ItemFields) > 0 {
