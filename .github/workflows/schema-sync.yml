@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      PYTHONHASHSEED: "0" # Deterministic hash ordering for stable schema output
     steps:
       - uses: actions/checkout@v4
         with:
