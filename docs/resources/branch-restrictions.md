@@ -16,6 +16,26 @@ Manages Bitbucket branch-restrictions via the Bitbucket Cloud API.
 - **Delete**: Supported
 - **List**: Supported (via data source)
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Create | `POST` | `/repositories/{workspace}/{repo_slug}/branch-restrictions` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branch-restrictions/#api-repositories-workspace-repo-slug-branch-restrictions-post) |
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/branch-restrictions/{id}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branch-restrictions/#api-repositories-workspace-repo-slug-branch-restrictions-id-get) |
+| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/branch-restrictions/{id}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branch-restrictions/#api-repositories-workspace-repo-slug-branch-restrictions-id-put) |
+| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/branch-restrictions/{id}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branch-restrictions/#api-repositories-workspace-repo-slug-branch-restrictions-id-delete) |
+| List | `GET` | `/repositories/{workspace}/{repo_slug}/branch-restrictions` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branch-restrictions/#api-repositories-workspace-repo-slug-branch-restrictions-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Create | `admin:repository:bitbucket` |
+| Read | `admin:repository:bitbucket` |
+| Update | `admin:repository:bitbucket` |
+| Delete | `admin:repository:bitbucket` |
+| List | `admin:repository:bitbucket` |
+
 ## Example Usage
 
 ```hcl

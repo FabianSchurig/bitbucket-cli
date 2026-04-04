@@ -47,6 +47,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-commit-commit-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updateCommitHostedPropertyValue`,
@@ -65,6 +66,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        true,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-commit-commit-properties-app-key-property-name-put`,
 		},
 		{
 			OperationID: `deleteCommitHostedPropertyValue`,
@@ -83,6 +85,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-commit-commit-properties-app-key-property-name-delete`,
 		},
 		{
 			OperationID: `getRepositoryHostedPropertyValue`,
@@ -100,6 +103,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updateRepositoryHostedPropertyValue`,
@@ -117,6 +121,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        true,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-properties-app-key-property-name-put`,
 		},
 		{
 			OperationID: `deleteRepositoryHostedPropertyValue`,
@@ -134,6 +139,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-properties-app-key-property-name-delete`,
 		},
 		{
 			OperationID: `getPullRequestHostedPropertyValue`,
@@ -152,6 +158,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-pullrequests-pullrequest-id-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updatePullRequestHostedPropertyValue`,
@@ -170,6 +177,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        true,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-pullrequests-pullrequest-id-properties-app-key-property-name-put`,
 		},
 		{
 			OperationID: `deletePullRequestHostedPropertyValue`,
@@ -188,6 +196,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-pullrequests-pullrequest-id-properties-app-key-property-name-delete`,
 		},
 		{
 			OperationID: `retrieveUserHostedPropertyValue`,
@@ -204,6 +213,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-users-selected-user-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updateUserHostedPropertyValue`,
@@ -220,6 +230,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        true,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-users-selected-user-properties-app-key-property-name-put`,
 		},
 		{
 			OperationID: `deleteUserHostedPropertyValue`,
@@ -236,6 +247,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-users-selected-user-properties-app-key-property-name-delete`,
 		},
 	}),
 	AllOps: []OperationDef{
@@ -256,6 +268,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-commit-commit-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updateCommitHostedPropertyValue`,
@@ -274,6 +287,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        true,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-commit-commit-properties-app-key-property-name-put`,
 		},
 		{
 			OperationID: `deleteCommitHostedPropertyValue`,
@@ -292,6 +306,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-commit-commit-properties-app-key-property-name-delete`,
 		},
 		{
 			OperationID: `getRepositoryHostedPropertyValue`,
@@ -309,6 +324,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updateRepositoryHostedPropertyValue`,
@@ -326,6 +342,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        true,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-properties-app-key-property-name-put`,
 		},
 		{
 			OperationID: `deleteRepositoryHostedPropertyValue`,
@@ -343,6 +360,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-properties-app-key-property-name-delete`,
 		},
 		{
 			OperationID: `getPullRequestHostedPropertyValue`,
@@ -361,6 +379,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-pullrequests-pullrequest-id-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updatePullRequestHostedPropertyValue`,
@@ -379,6 +398,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        true,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-pullrequests-pullrequest-id-properties-app-key-property-name-put`,
 		},
 		{
 			OperationID: `deletePullRequestHostedPropertyValue`,
@@ -397,6 +417,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-pullrequests-pullrequest-id-properties-app-key-property-name-delete`,
 		},
 		{
 			OperationID: `retrieveUserHostedPropertyValue`,
@@ -413,6 +434,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-users-selected-user-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updateUserHostedPropertyValue`,
@@ -429,6 +451,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        true,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-users-selected-user-properties-app-key-property-name-put`,
 		},
 		{
 			OperationID: `deleteUserHostedPropertyValue`,
@@ -445,6 +468,7 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-users-selected-user-properties-app-key-property-name-delete`,
 		},
 	},
 }

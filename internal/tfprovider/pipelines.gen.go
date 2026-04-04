@@ -108,6 +108,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-deployments-config-environments-environment-uuid-variables-get`,
 		},
 		{
 			OperationID: `createDeploymentVariable`,
@@ -134,6 +138,10 @@ Available operations:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-deployments-config-environments-environment-uuid-variables-post`,
 		},
 		{
 			OperationID: `updateDeploymentVariable`,
@@ -161,6 +169,10 @@ Available operations:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-deployments-config-environments-environment-uuid-variables-variable-uuid-put`,
 		},
 		{
 			OperationID: `deleteDeploymentVariable`,
@@ -178,6 +190,10 @@ Available operations:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-deployments-config-environments-environment-uuid-variables-variable-uuid-delete`,
 		},
 		{
 			OperationID: `getPipelinesForRepository`,
@@ -217,6 +233,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-get`,
 		},
 		{
 			OperationID: `createPipelineForRepository`,
@@ -243,6 +263,11 @@ for specific details.
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+				`write:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-post`,
 		},
 		{
 			OperationID: `getRepositoryPipelineCaches`,
@@ -269,6 +294,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-caches-get`,
 		},
 		{
 			OperationID: `deleteRepositoryPipelineCaches`,
@@ -285,6 +314,10 @@ for specific details.
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`write:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-caches-delete`,
 		},
 		{
 			OperationID: `deleteRepositoryPipelineCache`,
@@ -301,6 +334,10 @@ for specific details.
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`write:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-caches-cache-uuid-delete`,
 		},
 		{
 			OperationID: `getRepositoryPipelineCacheContentURI`,
@@ -319,6 +356,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-caches-cache-uuid-content-uri-get`,
 		},
 		{
 			OperationID: `getRepositoryRunners`,
@@ -350,6 +391,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-runners-get`,
 		},
 		{
 			OperationID: `createRepositoryRunner`,
@@ -379,6 +424,11 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`write:runner:bitbucket`,
+				`read:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-runners-post`,
 		},
 		{
 			OperationID: `getRepositoryRunner`,
@@ -409,6 +459,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-runners-runner-uuid-get`,
 		},
 		{
 			OperationID: `updateRepositoryRunner`,
@@ -439,6 +493,11 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:runner:bitbucket`,
+				`write:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-runners-runner-uuid-put`,
 		},
 		{
 			OperationID: `deleteRepositoryRunner`,
@@ -455,6 +514,10 @@ for specific details.
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`write:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-runners-runner-uuid-delete`,
 		},
 		{
 			OperationID: `getPipelineForRepository`,
@@ -477,6 +540,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-get`,
 		},
 		{
 			OperationID: `getPipelineStepsForRepository`,
@@ -503,6 +570,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-steps-get`,
 		},
 		{
 			OperationID: `getPipelineStepForRepository`,
@@ -528,6 +599,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-steps-step-uuid-get`,
 		},
 		{
 			OperationID: `getPipelineStepLogForRepository`,
@@ -547,6 +622,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-steps-step-uuid-log-get`,
 		},
 		{
 			OperationID: `getPipelineContainerLog`,
@@ -567,6 +646,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-steps-step-uuid-logs-log-uuid-get`,
 		},
 		{
 			OperationID: `getPipelineTestReports`,
@@ -584,6 +667,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-steps-step-uuid-test-reports-get`,
 		},
 		{
 			OperationID: `getPipelineTestReportTestCases`,
@@ -601,6 +688,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-steps-step-uuid-test-reports-test-cases-get`,
 		},
 		{
 			OperationID: `getPipelineTestReportTestCaseReasons`,
@@ -619,6 +710,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-steps-step-uuid-test-reports-test-cases-test-case-uuid-test-case-reasons-get`,
 		},
 		{
 			OperationID: `stopPipeline`,
@@ -635,6 +730,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`write:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-stopPipeline-post`,
 		},
 		{
 			OperationID: `getRepositoryPipelineConfig`,
@@ -652,6 +751,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-get`,
 		},
 		{
 			OperationID: `updateRepositoryPipelineConfig`,
@@ -671,6 +774,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-put`,
 		},
 		{
 			OperationID: `updateRepositoryBuildNumber`,
@@ -690,6 +797,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-build-number-put`,
 		},
 		{
 			OperationID: `getRepositoryPipelineSchedules`,
@@ -717,6 +828,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-schedules-get`,
 		},
 		{
 			OperationID: `createRepositoryPipelineSchedule`,
@@ -749,6 +864,11 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+				`write:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-schedules-post`,
 		},
 		{
 			OperationID: `getRepositoryPipelineSchedule`,
@@ -775,6 +895,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-schedules-schedule-uuid-get`,
 		},
 		{
 			OperationID: `updateRepositoryPipelineSchedule`,
@@ -803,6 +927,11 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+				`write:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-schedules-schedule-uuid-put`,
 		},
 		{
 			OperationID: `deleteRepositoryPipelineSchedule`,
@@ -819,6 +948,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`write:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-schedules-schedule-uuid-delete`,
 		},
 		{
 			OperationID: `getRepositoryPipelineScheduleExecutions`,
@@ -837,6 +970,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-schedules-schedule-uuid-executions-get`,
 		},
 		{
 			OperationID: `getRepositoryPipelineSshKeyPair`,
@@ -855,6 +992,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-key-pair-get`,
 		},
 		{
 			OperationID: `updateRepositoryPipelineKeyPair`,
@@ -876,6 +1017,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-key-pair-put`,
 		},
 		{
 			OperationID: `deleteRepositoryPipelineKeyPair`,
@@ -891,6 +1036,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-key-pair-delete`,
 		},
 		{
 			OperationID: `getRepositoryPipelineKnownHosts`,
@@ -915,6 +1064,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-known-hosts-get`,
 		},
 		{
 			OperationID: `createRepositoryPipelineKnownHost`,
@@ -944,6 +1097,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-known-hosts-post`,
 		},
 		{
 			OperationID: `getRepositoryPipelineKnownHost`,
@@ -967,6 +1124,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-known-hosts-known-host-uuid-get`,
 		},
 		{
 			OperationID: `updateRepositoryPipelineKnownHost`,
@@ -997,6 +1158,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-known-hosts-known-host-uuid-put`,
 		},
 		{
 			OperationID: `deleteRepositoryPipelineKnownHost`,
@@ -1013,6 +1178,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-known-hosts-known-host-uuid-delete`,
 		},
 		{
 			OperationID: `getRepositoryPipelineVariables`,
@@ -1035,6 +1204,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-variables-get`,
 		},
 		{
 			OperationID: `createRepositoryPipelineVariable`,
@@ -1060,6 +1233,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-variables-post`,
 		},
 		{
 			OperationID: `getRepositoryPipelineVariable`,
@@ -1081,6 +1258,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-variables-variable-uuid-get`,
 		},
 		{
 			OperationID: `updateRepositoryPipelineVariable`,
@@ -1107,6 +1288,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-variables-variable-uuid-put`,
 		},
 		{
 			OperationID: `deleteRepositoryPipelineVariable`,
@@ -1123,6 +1308,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-variables-variable-uuid-delete`,
 		},
 		{
 			OperationID: `getPipelineVariablesForTeam`,
@@ -1145,6 +1334,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: true,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-teams-username-pipelines-config-variables-get`,
 		},
 		{
 			OperationID: `createPipelineVariableForTeam`,
@@ -1165,6 +1355,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   true,
 			Paginated: false,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-teams-username-pipelines-config-variables-post`,
 		},
 		{
 			OperationID: `getPipelineVariableForTeam`,
@@ -1186,6 +1377,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: false,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-teams-username-pipelines-config-variables-variable-uuid-get`,
 		},
 		{
 			OperationID: `updatePipelineVariableForTeam`,
@@ -1207,6 +1399,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   true,
 			Paginated: false,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-teams-username-pipelines-config-variables-variable-uuid-put`,
 		},
 		{
 			OperationID: `deletePipelineVariableForTeam`,
@@ -1223,6 +1416,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-teams-username-pipelines-config-variables-variable-uuid-delete`,
 		},
 		{
 			OperationID: `getPipelineVariablesForUser`,
@@ -1245,6 +1439,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: true,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-users-selected-user-pipelines-config-variables-get`,
 		},
 		{
 			OperationID: `createPipelineVariableForUser`,
@@ -1265,6 +1460,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   true,
 			Paginated: false,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-users-selected-user-pipelines-config-variables-post`,
 		},
 		{
 			OperationID: `getPipelineVariableForUser`,
@@ -1286,6 +1482,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: false,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-users-selected-user-pipelines-config-variables-variable-uuid-get`,
 		},
 		{
 			OperationID: `updatePipelineVariableForUser`,
@@ -1307,6 +1504,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   true,
 			Paginated: false,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-users-selected-user-pipelines-config-variables-variable-uuid-put`,
 		},
 		{
 			OperationID: `deletePipelineVariableForUser`,
@@ -1323,6 +1521,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-users-selected-user-pipelines-config-variables-variable-uuid-delete`,
 		},
 		{
 			OperationID: `getOIDCConfiguration`,
@@ -1337,6 +1536,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-identity-oidc-.well-known-openid-configuration-get`,
 		},
 		{
 			OperationID: `getOIDCKeys`,
@@ -1351,6 +1551,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-identity-oidc-keys.json-get`,
 		},
 		{
 			OperationID: `getWorkspaceRunners`,
@@ -1381,6 +1582,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-runners-get`,
 		},
 		{
 			OperationID: `createWorkspaceRunner`,
@@ -1409,6 +1614,11 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`write:runner:bitbucket`,
+				`read:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-runners-post`,
 		},
 		{
 			OperationID: `getWorkspaceRunner`,
@@ -1438,6 +1648,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-runners-runner-uuid-get`,
 		},
 		{
 			OperationID: `updateWorkspaceRunner`,
@@ -1467,6 +1681,11 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:runner:bitbucket`,
+				`write:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-runners-runner-uuid-put`,
 		},
 		{
 			OperationID: `deleteWorkspaceRunner`,
@@ -1482,6 +1701,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`write:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-runners-runner-uuid-delete`,
 		},
 		{
 			OperationID: `getPipelineVariablesForWorkspace`,
@@ -1503,6 +1726,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-variables-get`,
 		},
 		{
 			OperationID: `createPipelineVariableForWorkspace`,
@@ -1522,6 +1749,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-variables-post`,
 		},
 		{
 			OperationID: `getPipelineVariableForWorkspace`,
@@ -1542,6 +1773,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-variables-variable-uuid-get`,
 		},
 		{
 			OperationID: `updatePipelineVariableForWorkspace`,
@@ -1562,6 +1797,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-variables-variable-uuid-put`,
 		},
 		{
 			OperationID: `deletePipelineVariableForWorkspace`,
@@ -1577,6 +1816,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-variables-variable-uuid-delete`,
 		},
 	}),
 	AllOps: []OperationDef{
@@ -1602,6 +1845,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-deployments-config-environments-environment-uuid-variables-get`,
 		},
 		{
 			OperationID: `createDeploymentVariable`,
@@ -1628,6 +1875,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-deployments-config-environments-environment-uuid-variables-post`,
 		},
 		{
 			OperationID: `updateDeploymentVariable`,
@@ -1655,6 +1906,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-deployments-config-environments-environment-uuid-variables-variable-uuid-put`,
 		},
 		{
 			OperationID: `deleteDeploymentVariable`,
@@ -1672,6 +1927,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-deployments-config-environments-environment-uuid-variables-variable-uuid-delete`,
 		},
 		{
 			OperationID: `getPipelinesForRepository`,
@@ -1711,6 +1970,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-get`,
 		},
 		{
 			OperationID: `createPipelineForRepository`,
@@ -1737,6 +2000,11 @@ for specific details.
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+				`write:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-post`,
 		},
 		{
 			OperationID: `getRepositoryPipelineCaches`,
@@ -1763,6 +2031,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-caches-get`,
 		},
 		{
 			OperationID: `deleteRepositoryPipelineCaches`,
@@ -1779,6 +2051,10 @@ for specific details.
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`write:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-caches-delete`,
 		},
 		{
 			OperationID: `deleteRepositoryPipelineCache`,
@@ -1795,6 +2071,10 @@ for specific details.
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`write:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-caches-cache-uuid-delete`,
 		},
 		{
 			OperationID: `getRepositoryPipelineCacheContentURI`,
@@ -1813,6 +2093,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-caches-cache-uuid-content-uri-get`,
 		},
 		{
 			OperationID: `getRepositoryRunners`,
@@ -1844,6 +2128,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-runners-get`,
 		},
 		{
 			OperationID: `createRepositoryRunner`,
@@ -1873,6 +2161,11 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`write:runner:bitbucket`,
+				`read:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-runners-post`,
 		},
 		{
 			OperationID: `getRepositoryRunner`,
@@ -1903,6 +2196,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-runners-runner-uuid-get`,
 		},
 		{
 			OperationID: `updateRepositoryRunner`,
@@ -1933,6 +2230,11 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:runner:bitbucket`,
+				`write:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-runners-runner-uuid-put`,
 		},
 		{
 			OperationID: `deleteRepositoryRunner`,
@@ -1949,6 +2251,10 @@ for specific details.
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`write:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-runners-runner-uuid-delete`,
 		},
 		{
 			OperationID: `getPipelineForRepository`,
@@ -1971,6 +2277,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-get`,
 		},
 		{
 			OperationID: `getPipelineStepsForRepository`,
@@ -1997,6 +2307,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-steps-get`,
 		},
 		{
 			OperationID: `getPipelineStepForRepository`,
@@ -2022,6 +2336,10 @@ for specific details.
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-steps-step-uuid-get`,
 		},
 		{
 			OperationID: `getPipelineStepLogForRepository`,
@@ -2041,6 +2359,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-steps-step-uuid-log-get`,
 		},
 		{
 			OperationID: `getPipelineContainerLog`,
@@ -2061,6 +2383,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-steps-step-uuid-logs-log-uuid-get`,
 		},
 		{
 			OperationID: `getPipelineTestReports`,
@@ -2078,6 +2404,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-steps-step-uuid-test-reports-get`,
 		},
 		{
 			OperationID: `getPipelineTestReportTestCases`,
@@ -2095,6 +2425,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-steps-step-uuid-test-reports-test-cases-get`,
 		},
 		{
 			OperationID: `getPipelineTestReportTestCaseReasons`,
@@ -2113,6 +2447,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-steps-step-uuid-test-reports-test-cases-test-case-uuid-test-case-reasons-get`,
 		},
 		{
 			OperationID: `stopPipeline`,
@@ -2129,6 +2467,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`write:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-pipeline-uuid-stopPipeline-post`,
 		},
 		{
 			OperationID: `getRepositoryPipelineConfig`,
@@ -2146,6 +2488,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-get`,
 		},
 		{
 			OperationID: `updateRepositoryPipelineConfig`,
@@ -2165,6 +2511,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-put`,
 		},
 		{
 			OperationID: `updateRepositoryBuildNumber`,
@@ -2184,6 +2534,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-build-number-put`,
 		},
 		{
 			OperationID: `getRepositoryPipelineSchedules`,
@@ -2211,6 +2565,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-schedules-get`,
 		},
 		{
 			OperationID: `createRepositoryPipelineSchedule`,
@@ -2243,6 +2601,11 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+				`write:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-schedules-post`,
 		},
 		{
 			OperationID: `getRepositoryPipelineSchedule`,
@@ -2269,6 +2632,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-schedules-schedule-uuid-get`,
 		},
 		{
 			OperationID: `updateRepositoryPipelineSchedule`,
@@ -2297,6 +2664,11 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+				`write:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-schedules-schedule-uuid-put`,
 		},
 		{
 			OperationID: `deleteRepositoryPipelineSchedule`,
@@ -2313,6 +2685,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`write:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-schedules-schedule-uuid-delete`,
 		},
 		{
 			OperationID: `getRepositoryPipelineScheduleExecutions`,
@@ -2331,6 +2707,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-schedules-schedule-uuid-executions-get`,
 		},
 		{
 			OperationID: `getRepositoryPipelineSshKeyPair`,
@@ -2349,6 +2729,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-key-pair-get`,
 		},
 		{
 			OperationID: `updateRepositoryPipelineKeyPair`,
@@ -2370,6 +2754,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-key-pair-put`,
 		},
 		{
 			OperationID: `deleteRepositoryPipelineKeyPair`,
@@ -2385,6 +2773,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-key-pair-delete`,
 		},
 		{
 			OperationID: `getRepositoryPipelineKnownHosts`,
@@ -2409,6 +2801,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-known-hosts-get`,
 		},
 		{
 			OperationID: `createRepositoryPipelineKnownHost`,
@@ -2438,6 +2834,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-known-hosts-post`,
 		},
 		{
 			OperationID: `getRepositoryPipelineKnownHost`,
@@ -2461,6 +2861,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-known-hosts-known-host-uuid-get`,
 		},
 		{
 			OperationID: `updateRepositoryPipelineKnownHost`,
@@ -2491,6 +2895,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-known-hosts-known-host-uuid-put`,
 		},
 		{
 			OperationID: `deleteRepositoryPipelineKnownHost`,
@@ -2507,6 +2915,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-known-hosts-known-host-uuid-delete`,
 		},
 		{
 			OperationID: `getRepositoryPipelineVariables`,
@@ -2529,6 +2941,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-variables-get`,
 		},
 		{
 			OperationID: `createRepositoryPipelineVariable`,
@@ -2554,6 +2970,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-variables-post`,
 		},
 		{
 			OperationID: `getRepositoryPipelineVariable`,
@@ -2575,6 +2995,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-variables-variable-uuid-get`,
 		},
 		{
 			OperationID: `updateRepositoryPipelineVariable`,
@@ -2601,6 +3025,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-variables-variable-uuid-put`,
 		},
 		{
 			OperationID: `deleteRepositoryPipelineVariable`,
@@ -2617,6 +3045,10 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-variables-variable-uuid-delete`,
 		},
 		{
 			OperationID: `getPipelineVariablesForTeam`,
@@ -2639,6 +3071,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: true,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-teams-username-pipelines-config-variables-get`,
 		},
 		{
 			OperationID: `createPipelineVariableForTeam`,
@@ -2659,6 +3092,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   true,
 			Paginated: false,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-teams-username-pipelines-config-variables-post`,
 		},
 		{
 			OperationID: `getPipelineVariableForTeam`,
@@ -2680,6 +3114,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: false,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-teams-username-pipelines-config-variables-variable-uuid-get`,
 		},
 		{
 			OperationID: `updatePipelineVariableForTeam`,
@@ -2701,6 +3136,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   true,
 			Paginated: false,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-teams-username-pipelines-config-variables-variable-uuid-put`,
 		},
 		{
 			OperationID: `deletePipelineVariableForTeam`,
@@ -2717,6 +3153,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-teams-username-pipelines-config-variables-variable-uuid-delete`,
 		},
 		{
 			OperationID: `getPipelineVariablesForUser`,
@@ -2739,6 +3176,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: true,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-users-selected-user-pipelines-config-variables-get`,
 		},
 		{
 			OperationID: `createPipelineVariableForUser`,
@@ -2759,6 +3197,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   true,
 			Paginated: false,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-users-selected-user-pipelines-config-variables-post`,
 		},
 		{
 			OperationID: `getPipelineVariableForUser`,
@@ -2780,6 +3219,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: false,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-users-selected-user-pipelines-config-variables-variable-uuid-get`,
 		},
 		{
 			OperationID: `updatePipelineVariableForUser`,
@@ -2801,6 +3241,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   true,
 			Paginated: false,
+			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-users-selected-user-pipelines-config-variables-variable-uuid-put`,
 		},
 		{
 			OperationID: `deletePipelineVariableForUser`,
@@ -2817,6 +3258,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-users-selected-user-pipelines-config-variables-variable-uuid-delete`,
 		},
 		{
 			OperationID: `getOIDCConfiguration`,
@@ -2831,6 +3273,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-identity-oidc-.well-known-openid-configuration-get`,
 		},
 		{
 			OperationID: `getOIDCKeys`,
@@ -2845,6 +3288,7 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			DocURL:         `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-identity-oidc-keys.json-get`,
 		},
 		{
 			OperationID: `getWorkspaceRunners`,
@@ -2875,6 +3319,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-runners-get`,
 		},
 		{
 			OperationID: `createWorkspaceRunner`,
@@ -2903,6 +3351,11 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`write:runner:bitbucket`,
+				`read:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-runners-post`,
 		},
 		{
 			OperationID: `getWorkspaceRunner`,
@@ -2932,6 +3385,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-runners-runner-uuid-get`,
 		},
 		{
 			OperationID: `updateWorkspaceRunner`,
@@ -2961,6 +3418,11 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:runner:bitbucket`,
+				`write:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-runners-runner-uuid-put`,
 		},
 		{
 			OperationID: `deleteWorkspaceRunner`,
@@ -2976,6 +3438,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`write:runner:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-runners-runner-uuid-delete`,
 		},
 		{
 			OperationID: `getPipelineVariablesForWorkspace`,
@@ -2997,6 +3463,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-variables-get`,
 		},
 		{
 			OperationID: `createPipelineVariableForWorkspace`,
@@ -3016,6 +3486,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-variables-post`,
 		},
 		{
 			OperationID: `getPipelineVariableForWorkspace`,
@@ -3036,6 +3510,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   false,
 			Paginated: false,
+			Scopes: []string{
+				`read:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-variables-variable-uuid-get`,
 		},
 		{
 			OperationID: `updatePipelineVariableForWorkspace`,
@@ -3056,6 +3534,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			},
 			HasBody:   true,
 			Paginated: false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-variables-variable-uuid-put`,
 		},
 		{
 			OperationID: `deletePipelineVariableForWorkspace`,
@@ -3071,6 +3553,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			ResponseFields: []BodyFieldDef{},
 			HasBody:        false,
 			Paginated:      false,
+			Scopes: []string{
+				`admin:pipeline:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-variables-variable-uuid-delete`,
 		},
 	},
 }

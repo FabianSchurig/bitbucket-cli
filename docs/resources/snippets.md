@@ -16,6 +16,26 @@ Manages Bitbucket snippets via the Bitbucket Cloud API.
 - **Delete**: Supported
 - **List**: Supported (via data source)
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Create | `POST` | `/snippets` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-post) |
+| Read | `GET` | `/snippets/{workspace}/{encoded_id}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-get) |
+| Update | `PUT` | `/snippets/{workspace}/{encoded_id}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-put) |
+| Delete | `DELETE` | `/snippets/{workspace}/{encoded_id}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-encoded-id-delete) |
+| List | `GET` | `/snippets` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-snippets/#api-snippets-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Create | `read:snippet:bitbucket`, `write:snippet:bitbucket` |
+| Read | `read:snippet:bitbucket` |
+| Update | `read:snippet:bitbucket`, `write:snippet:bitbucket` |
+| Delete | `delete:snippet:bitbucket` |
+| List | `read:snippet:bitbucket` |
+
 ## Example Usage
 
 ```hcl

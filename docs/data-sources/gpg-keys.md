@@ -9,6 +9,20 @@ description: |-
 
 Reads Bitbucket gpg-keys via the Bitbucket Cloud API.
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/users/{selected_user}/gpg-keys/{fingerprint}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-gpg/#api-users-selected-user-gpg-keys-fingerprint-get) |
+| List | `GET` | `/users/{selected_user}/gpg-keys` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-gpg/#api-users-selected-user-gpg-keys-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | `read:gpg-key:bitbucket` |
+| List | `read:gpg-key:bitbucket` |
+
 ## Example Usage
 
 ```hcl

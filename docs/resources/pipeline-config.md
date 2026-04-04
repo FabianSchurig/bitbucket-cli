@@ -13,6 +13,20 @@ Manages Bitbucket pipeline-config via the Bitbucket Cloud API.
 - **Read**: Supported
 - **Update**: Supported
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines_config` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-get) |
+| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-put) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | `admin:repository:bitbucket` |
+| Update | `admin:repository:bitbucket` |
+
 ## Example Usage
 
 ```hcl

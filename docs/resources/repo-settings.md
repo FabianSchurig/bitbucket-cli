@@ -13,6 +13,20 @@ Manages Bitbucket repo-settings via the Bitbucket Cloud API.
 - **Read**: Supported
 - **Update**: Supported
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/override-settings` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-repositories/#api-repositories-workspace-repo-slug-override-settings-get) |
+| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/override-settings` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-repositories/#api-repositories-workspace-repo-slug-override-settings-put) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | `admin:repository:bitbucket` |
+| Update | `admin:repository:bitbucket` |
+
 ## Example Usage
 
 ```hcl

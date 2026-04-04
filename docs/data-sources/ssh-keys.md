@@ -9,6 +9,20 @@ description: |-
 
 Reads Bitbucket ssh-keys via the Bitbucket Cloud API.
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/users/{selected_user}/ssh-keys/{key_id}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-ssh/#api-users-selected-user-ssh-keys-key-id-get) |
+| List | `GET` | `/users/{selected_user}/ssh-keys` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-ssh/#api-users-selected-user-ssh-keys-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | `read:ssh-key:bitbucket` |
+| List | `read:ssh-key:bitbucket` |
+
 ## Example Usage
 
 ```hcl

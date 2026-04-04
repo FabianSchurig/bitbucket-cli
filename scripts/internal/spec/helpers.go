@@ -196,6 +196,8 @@ type OperationDef struct {
 	ResponseFields []BodyField // Flattened fields from the response schema
 	HasBody        bool
 	Paginated      bool
+	Scopes         []string // OAuth2 scopes from x-atlassian-oauth2-scopes (Current state)
+	DocURL         string   // Atlassian REST API documentation URL
 }
 
 // BuildOperation creates an OperationDef from a path entry, method/op, and schema.
@@ -243,6 +245,8 @@ func BuildOperation(pe PathEntry, entry MethodOp, schema *Schema) OperationDef {
 		ResponseFields: responseFields,
 		HasBody:        op.RequestBody != nil,
 		Paginated:      paginated,
+		Scopes:         ExtractScopes(op),
+		DocURL:         BuildDocURL(op.Tags, pe.Path, entry.Method),
 	}
 }
 
@@ -266,4 +270,38 @@ func DescribeParam(p ParamDef) string {
 		return p.Desc
 	}
 	return fmt.Sprintf("%s (%s parameter)", p.Name, p.In)
+}
+
+// ExtractScopes returns the OAuth2 scopes from x-atlassian-oauth2-scopes
+// where state is "Current". Returns nil if none found.
+func ExtractScopes(op *Op) []string {
+	for _, entry := range op.OAuth2Scopes {
+		if entry.State == "Current" && len(entry.Scopes) > 0 {
+			return entry.Scopes
+		}
+	}
+	return nil
+}
+
+// BuildDocURL constructs the Atlassian REST API documentation URL for an operation.
+// The URL follows the pattern:
+// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-{tag}/#api-{path}-{method}
+func BuildDocURL(tags []string, path, method string) string {
+	if len(tags) == 0 {
+		return ""
+	}
+	// Use the last tag (most specific) for the API group.
+	tag := tags[len(tags)-1]
+	group := strings.ToLower(strings.ReplaceAll(tag, " ", "-"))
+
+	// Build the anchor: remove leading /, replace / with -, remove { and },
+	// and convert underscores to hyphens (Atlassian docs use hyphens throughout).
+	anchor := strings.TrimPrefix(path, "/")
+	anchor = strings.ReplaceAll(anchor, "/", "-")
+	anchor = strings.ReplaceAll(anchor, "{", "")
+	anchor = strings.ReplaceAll(anchor, "}", "")
+	anchor = strings.ReplaceAll(anchor, "_", "-")
+
+	return fmt.Sprintf("https://developer.atlassian.com/cloud/bitbucket/rest/api-group-%s/#api-%s-%s",
+		group, anchor, strings.ToLower(method))
 }

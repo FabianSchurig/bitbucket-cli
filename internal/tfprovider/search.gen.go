@@ -44,6 +44,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-search/#api-teams-username-search-code-get`,
 		},
 		{
 			OperationID: `searchAccount`,
@@ -68,6 +72,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-search/#api-users-selected-user-search-code-get`,
 		},
 		{
 			OperationID: `searchWorkspace`,
@@ -92,6 +100,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-search/#api-workspaces-workspace-search-code-get`,
 		},
 	}),
 	AllOps: []OperationDef{
@@ -118,6 +130,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-search/#api-teams-username-search-code-get`,
 		},
 		{
 			OperationID: `searchAccount`,
@@ -142,6 +158,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-search/#api-users-selected-user-search-code-get`,
 		},
 		{
 			OperationID: `searchWorkspace`,
@@ -166,6 +186,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: true,
+			Scopes: []string{
+				`read:repository:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-search/#api-workspaces-workspace-search-code-get`,
 		},
 	},
 }

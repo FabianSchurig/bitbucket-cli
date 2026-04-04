@@ -9,6 +9,20 @@ description: |-
 
 Reads Bitbucket hook-types via the Bitbucket Cloud API.
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/hook_events` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-webhooks/#api-hook-events-get) |
+| List | `GET` | `/hook_events/{subject_type}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-webhooks/#api-hook-events-subject-type-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | — |
+| List | — |
+
 ## Example Usage
 
 ```hcl

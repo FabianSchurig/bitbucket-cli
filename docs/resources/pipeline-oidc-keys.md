@@ -12,6 +12,18 @@ Manages Bitbucket pipeline-oidc-keys via the Bitbucket Cloud API.
 ## CRUD Operations
 - **Read**: Supported
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/workspaces/{workspace}/pipelines-config/identity/oidc/keys.json` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-workspaces-workspace-pipelines-config-identity-oidc-keys.json-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | — |
+
 ## Example Usage
 
 ```hcl

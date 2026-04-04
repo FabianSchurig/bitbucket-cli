@@ -33,6 +33,8 @@ type OperationDef struct {
 	ResponseFields []BodyFieldDef // Flattened fields from the response schema (computed)
 	HasBody        bool
 	Paginated      bool
+	Scopes         []string // OAuth2 scopes from x-atlassian-oauth2-scopes
+	DocURL         string   // Atlassian REST API documentation URL
 }
 
 // ParamDef describes a single API parameter.

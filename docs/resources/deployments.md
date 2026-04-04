@@ -15,6 +15,24 @@ Manages Bitbucket deployments via the Bitbucket Cloud API.
 - **Delete**: Supported
 - **List**: Supported (via data source)
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Create | `POST` | `/repositories/{workspace}/{repo_slug}/environments` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-post) |
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-environment-uuid-get) |
+| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-environment-uuid-delete) |
+| List | `GET` | `/repositories/{workspace}/{repo_slug}/environments` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Create | `admin:pipeline:bitbucket` |
+| Read | `read:pipeline:bitbucket` |
+| Delete | `admin:pipeline:bitbucket` |
+| List | `read:pipeline:bitbucket` |
+
 ## Example Usage
 
 ```hcl

@@ -9,6 +9,20 @@ description: |-
 
 Reads Bitbucket projects via the Bitbucket Cloud API.
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/workspaces/{workspace}/projects/{project_key}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-projects-project-key-get) |
+| List | `GET` | `/workspaces/{workspace}/projects` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-projects-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | `read:project:bitbucket` |
+| List | `read:project:bitbucket` |
+
 ## Example Usage
 
 ```hcl

@@ -13,6 +13,20 @@ Manages Bitbucket workspaces via the Bitbucket Cloud API.
 - **Read**: Supported
 - **List**: Supported (via data source)
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| Read | `GET` | `/workspaces/{workspace}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-workspace-get) |
+| List | `GET` | `/workspaces` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-workspaces/#api-workspaces-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| Read | `read:workspace:bitbucket` |
+| List | `read:user:bitbucket`, `read:workspace:bitbucket` |
+
 ## Example Usage
 
 ```hcl

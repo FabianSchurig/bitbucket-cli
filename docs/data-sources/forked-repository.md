@@ -9,6 +9,18 @@ description: |-
 
 Reads Bitbucket forked-repository via the Bitbucket Cloud API.
 
+## API Endpoints
+
+| Operation | Method | Path | API Docs |
+|-----------|--------|------|----------|
+| List | `GET` | `/repositories/{workspace}/{repo_slug}/forks` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-repositories/#api-repositories-workspace-repo-slug-forks-get) |
+
+## Required Permissions (OAuth2 Scopes)
+
+| Operation | Required Scopes |
+|-----------|----------------|
+| List | `read:repository:bitbucket` |
+
 ## Example Usage
 
 ```hcl
