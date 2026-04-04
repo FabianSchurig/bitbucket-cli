@@ -245,19 +245,19 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 		bodyHasWiki                        bool
 		bodyIsPrivate                      bool
 		bodyLanguage                       string
-		bodyMainbranchDefaultMergeStrategy string
-		bodyMainbranchMergeStrategies      string
-		bodyMainbranchName                 string
 		bodyMainbranchType                 string
+		bodyMainbranchName                 string
+		bodyMainbranchMergeStrategies      string
+		bodyMainbranchDefaultMergeStrategy string
 		bodyName                           string
 		bodyOwnerDisplayName               string
 		bodyOwnerUuid                      string
+		bodyProjectIsPrivate               bool
+		bodyProjectUuid                    string
+		bodyProjectKey                     string
 		bodyProjectDescription             string
 		bodyProjectHasPubliclyVisibleRepos bool
-		bodyProjectIsPrivate               bool
-		bodyProjectKey                     string
 		bodyProjectName                    string
-		bodyProjectUuid                    string
 		bodyScm                            string
 		bodySize                           int
 		bodyUuid                           string
@@ -307,17 +307,17 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 				if bodyLanguage != "" {
 					handlers.SetNested(bodyObj, "language", bodyLanguage)
 				}
-				if bodyMainbranchDefaultMergeStrategy != "" {
-					handlers.SetNested(bodyObj, "mainbranch.default_merge_strategy", bodyMainbranchDefaultMergeStrategy)
-				}
-				if bodyMainbranchMergeStrategies != "" {
-					handlers.SetNested(bodyObj, "mainbranch.merge_strategies", bodyMainbranchMergeStrategies)
+				if bodyMainbranchType != "" {
+					handlers.SetNested(bodyObj, "mainbranch.type", bodyMainbranchType)
 				}
 				if bodyMainbranchName != "" {
 					handlers.SetNested(bodyObj, "mainbranch.name", bodyMainbranchName)
 				}
-				if bodyMainbranchType != "" {
-					handlers.SetNested(bodyObj, "mainbranch.type", bodyMainbranchType)
+				if bodyMainbranchMergeStrategies != "" {
+					handlers.SetNested(bodyObj, "mainbranch.merge_strategies", bodyMainbranchMergeStrategies)
+				}
+				if bodyMainbranchDefaultMergeStrategy != "" {
+					handlers.SetNested(bodyObj, "mainbranch.default_merge_strategy", bodyMainbranchDefaultMergeStrategy)
 				}
 				if bodyName != "" {
 					handlers.SetNested(bodyObj, "name", bodyName)
@@ -328,23 +328,23 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 				if bodyOwnerUuid != "" {
 					handlers.SetNested(bodyObj, "owner.uuid", bodyOwnerUuid)
 				}
+				if bodyProjectIsPrivate {
+					handlers.SetNested(bodyObj, "project.is_private", bodyProjectIsPrivate)
+				}
+				if bodyProjectUuid != "" {
+					handlers.SetNested(bodyObj, "project.uuid", bodyProjectUuid)
+				}
+				if bodyProjectKey != "" {
+					handlers.SetNested(bodyObj, "project.key", bodyProjectKey)
+				}
 				if bodyProjectDescription != "" {
 					handlers.SetNested(bodyObj, "project.description", bodyProjectDescription)
 				}
 				if bodyProjectHasPubliclyVisibleRepos {
 					handlers.SetNested(bodyObj, "project.has_publicly_visible_repos", bodyProjectHasPubliclyVisibleRepos)
 				}
-				if bodyProjectIsPrivate {
-					handlers.SetNested(bodyObj, "project.is_private", bodyProjectIsPrivate)
-				}
-				if bodyProjectKey != "" {
-					handlers.SetNested(bodyObj, "project.key", bodyProjectKey)
-				}
 				if bodyProjectName != "" {
 					handlers.SetNested(bodyObj, "project.name", bodyProjectName)
-				}
-				if bodyProjectUuid != "" {
-					handlers.SetNested(bodyObj, "project.uuid", bodyProjectUuid)
 				}
 				if bodyScm != "" {
 					handlers.SetNested(bodyObj, "scm", bodyScm)
@@ -394,24 +394,24 @@ administered through admin.atlassian.com.
 `)
 	cmd.Flags().BoolVar(&bodyIsPrivate, "is-private", false, `is_private`)
 	cmd.Flags().StringVar(&bodyLanguage, "language", "", `language`)
-	cmd.Flags().StringVar(&bodyMainbranchDefaultMergeStrategy, "mainbranch-default-merge-strategy", "", `The default merge strategy for pull requests targeting this branch.`)
-	cmd.Flags().StringVar(&bodyMainbranchMergeStrategies, "mainbranch-merge-strategies", "", `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`)
+	cmd.Flags().StringVar(&bodyMainbranchType, "mainbranch-type", "", `type`)
 	cmd.Flags().StringVar(&bodyMainbranchName, "mainbranch-name", "", `The name of the ref.`)
-	cmd.Flags().StringVar(&bodyMainbranchType, "mainbranch-type", "", `mainbranch.type`)
+	cmd.Flags().StringVar(&bodyMainbranchMergeStrategies, "mainbranch-merge-strategies", "", `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`)
+	cmd.Flags().StringVar(&bodyMainbranchDefaultMergeStrategy, "mainbranch-default-merge-strategy", "", `The default merge strategy for pull requests targeting this branch.`)
 	cmd.Flags().StringVar(&bodyName, "name", "", `name`)
-	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `owner.display_name`)
-	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `owner.uuid`)
-	cmd.Flags().StringVar(&bodyProjectDescription, "project-description", "", `project.description`)
-	cmd.Flags().BoolVar(&bodyProjectHasPubliclyVisibleRepos, "project-has-publicly-visible-repos", false, `
-Indicates whether the project contains publicly visible repositories.
-Note that private projects cannot contain public repositories.`)
+	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `display_name`)
+	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `uuid`)
 	cmd.Flags().BoolVar(&bodyProjectIsPrivate, "project-is-private", false, `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`)
-	cmd.Flags().StringVar(&bodyProjectKey, "project-key", "", `The project's key.`)
-	cmd.Flags().StringVar(&bodyProjectName, "project-name", "", `The name of the project.`)
 	cmd.Flags().StringVar(&bodyProjectUuid, "project-uuid", "", `The project's immutable id.`)
+	cmd.Flags().StringVar(&bodyProjectKey, "project-key", "", `The project's key.`)
+	cmd.Flags().StringVar(&bodyProjectDescription, "project-description", "", `description`)
+	cmd.Flags().BoolVar(&bodyProjectHasPubliclyVisibleRepos, "project-has-publicly-visible-repos", false, `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`)
+	cmd.Flags().StringVar(&bodyProjectName, "project-name", "", `The name of the project.`)
 	cmd.Flags().StringVar(&bodyScm, "scm", "", `[git]`)
 	cmd.Flags().IntVar(&bodySize, "size", 0, `size`)
 	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`)
@@ -432,18 +432,18 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 		bodyHasWiki                        bool
 		bodyIsPrivate                      bool
 		bodyLanguage                       string
-		bodyMainbranchDefaultMergeStrategy string
-		bodyMainbranchMergeStrategies      string
 		bodyMainbranchName                 string
 		bodyMainbranchType                 string
+		bodyMainbranchMergeStrategies      string
+		bodyMainbranchDefaultMergeStrategy string
 		bodyName                           string
 		bodyOwnerDisplayName               string
 		bodyOwnerUuid                      string
+		bodyProjectKey                     string
 		bodyProjectDescription             string
 		bodyProjectHasPubliclyVisibleRepos bool
-		bodyProjectIsPrivate               bool
-		bodyProjectKey                     string
 		bodyProjectName                    string
+		bodyProjectIsPrivate               bool
 		bodyProjectUuid                    string
 		bodyScm                            string
 		bodySize                           int
@@ -494,17 +494,17 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 				if bodyLanguage != "" {
 					handlers.SetNested(bodyObj, "language", bodyLanguage)
 				}
-				if bodyMainbranchDefaultMergeStrategy != "" {
-					handlers.SetNested(bodyObj, "mainbranch.default_merge_strategy", bodyMainbranchDefaultMergeStrategy)
-				}
-				if bodyMainbranchMergeStrategies != "" {
-					handlers.SetNested(bodyObj, "mainbranch.merge_strategies", bodyMainbranchMergeStrategies)
-				}
 				if bodyMainbranchName != "" {
 					handlers.SetNested(bodyObj, "mainbranch.name", bodyMainbranchName)
 				}
 				if bodyMainbranchType != "" {
 					handlers.SetNested(bodyObj, "mainbranch.type", bodyMainbranchType)
+				}
+				if bodyMainbranchMergeStrategies != "" {
+					handlers.SetNested(bodyObj, "mainbranch.merge_strategies", bodyMainbranchMergeStrategies)
+				}
+				if bodyMainbranchDefaultMergeStrategy != "" {
+					handlers.SetNested(bodyObj, "mainbranch.default_merge_strategy", bodyMainbranchDefaultMergeStrategy)
 				}
 				if bodyName != "" {
 					handlers.SetNested(bodyObj, "name", bodyName)
@@ -515,20 +515,20 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 				if bodyOwnerUuid != "" {
 					handlers.SetNested(bodyObj, "owner.uuid", bodyOwnerUuid)
 				}
+				if bodyProjectKey != "" {
+					handlers.SetNested(bodyObj, "project.key", bodyProjectKey)
+				}
 				if bodyProjectDescription != "" {
 					handlers.SetNested(bodyObj, "project.description", bodyProjectDescription)
 				}
 				if bodyProjectHasPubliclyVisibleRepos {
 					handlers.SetNested(bodyObj, "project.has_publicly_visible_repos", bodyProjectHasPubliclyVisibleRepos)
 				}
-				if bodyProjectIsPrivate {
-					handlers.SetNested(bodyObj, "project.is_private", bodyProjectIsPrivate)
-				}
-				if bodyProjectKey != "" {
-					handlers.SetNested(bodyObj, "project.key", bodyProjectKey)
-				}
 				if bodyProjectName != "" {
 					handlers.SetNested(bodyObj, "project.name", bodyProjectName)
+				}
+				if bodyProjectIsPrivate {
+					handlers.SetNested(bodyObj, "project.is_private", bodyProjectIsPrivate)
 				}
 				if bodyProjectUuid != "" {
 					handlers.SetNested(bodyObj, "project.uuid", bodyProjectUuid)
@@ -581,23 +581,23 @@ administered through admin.atlassian.com.
 `)
 	cmd.Flags().BoolVar(&bodyIsPrivate, "is-private", false, `is_private`)
 	cmd.Flags().StringVar(&bodyLanguage, "language", "", `language`)
-	cmd.Flags().StringVar(&bodyMainbranchDefaultMergeStrategy, "mainbranch-default-merge-strategy", "", `The default merge strategy for pull requests targeting this branch.`)
-	cmd.Flags().StringVar(&bodyMainbranchMergeStrategies, "mainbranch-merge-strategies", "", `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`)
 	cmd.Flags().StringVar(&bodyMainbranchName, "mainbranch-name", "", `The name of the ref.`)
-	cmd.Flags().StringVar(&bodyMainbranchType, "mainbranch-type", "", `mainbranch.type`)
+	cmd.Flags().StringVar(&bodyMainbranchType, "mainbranch-type", "", `type`)
+	cmd.Flags().StringVar(&bodyMainbranchMergeStrategies, "mainbranch-merge-strategies", "", `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`)
+	cmd.Flags().StringVar(&bodyMainbranchDefaultMergeStrategy, "mainbranch-default-merge-strategy", "", `The default merge strategy for pull requests targeting this branch.`)
 	cmd.Flags().StringVar(&bodyName, "name", "", `name`)
-	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `owner.display_name`)
-	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `owner.uuid`)
-	cmd.Flags().StringVar(&bodyProjectDescription, "project-description", "", `project.description`)
+	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `display_name`)
+	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `uuid`)
+	cmd.Flags().StringVar(&bodyProjectKey, "project-key", "", `The project's key.`)
+	cmd.Flags().StringVar(&bodyProjectDescription, "project-description", "", `description`)
 	cmd.Flags().BoolVar(&bodyProjectHasPubliclyVisibleRepos, "project-has-publicly-visible-repos", false, `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`)
+	cmd.Flags().StringVar(&bodyProjectName, "project-name", "", `The name of the project.`)
 	cmd.Flags().BoolVar(&bodyProjectIsPrivate, "project-is-private", false, `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`)
-	cmd.Flags().StringVar(&bodyProjectKey, "project-key", "", `The project's key.`)
-	cmd.Flags().StringVar(&bodyProjectName, "project-name", "", `The name of the project.`)
 	cmd.Flags().StringVar(&bodyProjectUuid, "project-uuid", "", `The project's immutable id.`)
 	cmd.Flags().StringVar(&bodyScm, "scm", "", `[git]`)
 	cmd.Flags().IntVar(&bodySize, "size", 0, `size`)
@@ -806,18 +806,18 @@ func newReposForkARepositoryCmd() *cobra.Command {
 		bodyHasWiki                        bool
 		bodyIsPrivate                      bool
 		bodyLanguage                       string
-		bodyMainbranchDefaultMergeStrategy string
-		bodyMainbranchMergeStrategies      string
-		bodyMainbranchName                 string
 		bodyMainbranchType                 string
+		bodyMainbranchName                 string
+		bodyMainbranchMergeStrategies      string
+		bodyMainbranchDefaultMergeStrategy string
 		bodyName                           string
 		bodyOwnerDisplayName               string
 		bodyOwnerUuid                      string
+		bodyProjectKey                     string
 		bodyProjectDescription             string
 		bodyProjectHasPubliclyVisibleRepos bool
-		bodyProjectIsPrivate               bool
-		bodyProjectKey                     string
 		bodyProjectName                    string
+		bodyProjectIsPrivate               bool
 		bodyProjectUuid                    string
 		bodyScm                            string
 		bodySize                           int
@@ -868,17 +868,17 @@ func newReposForkARepositoryCmd() *cobra.Command {
 				if bodyLanguage != "" {
 					handlers.SetNested(bodyObj, "language", bodyLanguage)
 				}
-				if bodyMainbranchDefaultMergeStrategy != "" {
-					handlers.SetNested(bodyObj, "mainbranch.default_merge_strategy", bodyMainbranchDefaultMergeStrategy)
-				}
-				if bodyMainbranchMergeStrategies != "" {
-					handlers.SetNested(bodyObj, "mainbranch.merge_strategies", bodyMainbranchMergeStrategies)
+				if bodyMainbranchType != "" {
+					handlers.SetNested(bodyObj, "mainbranch.type", bodyMainbranchType)
 				}
 				if bodyMainbranchName != "" {
 					handlers.SetNested(bodyObj, "mainbranch.name", bodyMainbranchName)
 				}
-				if bodyMainbranchType != "" {
-					handlers.SetNested(bodyObj, "mainbranch.type", bodyMainbranchType)
+				if bodyMainbranchMergeStrategies != "" {
+					handlers.SetNested(bodyObj, "mainbranch.merge_strategies", bodyMainbranchMergeStrategies)
+				}
+				if bodyMainbranchDefaultMergeStrategy != "" {
+					handlers.SetNested(bodyObj, "mainbranch.default_merge_strategy", bodyMainbranchDefaultMergeStrategy)
 				}
 				if bodyName != "" {
 					handlers.SetNested(bodyObj, "name", bodyName)
@@ -889,20 +889,20 @@ func newReposForkARepositoryCmd() *cobra.Command {
 				if bodyOwnerUuid != "" {
 					handlers.SetNested(bodyObj, "owner.uuid", bodyOwnerUuid)
 				}
+				if bodyProjectKey != "" {
+					handlers.SetNested(bodyObj, "project.key", bodyProjectKey)
+				}
 				if bodyProjectDescription != "" {
 					handlers.SetNested(bodyObj, "project.description", bodyProjectDescription)
 				}
 				if bodyProjectHasPubliclyVisibleRepos {
 					handlers.SetNested(bodyObj, "project.has_publicly_visible_repos", bodyProjectHasPubliclyVisibleRepos)
 				}
-				if bodyProjectIsPrivate {
-					handlers.SetNested(bodyObj, "project.is_private", bodyProjectIsPrivate)
-				}
-				if bodyProjectKey != "" {
-					handlers.SetNested(bodyObj, "project.key", bodyProjectKey)
-				}
 				if bodyProjectName != "" {
 					handlers.SetNested(bodyObj, "project.name", bodyProjectName)
+				}
+				if bodyProjectIsPrivate {
+					handlers.SetNested(bodyObj, "project.is_private", bodyProjectIsPrivate)
 				}
 				if bodyProjectUuid != "" {
 					handlers.SetNested(bodyObj, "project.uuid", bodyProjectUuid)
@@ -955,23 +955,23 @@ administered through admin.atlassian.com.
 `)
 	cmd.Flags().BoolVar(&bodyIsPrivate, "is-private", false, `is_private`)
 	cmd.Flags().StringVar(&bodyLanguage, "language", "", `language`)
-	cmd.Flags().StringVar(&bodyMainbranchDefaultMergeStrategy, "mainbranch-default-merge-strategy", "", `The default merge strategy for pull requests targeting this branch.`)
-	cmd.Flags().StringVar(&bodyMainbranchMergeStrategies, "mainbranch-merge-strategies", "", `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`)
+	cmd.Flags().StringVar(&bodyMainbranchType, "mainbranch-type", "", `type`)
 	cmd.Flags().StringVar(&bodyMainbranchName, "mainbranch-name", "", `The name of the ref.`)
-	cmd.Flags().StringVar(&bodyMainbranchType, "mainbranch-type", "", `mainbranch.type`)
+	cmd.Flags().StringVar(&bodyMainbranchMergeStrategies, "mainbranch-merge-strategies", "", `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`)
+	cmd.Flags().StringVar(&bodyMainbranchDefaultMergeStrategy, "mainbranch-default-merge-strategy", "", `The default merge strategy for pull requests targeting this branch.`)
 	cmd.Flags().StringVar(&bodyName, "name", "", `name`)
-	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `owner.display_name`)
-	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `owner.uuid`)
-	cmd.Flags().StringVar(&bodyProjectDescription, "project-description", "", `project.description`)
+	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `display_name`)
+	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `uuid`)
+	cmd.Flags().StringVar(&bodyProjectKey, "project-key", "", `The project's key.`)
+	cmd.Flags().StringVar(&bodyProjectDescription, "project-description", "", `description`)
 	cmd.Flags().BoolVar(&bodyProjectHasPubliclyVisibleRepos, "project-has-publicly-visible-repos", false, `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`)
+	cmd.Flags().StringVar(&bodyProjectName, "project-name", "", `The name of the project.`)
 	cmd.Flags().BoolVar(&bodyProjectIsPrivate, "project-is-private", false, `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`)
-	cmd.Flags().StringVar(&bodyProjectKey, "project-key", "", `The project's key.`)
-	cmd.Flags().StringVar(&bodyProjectName, "project-name", "", `The name of the project.`)
 	cmd.Flags().StringVar(&bodyProjectUuid, "project-uuid", "", `The project's immutable id.`)
 	cmd.Flags().StringVar(&bodyScm, "scm", "", `[git]`)
 	cmd.Flags().IntVar(&bodySize, "size", 0, `size`)

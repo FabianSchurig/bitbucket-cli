@@ -58,20 +58,26 @@ resource "bitbucket_project_user_permissions" "example" {
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `permission` (String) [read, write, create-repo, admin, none]
-- `project_created_on` (String) project.created_on
-- `project_description` (String) project.description
-- `project_has_publicly_visible_repos` (String) 
-- `project_is_private` (String) 
-- `project_key` (String) The project's key.
-- `project_name` (String) The name of the project.
-- `project_updated_on` (String) project.updated_on
-- `project_uuid` (String) The project's immutable id.
+- `project` (Object) project
+  Nested schema:
+  - `uuid` (String) The project's immutable id.
+  - `key` (String) The project's key.
+  - `name` (String) The name of the project.
+  - `description` (String) description
+  - `is_private` (String) 
+  - `updated_on` (String) updated_on
+  - `created_on` (String) created_on
+  - `has_publicly_visible_repos` (String) 
+
 - `type` (String) type
-- `user_account_id` (String) The user's Atlassian account ID.
-- `user_account_status` (String) The status of the account. Currently the only possible value is "active", but more values may be added in the future.
-- `user_created_on` (String) user.created_on
-- `user_display_name` (String) user.display_name
-- `user_has_2fa_enabled` (String) user.has_2fa_enabled
-- `user_is_staff` (String) user.is_staff
-- `user_nickname` (String) Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.
-- `user_uuid` (String) user.uuid
+- `user` (Object) user
+  Nested schema:
+  - `created_on` (String) created_on
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+  - `account_id` (String) The user's Atlassian account ID.
+  - `account_status` (String) The status of the account. Currently the only possible value is "active", but more values may be added in the future.
+  - `has_2fa_enabled` (String) has_2fa_enabled
+  - `nickname` (String) Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.
+  - `is_staff` (String) is_staff
+

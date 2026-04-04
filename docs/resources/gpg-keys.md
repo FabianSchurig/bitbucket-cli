@@ -55,8 +55,11 @@ resource "bitbucket_gpg_keys" "example" {
 - `key_id` (String) The unique identifier for the GPG key (also computed from API response)
 - `last_used` (String) last_used (also computed from API response)
 - `name` (String) The user-defined label for the GPG key (also computed from API response)
-- `owner_display_name` (String) owner.display_name (also computed from API response)
-- `owner_uuid` (String) owner.uuid (also computed from API response)
+- `owner` (Object) owner (also computed from API response)
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
 - `parent_fingerprint` (String) The fingerprint of the parent key. This value is null unless the current key is a subkey. (also computed from API response)
 - `subkeys` (String) subkeys (JSON array) (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
@@ -66,4 +69,3 @@ resource "bitbucket_gpg_keys" "example" {
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
-- `owner_created_on` (String) owner.created_on

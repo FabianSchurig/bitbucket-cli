@@ -52,7 +52,11 @@ resource "bitbucket_pr" "example" {
 - `pull_request_id` (String) Path parameter (auto-populated from API response).
 - `close_source_branch` (String) A boolean flag indicating if merging the pull request closes the source branch. (also computed from API response)
 - `description` (String) Explains what the pull request does. (also computed from API response)
-- `destination_commit_hash` (String) destination.commit.hash (also computed from API response)
+- `destination` (Object) destination (also computed from API response)
+  Nested schema:
+  - `commit` (Object) commit
+    - `hash` (String) hash
+
 - `draft` (String) A boolean flag indicating whether the pull request is a draft. (also computed from API response)
 - `reason` (String) Explains why a pull request was declined. This field is only applicable to pull requests in rejected state. (also computed from API response)
 - `reviewers` (List of Object) The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL. (also computed from API response)
@@ -61,7 +65,11 @@ resource "bitbucket_pr" "example" {
   - `display_name` (String) display_name
   - `uuid` (String) uuid
 
-- `source_commit_hash` (String) source.commit.hash (also computed from API response)
+- `source` (Object) source (also computed from API response)
+  Nested schema:
+  - `commit` (Object) commit
+    - `hash` (String) hash
+
 - `state` (String) The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED] (also computed from API response)
 - `title` (String) Title of the pull request. (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
@@ -70,15 +78,24 @@ resource "bitbucket_pr" "example" {
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `author_created_on` (String) author.created_on
-- `author_display_name` (String) author.display_name
-- `author_uuid` (String) author.uuid
-- `closed_by_created_on` (String) closed_by.created_on
-- `closed_by_display_name` (String) closed_by.display_name
-- `closed_by_uuid` (String) closed_by.uuid
+- `author` (Object) author
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+  - `created_on` (String) created_on
+
+- `closed_by` (Object) closed_by
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+  - `created_on` (String) created_on
+
 - `comment_count` (String) The number of comments for a specific pull request.
 - `created_on` (String) The ISO8601 timestamp the request was created.
-- `merge_commit_hash` (String) merge_commit.hash
+- `merge_commit` (Object) merge_commit
+  Nested schema:
+  - `hash` (String) hash
+
 - `participants` (List of Object) The list of users that are collaborating on this pull request.
   Nested schema:
   - `role` (String) [PARTICIPANT, REVIEWER]
@@ -87,7 +104,10 @@ resource "bitbucket_pr" "example" {
   - `participated_on` (String) The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.
 
 - `queued` (String) A boolean flag indicating whether the pull request is queued
-- `summary_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
-- `summary_raw` (String) The text as it was typed by a user.
+- `summary` (Object) summary
+  Nested schema:
+  - `raw` (String) The text as it was typed by a user.
+  - `markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
+
 - `task_count` (String) The number of open tasks for a specific pull request.
 - `updated_on` (String) The ISO8601 timestamp the request was last updated.

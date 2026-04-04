@@ -42,7 +42,15 @@ output "hook_types_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `repository_events_href` (String) repository.events.href
-- `repository_events_name` (String) repository.events.name
-- `workspace_events_href` (String) workspace.events.href
-- `workspace_events_name` (String) workspace.events.name
+- `repository` (Object) repository
+  Nested schema:
+  - `events` (Object) A link to a resource related to this object.
+    - `href` (String) href
+    - `name` (String) name
+
+- `workspace` (Object) workspace
+  Nested schema:
+  - `events` (Object) A link to a resource related to this object.
+    - `name` (String) name
+    - `href` (String) href
+

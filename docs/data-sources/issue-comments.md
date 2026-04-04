@@ -53,25 +53,35 @@ output "issue_comments_response" {
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
 - `deleted` (String) deleted
-- `issue_created_on` (String) issue.created_on
-- `issue_id` (String) issue.id
-- `issue_updated_on` (String) issue.updated_on
 - `updated_on` (String) updated_on
-- `user_created_on` (String) user.created_on
-- `user_display_name` (String) user.display_name
-- `user_uuid` (String) user.uuid
-- `content_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
-- `content_raw` (String) The text as it was typed by a user.
-- `inline_from` (String) The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.
-- `inline_path` (String) The path of the file this comment is anchored to.
-- `inline_start_from` (String) The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.
-- `inline_start_to` (String) The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.
-- `inline_to` (String) The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.
-- `issue_content_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
-- `issue_content_raw` (String) The text as it was typed by a user.
-- `issue_edited_on` (String) issue.edited_on
-- `issue_kind` (String) [bug, enhancement, proposal, task]
-- `issue_priority` (String) [trivial, minor, major, critical, blocker]
-- `issue_state` (String) [submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]
-- `issue_title` (String) issue.title
-- `issue_votes` (String) issue.votes
+- `user` (Object) user
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+  - `created_on` (String) created_on
+
+- `content` (Object) content
+  Nested schema:
+  - `raw` (String) The text as it was typed by a user.
+  - `markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
+
+- `inline` (Object) inline
+  Nested schema:
+  - `path` (String) The path of the file this comment is anchored to.
+  - `from` (String) The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.
+  - `to` (String) The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.
+  - `start_from` (String) The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.
+  - `start_to` (String) The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.
+
+- `issue` (Object) issue
+  Nested schema:
+  - `votes` (String) votes
+  - `content` (Object) content
+    - `markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
+    - `raw` (String) The text as it was typed by a user.
+  - `title` (String) title
+  - `state` (String) [submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]
+  - `kind` (String) [bug, enhancement, proposal, task]
+  - `priority` (String) [trivial, minor, major, critical, blocker]
+  - `edited_on` (String) edited_on
+

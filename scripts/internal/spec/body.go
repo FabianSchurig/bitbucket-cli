@@ -14,7 +14,8 @@ type BodyField struct {
 	Default    string      // Go zero-value literal
 	Desc       string      // human-readable description
 	IsArray    bool        // true when the field is an array
-	ItemFields []BodyField // nested fields for array item objects (empty for simple arrays)
+	IsObject   bool        // true when the field is a nested object ($ref or inline)
+	ItemFields []BodyField // nested fields for array item objects or object properties
 }
 
 // ─── Body field helpers ───────────────────────────────────────────────────────
@@ -139,6 +140,39 @@ func ResolveResponseFields(schemas map[string]any, ref, prefix string, visited m
 	return ResolveFields(schemas, ref, prefix, visited, ResponseFieldOpts())
 }
 
+// FlattenBodyFields recursively flattens nested object BodyFields into flat
+// dot-separated paths. Array fields are preserved as-is (only object nesting
+// is flattened). This is used by CLI and MCP generators that need flat flags.
+func FlattenBodyFields(fields []BodyField) []BodyField {
+	var flat []BodyField
+	for _, f := range fields {
+		flat = append(flat, flattenBodyFieldRec(f, "")...)
+	}
+	return flat
+}
+
+func flattenBodyFieldRec(f BodyField, prefix string) []BodyField {
+	path := f.Path
+	if prefix != "" {
+		path = prefix + "." + f.Path
+	}
+
+	if f.IsObject && len(f.ItemFields) > 0 {
+		var flat []BodyField
+		for _, item := range f.ItemFields {
+			flat = append(flat, flattenBodyFieldRec(item, path)...)
+		}
+		return flat
+	}
+
+	// For scalars and arrays, reconstruct with full path.
+	result := f
+	result.Path = path
+	result.FlagName = BodyFlagName(path)
+	result.GoName = BodyGoName(path)
+	return []BodyField{result}
+}
+
 // ResolveFields recursively resolves a $ref to a list of flattened fields
 // with configurable skip lists via opts.
 func ResolveFields(schemas map[string]any, ref, prefix string, visited map[string]bool, opts FieldResolveOpts) []BodyField {
@@ -218,10 +252,22 @@ func flattenProperties(schemas map[string]any, props map[string]any, prefix stri
 
 func flattenProperty(schemas map[string]any, name, path string, prop map[string]any, visited map[string]bool, opts FieldResolveOpts) []BodyField {
 	if ref, ok := prop["$ref"].(string); ok {
-		return resolveRefProperty(schemas, name, path, ref, visited, opts)
+		return resolveRefProperty(schemas, name, path, ref, prop, visited, opts)
 	}
 	if _, ok := prop["allOf"]; ok {
-		return resolveSchemaObj(schemas, prop, path, visited, opts)
+		nested := resolveSchemaObj(schemas, prop, "", visited, opts)
+		if len(nested) > 0 {
+			desc, _ := prop["description"].(string)
+			if desc == "" {
+				desc = name
+			}
+			return []BodyField{{
+				Path: path, FlagName: BodyFlagName(path), GoName: BodyGoName(path),
+				GoType: "string", Default: `""`, Desc: desc,
+				IsObject: true, ItemFields: nested,
+			}}
+		}
+		return nil
 	}
 
 	typ, _ := prop["type"].(string)
@@ -233,7 +279,17 @@ func flattenProperty(schemas map[string]any, name, path string, prop map[string]
 		return []BodyField{MakeBodyField(path, typ, desc)}
 	case "object":
 		if subProps, ok := prop["properties"].(map[string]any); ok {
-			return flattenProperties(schemas, subProps, path, visited, opts)
+			nested := flattenProperties(schemas, subProps, "", visited, opts)
+			if len(nested) > 0 {
+				if desc == "" {
+					desc = name
+				}
+				return []BodyField{{
+					Path: path, FlagName: BodyFlagName(path), GoName: BodyGoName(path),
+					GoType: "string", Default: `""`, Desc: desc,
+					IsObject: true, ItemFields: nested,
+				}}
+			}
 		}
 	case "array":
 		items, _ := prop["items"].(map[string]any)
@@ -337,13 +393,35 @@ func flattenProperty(schemas map[string]any, name, path string, prop map[string]
 	return nil
 }
 
-func resolveRefProperty(schemas map[string]any, name, path, ref string, visited map[string]bool, opts FieldResolveOpts) []BodyField {
+func resolveRefProperty(schemas map[string]any, name, path, ref string, prop map[string]any, visited map[string]bool, opts FieldResolveOpts) []BodyField {
 	if opts.MaxRefDepth <= 0 {
 		return nil
 	}
 	deeper := opts
 	deeper.MaxRefDepth = opts.MaxRefDepth - 1
-	return ResolveFields(schemas, ref, path, visited, deeper)
+	// Resolve with empty prefix so item fields have relative paths.
+	nested := ResolveFields(schemas, ref, "", visited, deeper)
+	if len(nested) == 0 {
+		return nil
+	}
+	desc, _ := prop["description"].(string)
+	if desc == "" {
+		// Try to get description from the referenced schema.
+		refName := strings.TrimPrefix(ref, schemaRefPrefix)
+		if raw, ok := schemas[refName]; ok {
+			if s, ok := raw.(map[string]any); ok {
+				desc, _ = s["description"].(string)
+			}
+		}
+	}
+	if desc == "" {
+		desc = name
+	}
+	return []BodyField{{
+		Path: path, FlagName: BodyFlagName(path), GoName: BodyGoName(path),
+		GoType: "string", Default: `""`, Desc: desc,
+		IsObject: true, ItemFields: nested,
+	}}
 }
 
 // ResolveResponseRef extracts the response entity schema $ref from an operation.

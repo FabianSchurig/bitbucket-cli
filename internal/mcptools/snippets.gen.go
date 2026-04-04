@@ -163,9 +163,9 @@ Available operations:
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
-				{Path: `snippet.is_private`, Type: `bool`, Desc: `snippet.is_private`},
+				{Path: `snippet.is_private`, Type: `bool`, Desc: `is_private`},
+				{Path: `snippet.title`, Type: `string`, Desc: `title`},
 				{Path: `snippet.scm`, Type: `string`, Desc: `The DVCS used to store the snippet. [git]`},
-				{Path: `snippet.title`, Type: `string`, Desc: `snippet.title`},
 			},
 			HasBody:   true,
 			Paginated: false,
@@ -197,9 +197,9 @@ Available operations:
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
-				{Path: `snippet.is_private`, Type: `bool`, Desc: `snippet.is_private`},
+				{Path: `snippet.is_private`, Type: `bool`, Desc: `is_private`},
+				{Path: `snippet.title`, Type: `string`, Desc: `title`},
 				{Path: `snippet.scm`, Type: `string`, Desc: `The DVCS used to store the snippet. [git]`},
-				{Path: `snippet.title`, Type: `string`, Desc: `snippet.title`},
 			},
 			HasBody:   true,
 			Paginated: false,

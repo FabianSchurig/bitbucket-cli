@@ -50,9 +50,6 @@ output "pipelines_response" {
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) The timestamp when the pipeline was created.
-- `creator_created_on` (String) creator.created_on
-- `repository_created_on` (String) repository.created_on
-- `repository_updated_on` (String) repository.updated_on
 - `build_number` (String) The build number of the pipeline.
 - `build_seconds_used` (String) The number of build seconds used by this pipeline.
 - `completed_on` (String) The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.
@@ -61,24 +58,30 @@ output "pipelines_response" {
   - `source` (String) Identifier of the configuration source
   - `uri` (String) Link to the configuration source view or its immediate content
 
-- `creator_display_name` (String) creator.display_name
-- `creator_uuid` (String) creator.uuid
-- `repository_description` (String) repository.description
-- `repository_fork_policy` (String) 
-- `repository_full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
-- `repository_has_issues` (String) 
-- `repository_has_wiki` (String) 
-- `repository_is_private` (String) repository.is_private
-- `repository_language` (String) repository.language
-- `repository_name` (String) repository.name
-- `repository_scm` (String) [git]
-- `repository_size` (String) repository.size
-- `repository_uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+- `creator` (Object) creator
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
+- `repository` (Object) repository
+  Nested schema:
+  - `is_private` (String) is_private
+  - `size` (String) size
+  - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+  - `language` (String) language
+  - `has_issues` (String) 
+  - `fork_policy` (String) 
+  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+  - `name` (String) name
+  - `has_wiki` (String) 
+  - `scm` (String) [git]
+  - `description` (String) description
+
 - `uuid` (String) The UUID identifying the pipeline.
 - `variables` (List of Object) The variables for the pipeline.
   Nested schema:
+  - `secured` (String) If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.
   - `uuid` (String) The UUID identifying the variable.
   - `key` (String) The unique name of the variable.
   - `value` (String) The value of the variable. If the variable is secured, this will be empty.
-  - `secured` (String) If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.
 

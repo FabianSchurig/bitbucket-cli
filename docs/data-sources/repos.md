@@ -48,9 +48,6 @@ output "repos_response" {
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
-- `owner_created_on` (String) owner.created_on
-- `project_created_on` (String) project.created_on
-- `project_updated_on` (String) project.updated_on
 - `updated_on` (String) updated_on
 - `description` (String) description
 - `fork_policy` (String) 
@@ -59,19 +56,28 @@ output "repos_response" {
 - `has_wiki` (String) 
 - `is_private` (String) is_private
 - `language` (String) language
-- `mainbranch_default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch.
-- `mainbranch_merge_strategies` (List of String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
-- `mainbranch_name` (String) The name of the ref.
-- `mainbranch_type` (String) mainbranch.type
+- `mainbranch` (Object) mainbranch
+  Nested schema:
+  - `type` (String) type
+  - `name` (String) The name of the ref.
+  - `merge_strategies` (List of String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
+  - `default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch.
+
 - `name` (String) name
-- `owner_display_name` (String) owner.display_name
-- `owner_uuid` (String) owner.uuid
-- `project_description` (String) project.description
-- `project_has_publicly_visible_repos` (String) 
-- `project_is_private` (String) 
-- `project_key` (String) The project's key.
-- `project_name` (String) The name of the project.
-- `project_uuid` (String) The project's immutable id.
+- `owner` (Object) owner
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
+- `project` (Object) project
+  Nested schema:
+  - `uuid` (String) The project's immutable id.
+  - `key` (String) The project's key.
+  - `name` (String) The name of the project.
+  - `is_private` (String) 
+  - `has_publicly_visible_repos` (String) 
+  - `description` (String) description
+
 - `scm` (String) [git]
 - `size` (String) size
 - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.

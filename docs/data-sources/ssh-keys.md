@@ -48,13 +48,15 @@ output "ssh_keys_response" {
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
-- `owner_created_on` (String) owner.created_on
 - `comment` (String) The comment parsed from the SSH key (if present)
 - `expires_on` (String) expires_on
 - `fingerprint` (String) The SSH key fingerprint in SHA-256 format.
 - `key` (String) The SSH public key value in OpenSSH format.
 - `label` (String) The user-defined label for the SSH key
 - `last_used` (String) last_used
-- `owner_display_name` (String) owner.display_name
-- `owner_uuid` (String) owner.uuid
+- `owner` (Object) owner
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
 - `uuid` (String) The SSH key's immutable ID.

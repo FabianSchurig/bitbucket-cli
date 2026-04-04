@@ -438,8 +438,8 @@ func newSnippetsCreateACommentOnASnippetCmd() *cobra.Command {
 	var (
 		encodedId            string
 		workspace            string
-		bodySnippetIsPrivate bool
 		bodySnippetScm       string
+		bodySnippetIsPrivate bool
 		bodySnippetTitle     string
 		body                 string
 	)
@@ -466,11 +466,11 @@ func newSnippetsCreateACommentOnASnippetCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodySnippetIsPrivate {
-					handlers.SetNested(bodyObj, "snippet.is_private", bodySnippetIsPrivate)
-				}
 				if bodySnippetScm != "" {
 					handlers.SetNested(bodyObj, "snippet.scm", bodySnippetScm)
+				}
+				if bodySnippetIsPrivate {
+					handlers.SetNested(bodyObj, "snippet.is_private", bodySnippetIsPrivate)
 				}
 				if bodySnippetTitle != "" {
 					handlers.SetNested(bodyObj, "snippet.title", bodySnippetTitle)
@@ -492,9 +492,9 @@ func newSnippetsCreateACommentOnASnippetCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVar(&encodedId, "encoded-id", "", "encoded_id (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().BoolVar(&bodySnippetIsPrivate, "snippet-is-private", false, `snippet.is_private`)
 	cmd.Flags().StringVar(&bodySnippetScm, "snippet-scm", "", `The DVCS used to store the snippet. [git]`)
-	cmd.Flags().StringVar(&bodySnippetTitle, "snippet-title", "", `snippet.title`)
+	cmd.Flags().BoolVar(&bodySnippetIsPrivate, "snippet-is-private", false, `is_private`)
+	cmd.Flags().StringVar(&bodySnippetTitle, "snippet-title", "", `title`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -556,8 +556,8 @@ func newSnippetsUpdateACommentOnASnippetCmd() *cobra.Command {
 		commentId            int
 		encodedId            string
 		workspace            string
-		bodySnippetIsPrivate bool
 		bodySnippetScm       string
+		bodySnippetIsPrivate bool
 		bodySnippetTitle     string
 		body                 string
 	)
@@ -588,11 +588,11 @@ func newSnippetsUpdateACommentOnASnippetCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodySnippetIsPrivate {
-					handlers.SetNested(bodyObj, "snippet.is_private", bodySnippetIsPrivate)
-				}
 				if bodySnippetScm != "" {
 					handlers.SetNested(bodyObj, "snippet.scm", bodySnippetScm)
+				}
+				if bodySnippetIsPrivate {
+					handlers.SetNested(bodyObj, "snippet.is_private", bodySnippetIsPrivate)
 				}
 				if bodySnippetTitle != "" {
 					handlers.SetNested(bodyObj, "snippet.title", bodySnippetTitle)
@@ -615,9 +615,9 @@ func newSnippetsUpdateACommentOnASnippetCmd() *cobra.Command {
 	cmd.Flags().IntVar(&commentId, "comment-id", 0, "comment_id (path parameter)")
 	cmd.Flags().StringVar(&encodedId, "encoded-id", "", "encoded_id (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().BoolVar(&bodySnippetIsPrivate, "snippet-is-private", false, `snippet.is_private`)
 	cmd.Flags().StringVar(&bodySnippetScm, "snippet-scm", "", `The DVCS used to store the snippet. [git]`)
-	cmd.Flags().StringVar(&bodySnippetTitle, "snippet-title", "", `snippet.title`)
+	cmd.Flags().BoolVar(&bodySnippetIsPrivate, "snippet-is-private", false, `is_private`)
+	cmd.Flags().StringVar(&bodySnippetTitle, "snippet-title", "", `title`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }

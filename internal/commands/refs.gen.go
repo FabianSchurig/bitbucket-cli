@@ -418,8 +418,8 @@ func newRefsCreateATagCmd() *cobra.Command {
 		bodyMessage       string
 		bodyName          string
 		bodyTaggerRaw     string
-		bodyTargetDate    string
 		bodyTargetHash    string
+		bodyTargetDate    string
 		bodyTargetMessage string
 		bodyTargetParents string
 		bodyType          string
@@ -460,11 +460,11 @@ func newRefsCreateATagCmd() *cobra.Command {
 				if bodyTaggerRaw != "" {
 					handlers.SetNested(bodyObj, "tagger.raw", bodyTaggerRaw)
 				}
-				if bodyTargetDate != "" {
-					handlers.SetNested(bodyObj, "target.date", bodyTargetDate)
-				}
 				if bodyTargetHash != "" {
 					handlers.SetNested(bodyObj, "target.hash", bodyTargetHash)
+				}
+				if bodyTargetDate != "" {
+					handlers.SetNested(bodyObj, "target.date", bodyTargetDate)
 				}
 				if bodyTargetMessage != "" {
 					handlers.SetNested(bodyObj, "target.message", bodyTargetMessage)
@@ -496,9 +496,9 @@ func newRefsCreateATagCmd() *cobra.Command {
 	cmd.Flags().StringVar(&bodyMessage, "message", "", `The message associated with the tag, if available.`)
 	cmd.Flags().StringVar(&bodyName, "name", "", `The name of the ref.`)
 	cmd.Flags().StringVar(&bodyTaggerRaw, "tagger-raw", "", `The raw author value from the repository. This may be the only value available if the author does not match a user in Bitbucket.`)
-	cmd.Flags().StringVar(&bodyTargetDate, "target-date", "", `target.date`)
-	cmd.Flags().StringVar(&bodyTargetHash, "target-hash", "", `target.hash`)
-	cmd.Flags().StringVar(&bodyTargetMessage, "target-message", "", `target.message`)
+	cmd.Flags().StringVar(&bodyTargetHash, "target-hash", "", `hash`)
+	cmd.Flags().StringVar(&bodyTargetDate, "target-date", "", `date`)
+	cmd.Flags().StringVar(&bodyTargetMessage, "target-message", "", `message`)
 	cmd.Flags().StringVar(&bodyTargetParents, "target-parents", "", `parents (JSON array)`)
 	cmd.Flags().StringVar(&bodyType, "type", "", `type`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")

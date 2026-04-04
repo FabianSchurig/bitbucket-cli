@@ -54,19 +54,25 @@ output "repo_deploy_keys_response" {
 - `key` (String) The deploy key value.
 - `label` (String) The user-defined label for the deploy key
 - `last_used` (String) last_used
-- `owner_created_on` (String) owner.created_on
-- `owner_display_name` (String) owner.display_name
-- `owner_uuid` (String) owner.uuid
-- `repository_created_on` (String) repository.created_on
-- `repository_description` (String) repository.description
-- `repository_fork_policy` (String) 
-- `repository_full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
-- `repository_has_issues` (String) 
-- `repository_has_wiki` (String) 
-- `repository_is_private` (String) repository.is_private
-- `repository_language` (String) repository.language
-- `repository_name` (String) repository.name
-- `repository_scm` (String) [git]
-- `repository_size` (String) repository.size
-- `repository_updated_on` (String) repository.updated_on
-- `repository_uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+- `owner` (Object) owner
+  Nested schema:
+  - `created_on` (String) created_on
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
+- `repository` (Object) repository
+  Nested schema:
+  - `scm` (String) [git]
+  - `size` (String) size
+  - `has_wiki` (String) 
+  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
+  - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+  - `fork_policy` (String) 
+  - `is_private` (String) is_private
+  - `description` (String) description
+  - `updated_on` (String) updated_on
+  - `name` (String) name
+  - `created_on` (String) created_on
+  - `language` (String) language
+  - `has_issues` (String) 
+

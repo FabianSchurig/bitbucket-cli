@@ -50,19 +50,28 @@ resource "bitbucket_forked_repository" "example" {
 - `has_wiki` (String)  (also computed from API response)
 - `is_private` (String) is_private (also computed from API response)
 - `language` (String) language (also computed from API response)
-- `mainbranch_default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch. (also computed from API response)
-- `mainbranch_merge_strategies` (List of String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge] (also computed from API response)
-- `mainbranch_name` (String) The name of the ref. (also computed from API response)
-- `mainbranch_type` (String) mainbranch.type (also computed from API response)
+- `mainbranch` (Object) mainbranch (also computed from API response)
+  Nested schema:
+  - `type` (String) type
+  - `name` (String) The name of the ref.
+  - `merge_strategies` (List of String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
+  - `default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch.
+
 - `name` (String) name (also computed from API response)
-- `owner_display_name` (String) owner.display_name (also computed from API response)
-- `owner_uuid` (String) owner.uuid (also computed from API response)
-- `project_description` (String) project.description (also computed from API response)
-- `project_has_publicly_visible_repos` (String)  (also computed from API response)
-- `project_is_private` (String)  (also computed from API response)
-- `project_key` (String) The project's key. (also computed from API response)
-- `project_name` (String) The name of the project. (also computed from API response)
-- `project_uuid` (String) The project's immutable id. (also computed from API response)
+- `owner` (Object) owner (also computed from API response)
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
+- `project` (Object) project (also computed from API response)
+  Nested schema:
+  - `is_private` (String) 
+  - `has_publicly_visible_repos` (String) 
+  - `description` (String) description
+  - `uuid` (String) The project's immutable id.
+  - `key` (String) The project's key.
+  - `name` (String) The name of the project.
+
 - `scm` (String) [git] (also computed from API response)
 - `size` (String) size (also computed from API response)
 - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user. (also computed from API response)
@@ -73,7 +82,4 @@ resource "bitbucket_forked_repository" "example" {
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
-- `owner_created_on` (String) owner.created_on
-- `project_created_on` (String) project.created_on
-- `project_updated_on` (String) project.updated_on
 - `updated_on` (String) updated_on

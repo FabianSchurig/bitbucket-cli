@@ -46,13 +46,14 @@ type ParamDef struct {
 	Required bool
 }
 
-// BodyFieldDef describes a flattened request body field.
+// BodyFieldDef describes a request body field, potentially nested.
 type BodyFieldDef struct {
-	Path       string // dot-separated path (e.g., "source.branch.name")
+	Path       string // relative field name (e.g., "hash" inside a "target" object)
 	Type       string // "string", "integer", "boolean"
 	Desc       string
 	IsArray    bool           // true when the field is an array
-	ItemFields []BodyFieldDef // nested fields for array item objects (empty for simple arrays)
+	IsObject   bool           // true when the field is a nested object
+	ItemFields []BodyFieldDef // nested fields for array items or object properties
 }
 
 // CRUDOps maps CRUD operations to their OperationDef. All fields are optional —
@@ -165,7 +166,13 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 			if desc == "" {
 				desc = bf.Path
 			}
-			if bf.IsArray && len(bf.ItemFields) > 0 {
+			if bf.IsObject && len(bf.ItemFields) > 0 {
+				attrs[key] = schema.SingleNestedAttribute{
+					Description: desc,
+					Optional:    true,
+					Attributes:  buildNestedItemAttrs(bf.ItemFields),
+				}
+			} else if bf.IsArray && len(bf.ItemFields) > 0 {
 				attrs[key] = schema.ListNestedAttribute{
 					Description: desc,
 					Optional:    true,
@@ -217,6 +224,15 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						sa.Description = desc
 						attrs[key] = sa
 					}
+				case schema.SingleNestedAttribute:
+					if !sa.Computed && !sa.Required {
+						sa.Computed = true
+						sa.Description = desc
+						if rf.IsObject && len(rf.ItemFields) > 0 {
+							sa.Attributes = buildNestedItemAttrs(rf.ItemFields)
+						}
+						attrs[key] = sa
+					}
 				case schema.ListNestedAttribute:
 					if !sa.Computed && !sa.Required {
 						sa.Computed = true
@@ -238,7 +254,13 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				}
 			} else if !paramSeen[key] {
 				// New response-only field.
-				if rf.IsArray && len(rf.ItemFields) > 0 {
+				if rf.IsObject && len(rf.ItemFields) > 0 {
+					attrs[key] = schema.SingleNestedAttribute{
+						Description: desc,
+						Computed:    true,
+						Attributes:  buildNestedItemAttrs(rf.ItemFields),
+					}
+				} else if rf.IsArray && len(rf.ItemFields) > 0 {
 					attrs[key] = schema.ListNestedAttribute{
 						Description: desc,
 						Computed:    true,
@@ -279,9 +301,8 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 	}
 }
 
-// buildNestedItemAttrs creates schema attributes for array item fields.
-// All nested fields are Optional+Computed: users can provide identifiers,
-// and the API response populates the rest.
+// buildNestedItemAttrs creates schema attributes for nested fields (array items
+// or object properties). Recursively handles nested objects and arrays.
 func buildNestedItemAttrs(itemFields []BodyFieldDef) map[string]schema.Attribute {
 	nested := map[string]schema.Attribute{}
 	for _, f := range itemFields {
@@ -290,21 +311,55 @@ func buildNestedItemAttrs(itemFields []BodyFieldDef) map[string]schema.Attribute
 		if desc == "" {
 			desc = f.Path
 		}
-		nested[key] = schema.StringAttribute{
-			Description: desc,
-			Optional:    true,
-			Computed:    true,
+		if f.IsObject && len(f.ItemFields) > 0 {
+			nested[key] = schema.SingleNestedAttribute{
+				Description: desc,
+				Optional:    true,
+				Computed:    true,
+				Attributes:  buildNestedItemAttrs(f.ItemFields),
+			}
+		} else if f.IsArray && len(f.ItemFields) > 0 {
+			nested[key] = schema.ListNestedAttribute{
+				Description: desc,
+				Optional:    true,
+				Computed:    true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: buildNestedItemAttrs(f.ItemFields),
+				},
+			}
+		} else if f.IsArray {
+			nested[key] = schema.ListAttribute{
+				Description: desc,
+				Optional:    true,
+				Computed:    true,
+				ElementType: types.StringType,
+			}
+		} else {
+			nested[key] = schema.StringAttribute{
+				Description: desc,
+				Optional:    true,
+				Computed:    true,
+			}
 		}
 	}
 	return nested
 }
 
-// itemAttrTypes returns the attr.Type map for a list-nested attribute's items.
+// itemAttrTypes returns the attr.Type map for nested attribute items.
+// Recursively handles nested objects and arrays.
 func itemAttrTypes(itemFields []BodyFieldDef) map[string]attr.Type {
 	attrTypes := map[string]attr.Type{}
 	for _, f := range itemFields {
 		key := toSnakeCase(strings.ReplaceAll(f.Path, ".", "_"))
-		attrTypes[key] = types.StringType
+		if f.IsObject && len(f.ItemFields) > 0 {
+			attrTypes[key] = types.ObjectType{AttrTypes: itemAttrTypes(f.ItemFields)}
+		} else if f.IsArray && len(f.ItemFields) > 0 {
+			attrTypes[key] = types.ListType{ElemType: types.ObjectType{AttrTypes: itemAttrTypes(f.ItemFields)}}
+		} else if f.IsArray {
+			attrTypes[key] = types.ListType{ElemType: types.StringType}
+		} else {
+			attrTypes[key] = types.StringType
+		}
 	}
 	return attrTypes
 }
@@ -503,7 +558,13 @@ func (r *GenericResource) buildBody(ctx context.Context, op *OperationDef, sourc
 		bodyObj := map[string]any{}
 		for _, bf := range op.BodyFields {
 			attrName := toSnakeCase(strings.ReplaceAll(bf.Path, ".", "_"))
-			if bf.IsArray && len(bf.ItemFields) > 0 {
+			if bf.IsObject && len(bf.ItemFields) > 0 {
+				// Read single-nested attribute.
+				obj := readSingleNested(ctx, source, attrName, bf.ItemFields, diags)
+				if obj != nil {
+					handlers.SetNested(bodyObj, bf.Path, obj)
+				}
+			} else if bf.IsArray && len(bf.ItemFields) > 0 {
 				// Read list-nested attribute.
 				arr := readListNested(ctx, source, attrName, bf.ItemFields, diags)
 				if arr != nil {
@@ -583,6 +644,66 @@ func readListNested(ctx context.Context, source stateAccessor, attrName string, 
 	return result
 }
 
+// readSingleNested reads a SingleNestedAttribute from state and returns it as a
+// map[string]any suitable for JSON marshaling. Returns nil if the object is
+// null, unknown, or all fields are empty.
+func readSingleNested(ctx context.Context, source stateAccessor, attrName string, itemFields []BodyFieldDef, diags *diag.Diagnostics) map[string]any {
+	var obj types.Object
+	d := source.GetAttribute(ctx, attrPath(attrName), &obj)
+	diags.Append(d...)
+	if d.HasError() || obj.IsNull() || obj.IsUnknown() {
+		return nil
+	}
+	result := map[string]any{}
+	objAttrs := obj.Attributes()
+	for _, f := range itemFields {
+		key := toSnakeCase(strings.ReplaceAll(f.Path, ".", "_"))
+		v, exists := objAttrs[key]
+		if !exists {
+			continue
+		}
+		if f.IsObject && len(f.ItemFields) > 0 {
+			if innerObj, ok := v.(types.Object); ok && !innerObj.IsNull() && !innerObj.IsUnknown() {
+				inner := readObjectAttrs(innerObj, f.ItemFields)
+				if len(inner) > 0 {
+					result[f.Path] = inner
+				}
+			}
+		} else if sv, ok := v.(types.String); ok && !sv.IsNull() && !sv.IsUnknown() && sv.ValueString() != "" {
+			result[f.Path] = sv.ValueString()
+		}
+	}
+	if len(result) == 0 {
+		return nil
+	}
+	return result
+}
+
+// readObjectAttrs reads attribute values from a types.Object, used by
+// readSingleNested for recursively reading nested objects.
+func readObjectAttrs(obj types.Object, itemFields []BodyFieldDef) map[string]any {
+	result := map[string]any{}
+	objAttrs := obj.Attributes()
+	for _, f := range itemFields {
+		key := toSnakeCase(strings.ReplaceAll(f.Path, ".", "_"))
+		v, exists := objAttrs[key]
+		if !exists {
+			continue
+		}
+		if f.IsObject && len(f.ItemFields) > 0 {
+			if innerObj, ok := v.(types.Object); ok && !innerObj.IsNull() && !innerObj.IsUnknown() {
+				inner := readObjectAttrs(innerObj, f.ItemFields)
+				if len(inner) > 0 {
+					result[f.Path] = inner
+				}
+			}
+		} else if sv, ok := v.(types.String); ok && !sv.IsNull() && !sv.IsUnknown() && sv.ValueString() != "" {
+			result[f.Path] = sv.ValueString()
+		}
+	}
+	return result
+}
+
 // readSimpleList reads a ListAttribute (list of strings) from state and returns
 // it as a []string suitable for JSON marshaling. Returns nil if null/unknown/empty.
 func readSimpleList(ctx context.Context, source stateAccessor, attrName string, diags *diag.Diagnostics) []string {
@@ -634,8 +755,8 @@ func (r *GenericResource) copyAttributes(ctx context.Context, _ *OperationDef, s
 				continue
 			}
 			seen[attrName] = true
-			if bf.IsArray {
-				// For list attributes (both nested and simple), skip copying from source.
+			if bf.IsArray || bf.IsObject {
+				// For list/object attributes, skip copying from source.
 				// The response-populated value from extractResponseFields
 				// should be preserved (it has all computed sub-fields).
 				continue
@@ -732,6 +853,14 @@ func (r *GenericResource) extractResponseFields(ctx context.Context, m map[strin
 		if !ok || val == nil {
 			continue
 		}
+		// For object fields with item schema, build a typed object.
+		if rf.IsObject && len(rf.ItemFields) > 0 {
+			if obj, ok := val.(map[string]any); ok {
+				objVal := buildObjectFromResponse(obj, rf.ItemFields)
+				diags.Append(target.SetAttribute(ctx, attrPath(key), objVal)...)
+			}
+			continue
+		}
 		// For array fields with item schema, build a typed list.
 		if rf.IsArray && len(rf.ItemFields) > 0 {
 			if arr, ok := val.([]any); ok {
@@ -783,15 +912,75 @@ func buildListFromResponse(arr []any, itemFields []BodyFieldDef) types.List {
 		objAttrs := map[string]attr.Value{}
 		for _, f := range itemFields {
 			key := toSnakeCase(strings.ReplaceAll(f.Path, ".", "_"))
-			if v, exists := m[f.Path]; exists && v != nil {
-				objAttrs[key] = types.StringValue(fmt.Sprintf("%v", v))
+			v, exists := m[f.Path]
+			if !exists || v == nil {
+				objAttrs[key] = attrNullValue(f)
+				continue
+			}
+			if f.IsObject && len(f.ItemFields) > 0 {
+				if sub, ok := v.(map[string]any); ok {
+					objAttrs[key] = buildObjectFromResponse(sub, f.ItemFields)
+				} else {
+					objAttrs[key] = attrNullValue(f)
+				}
 			} else {
-				objAttrs[key] = types.StringNull()
+				objAttrs[key] = types.StringValue(fmt.Sprintf("%v", v))
 			}
 		}
 		elements = append(elements, types.ObjectValueMust(attrTypes, objAttrs))
 	}
 	return types.ListValueMust(objType, elements)
+}
+
+// buildObjectFromResponse converts a JSON object from the API response into a
+// types.Object value suitable for a SingleNestedAttribute.
+func buildObjectFromResponse(m map[string]any, itemFields []BodyFieldDef) types.Object {
+	attrTypes := itemAttrTypes(itemFields)
+	objAttrs := map[string]attr.Value{}
+	for _, f := range itemFields {
+		key := toSnakeCase(strings.ReplaceAll(f.Path, ".", "_"))
+		v, exists := m[f.Path]
+		if !exists || v == nil {
+			objAttrs[key] = attrNullValue(f)
+			continue
+		}
+		if f.IsObject && len(f.ItemFields) > 0 {
+			if sub, ok := v.(map[string]any); ok {
+				objAttrs[key] = buildObjectFromResponse(sub, f.ItemFields)
+			} else {
+				objAttrs[key] = attrNullValue(f)
+			}
+		} else if f.IsArray && len(f.ItemFields) > 0 {
+			if arr, ok := v.([]any); ok {
+				objAttrs[key] = buildListFromResponse(arr, f.ItemFields)
+			} else {
+				objAttrs[key] = attrNullValue(f)
+			}
+		} else if f.IsArray {
+			if arr, ok := v.([]any); ok {
+				objAttrs[key] = buildSimpleListFromResponse(arr)
+			} else {
+				objAttrs[key] = attrNullValue(f)
+			}
+		} else {
+			objAttrs[key] = types.StringValue(fmt.Sprintf("%v", v))
+		}
+	}
+	return types.ObjectValueMust(attrTypes, objAttrs)
+}
+
+// attrNullValue returns the appropriate null value for a field's type.
+func attrNullValue(f BodyFieldDef) attr.Value {
+	if f.IsObject && len(f.ItemFields) > 0 {
+		return types.ObjectNull(itemAttrTypes(f.ItemFields))
+	}
+	if f.IsArray && len(f.ItemFields) > 0 {
+		return types.ListNull(types.ObjectType{AttrTypes: itemAttrTypes(f.ItemFields)})
+	}
+	if f.IsArray {
+		return types.ListNull(types.StringType)
+	}
+	return types.StringNull()
 }
 
 // buildSimpleListFromResponse converts a JSON array of simple values into a

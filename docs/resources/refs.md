@@ -57,17 +57,19 @@ resource "bitbucket_refs" "example" {
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch.
 - `merge_strategies` (List of String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
-- `target_date` (String) target.date
-- `target_hash` (String) target.hash
-- `target_message` (String) target.message
-- `target_parents` (String) parents (JSON array)
-- `target_participants` (List of Object) participants
+- `target` (Object) target
   Nested schema:
-  - `approved` (String) approved
-  - `state` (String) [approved, changes_requested, <nil>]
-  - `participated_on` (String) The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.
-  - `role` (String) [PARTICIPANT, REVIEWER]
+  - `hash` (String) hash
+  - `date` (String) date
+  - `message` (String) message
+  - `summary` (Object) summary
+    - `raw` (String) The text as it was typed by a user.
+    - `markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
+  - `parents` (String) parents (JSON array)
+  - `participants` (List of Object) participants
+    - `approved` (String) approved
+    - `state` (String) [approved, changes_requested, <nil>]
+    - `participated_on` (String) The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.
+    - `role` (String) [PARTICIPANT, REVIEWER]
 
-- `target_summary_markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
-- `target_summary_raw` (String) The text as it was typed by a user.
 - `type` (String) type

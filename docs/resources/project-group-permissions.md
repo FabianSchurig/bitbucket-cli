@@ -57,16 +57,22 @@ resource "bitbucket_project_group_permissions" "example" {
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `group_full_slug` (String) The concatenation of the workspace's slug and the group's slug,
-- `group_name` (String) group.name
-- `group_slug` (String) The "sluggified" version of the group's name. This contains only ASCII
+- `group` (Object) group
+  Nested schema:
+  - `name` (String) name
+  - `slug` (String) The "sluggified" version of the group's name. This contains only ASCII
+  - `full_slug` (String) The concatenation of the workspace's slug and the group's slug,
+
 - `permission` (String) [read, write, create-repo, admin, none]
-- `project_created_on` (String) project.created_on
-- `project_description` (String) project.description
-- `project_has_publicly_visible_repos` (String) 
-- `project_is_private` (String) 
-- `project_key` (String) The project's key.
-- `project_name` (String) The name of the project.
-- `project_updated_on` (String) project.updated_on
-- `project_uuid` (String) The project's immutable id.
+- `project` (Object) project
+  Nested schema:
+  - `created_on` (String) created_on
+  - `has_publicly_visible_repos` (String) 
+  - `uuid` (String) The project's immutable id.
+  - `key` (String) The project's key.
+  - `name` (String) The name of the project.
+  - `description` (String) description
+  - `is_private` (String) 
+  - `updated_on` (String) updated_on
+
 - `type` (String) type
