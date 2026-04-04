@@ -40,6 +40,14 @@ jobs:
       - name: Test with race detector
         run: go test -race -coverprofile=coverage.out ./...
 
+      - name: Normalize coverage report for SonarQube
+        run: |
+          test -s coverage.out
+          awk 'NR == 1 || ($0 !~ /\.gen\.go:/ && $0 !~ /^github.com\/FabianSchurig\/bitbucket-cli\/scripts\//)' coverage.out \
+            | sed '2,$ s#^github.com/FabianSchurig/bitbucket-cli/##' \
+            > coverage.out.tmp
+          mv coverage.out.tmp coverage.out
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
