@@ -20,6 +20,8 @@ import (
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
 )
 
+const testItemReadPath = "/items/{workspace}/{id}"
+
 type mockState struct {
 	values map[string]attr.Value
 	set    map[string]any
@@ -122,7 +124,7 @@ func testResourceGroup() ResourceGroup {
 			Read: &OperationDef{
 				OperationID: "getSample",
 				Method:      http.MethodGet,
-				Path:        "/items/{workspace}/{id}",
+				Path:        testItemReadPath,
 				Params: []ParamDef{
 					{Name: "workspace", In: "path", Required: true},
 					{Name: "id", In: "path", Required: true},
@@ -138,7 +140,7 @@ func testResourceGroup() ResourceGroup {
 			Update: &OperationDef{
 				OperationID: "updateSample",
 				Method:      http.MethodPut,
-				Path:        "/items/{workspace}/{id}",
+				Path:        testItemReadPath,
 				Params: []ParamDef{
 					{Name: "workspace", In: "path", Required: true},
 					{Name: "id", In: "path", Required: true},
@@ -151,7 +153,7 @@ func testResourceGroup() ResourceGroup {
 			Delete: &OperationDef{
 				OperationID: "deleteSample",
 				Method:      http.MethodDelete,
-				Path:        "/items/{workspace}/{id}",
+				Path:        testItemReadPath,
 				Params: []ParamDef{
 					{Name: "workspace", In: "path", Required: true},
 					{Name: "id", In: "path", Required: true},
@@ -252,7 +254,7 @@ func TestGenericResourceConfigureAndWrappers(t *testing.T) {
 	}
 }
 
-func TestResourceHelpers(t *testing.T) {
+func TestResourceExtractParamsAndBody(t *testing.T) {
 	group := testResourceGroup()
 	r := &GenericResource{group: group}
 	ctx := context.Background()
@@ -266,7 +268,6 @@ func TestResourceHelpers(t *testing.T) {
 		"reviewers": nestedListValue(itemFields, map[string]attr.Value{"name": types.StringValue("alice")}),
 		"tags":      stringListValue("one", "two"),
 	})
-	target := newMockState(nil)
 	var diags diag.Diagnostics
 
 	pathParams, queryParams := r.extractParams(ctx, group.Ops.Create, source, &diags)
@@ -296,6 +297,22 @@ func TestResourceHelpers(t *testing.T) {
 	if raw := r.buildBody(ctx, rawOp, rawSource, &diags); raw != `{"custom":true}` {
 		t.Fatalf("expected raw request_body fallback, got %q", raw)
 	}
+}
+
+func TestResourceHelperSelectionAndCopyAttributes(t *testing.T) {
+	group := testResourceGroup()
+	r := &GenericResource{group: group}
+	ctx := context.Background()
+	itemFields := []BodyFieldDef{{Path: "name", Type: "string"}}
+	source := newMockState(map[string]attr.Value{
+		"workspace": types.StringValue("ws"),
+		"title":     types.StringValue("Hello"),
+		"settings":  nestedObjectValue(itemFields, map[string]attr.Value{"name": types.StringValue("cfg")}),
+		"reviewers": nestedListValue(itemFields, map[string]attr.Value{"name": types.StringValue("alice")}),
+		"tags":      stringListValue("one", "two"),
+	})
+	target := newMockState(nil)
+	var diags diag.Diagnostics
 
 	missingSource := newMockState(map[string]attr.Value{})
 	diags = nil
@@ -321,13 +338,18 @@ func TestResourceHelpers(t *testing.T) {
 	if target.set["title"] != types.StringValue("Hello") {
 		t.Fatalf("expected title copied to target, got %#v", target.set["title"])
 	}
+}
 
+func TestResourcePopulateComputedParamsAndExtractResponseFields(t *testing.T) {
+	group := testResourceGroup()
+	r := &GenericResource{group: group}
+	ctx := context.Background()
+	var diags diag.Diagnostics
 	computedSource := newMockState(map[string]attr.Value{
 		"workspace": types.StringValue("ws"),
 		"param_id":  types.StringNull(),
 	})
 	computedTarget := newMockState(nil)
-	diags = nil
 	r.populateComputedParams(ctx, map[string]any{"id": 42}, computedSource, computedTarget, &diags)
 	if got := computedTarget.set["param_id"]; got != types.StringValue("42") {
 		t.Fatalf("expected computed param_id, got %#v", got)
@@ -361,7 +383,7 @@ func TestResourceHelpers(t *testing.T) {
 	}
 }
 
-func TestResourceValueHelpers(t *testing.T) {
+func TestResourceReadValueHelpers(t *testing.T) {
 	itemFields := []BodyFieldDef{{Path: "name", Type: "string"}}
 
 	if got := readSimpleListValue(stringListValue("one", "two")); !reflect.DeepEqual(got, []string{"one", "two"}) {
@@ -391,7 +413,10 @@ func TestResourceValueHelpers(t *testing.T) {
 	if got, ok := readAttrValue(types.ListNull(types.StringType), BodyFieldDef{Path: "tags", Type: "string", IsArray: true}); ok || got != nil {
 		t.Fatalf("expected null list to be skipped, got %#v ok=%v", got, ok)
 	}
+}
 
+func TestResourceResponseValueHelpers(t *testing.T) {
+	itemFields := []BodyFieldDef{{Path: "name", Type: "string"}}
 	if got := buildSimpleListFromResponse([]any{"one", 2}); len(got.Elements()) != 2 {
 		t.Fatalf("expected two simple response elements, got %#v", got)
 	}
@@ -426,7 +451,9 @@ func TestResourceValueHelpers(t *testing.T) {
 	if got := attrNullValue(BodyFieldDef{Path: "tags", IsArray: true}); !got.IsNull() {
 		t.Fatal("expected null simple list attr")
 	}
+}
 
+func TestResourceIDHelpers(t *testing.T) {
 	if id := extractID(map[string]any{"uuid": "u-1"}); id != "u-1" {
 		t.Fatalf("expected uuid id, got %q", id)
 	}
@@ -492,5 +519,195 @@ func TestGenericResourceDispatch(t *testing.T) {
 	}
 	if got := deleteTarget.set["api_response"]; got != types.StringValue("") {
 		t.Fatalf("expected empty api_response on delete, got %#v", got)
+	}
+}
+
+func TestResourceSchemaHelpersAndFallbacks(t *testing.T) {
+	attrs := resourceBaseAttrs()
+	if _, ok := attrs["id"].(resourceschema.StringAttribute); !ok {
+		t.Fatalf("expected id base attribute, got %T", attrs["id"])
+	}
+
+	readOnly := &GenericResource{group: ResourceGroup{Ops: CRUDOps{Read: testResourceGroup().Ops.Read}}}
+	if readOnly.primaryOp() != readOnly.group.Ops.Read {
+		t.Fatal("expected primaryOp to fall back to read")
+	}
+	if readOnly.responseOp() != readOnly.group.Ops.Read {
+		t.Fatal("expected responseOp to prefer read")
+	}
+	if required := requiredPrimaryPathParams(nil); len(required) != 0 {
+		t.Fatalf("expected nil primary op to produce no required params, got %#v", required)
+	}
+
+	queryAttr := resourceParamAttr(ParamDef{Name: "state", In: "query"}, false)
+	if !queryAttr.Optional || queryAttr.Computed {
+		t.Fatalf("expected optional non-computed query attr, got %#v", queryAttr)
+	}
+	requiredAttr := resourceParamAttr(ParamDef{Name: "workspace", In: "path"}, true)
+	if !requiredAttr.Required {
+		t.Fatalf("expected required attr, got %#v", requiredAttr)
+	}
+
+	if !canMergeComputedAttr(false, false) || canMergeComputedAttr(true, false) || canMergeComputedAttr(false, true) {
+		t.Fatal("unexpected canMergeComputedAttr result")
+	}
+	if got := fieldDescription(BodyFieldDef{Path: "title"}); got != "title" {
+		t.Fatalf("expected path fallback description, got %q", got)
+	}
+
+	requestBodyAttrs := map[string]resourceschema.Attribute{}
+	addRequestBodyAttr(requestBodyAttrs, false)
+	if len(requestBodyAttrs) != 0 {
+		t.Fatalf("expected no request_body attr when no body exists, got %#v", requestBodyAttrs)
+	}
+}
+
+func TestResourceNestedSchemaHelpers(t *testing.T) {
+	itemFields := []BodyFieldDef{{Path: "name", Type: "string"}}
+	nested := buildNestedItemAttrs([]BodyFieldDef{
+		{Path: "settings", IsObject: true, ItemFields: itemFields},
+		{Path: "reviewers", IsArray: true, ItemFields: itemFields},
+		{Path: "tags", IsArray: true},
+		{Path: "title"},
+	})
+	if _, ok := nested["settings"].(resourceschema.SingleNestedAttribute); !ok {
+		t.Fatalf("expected nested object attr, got %T", nested["settings"])
+	}
+	if _, ok := nested["reviewers"].(resourceschema.ListNestedAttribute); !ok {
+		t.Fatalf("expected nested list attr, got %T", nested["reviewers"])
+	}
+	if _, ok := nested["tags"].(resourceschema.ListAttribute); !ok {
+		t.Fatalf("expected list attr, got %T", nested["tags"])
+	}
+
+	attrTypes := itemAttrTypes([]BodyFieldDef{
+		{Path: "settings", IsObject: true, ItemFields: itemFields},
+		{Path: "reviewers", IsArray: true, ItemFields: itemFields},
+		{Path: "tags", IsArray: true},
+		{Path: "title"},
+	})
+	if _, ok := attrTypes["settings"].(types.ObjectType); !ok {
+		t.Fatalf("expected object attr type, got %T", attrTypes["settings"])
+	}
+	if _, ok := attrTypes["reviewers"].(types.ListType); !ok {
+		t.Fatalf("expected list attr type, got %T", attrTypes["reviewers"])
+	}
+}
+
+func TestResourceResponseAttributeHelpers(t *testing.T) {
+	itemFields := []BodyFieldDef{{Path: "name", Type: "string"}}
+	if _, ok := responseFieldAttr(BodyFieldDef{Path: "settings", IsObject: true, ItemFields: itemFields}).(resourceschema.SingleNestedAttribute); !ok {
+		t.Fatal("expected single nested response attribute")
+	}
+	if _, ok := responseFieldAttr(BodyFieldDef{Path: "reviewers", IsArray: true, ItemFields: itemFields}).(resourceschema.ListNestedAttribute); !ok {
+		t.Fatal("expected list nested response attribute")
+	}
+	if _, ok := responseFieldAttr(BodyFieldDef{Path: "tags", IsArray: true}).(resourceschema.ListAttribute); !ok {
+		t.Fatal("expected list response attribute")
+	}
+
+	merged := mergeResponseAttr(resourceschema.StringAttribute{Optional: true}, BodyFieldDef{Path: "title"}).(resourceschema.StringAttribute)
+	if !merged.Computed || merged.Description != "title" {
+		t.Fatalf("expected merged string attr, got %#v", merged)
+	}
+	required := mergeResponseAttr(resourceschema.StringAttribute{Required: true}, BodyFieldDef{Path: "title"}).(resourceschema.StringAttribute)
+	if required.Computed {
+		t.Fatalf("expected required string attr to remain non-computed, got %#v", required)
+	}
+	objectAttr := mergeResponseAttr(resourceschema.SingleNestedAttribute{Optional: true}, BodyFieldDef{Path: "settings", IsObject: true, ItemFields: itemFields}).(resourceschema.SingleNestedAttribute)
+	if !objectAttr.Computed || len(objectAttr.Attributes) == 0 {
+		t.Fatalf("expected merged object attr, got %#v", objectAttr)
+	}
+	listAttr := mergeResponseAttr(resourceschema.ListNestedAttribute{Optional: true}, BodyFieldDef{Path: "reviewers", IsArray: true, ItemFields: itemFields}).(resourceschema.ListNestedAttribute)
+	if !listAttr.Computed || len(listAttr.NestedObject.Attributes) == 0 {
+		t.Fatalf("expected merged list nested attr, got %#v", listAttr)
+	}
+}
+
+func TestResourceBodyAndComputedParamHelpers(t *testing.T) {
+	ctx := context.Background()
+	itemFields := []BodyFieldDef{{Path: "name", Type: "string"}}
+	source := newMockState(map[string]attr.Value{
+		"settings": types.ObjectValueMust(itemAttrTypes(itemFields), map[string]attr.Value{"name": types.StringValue("cfg")}),
+		"reviewers": types.ListValueMust(types.ObjectType{AttrTypes: itemAttrTypes(itemFields)}, []attr.Value{
+			types.ObjectValueMust(itemAttrTypes(itemFields), map[string]attr.Value{"name": types.StringValue("alice")}),
+		}),
+		"tags":  stringListValue("one"),
+		"title": types.StringValue("Hello"),
+	})
+	var diags diag.Diagnostics
+
+	if val, ok := bodyFieldValue(ctx, source, BodyFieldDef{Path: "settings", IsObject: true, ItemFields: itemFields}, &diags); !ok || val == nil {
+		t.Fatalf("expected object body field value, got %#v ok=%v", val, ok)
+	}
+	if val, ok := bodyFieldValue(ctx, source, BodyFieldDef{Path: "reviewers", IsArray: true, ItemFields: itemFields}, &diags); !ok || val == nil {
+		t.Fatalf("expected nested list body field value, got %#v ok=%v", val, ok)
+	}
+	if val, ok := bodyFieldValue(ctx, source, BodyFieldDef{Path: "tags", IsArray: true}, &diags); !ok || val == nil {
+		t.Fatalf("expected list body field value, got %#v ok=%v", val, ok)
+	}
+	if val, ok := bodyFieldValue(ctx, source, BodyFieldDef{Path: "title"}, &diags); !ok || val != "Hello" {
+		t.Fatalf("expected string body field value, got %#v ok=%v", val, ok)
+	}
+
+	if body := marshalBodyObject(&diags, nil); body != "" {
+		t.Fatalf("expected empty marshaled body, got %q", body)
+	}
+	if body := rawRequestBody(ctx, newMockState(map[string]attr.Value{}), &diags); body != "" {
+		t.Fatalf("expected missing request body to be empty, got %q", body)
+	}
+
+	seen := map[string]bool{}
+	if !shouldSkipComputedParam(ParamDef{Name: "workspace", In: "query"}, "workspace", seen, ctx, source, &diags) {
+		t.Fatal("expected non-path computed param to be skipped")
+	}
+	if !shouldSkipComputedParam(ParamDef{Name: "title", In: "path"}, "title", map[string]bool{}, ctx, source, &diags) {
+		t.Fatal("expected existing path value to be skipped")
+	}
+
+	target := newMockState(nil)
+	setComputedParam(ctx, map[string]any{"id": 7}, "missing_id", "param_id", target, &diags)
+	if got := target.set["param_id"]; got != types.StringValue("7") {
+		t.Fatalf("expected fallback computed param, got %#v", got)
+	}
+}
+
+func TestResourceDispatchResultAndResponseHelpers(t *testing.T) {
+	r := &GenericResource{group: testResourceGroup()}
+	ctx := context.Background()
+	target := newMockState(nil)
+	var diags diag.Diagnostics
+
+	if result := r.storeDispatchResult(ctx, &OperationDef{OperationID: "delete"}, nil, target, &diags, nil); result != nil {
+		t.Fatalf("expected nil result map, got %#v", result)
+	}
+	if got := target.set["id"]; got != types.StringValue("delete") {
+		t.Fatalf("expected fallback nil-result id, got %#v", got)
+	}
+
+	target = newMockState(nil)
+	diags = nil
+	if result := r.storeDispatchResult(ctx, &OperationDef{OperationID: "bad"}, nil, target, &diags, map[string]any{"bad": make(chan int)}); result != nil || !diags.HasError() {
+		t.Fatalf("expected marshal failure diagnostics, got result=%#v diags=%#v", result, diags)
+	}
+
+	if got := fallbackResourceID(&OperationDef{OperationID: "get", Params: []ParamDef{{Name: "workspace", In: "path"}, {Name: "id", In: "path"}}}, map[string]string{"workspace": "ws", "id": "5"}); got != "get/ws/5" {
+		t.Fatalf("unexpected fallback resource id %q", got)
+	}
+
+	reservedTarget := newMockState(nil)
+	setResponseField(ctx, BodyFieldDef{Path: "id"}, map[string]any{"id": 1}, reservedTarget, &diags)
+	if len(reservedTarget.set) != 0 {
+		t.Fatalf("expected reserved field to be skipped, got %#v", reservedTarget.set)
+	}
+
+	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "settings", IsObject: true, ItemFields: []BodyFieldDef{{Path: "name"}}}); ok || val != nil {
+		t.Fatalf("expected invalid object response field to be skipped, got %#v ok=%v", val, ok)
+	}
+	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "reviewers", IsArray: true, ItemFields: []BodyFieldDef{{Path: "name"}}}); ok || val != nil {
+		t.Fatalf("expected invalid nested list response field to be skipped, got %#v ok=%v", val, ok)
+	}
+	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "tags", IsArray: true}); ok || val != nil {
+		t.Fatalf("expected invalid list response field to be skipped, got %#v ok=%v", val, ok)
 	}
 }

@@ -694,46 +694,73 @@ func responseFieldAttr(rf BodyFieldDef) schema.Attribute {
 }
 
 func mergeResponseAttr(existing schema.Attribute, rf BodyFieldDef) schema.Attribute {
-	desc := rf.Desc
-	if desc == "" {
-		desc = rf.Path
-	}
 	switch sa := existing.(type) {
 	case schema.StringAttribute:
-		if !sa.Computed && !sa.Required {
-			sa.Computed = true
-			sa.Description = desc
-		}
-		return sa
+		return mergeStringResponseAttr(sa, rf)
 	case schema.SingleNestedAttribute:
-		if !sa.Computed && !sa.Required {
-			sa.Computed = true
-			sa.Description = desc
-			if rf.IsObject && len(rf.ItemFields) > 0 {
-				sa.Attributes = buildNestedItemAttrs(rf.ItemFields)
-			}
-		}
-		return sa
+		return mergeSingleNestedResponseAttr(sa, rf)
 	case schema.ListNestedAttribute:
-		if !sa.Computed && !sa.Required {
-			sa.Computed = true
-			sa.Description = desc
-			if rf.IsArray && len(rf.ItemFields) > 0 {
-				sa.NestedObject = schema.NestedAttributeObject{
-					Attributes: buildNestedItemAttrs(rf.ItemFields),
-				}
-			}
-		}
-		return sa
+		return mergeListNestedResponseAttr(sa, rf)
 	case schema.ListAttribute:
-		if !sa.Computed && !sa.Required {
-			sa.Computed = true
-			sa.Description = desc
-		}
-		return sa
+		return mergeListResponseAttr(sa, rf)
 	default:
 		return existing
 	}
+}
+
+func mergeStringResponseAttr(attr schema.StringAttribute, rf BodyFieldDef) schema.Attribute {
+	if !canMergeComputedAttr(attr.Computed, attr.Required) {
+		return attr
+	}
+	attr.Computed = true
+	attr.Description = fieldDescription(rf)
+	return attr
+}
+
+func mergeSingleNestedResponseAttr(attr schema.SingleNestedAttribute, rf BodyFieldDef) schema.Attribute {
+	if !canMergeComputedAttr(attr.Computed, attr.Required) {
+		return attr
+	}
+	attr.Computed = true
+	attr.Description = fieldDescription(rf)
+	if rf.IsObject && len(rf.ItemFields) > 0 {
+		attr.Attributes = buildNestedItemAttrs(rf.ItemFields)
+	}
+	return attr
+}
+
+func mergeListNestedResponseAttr(attr schema.ListNestedAttribute, rf BodyFieldDef) schema.Attribute {
+	if !canMergeComputedAttr(attr.Computed, attr.Required) {
+		return attr
+	}
+	attr.Computed = true
+	attr.Description = fieldDescription(rf)
+	if rf.IsArray && len(rf.ItemFields) > 0 {
+		attr.NestedObject = schema.NestedAttributeObject{
+			Attributes: buildNestedItemAttrs(rf.ItemFields),
+		}
+	}
+	return attr
+}
+
+func mergeListResponseAttr(attr schema.ListAttribute, rf BodyFieldDef) schema.Attribute {
+	if !canMergeComputedAttr(attr.Computed, attr.Required) {
+		return attr
+	}
+	attr.Computed = true
+	attr.Description = fieldDescription(rf)
+	return attr
+}
+
+func canMergeComputedAttr(computed, required bool) bool {
+	return !computed && !required
+}
+
+func fieldDescription(field BodyFieldDef) string {
+	if field.Desc != "" {
+		return field.Desc
+	}
+	return field.Path
 }
 
 func addRequestBodyAttr(attrs map[string]schema.Attribute, hasBody bool) {

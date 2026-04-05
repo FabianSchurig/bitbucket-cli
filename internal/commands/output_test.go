@@ -14,7 +14,7 @@ func TestAddOutputFlag(t *testing.T) {
 
 	AddOutputFlag(cmd)
 
-	if got := cmd.PersistentFlags().Lookup(outputFlagName); got == nil {
+	if cmd.PersistentFlags().Lookup(outputFlagName) == nil {
 		t.Fatal("expected output flag to be registered")
 	}
 	if output.Format != "table" {

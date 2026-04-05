@@ -182,6 +182,112 @@ func TestDataSourceHelpers(t *testing.T) {
 	}
 }
 
+func TestDataSourceHelperBranches(t *testing.T) {
+	group := testResourceGroup()
+	d := &GenericDataSource{group: group}
+
+	var schemaResp datasource.SchemaResponse
+	d.Schema(context.Background(), datasource.SchemaRequest{}, &schemaResp)
+	if len(dataSourceBaseAttrs()) != 2 {
+		t.Fatal("expected base datasource attrs")
+	}
+	if required := listRequiredPathParams(nil); len(required) != 0 {
+		t.Fatalf("expected nil list op to produce no required params, got %#v", required)
+	}
+	if !isDataSourceParamRequired(ParamDef{Name: "workspace", In: "path", Required: true}, map[string]bool{}) {
+		t.Fatal("expected required path param when no list path params are defined")
+	}
+	if isDataSourceParamRequired(ParamDef{Name: "state", In: "query", Required: true}, map[string]bool{}) {
+		t.Fatal("expected query param to stay optional")
+	}
+
+	attrs := map[string]datasourceschema.Attribute{}
+	addDataSourceListParams(attrs, nil, map[string]bool{})
+	if len(attrs) != 0 {
+		t.Fatalf("expected nil list op to add no attrs, got %#v", attrs)
+	}
+	if _, ok := dataSourceResponseAttr(BodyFieldDef{Path: "reviewers", IsArray: true, ItemFields: []BodyFieldDef{{Path: "name"}}}).(datasourceschema.ListNestedAttribute); !ok {
+		t.Fatal("expected nested response attribute")
+	}
+
+	readOnly := &GenericDataSource{group: ResourceGroup{Ops: CRUDOps{Read: group.Ops.Read}}}
+	req := datasource.ReadRequest{
+		Config: tfsdk.Config{
+			Raw:    objectValue(datasourceObjectType(schemaResp.Schema.Attributes), map[string]string{"workspace": "ws", "param_id": "5"}),
+			Schema: schemaResp.Schema,
+		},
+	}
+	if op := readOnly.selectReadOp(context.Background(), req); op == nil || op.OperationID != group.Ops.Read.OperationID {
+		t.Fatalf("expected selectReadOp to keep read op, got %#v", op)
+	}
+}
+
+func TestDataSourceResultAndValueHelpers(t *testing.T) {
+	group := testResourceGroup()
+	resp := datasource.ReadResponse{State: tfsdk.State{}}
+	ctx := context.Background()
+
+	setDataSourceResult(ctx, &resp, group.Ops.Read, map[string]string{"workspace": "ws"}, nil)
+	if resp.Diagnostics.HasError() {
+		t.Fatalf("expected nil result to be ignored, got %#v", resp.Diagnostics)
+	}
+
+	resp = datasource.ReadResponse{State: tfsdk.State{}}
+	setDataSourceResult(ctx, &resp, group.Ops.Read, map[string]string{"workspace": "ws"}, map[string]any{"bad": make(chan int)})
+	if !resp.Diagnostics.HasError() {
+		t.Fatal("expected marshal failure diagnostics")
+	}
+
+	if got := stringifyResponseValue(map[string]any{"mode": "full"}); got != `{"mode":"full"}` {
+		t.Fatalf("unexpected stringified response value %q", got)
+	}
+	if val := dataSourceResponseValue("bad", BodyFieldDef{Path: "tags", IsArray: true}); val != nil {
+		t.Fatalf("expected invalid list response value to be nil, got %#v", val)
+	}
+	if val := dataSourceResponseValue("bad", BodyFieldDef{Path: "reviewers", IsArray: true, ItemFields: []BodyFieldDef{{Path: "name"}}}); val != nil {
+		t.Fatalf("expected invalid nested list response value to be nil, got %#v", val)
+	}
+}
+
+func TestDataSourceSchemaAndParamHelperBranches(t *testing.T) {
+	d := &GenericDataSource{group: ResourceGroup{Description: "empty"}}
+	var schemaResp datasource.SchemaResponse
+	d.Schema(context.Background(), datasource.SchemaRequest{}, &schemaResp)
+	if schemaResp.Schema.Description != "empty" {
+		t.Fatalf("expected empty datasource schema description, got %q", schemaResp.Schema.Description)
+	}
+
+	attrs := map[string]datasourceschema.Attribute{}
+	addDataSourceParams(attrs, []ParamDef{{Name: "workspace", In: "path", Required: true}}, map[string]bool{"other": true}, map[string]bool{})
+	if !attrs["workspace"].(datasourceschema.StringAttribute).Optional {
+		t.Fatalf("expected unmatched read-only path param to become optional, got %#v", attrs["workspace"])
+	}
+
+	pathParams := map[string]string{}
+	queryParams := map[string]string{}
+	assignDataSourceParam(pathParams, queryParams, ParamDef{Name: "workspace", In: "path"}, "ws")
+	assignDataSourceParam(pathParams, queryParams, ParamDef{Name: "state", In: "query"}, "open")
+	if pathParams["workspace"] != "ws" || queryParams["state"] != "open" {
+		t.Fatalf("unexpected assigned params: path=%#v query=%#v", pathParams, queryParams)
+	}
+
+	responseAttrs := map[string]datasourceschema.Attribute{}
+	addDataSourceResponseFields(responseAttrs, []BodyFieldDef{{Path: "id"}, {Path: "title"}})
+	if _, ok := responseAttrs["id"]; ok || responseAttrs["title"] == nil {
+		t.Fatalf("expected reserved id skipped and title added, got %#v", responseAttrs)
+	}
+}
+
+func TestDataSourceResponseFieldHelpers(t *testing.T) {
+	resp := datasource.ReadResponse{State: tfsdk.State{}}
+	ctx := context.Background()
+	targetMap := map[string]any{"id": 1}
+	setDataSourceResponseField(ctx, &resp, BodyFieldDef{Path: "id"}, targetMap)
+	if resp.Diagnostics.HasError() {
+		t.Fatalf("expected reserved response field to be ignored, got %#v", resp.Diagnostics)
+	}
+}
+
 func TestDataSourceRead(t *testing.T) {
 	group := testResourceGroup()
 	d := &GenericDataSource{group: group}

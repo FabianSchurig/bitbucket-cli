@@ -293,7 +293,7 @@ func TestRenderMarkdown_MapSlice(t *testing.T) {
 
 	var buf bytes.Buffer
 	if err := output.RenderTo(&buf, items); err != nil {
-		t.Fatalf("RenderTo: %v", err)
+		t.Fatalf(renderToErrFmt, err)
 	}
 
 	got := buf.String()

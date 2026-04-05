@@ -2,12 +2,16 @@ package output
 
 import (
 	"bytes"
+	"errors"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/fatih/color"
 )
+
+const renderToErrFmt = "RenderTo: %v"
 
 func TestRender_WritesToStdout(t *testing.T) {
 	Format = "json"
@@ -38,144 +42,138 @@ func TestRender_WritesToStdout(t *testing.T) {
 	}
 }
 
-func TestRenderTable_Fallbacks(t *testing.T) {
-	t.Run("struct", func(t *testing.T) {
-		Format = "table"
-		type sample struct {
-			ID      int
-			Name    string
-			private string
-		}
-		var buf bytes.Buffer
-		if err := RenderTo(&buf, sample{ID: 1, Name: "demo", private: "hidden"}); err != nil {
-			t.Fatalf("RenderTo: %v", err)
-		}
-		got := buf.String()
-		if !strings.Contains(got, "ID") || !strings.Contains(got, "NAME") || strings.Contains(got, "private") {
-			t.Fatalf("unexpected struct table output:\n%s", got)
-		}
-	})
-
-	t.Run("default value", func(t *testing.T) {
-		Format = "table"
-		var buf bytes.Buffer
-		if err := RenderTo(&buf, 123); err != nil {
-			t.Fatalf("RenderTo: %v", err)
-		}
-		if got := strings.TrimSpace(buf.String()); got != "123" {
-			t.Fatalf("expected fallback numeric output, got %q", got)
-		}
-	})
-
-	t.Run("non map any slice", func(t *testing.T) {
-		Format = "table"
-		var buf bytes.Buffer
-		if err := RenderTo(&buf, []any{"a", 2}); err != nil {
-			t.Fatalf("RenderTo: %v", err)
-		}
-		got := buf.String()
-		if !strings.Contains(got, "a") || !strings.Contains(got, "2") {
-			t.Fatalf("expected direct slice item output, got %q", got)
-		}
-	})
+func TestRenderTableStructFallback(t *testing.T) {
+	Format = "table"
+	type sample struct {
+		ID      int
+		Name    string
+		private string
+	}
+	var buf bytes.Buffer
+	if err := RenderTo(&buf, sample{ID: 1, Name: "demo", private: "hidden"}); err != nil {
+		t.Fatalf(renderToErrFmt, err)
+	}
+	got := buf.String()
+	if !strings.Contains(got, "ID") || !strings.Contains(got, "NAME") || strings.Contains(got, "private") {
+		t.Fatalf("unexpected struct table output:\n%s", got)
+	}
 }
 
-func TestRenderMarkdown_Fallbacks(t *testing.T) {
-	t.Run("empty slice", func(t *testing.T) {
-		Format = "markdown"
-		var buf bytes.Buffer
-		if err := RenderTo(&buf, []sampleRow{}); err != nil {
-			t.Fatalf("RenderTo: %v", err)
-		}
-		if strings.TrimSpace(buf.String()) != noResults {
-			t.Fatalf("expected %q, got %q", noResults, buf.String())
-		}
-	})
-
-	t.Run("struct slice", func(t *testing.T) {
-		Format = "markdown"
-		var buf bytes.Buffer
-		rows := []sampleRow{{Id: 1, Title: "One", State: "OPEN"}, {Id: 2, Title: "Two", State: "MERGED"}}
-		if err := RenderTo(&buf, rows); err != nil {
-			t.Fatalf("RenderTo: %v", err)
-		}
-		got := buf.String()
-		if !strings.Contains(got, "TITLE") || !strings.Contains(got, "One") || !strings.Contains(got, "Two") {
-			t.Fatalf("unexpected markdown slice output:\n%s", got)
-		}
-	})
-
-	t.Run("struct", func(t *testing.T) {
-		Format = "markdown"
-		var buf bytes.Buffer
-		if err := RenderTo(&buf, sampleRow{Id: 3, Title: "Three"}); err != nil {
-			t.Fatalf("RenderTo: %v", err)
-		}
-		got := buf.String()
-		if !strings.Contains(got, "Id: 3") || !strings.Contains(got, "Title: Three") {
-			t.Fatalf("unexpected markdown struct output:\n%s", got)
-		}
-	})
-
-	t.Run("default value", func(t *testing.T) {
-		Format = "markdown"
-		var buf bytes.Buffer
-		if err := RenderTo(&buf, true); err != nil {
-			t.Fatalf("RenderTo: %v", err)
-		}
-		if strings.TrimSpace(buf.String()) != "true" {
-			t.Fatalf("expected fallback boolean output, got %q", buf.String())
-		}
-	})
-
-	t.Run("non map any slice", func(t *testing.T) {
-		Format = "markdown"
-		var buf bytes.Buffer
-		if err := RenderTo(&buf, []any{"alpha", "beta"}); err != nil {
-			t.Fatalf("RenderTo: %v", err)
-		}
-		got := buf.String()
-		if !strings.Contains(got, "alpha") || !strings.Contains(got, "beta") {
-			t.Fatalf("unexpected markdown any-slice output:\n%s", got)
-		}
-	})
+func TestRenderTableDefaultFallback(t *testing.T) {
+	Format = "table"
+	var buf bytes.Buffer
+	if err := RenderTo(&buf, 123); err != nil {
+		t.Fatalf(renderToErrFmt, err)
+	}
+	if got := strings.TrimSpace(buf.String()); got != "123" {
+		t.Fatalf("expected fallback numeric output, got %q", got)
+	}
 }
 
-func TestRenderIDs_Fallbacks(t *testing.T) {
-	t.Run("map slice", func(t *testing.T) {
-		Format = "id"
-		var buf bytes.Buffer
-		items := []any{map[string]any{"id": float64(11)}, "skip", map[string]any{"id": float64(12)}}
-		if err := RenderTo(&buf, items); err != nil {
-			t.Fatalf("RenderTo: %v", err)
-		}
-		got := buf.String()
-		if !strings.Contains(got, "11") || !strings.Contains(got, "12") {
-			t.Fatalf("expected map IDs, got %q", got)
-		}
-	})
+func TestRenderTableAnySliceFallback(t *testing.T) {
+	Format = "table"
+	var buf bytes.Buffer
+	if err := RenderTo(&buf, []any{"a", 2}); err != nil {
+		t.Fatalf(renderToErrFmt, err)
+	}
+	got := buf.String()
+	if !strings.Contains(got, "a") || !strings.Contains(got, "2") {
+		t.Fatalf("expected direct slice item output, got %q", got)
+	}
+}
 
-	t.Run("single map without id", func(t *testing.T) {
-		Format = "id"
-		var buf bytes.Buffer
-		if err := RenderTo(&buf, map[string]any{"title": "missing"}); err != nil {
-			t.Fatalf("RenderTo: %v", err)
-		}
-		if buf.Len() != 0 {
-			t.Fatalf("expected empty output for map without id, got %q", buf.String())
-		}
-	})
+func TestRenderMarkdownEmptySliceFallback(t *testing.T) {
+	Format = "markdown"
+	var buf bytes.Buffer
+	if err := RenderTo(&buf, []sampleRow{}); err != nil {
+		t.Fatalf(renderToErrFmt, err)
+	}
+	if strings.TrimSpace(buf.String()) != noResults {
+		t.Fatalf("expected %q, got %q", noResults, buf.String())
+	}
+}
 
-	t.Run("single struct without id", func(t *testing.T) {
-		Format = "id"
-		var buf bytes.Buffer
-		if err := RenderTo(&buf, struct{ Title string }{Title: "x"}); err != nil {
-			t.Fatalf("RenderTo: %v", err)
-		}
-		if buf.Len() != 0 {
-			t.Fatalf("expected empty output for struct without Id, got %q", buf.String())
-		}
-	})
+func TestRenderMarkdownStructSliceFallback(t *testing.T) {
+	Format = "markdown"
+	var buf bytes.Buffer
+	rows := []sampleRow{{Id: 1, Title: "One", State: "OPEN"}, {Id: 2, Title: "Two", State: "MERGED"}}
+	if err := RenderTo(&buf, rows); err != nil {
+		t.Fatalf(renderToErrFmt, err)
+	}
+	got := buf.String()
+	if !strings.Contains(got, "TITLE") || !strings.Contains(got, "One") || !strings.Contains(got, "Two") {
+		t.Fatalf("unexpected markdown slice output:\n%s", got)
+	}
+}
+
+func TestRenderMarkdownStructFallback(t *testing.T) {
+	Format = "markdown"
+	var buf bytes.Buffer
+	if err := RenderTo(&buf, sampleRow{Id: 3, Title: "Three"}); err != nil {
+		t.Fatalf(renderToErrFmt, err)
+	}
+	got := buf.String()
+	if !strings.Contains(got, "Id: 3") || !strings.Contains(got, "Title: Three") {
+		t.Fatalf("unexpected markdown struct output:\n%s", got)
+	}
+}
+
+func TestRenderMarkdownDefaultFallback(t *testing.T) {
+	Format = "markdown"
+	var buf bytes.Buffer
+	if err := RenderTo(&buf, true); err != nil {
+		t.Fatalf(renderToErrFmt, err)
+	}
+	if strings.TrimSpace(buf.String()) != "true" {
+		t.Fatalf("expected fallback boolean output, got %q", buf.String())
+	}
+}
+
+func TestRenderMarkdownAnySliceFallback(t *testing.T) {
+	Format = "markdown"
+	var buf bytes.Buffer
+	if err := RenderTo(&buf, []any{"alpha", "beta"}); err != nil {
+		t.Fatalf(renderToErrFmt, err)
+	}
+	got := buf.String()
+	if !strings.Contains(got, "alpha") || !strings.Contains(got, "beta") {
+		t.Fatalf("unexpected markdown any-slice output:\n%s", got)
+	}
+}
+
+func TestRenderIDsMapSliceFallback(t *testing.T) {
+	Format = "id"
+	var buf bytes.Buffer
+	items := []any{map[string]any{"id": float64(11)}, "skip", map[string]any{"id": float64(12)}}
+	if err := RenderTo(&buf, items); err != nil {
+		t.Fatalf(renderToErrFmt, err)
+	}
+	got := buf.String()
+	if !strings.Contains(got, "11") || !strings.Contains(got, "12") {
+		t.Fatalf("expected map IDs, got %q", got)
+	}
+}
+
+func TestRenderIDsSingleMapWithoutID(t *testing.T) {
+	Format = "id"
+	var buf bytes.Buffer
+	if err := RenderTo(&buf, map[string]any{"title": "missing"}); err != nil {
+		t.Fatalf(renderToErrFmt, err)
+	}
+	if buf.Len() != 0 {
+		t.Fatalf("expected empty output for map without id, got %q", buf.String())
+	}
+}
+
+func TestRenderIDsSingleStructWithoutID(t *testing.T) {
+	Format = "id"
+	var buf bytes.Buffer
+	if err := RenderTo(&buf, struct{ Title string }{Title: "x"}); err != nil {
+		t.Fatalf(renderToErrFmt, err)
+	}
+	if buf.Len() != 0 {
+		t.Fatalf("expected empty output for struct without Id, got %q", buf.String())
+	}
 }
 
 func TestHelpersAndValueFormatting(t *testing.T) {
@@ -234,8 +232,52 @@ func TestHelpersAndValueFormatting(t *testing.T) {
 	}
 }
 
+func TestMarkdownHelpersAndErrorPaths(t *testing.T) {
+	if err := mdTable(ioDiscardWithError{}, []string{"ID"}, [][]string{{"1"}}); !errors.Is(err, errWriteFailed) {
+		t.Fatalf("expected markdown write error, got %v", err)
+	}
+
+	if err := mdTable(&bytes.Buffer{}, nil, nil); err != nil {
+		t.Fatalf("expected empty headers to no-op, got %v", err)
+	}
+}
+
+func TestWritePlainItemsAndPrintIDHelpers(t *testing.T) {
+	if err := writePlainItems(ioDiscardWithError{}, []any{"x"}); !errors.Is(err, errWriteFailed) {
+		t.Fatalf("expected plain item write error, got %v", err)
+	}
+
+	if err := printMapID(ioDiscardWithError{}, map[string]any{"id": 1}); !errors.Is(err, errWriteFailed) {
+		t.Fatalf("expected printMapID write error, got %v", err)
+	}
+
+	if err := printFieldID(ioDiscardWithError{}, reflect.ValueOf(struct{ Id int }{Id: 1})); !errors.Is(err, errWriteFailed) {
+		t.Fatalf("expected printFieldID write error, got %v", err)
+	}
+}
+
+func TestRenderMapHelpersSkipNonMaps(t *testing.T) {
+	var buf bytes.Buffer
+	if err := renderMapSliceKV(&buf, []any{map[string]any{"id": 1}, "skip"}); err != nil {
+		t.Fatalf("unexpected renderMapSliceKV error: %v", err)
+	}
+
+	buf.Reset()
+	if err := renderMapSliceTable(&buf, []any{map[string]any{"id": 1}, "skip"}); err != nil {
+		t.Fatalf("unexpected renderMapSliceTable error: %v", err)
+	}
+}
+
 type sampleRow struct {
 	Id    int
 	Title string
 	State string
+}
+
+var errWriteFailed = errors.New("write failed")
+
+type ioDiscardWithError struct{}
+
+func (ioDiscardWithError) Write(_ []byte) (int, error) {
+	return 0, errWriteFailed
 }

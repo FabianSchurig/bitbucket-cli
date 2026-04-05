@@ -72,6 +72,23 @@ func TestDispatchRaw_InvalidJSON(t *testing.T) {
 	}
 }
 
+func TestFetchResultAndPaginationHelpers(t *testing.T) {
+	if !shouldFetchNextPage(true, &pageResult{nextURL: "https://example.test/next"}) {
+		t.Fatal("expected pagination helper to request the next page")
+	}
+	if shouldFetchNextPage(false, &pageResult{nextURL: "https://example.test/next"}) {
+		t.Fatal("expected pagination helper to stop when all=false")
+	}
+
+	_, _, err := fetchResult(context.Background(), newInternalTestClient("http://127.0.0.1:1"), Request{
+		Method:      http.MethodGet,
+		URLTemplate: "/test",
+	}, "http://127.0.0.1:1/test", "http://127.0.0.1:1/test")
+	if err == nil {
+		t.Fatal("expected fetchResult request error")
+	}
+}
+
 func TestExtractPage(t *testing.T) {
 	t.Run("non page payloads", func(t *testing.T) {
 		for _, payload := range []any{
