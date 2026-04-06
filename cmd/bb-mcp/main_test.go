@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -79,7 +80,7 @@ server:
 		}
 		// Check that no tool description mentions DELETE.
 		desc := tool.Description
-		if contains(desc, "[DELETE]") {
+		if strings.Contains(desc, "[DELETE]") {
 			t.Errorf("tool %q still contains DELETE operations after filtering", tool.Name)
 		}
 	}
@@ -215,17 +216,4 @@ server:
 	if count != 19 {
 		t.Errorf("expected 19 tools (20 minus 1 ignored), got %d", count)
 	}
-}
-
-func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(s) > 0 && containsSubstr(s, substr))
-}
-
-func containsSubstr(s, substr string) bool {
-	for i := 0; i <= len(s)-len(substr); i++ {
-		if s[i:i+len(substr)] == substr {
-			return true
-		}
-	}
-	return false
 }
