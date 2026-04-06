@@ -589,6 +589,9 @@ description: |-
 Terraform provider for Bitbucket Cloud, exposing all Bitbucket API operations as
 generic resources and data sources. Auto-generated from the Bitbucket OpenAPI spec.
 
+Migrating from the legacy ` + "`DrFaust92/terraform-provider-bitbucket`" + ` provider? See
+[` + "`MIGRATION.md`" + `](../MIGRATION.md).
+
 ## Authentication
 
 The provider authenticates via HTTP Basic Auth using an Atlassian API token.
