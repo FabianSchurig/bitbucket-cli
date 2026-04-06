@@ -12,7 +12,7 @@ func TestToolHelperFunctions(t *testing.T) {
 	if got := opDescription(OperationDef{OperationID: "fallback"}); got != "fallback" {
 		t.Fatalf("expected operation ID fallback, got %q", got)
 	}
-	if got := bodyFieldDescription(BodyFieldDef{Path: "title"}); got != "title" {
+	if got := bodyFieldDescription(BodyFieldDef{Path: "title"}); got != "title (use parameter name: body_title)" {
 		t.Fatalf("expected body field path fallback, got %q", got)
 	}
 	if got := bodyFieldKey("content.raw"); got != "body_content_raw" {
@@ -61,9 +61,13 @@ func TestToolHelperFunctions(t *testing.T) {
 	if result, err := formatToolResult(nil); err != nil || result == nil || result.IsError {
 		t.Fatalf("expected OK tool result, got %#v err=%v", result, err)
 	}
+	// Infinity cannot be JSON-marshaled; verify the error path using json format.
+	prevFormat := Format
+	Format = "json"
 	if result, err := formatToolResult(map[string]any{"value": math.Inf(1)}); err != nil || result == nil || !result.IsError {
 		t.Fatalf("expected formatting error result, got %#v err=%v", result, err)
 	}
+	Format = prevFormat
 
 	if got := extractStringParam(map[string]any{"value": 7}, "value", "integer"); got != "7" {
 		t.Fatalf("expected integer conversion, got %q", got)

@@ -30,11 +30,14 @@ const (
 
 // ─── Test helpers ─────────────────────────────────────────────────────────────
 
-// setupEnv configures Bitbucket auth env vars and returns a cleanup function.
+// setupEnv configures Bitbucket auth env vars and sets Format to json for test output.
 func setupEnv(t *testing.T) {
 	t.Helper()
 	t.Setenv("BITBUCKET_USERNAME", "testuser")
 	t.Setenv("BITBUCKET_TOKEN", "testtoken")
+	prev := mcptools.Format
+	mcptools.Format = "json"
+	t.Cleanup(func() { mcptools.Format = prev })
 }
 
 // testToolGroup returns a minimal ToolGroup for testing.

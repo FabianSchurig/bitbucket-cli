@@ -26,7 +26,7 @@ func TestDispatchRaw_EmptyAndNonJSONResponses(t *testing.T) {
 		wantNil     bool
 	}{
 		{name: "empty body", contentType: "application/json", body: "", wantNil: true},
-		{name: "non json body", contentType: "text/plain", body: "plain text", wantNil: true},
+		{name: "non json body", contentType: "text/plain", body: "plain text", wantNil: false},
 	}
 
 	for _, tt := range tests {
