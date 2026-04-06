@@ -1084,5 +1084,3 @@ func writeFile(path, content string) {
 		os.Exit(1)
 	}
 }
-
-
