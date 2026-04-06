@@ -27,6 +27,8 @@ import (
 	"github.com/FabianSchurig/bitbucket-cli/internal/tfprovider"
 )
 
+const migrationGuideURL = "https://github.com/FabianSchurig/bitbucket-cli/blob/main/MIGRATION.md"
+
 // ─── Template data ────────────────────────────────────────────────────────────
 
 type GroupData struct {
@@ -590,7 +592,7 @@ Terraform provider for Bitbucket Cloud, exposing all Bitbucket API operations as
 generic resources and data sources. Auto-generated from the Bitbucket OpenAPI spec.
 
 Migrating from the legacy ` + "`DrFaust92/terraform-provider-bitbucket`" + ` provider? See
-[` + "`MIGRATION.md`" + `](../MIGRATION.md).
+[` + "`MIGRATION.md`" + `](` + migrationGuideURL + `).
 
 ## Authentication
 
@@ -1082,3 +1084,5 @@ func writeFile(path, content string) {
 		os.Exit(1)
 	}
 }
+
+
