@@ -50,7 +50,7 @@ FROM dhi.io/golang:1 AS bb-mcp
 
 COPY --from=build-bb-mcp /go/bin/bb-mcp /usr/local/bin/bb-mcp
 
-LABEL io.modelcontextprotocol.server.name="io.github.fabianschurig/bitbucket-mcp"
+LABEL io.modelcontextprotocol.server.name="io.github.FabianSchurig/bitbucket-mcp"
 
 EXPOSE 8080
 ENTRYPOINT ["bb-mcp"]
