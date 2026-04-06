@@ -19,6 +19,7 @@ import (
 // Ensure the implementation satisfies the resource interface.
 var _ resource.Resource = &GenericResource{}
 var _ resource.ResourceWithConfigure = &GenericResource{}
+var _ resource.ResourceWithImportState = &GenericResource{}
 
 // ─── Resource group metadata (shared with generators) ─────────────────────────
 
@@ -48,8 +49,8 @@ type ParamDef struct {
 
 // BodyFieldDef describes a request body field, potentially nested.
 type BodyFieldDef struct {
-	Path       string         // relative field name (e.g., "hash" inside a "target" object)
-	Type       string         // "string", "integer", "boolean"
+	Path       string // relative field name (e.g., "hash" inside a "target" object)
+	Type       string // "string", "integer", "boolean"
 	Desc       string
 	Required   bool           // true when the API schema lists this field as required
 	IsArray    bool           // true when the field is an array
@@ -213,6 +214,68 @@ func (r *GenericResource) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 	r.dispatch(ctx, op, &req.Plan, &resp.State, &resp.Diagnostics)
+}
+
+// ImportState implements resource import. The import ID must be the slash-separated
+// required path parameter values in the order they appear in the URL path template
+// (e.g. "my-workspace/my-repo-slug" for /repositories/{workspace}/{repo_slug}).
+// After import, a Read is performed automatically to populate all computed attributes.
+func (r *GenericResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	readOp := r.group.Ops.Read
+	if readOp == nil {
+		resp.Diagnostics.AddError("Import not supported", fmt.Sprintf("Resource %s has no Read operation", r.group.TypeName))
+		return
+	}
+
+	// Collect required path params in URL template order (e.g. {workspace} before {repo_slug}).
+	requiredSet := map[string]bool{}
+	for _, p := range readOp.Params {
+		if p.In == "path" && p.Required {
+			requiredSet[p.Name] = true
+		}
+	}
+	var paramNames []string
+	// Extract {param} placeholders from the path in order.
+	pathTemplate := readOp.Path
+	for len(pathTemplate) > 0 {
+		start := strings.Index(pathTemplate, "{")
+		if start == -1 {
+			break
+		}
+		end := strings.Index(pathTemplate[start:], "}")
+		if end == -1 {
+			break
+		}
+		name := pathTemplate[start+1 : start+end]
+		if requiredSet[name] {
+			paramNames = append(paramNames, ParamAttrName(name))
+		}
+		pathTemplate = pathTemplate[start+end+1:]
+	}
+
+	if len(paramNames) == 0 {
+		// Fallback: treat ID as the resource id attribute.
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, attrPath("id"), types.StringValue(req.ID))...)
+		return
+	}
+
+	parts := strings.Split(req.ID, "/")
+	if len(parts) < len(paramNames) {
+		resp.Diagnostics.AddError("Invalid import ID",
+			fmt.Sprintf("Expected %d slash-separated values (%s), got %q",
+				len(paramNames), strings.Join(paramNames, "/"), req.ID))
+		return
+	}
+
+	// When the last param may itself contain slashes (e.g. file paths), join
+	// any extra parts back into the last segment.
+	values := make([]string, len(paramNames))
+	copy(values, parts[:len(paramNames)-1])
+	values[len(paramNames)-1] = strings.Join(parts[len(paramNames)-1:], "/")
+
+	for i, name := range paramNames {
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, attrPath(name), types.StringValue(values[i]))...)
+	}
 }
 
 // Delete calls the delete API operation.

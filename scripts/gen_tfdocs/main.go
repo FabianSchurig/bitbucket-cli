@@ -32,26 +32,26 @@ const migrationGuideURL = "https://github.com/FabianSchurig/bitbucket-cli/blob/m
 // ─── Template data ────────────────────────────────────────────────────────────
 
 type GroupData struct {
-	Name             string
-	TFName           string // e.g., "bitbucket_repos"
-	Subcategory      string // API group category for Terraform Registry sidebar grouping
-	HasCreate        bool
-	HasRead          bool
-	HasUpdate        bool
-	HasDelete        bool
-	HasList          bool
-	HasIDParam       bool // true if "id" is a path parameter (avoids conflict with computed id)
-	HasBody          bool // true if any CRUD op accepts a body
-	Params           []string
-	ComputedParams   []string // params from non-primary ops (Optional+Computed)
-	DSRequiredParams []string // data source Required params (from List or Read base path)
-	DSOptionalParams []string // data source Optional params (Read-only, not in List)
-	ParamValues      map[string]string
+	Name               string
+	TFName             string // e.g., "bitbucket_repos"
+	Subcategory        string // API group category for Terraform Registry sidebar grouping
+	HasCreate          bool
+	HasRead            bool
+	HasUpdate          bool
+	HasDelete          bool
+	HasList            bool
+	HasIDParam         bool // true if "id" is a path parameter (avoids conflict with computed id)
+	HasBody            bool // true if any CRUD op accepts a body
+	Params             []string
+	ComputedParams     []string // params from non-primary ops (Optional+Computed)
+	DSRequiredParams   []string // data source Required params (from List or Read base path)
+	DSOptionalParams   []string // data source Optional params (Read-only, not in List)
+	ParamValues        map[string]string
 	RequiredBodyFields []FieldDoc   // writable body fields that are Required per API schema
 	BodyFields         []FieldDoc   // writable body fields (Optional)
 	ResponseFields     []FieldDoc   // computed response fields (Computed)
 	OverlapFields      []FieldDoc   // fields that are both writable and computed (Optional+Computed)
-	CRUDOps          []CRUDOpInfo // CRUD operation details (scopes, doc links)
+	CRUDOps            []CRUDOpInfo // CRUD operation details (scopes, doc links)
 }
 
 // FieldDoc describes a Terraform attribute for documentation.
