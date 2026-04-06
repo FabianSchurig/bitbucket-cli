@@ -165,7 +165,6 @@ commits.`,
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
-				{Path: `commit.hash`, Type: `string`, Desc: `hash`},
 				{Path: `commit.date`, Type: `string`, Desc: `date`},
 				{Path: `commit.hash`, Type: `string`, Desc: `hash`},
 				{Path: `commit.message`, Type: `string`, Desc: `message`},

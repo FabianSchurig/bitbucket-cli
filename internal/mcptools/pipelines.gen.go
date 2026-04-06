@@ -209,9 +209,6 @@ for specific details.
 				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`},
 				{Path: `creator.display_name`, Type: `string`, Desc: `display_name`},
 				{Path: `creator.uuid`, Type: `string`, Desc: `uuid`},
-				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-				{Path: `repository.is_private`, Type: `bool`, Desc: `is_private`},
 				{Path: `repository.description`, Type: `string`, Desc: `description`},
 				{Path: `repository.fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
@@ -816,8 +813,6 @@ administered through admin.atlassian.com.
 				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
 				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
 				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
-				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
 			},
 			HasBody:   true,

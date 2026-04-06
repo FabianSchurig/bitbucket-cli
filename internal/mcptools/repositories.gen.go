@@ -200,7 +200,6 @@ administered through admin.atlassian.com.
 				{Path: `mainbranch.type`, Type: `string`, Desc: `type`},
 				{Path: `mainbranch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
 				{Path: `mainbranch.merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`},
-				{Path: `mainbranch.default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
 				{Path: `name`, Type: `string`, Desc: `name`},
 				{Path: `owner.display_name`, Type: `string`, Desc: `display_name`},
 				{Path: `owner.uuid`, Type: `string`, Desc: `uuid`},
