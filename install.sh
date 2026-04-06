@@ -18,23 +18,47 @@ BINARY="bb-cli"
 VERSION=""
 INSTALL_DIR="/usr/local/bin"
 
+usage() {
+  cat >&2 <<EOF
+Usage:
+  sh install.sh [--binary NAME] [--version TAG] [--install-dir DIR]
+
+Options:
+  --binary NAME      Binary to install: bb-cli (default), bb-mcp, or all
+  --version TAG      Version tag to install (default: latest)
+  --install-dir DIR  Installation directory (default: /usr/local/bin)
+EOF
+}
+
+require_value() {
+  if [ $# -lt 2 ] || [ -z "$2" ]; then
+    echo "Missing value for option: $1" >&2
+    usage
+    exit 1
+  fi
+}
+
 # Parse arguments
 while [ $# -gt 0 ]; do
   case "$1" in
     --binary)
+      require_value "$1" "${2:-}"
       BINARY="$2"
       shift 2
       ;;
     --version)
+      require_value "$1" "${2:-}"
       VERSION="$2"
       shift 2
       ;;
     --install-dir)
+      require_value "$1" "${2:-}"
       INSTALL_DIR="$2"
       shift 2
       ;;
     *)
       echo "Unknown option: $1" >&2
+      usage
       exit 1
       ;;
   esac
@@ -45,9 +69,9 @@ detect_os() {
   case "$os" in
     linux)  echo "linux" ;;
     darwin) echo "darwin" ;;
-    mingw*|msys*|cygwin*) echo "windows" ;;
     *)
       echo "Unsupported OS: $os" >&2
+      echo "On Windows, download binaries directly from https://github.com/${REPO}/releases" >&2
       exit 1
       ;;
   esac
@@ -89,6 +113,41 @@ download() {
   fi
 }
 
+verify_checksum() {
+  archive_path="$1"
+  archive_name="$2"
+  version="$3"
+
+  checksums_url="https://github.com/${REPO}/releases/download/${version}/checksums.txt"
+  checksums_file="$(dirname "$archive_path")/checksums.txt"
+
+  echo "Verifying checksum..."
+  download "$checksums_url" "$checksums_file"
+
+  expected="$(grep "${archive_name}" "$checksums_file" | awk '{print $1}')"
+  if [ -z "$expected" ]; then
+    echo "Warning: checksum for ${archive_name} not found in checksums.txt, skipping verification" >&2
+    return
+  fi
+
+  if command -v sha256sum >/dev/null 2>&1; then
+    actual="$(sha256sum "$archive_path" | awk '{print $1}')"
+  elif command -v shasum >/dev/null 2>&1; then
+    actual="$(shasum -a 256 "$archive_path" | awk '{print $1}')"
+  else
+    echo "Warning: sha256sum or shasum not found, skipping checksum verification" >&2
+    return
+  fi
+
+  if [ "$expected" != "$actual" ]; then
+    echo "Error: checksum mismatch for ${archive_name}" >&2
+    echo "  expected: ${expected}" >&2
+    echo "  actual:   ${actual}" >&2
+    exit 1
+  fi
+  echo "Checksum verified."
+}
+
 install_binary() {
   bin_name="$1"
   os="$2"
@@ -98,47 +157,37 @@ install_binary() {
 
   echo "Installing ${bin_name} ${version} for ${os}/${arch}..."
 
-  ext="tar.gz"
-  if [ "$os" = "windows" ]; then
-    ext="zip"
-  fi
-
-  archive_name="bb-cli_${version_num}_${os}_${arch}.${ext}"
+  archive_name="bb-cli_${version_num}_${os}_${arch}.tar.gz"
   download_url="https://github.com/${REPO}/releases/download/${version}/${archive_name}"
 
   tmpdir="$(mktemp -d)"
-  trap 'rm -rf "$tmpdir"' EXIT
 
   echo "Downloading ${download_url}..."
   download "$download_url" "${tmpdir}/${archive_name}"
 
+  verify_checksum "${tmpdir}/${archive_name}" "$archive_name" "$version"
+
   echo "Extracting..."
-  if [ "$ext" = "zip" ]; then
-    if command -v unzip >/dev/null 2>&1; then
-      unzip -q "${tmpdir}/${archive_name}" -d "$tmpdir"
-    else
-      echo "Error: unzip is required for Windows archives" >&2
-      exit 1
-    fi
-  else
-    tar -xzf "${tmpdir}/${archive_name}" -C "$tmpdir"
-  fi
+  tar -xzf "${tmpdir}/${archive_name}" -C "$tmpdir"
 
   if [ ! -f "${tmpdir}/${bin_name}" ]; then
     echo "Error: ${bin_name} binary not found in archive" >&2
+    rm -rf "$tmpdir"
     exit 1
   fi
 
   echo "Installing to ${INSTALL_DIR}/${bin_name}..."
-  if [ -w "$INSTALL_DIR" ]; then
+  if mkdir -p "$INSTALL_DIR" 2>/dev/null && [ -w "$INSTALL_DIR" ]; then
     mv "${tmpdir}/${bin_name}" "${INSTALL_DIR}/${bin_name}"
     chmod +x "${INSTALL_DIR}/${bin_name}"
   else
     echo "Elevated permissions required to install to ${INSTALL_DIR}. Use --install-dir to choose a writable directory."
+    sudo mkdir -p "$INSTALL_DIR"
     sudo mv "${tmpdir}/${bin_name}" "${INSTALL_DIR}/${bin_name}"
     sudo chmod +x "${INSTALL_DIR}/${bin_name}"
   fi
 
+  rm -rf "$tmpdir"
   echo "${bin_name} ${version} installed successfully to ${INSTALL_DIR}/${bin_name}"
 }
 
