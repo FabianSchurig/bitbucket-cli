@@ -67,6 +67,21 @@ class GenMigrationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "missing Terraform object heading"):
                 gen_migration.parse_current_doc(path, "resource")
 
+    def test_parse_current_doc_rejects_heading_without_terraform_object_name(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "broken.md"
+            path.write_text("# not-a-terraform-object\n")
+
+            with self.assertRaisesRegex(ValueError, "missing Terraform object name"):
+                gen_migration.parse_current_doc(path, "resource")
+
+    def test_parse_bullets_filters_nested_current_bullets(self):
+        section = "- `top_level`\n  - `nested`\n- `another_top_level`\n"
+
+        parsed = gen_migration.parse_bullets(section, current=True)
+
+        self.assertEqual(parsed, ["top_level", "another_top_level"])
+
     def test_parse_current_doc_ignores_nested_schema_bullets(self):
         markdown = """# bitbucket_example (Resource)
 

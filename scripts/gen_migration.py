@@ -244,6 +244,7 @@ def fetch(url: str, *, required: bool = True, timeout: int = 20) -> str | None:
 
 
 def parse_bullets(section: str, current: bool) -> list[str]:
+    """Parse top-level markdown bullets and intentionally ignore nested schema bullets."""
     items = []
     for line in section.splitlines():
         line = line.rstrip()
@@ -270,14 +271,14 @@ def split_section(text: str, start: str, stops: list[str]) -> str:
 
 def parse_current_doc(path: Path, kind: str) -> DocObject:
     text = path.read_text()
-    name_match = re.search(r"^#\s+(bitbucket_[^\s]+)", text, re.M)
-    if name_match is None:
-        raise ValueError(f"missing Terraform object heading in {path}")
     title_match = re.search(r"^#\s+(.+)$", text, re.M)
     if title_match is None:
-        raise ValueError(f"missing markdown title in {path}")
-    name = name_match.group(1)
+        raise ValueError(f"missing Terraform object heading in {path}")
     title = title_match.group(1)
+    name_match = re.search(r"(bitbucket_[^\s]+)", title)
+    if name_match is None:
+        raise ValueError(f"missing Terraform object name in heading for {path}")
+    name = name_match.group(1)
     doc = DocObject(kind=kind, name=name, title=title)
     doc.inputs_required = parse_bullets(
         split_section(text, "### Required", ["### Optional", "### Read-Only", "##"]),
@@ -391,15 +392,14 @@ def parse_legacy_endpoints(kind: str, name: str, mapped_current: list[DocObject]
         if converted:
             endpoints.append(f"{converted[0]} {converted[1]}")
     raw_patterns = [
-        r'\.Get\("(2\.0/[^"]+)"\)',
-        r'\.Put\(fmt\.Sprintf\("(2\.0/[^"]+)"',
-        r'\.Get\(fmt\.Sprintf\("(2\.0/[^"]+)"',
-        r'\.Post\(fmt\.Sprintf\("(2\.0/[^"]+)"',
-        r'\.Delete\(fmt\.Sprintf\("(2\.0/[^"]+)"',
+        ("GET", r'\.Get\("(2\.0/[^"]+)"\)'),
+        ("PUT", r'\.Put\(fmt\.Sprintf\("(2\.0/[^"]+)"'),
+        ("GET", r'\.Get\(fmt\.Sprintf\("(2\.0/[^"]+)"'),
+        ("POST", r'\.Post\(fmt\.Sprintf\("(2\.0/[^"]+)"'),
+        ("DELETE", r'\.Delete\(fmt\.Sprintf\("(2\.0/[^"]+)"'),
     ]
-    for pattern in raw_patterns:
+    for verb, pattern in raw_patterns:
         for match in re.finditer(pattern, text):
-            verb = pattern.split(r"\.")[1].split(r"\(")[0].upper()
             endpoints.append(f"{verb} {normalize_raw_path(match.group(1))}")
     endpoints = dedupe(endpoints)
     if mapped_current:
