@@ -1023,7 +1023,6 @@ func main() {
 		"Groups":         groups,
 		"CategoryGroups": groupByCategory(groups),
 	})
-	copyFile("docs/MIGRATION.md", "MIGRATION.md")
 
 	// Generate provider example.
 	writeFile("examples/provider/provider.tf", exampleProviderTemplate)
@@ -1086,14 +1085,4 @@ func writeFile(path, content string) {
 	}
 }
 
-func copyFile(dst, src string) {
-	content, err := os.ReadFile(src)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "reading %s: %v\n", src, err)
-		os.Exit(1)
-	}
-	if err := os.WriteFile(dst, content, 0o644); err != nil {
-		fmt.Fprintf(os.Stderr, "writing %s: %v\n", dst, err)
-		os.Exit(1)
-	}
-}
+
