@@ -13,6 +13,7 @@ from typing import Iterable
 from urllib.error import HTTPError, URLError
 
 LEGACY_BASE = "https://raw.githubusercontent.com/DrFaust92/terraform-provider-bitbucket/master"
+CURRENT_DOCS_BASE = "https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs"
 
 CURRENT_KIND_PATH = {
     "resource": "resources",
@@ -240,7 +241,7 @@ def get_legacy_doc_url(kind: str, name: str) -> str:
 
 
 def get_current_doc_url(kind: str, name: str) -> str:
-    return f"./docs/{CURRENT_KIND_PATH[kind]}/{name}.md"
+    return f"{CURRENT_DOCS_BASE}/{CURRENT_KIND_PATH[kind]}/{name}.md"
 
 
 def parse_current_doc(path: Path, kind: str) -> DocObject:

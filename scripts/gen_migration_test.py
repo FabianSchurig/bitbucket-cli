@@ -125,7 +125,7 @@ class GenMigrationTests(unittest.TestCase):
     def test_get_current_doc_url(self):
         self.assertEqual(
             gen_migration.get_current_doc_url("data-source", "bitbucket_current_user"),
-            "./docs/data-sources/bitbucket_current_user.md",
+            "https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/bitbucket_current_user.md",
         )
 
     def test_format_doc_link_handles_missing_legacy_docs(self):
@@ -141,17 +141,17 @@ class GenMigrationTests(unittest.TestCase):
             "`bitbucket_missing` (legacy doc not available)",
         )
 
-    def test_render_uses_relative_docs_path(self):
+    def test_render_uses_main_branch_doc_links(self):
         current = {
             ("resource", "bitbucket_branch_restrictions"): gen_migration.DocObject(
                 kind="resource",
                 name="bitbucket_branch_restrictions",
-                doc_link="./docs/resources/bitbucket_branch_restrictions.md",
+                doc_link="https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/bitbucket_branch_restrictions.md",
             ),
             ("data-source", "bitbucket_current_user"): gen_migration.DocObject(
                 kind="data-source",
                 name="bitbucket_current_user",
-                doc_link="./docs/data-sources/bitbucket_current_user.md",
+                doc_link="https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/bitbucket_current_user.md",
             ),
         }
 
@@ -183,7 +183,10 @@ class GenMigrationTests(unittest.TestCase):
         self.assertIn("Legacy docs:", rendered)
         self.assertIn("New docs:", rendered)
         self.assertIn("- Legacy docs: [`bitbucket_branch_restriction`](https://legacy.example/resource/bitbucket_branch_restriction.md)", rendered)
-        self.assertIn("- New docs: [`bitbucket_branch_restrictions`](./docs/resources/bitbucket_branch_restrictions.md)", rendered)
+        self.assertIn(
+            "- New docs: [`bitbucket_branch_restrictions`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/bitbucket_branch_restrictions.md)",
+            rendered,
+        )
         self.assertNotIn("#### Legacy HCL", rendered)
         self.assertNotIn("- Diff summary:", rendered)
 
