@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
@@ -1305,7 +1306,9 @@ func testAccCheckProjectDestroy(workspace, projectKey string) resource.TestCheck
 		if err != nil {
 			return fmt.Errorf("failed to create client: %v", err)
 		}
-		_, err = handlers.DispatchRaw(context.Background(), c, handlers.Request{
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		_, err = handlers.DispatchRaw(ctx, c, handlers.Request{
 			Method:      "GET",
 			URLTemplate: "/workspaces/{workspace}/projects/{project_key}",
 			PathParams:  map[string]string{"workspace": workspace, "project_key": projectKey},
@@ -1314,8 +1317,8 @@ func testAccCheckProjectDestroy(workspace, projectKey string) resource.TestCheck
 		if err == nil {
 			return fmt.Errorf("project %s still exists in workspace %s after destroy", projectKey, workspace)
 		}
-		// Verify the error is a 404 (not a network/auth error).
-		if !strings.Contains(err.Error(), "404") {
+		// Verify the error is a Bitbucket API 404 (not a network/auth error).
+		if !strings.Contains(err.Error(), "bitbucket API error 404") {
 			return fmt.Errorf("unexpected error checking project %s destroy: %v", projectKey, err)
 		}
 		return nil
