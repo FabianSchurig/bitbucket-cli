@@ -228,6 +228,7 @@ def dedupe(items: Iterable[str]) -> list[str]:
 
 
 def fetch(url: str, *, required: bool = True, timeout: int = 20) -> str | None:
+    """Fetch UTF-8 text from a URL with timeout and optional missing-file tolerance."""
     request = urllib.request.Request(url, headers={"User-Agent": "bitbucket-cli-migration-generator"})
     try:
         with urllib.request.urlopen(
@@ -270,6 +271,7 @@ def split_section(text: str, start: str, stops: list[str]) -> str:
 
 
 def parse_current_doc(path: Path, kind: str) -> DocObject:
+    """Parse one generated doc in ./docs/resources or ./docs/data-sources."""
     text = path.read_text()
     title_match = re.search(r"^#\s+(.+)$", text, re.M)
     if title_match is None:
@@ -306,6 +308,7 @@ def parse_current_doc(path: Path, kind: str) -> DocObject:
 
 
 def parse_legacy_doc(kind: str, name: str) -> DocObject:
+    """Parse one legacy markdown doc from the DrFaust92 provider, if it exists."""
     base = name.removeprefix("bitbucket_")
     doc_url = f"{LEGACY_BASE}/docs/{CURRENT_KIND_PATH[kind]}/{base}.md"
     text = fetch(doc_url, required=False)
@@ -383,6 +386,7 @@ def normalize_raw_path(path: str) -> str:
 
 
 def parse_legacy_endpoints(kind: str, name: str, mapped_current: list[DocObject]) -> list[str]:
+    """Extract legacy endpoints from source, replacing placeholder paths with mapped current endpoints."""
     text = fetch(f"{LEGACY_BASE}/{source_filename(kind, name)}", required=False)
     if text is None:
         return dedupe(sum((doc.endpoints for doc in mapped_current), []))
@@ -473,6 +477,7 @@ def normalized_params(params: Iterable[str]) -> set[str]:
 
 
 def diff_summary(legacy: DocObject, currents: list[DocObject]) -> str:
+    """Summarize renamed, dropped, and added parameters between legacy and current objects."""
     current_inputs = dedupe(sum((doc.inputs for doc in currents), []))
     legacy_norm = normalized_params(legacy.inputs)
     current_set = set(current_inputs)
