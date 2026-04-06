@@ -2,7 +2,7 @@
 # Dockerfile for bitbucket-cli
 #
 # Uses the hardened dhi.io/golang base image and installs pre-built binaries
-# from the Go module proxy — no local source build required.
+# directly from GitHub (bypassing the Go module proxy to avoid cache lag).
 #
 # Targets:
 #   bb-cli  — Bitbucket CLI
@@ -12,6 +12,7 @@
 #   docker build -t bb-mcp .                 # uses default (bb-mcp)
 #   docker build --target bb-cli -t bb-cli .
 #   docker build --target bb-mcp -t bb-mcp .
+#   docker build --build-arg VERSION=v1.0.0 -t bb-mcp .  # pin a version
 # Extending this Dockerfile:
 #   To add a new binary target, add a new stage that installs the binary
 #   with `go install` (use the existing stages as a template), then add
@@ -21,14 +22,22 @@
 # --- bb-cli: hardened image for the Bitbucket CLI ---
 FROM dhi.io/golang:1 AS bb-cli
 
-RUN go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-cli@latest
+ARG VERSION=latest
+
+# Use GOPROXY=direct so Go fetches directly from GitHub, bypassing the slow proxy cache
+RUN GOPROXY=direct go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-cli@${VERSION}
 
 ENTRYPOINT ["bb-cli"]
 
 # --- bb-mcp: hardened image for the Bitbucket MCP server ---
 FROM dhi.io/golang:1 AS bb-mcp
 
-RUN go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-mcp@latest
+ARG VERSION=latest
+
+# Use GOPROXY=direct so Go fetches directly from GitHub, bypassing the slow proxy cache
+RUN GOPROXY=direct go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-mcp@${VERSION}
+
+LABEL io.modelcontextprotocol.server.name="io.github.fabianschurig/bitbucket-mcp"
 
 EXPOSE 8080
 ENTRYPOINT ["bb-mcp"]
