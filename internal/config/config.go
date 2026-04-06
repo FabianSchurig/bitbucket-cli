@@ -8,6 +8,7 @@
 package config
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"strings"
@@ -49,9 +50,13 @@ func Load(path string) (*Config, error) {
 }
 
 // Parse parses a YAML config from raw bytes.
+// Unknown keys are rejected so that typos (e.g. "allowed_method" instead of
+// "allowed_methods") do not silently fail open.
 func Parse(data []byte) (*Config, error) {
 	var cfg Config
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
+	dec := yaml.NewDecoder(bytes.NewReader(data))
+	dec.KnownFields(true)
+	if err := dec.Decode(&cfg); err != nil {
 		return nil, fmt.Errorf("parsing config: %w", err)
 	}
 	if cfg.ToolOverrides == nil {

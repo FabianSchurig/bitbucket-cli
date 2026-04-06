@@ -10,6 +10,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/config"
+	"github.com/FabianSchurig/bitbucket-cli/internal/mcptools"
 )
 
 func TestRegisterAllTools(t *testing.T) {
@@ -41,8 +42,8 @@ func TestRegisterAllTools(t *testing.T) {
 		count++
 	}
 
-	if count != 20 {
-		t.Fatalf("expected 20 registered MCP tools, got %d", count)
+	if count != len(mcptools.AllToolGroups) {
+		t.Fatalf("expected %d registered MCP tools, got %d", len(mcptools.AllToolGroups), count)
 	}
 }
 
@@ -213,7 +214,8 @@ server:
 		}
 		count++
 	}
-	if count != 19 {
-		t.Errorf("expected 19 tools (20 minus 1 ignored), got %d", count)
+	expected := len(mcptools.AllToolGroups) - 1
+	if count != expected {
+		t.Errorf("expected %d tools (all minus 1 ignored), got %d", expected, count)
 	}
 }

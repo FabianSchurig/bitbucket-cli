@@ -94,3 +94,13 @@ server:
 		t.Error("ToolOverrides should be initialized to empty map")
 	}
 }
+
+func TestParse_UnknownField(t *testing.T) {
+	_, err := Parse([]byte(`
+server:
+  allowed_method: ["GET"]
+`))
+	if err == nil {
+		t.Fatal("expected error for unknown field 'allowed_method'")
+	}
+}
