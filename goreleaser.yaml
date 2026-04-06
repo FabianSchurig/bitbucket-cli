@@ -87,6 +87,17 @@ archives:
 checksum:
   name_template: checksums.txt
 
+signs:
+  - artifacts: checksum
+    args:
+      - "--batch"
+      - "--local-user"
+      - "{{ .Env.GPG_FINGERPRINT }}"
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
+
 release:
   github:
     owner: FabianSchurig
@@ -105,6 +116,80 @@ gomod:
   env:
     - GOPROXY=https://proxy.golang.org,direct
     - GONOSUMCHECK=
+
+nfpms:
+  - id: bb-cli
+    builds:
+      - bb-cli
+    package_name: bb-cli
+    file_name_template: "{{ .PackageName }}_{{ .Version }}_{{ .Arch }}"
+    vendor: FabianSchurig
+    homepage: "https://github.com/FabianSchurig/bitbucket-cli"
+    maintainer: "Fabian Schurig"
+    description: "A CLI tool for interacting with Bitbucket."
+    license: AGPL-3.0
+    formats:
+      - deb
+      - rpm
+  - id: bb-mcp
+    builds:
+      - bb-mcp
+    package_name: bb-mcp
+    file_name_template: "{{ .PackageName }}_{{ .Version }}_{{ .Arch }}"
+    vendor: FabianSchurig
+    homepage: "https://github.com/FabianSchurig/bitbucket-cli"
+    maintainer: "Fabian Schurig"
+    description: "An MCP server for interacting with Bitbucket via AI agents."
+    license: AGPL-3.0
+    formats:
+      - deb
+      - rpm
+
+scoops:
+  - ids:
+      - bb-cli
+    name: bb-cli
+    repository:
+      owner: FabianSchurig
+      name: scoop-bucket
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+    description: "A CLI tool for interacting with Bitbucket."
+    homepage: "https://github.com/FabianSchurig/bitbucket-cli"
+    license: AGPL-3.0
+  - ids:
+      - bb-mcp
+    name: bb-mcp
+    repository:
+      owner: FabianSchurig
+      name: scoop-bucket
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+    description: "An MCP server for interacting with Bitbucket via AI agents."
+    homepage: "https://github.com/FabianSchurig/bitbucket-cli"
+    license: AGPL-3.0
+
+wingets:
+  - ids:
+      - bb-cli
+    name: bb-cli
+    publisher: FabianSchurig
+    short_description: "A CLI tool for interacting with Bitbucket."
+    license: AGPL-3.0
+    homepage: "https://github.com/FabianSchurig/bitbucket-cli"
+    repository:
+      owner: FabianSchurig
+      name: winget-pkgs
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+  - ids:
+      - bb-mcp
+    name: bb-mcp
+    publisher: FabianSchurig
+    short_description: "An MCP server for interacting with Bitbucket via AI agents."
+    license: AGPL-3.0
+    homepage: "https://github.com/FabianSchurig/bitbucket-cli"
+    repository:
+      owner: FabianSchurig
+      name: winget-pkgs
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
 
 brews:
   - name: bitbucket-cli

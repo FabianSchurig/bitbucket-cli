@@ -31,6 +31,63 @@ jobs:
       - name: Verify bb-mcp
         run: bb-mcp --help
 
+  test-deb:
+    name: Test .deb install
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get latest release tag
+        id: tag
+        run: |
+          TAG=$(curl -s https://api.github.com/repos/FabianSchurig/bitbucket-cli/releases/latest | jq -r .tag_name)
+          VERSION=${TAG#v}
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Download and install bb-cli .deb
+        run: |
+          curl -LO "https://github.com/FabianSchurig/bitbucket-cli/releases/download/v${{ steps.tag.outputs.version }}/bb-cli_${{ steps.tag.outputs.version }}_amd64.deb"
+          sudo dpkg -i bb-cli_*.deb
+
+      - name: Verify bb-cli
+        run: bb-cli --help
+
+      - name: Download and install bb-mcp .deb
+        run: |
+          curl -LO "https://github.com/FabianSchurig/bitbucket-cli/releases/download/v${{ steps.tag.outputs.version }}/bb-mcp_${{ steps.tag.outputs.version }}_amd64.deb"
+          sudo dpkg -i bb-mcp_*.deb
+
+      - name: Verify bb-mcp
+        run: bb-mcp --help
+
+  test-scoop:
+    name: Test Scoop install
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: windows-latest
+    steps:
+      - name: Install Scoop
+        shell: pwsh
+        run: |
+          Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+          iex "& {$(irm get.scoop.sh)}"
+
+      - name: Add bucket and install bb-cli
+        shell: pwsh
+        run: |
+          scoop bucket add bitbucket https://github.com/FabianSchurig/scoop-bucket
+          scoop install bb-cli
+
+      - name: Verify bb-cli
+        shell: pwsh
+        run: bb-cli --help
+
+      - name: Install bb-mcp
+        shell: pwsh
+        run: scoop install bb-mcp
+
+      - name: Verify bb-mcp
+        shell: pwsh
+        run: bb-mcp --help
+
   test-install-script:
     name: Test install script (${{ matrix.os }})
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
