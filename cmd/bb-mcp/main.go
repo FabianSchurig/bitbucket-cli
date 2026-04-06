@@ -50,7 +50,10 @@ func main() {
 	transport := flag.String("transport", "stdio", "MCP transport: stdio or sse")
 	addr := flag.String("addr", ":8080", "Address to listen on (SSE transport only)")
 	configFile := flag.String("config", config.DefaultConfigFile, "Path to MCP configuration file")
+	outputFmt := flag.String("output", "markdown", "Response format for tool results: markdown, table, json, id")
 	flag.Parse()
+
+	mcptools.Format = *outputFmt
 
 	cfg, err := config.Load(*configFile)
 	if err != nil {
@@ -104,8 +107,16 @@ func registerAllTools(server *mcp.Server, cfg *config.Config) {
 		}
 
 		// Override: Replace description if configured.
-		if override, ok := cfg.ToolOverrides[filtered.Name]; ok && override.Description != "" {
-			filtered.Description = override.Description
+		if override, ok := cfg.ToolOverrides[filtered.Name]; ok {
+			if override.Description != "" {
+				filtered.Description = override.Description
+			}
+			// Apply per-operation description overrides.
+			for i, op := range filtered.Operations {
+				if opOverride, ok := override.Operations[op.OperationID]; ok && opOverride.Description != "" {
+					filtered.Operations[i].Description = opOverride.Description
+				}
+			}
 		}
 
 		mcptools.RegisterToolGroup(server, filtered)

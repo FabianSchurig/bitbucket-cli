@@ -19,13 +19,21 @@ func TestDefaultConfig_AllowsEverything(t *testing.T) {
 	}
 }
 
-func TestLoad_MissingFile_ReturnsDefault(t *testing.T) {
+func TestLoad_MissingFile_UsesEmbeddedDefault(t *testing.T) {
 	cfg, err := Load("/nonexistent/mcp_config.yaml")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if !cfg.IsMethodAllowed("DELETE") {
-		t.Error("missing file should return permissive default")
+	// Embedded default only allows GET, POST, PUT, PATCH — not DELETE.
+	if cfg.IsMethodAllowed("DELETE") {
+		t.Error("missing file should use embedded default, which disallows DELETE")
+	}
+	if !cfg.IsMethodAllowed("GET") {
+		t.Error("embedded default should allow GET")
+	}
+	// Embedded default ignores bitbucket_addon.
+	if !cfg.IsToolIgnored("bitbucket_addon") {
+		t.Error("embedded default should ignore bitbucket_addon")
 	}
 }
 

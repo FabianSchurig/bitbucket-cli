@@ -29,7 +29,15 @@ func Render(v any) error {
 
 // RenderTo writes v to the provided writer in the configured format.
 func RenderTo(w io.Writer, v any) error {
-	switch Format {
+	return RenderToFormat(w, v, Format)
+}
+
+// RenderToFormat writes v to w using the given format string.
+// Valid formats: table, markdown, json, id.
+// Unlike RenderTo, this does not read the package-level Format variable,
+// making it safe for concurrent use.
+func RenderToFormat(w io.Writer, v any, format string) error {
+	switch format {
 	case "json":
 		enc := json.NewEncoder(w)
 		enc.SetIndent("", "  ")
@@ -41,7 +49,7 @@ func RenderTo(w io.Writer, v any) error {
 	case "id":
 		return renderIDs(w, v)
 	default:
-		return fmt.Errorf("unknown output format: %s (valid: table, markdown, json, id)", Format)
+		return fmt.Errorf("unknown output format: %s (valid: table, markdown, json, id)", format)
 	}
 }
 

@@ -1,0 +1,233 @@
+server:
+  # Only allow safe read/write operations by default. No destructive deletions.
+  allowed_methods: ["GET", "POST", "PUT", "PATCH"]
+
+  # Hide tools that are rarely useful to a software engineer day-to-day.
+  # These cover Connect app integration (addon) and low-level app property
+  # storage (properties) which are admin/platform concerns.
+  ignored_tools:
+    - bitbucket_addon
+    - bitbucket_properties
+
+tool_overrides:
+  # ── Pull Requests ────────────────────────────────────────────────────────────
+  bitbucket_pr:
+    description: >
+      Manage pull requests in a Bitbucket repository.
+
+      Typical workflow:
+        1. listPullRequests           — Find open PRs; note the pull_request_id.
+        2. getAPullRequest            — Read title, description, reviewers, state.
+        3. listCommentsOnAPullRequest — Read existing review comments.
+        4. listChangesInAPullRequest  — See which files changed.
+        5. createACommentOnAPullRequest — Post a review comment.
+        6. approveAPullRequest / requestChangesForAPullRequest — Submit review.
+        7. mergeAPullRequest          — Merge when all checks pass.
+    operations:
+      listPullRequests:
+        description: >
+          Returns open (or filtered) pull requests for the repository.
+          Always call this first to get the pull_request_id before reading
+          PR details or posting comments. Filter by state with
+          ?q=state="OPEN" or ?q=state="MERGED".
+      getAPullRequest:
+        description: >
+          Returns full details of a single pull request: title, description,
+          source/destination branches, reviewers, state, and task count.
+          Requires pull_request_id from listPullRequests.
+      listChangesInAPullRequest:
+        description: >
+          Returns the list of files changed in the pull request with their
+          change type (added, modified, removed). Use this to understand
+          the scope of changes before reading individual file diffs.
+      mergeAPullRequest:
+        description: >
+          Merges the pull request. Common merge strategies: merge_commit,
+          squash, fast_forward. Requires all required approvals and passing
+          builds. Confirm with listCommitStatusesForAPullRequest first.
+      createAPullRequest:
+        description: >
+          Opens a new pull request. Required body fields: title, source.branch.name,
+          destination.branch.name. Optional: description, reviewers (array of
+          {uuid} objects), close_source_branch.
+      createACommentOnAPullRequest:
+        description: >
+          Posts a review comment on the pull request. To anchor a comment to a
+          specific file line, include inline.path (file path), inline.from
+          (start line, optional), and inline.to (line number).
+      approveAPullRequest:
+        description: >
+          Approves the pull request as the authenticated user. No body required.
+          Use requestChangesForAPullRequest instead if you want to block the merge.
+      requestChangesForAPullRequest:
+        description: >
+          Marks the pull request as needing changes from the author. This
+          blocks merge until the change request is resolved or removed.
+
+  # ── Pipelines / CI ───────────────────────────────────────────────────────────
+  bitbucket_pipelines:
+    description: >
+      Inspect and trigger Bitbucket Pipelines (CI/CD).
+
+      Debugging a failing build:
+        1. getPipelinesForRepository       — List recent runs; note the pipeline UUID.
+        2. getPipelineForRepository        — Get state and result of a specific run.
+        3. getPipelineStepsForRepository   — List steps; identify which step failed.
+        4. getPipelineStepLogForRepository — Read the raw log for the failed step.
+    operations:
+      getPipelinesForRepository:
+        description: >
+          Lists recent pipeline runs sorted by creation time (newest first).
+          Each entry includes the UUID, state (PENDING/IN_PROGRESS/COMPLETED),
+          result (SUCCESSFUL/FAILED/ERROR/STOPPED), trigger type, and branch.
+          Use UUID in subsequent step and log calls.
+      getPipelineStepsForRepository:
+        description: >
+          Lists all steps of a pipeline run. Each step has a UUID, name, state,
+          and result. Identify the failed step by result=FAILED, then pass its
+          UUID to getPipelineStepLogForRepository to read the log.
+      getPipelineStepLogForRepository:
+        description: >
+          Returns the raw stdout/stderr log for a pipeline step as plain text.
+          This is the primary way to diagnose build failures. The response is
+          large text — look for "ERROR", "FAILED", or exception stack traces.
+      createPipelineForRepository:
+        description: >
+          Triggers a new pipeline run. Specify target.ref_type="branch" and
+          target.ref_name="<branch>" to run on a specific branch. Optionally
+          set target.selector.type="custom" and target.selector.pattern to
+          target a custom pipeline defined in bitbucket-pipelines.yml.
+
+  # ── Repositories ─────────────────────────────────────────────────────────────
+  bitbucket_repos:
+    description: >
+      Browse and manage Bitbucket repositories and read source files.
+
+      Common operations:
+        - listRepositoriesInAWorkspace — Find repos by name or project.
+        - getARepository               — Read repo metadata (main branch, links).
+        - getFileOrDirectoryContents   — Read source files or list a directory.
+        - createARepository            — Create a new repo.
+    operations:
+      getFileOrDirectoryContents:
+        description: >
+          Returns the contents of a file or lists a directory. Pass the file
+          path in the `path` query parameter (e.g., path=src/main.go). Omit
+          `path` to list the repo root. Add `at=<branch>` to read a specific
+          branch. File contents are returned as raw text.
+      listRepositoriesInAWorkspace:
+        description: >
+          Lists all repositories the authenticated user can access in the
+          workspace. Filter with ?q=name~"keyword". Returns slug, full_name,
+          main_branch, description, and links for each repo.
+      createARepository:
+        description: >
+          Creates a new repository. Required body fields: scm ("git"),
+          is_private (true/false). Optional: project.key (links to a project),
+          description, fork_policy ("no_forks", "no_public_forks", "allow_forks").
+
+  # ── Commits ──────────────────────────────────────────────────────────────────
+  bitbucket_commits:
+    description: >
+      Read commit history and compare branches or commits.
+    operations:
+      listCommitsForRevision:
+        description: >
+          Lists commits reachable from a branch, tag, or SHA. Pass the branch
+          name or full SHA as the `revision` path parameter. Use `include` to
+          add refs and `exclude` to stop at a base ref (e.g., exclude=main).
+      compareTwoCommits:
+        description: >
+          Returns the diff between two refs (branch names, tags, or commit SHAs).
+          spec parameter is "<new>..<old>" or "<new>...<old>" for three-dot diff.
+          Returns raw unified diff text.
+      compareTwoCommitDiffStats:
+        description: >
+          Returns a file-level summary (files changed, lines added/removed) for
+          the diff between two refs. Cheaper than compareTwoCommits when you
+          only need to know which files changed, not their contents.
+
+  # ── Branches & Tags ──────────────────────────────────────────────────────────
+  bitbucket_refs:
+    description: >
+      Manage branches and tags in a Bitbucket repository.
+    operations:
+      listOpenBranches:
+        description: >
+          Lists all branches in the repository. Filter by name with
+          ?q=name~"feature". Each entry includes the branch name and the
+          latest commit hash (target.hash). Use this before createAPullRequest
+          to verify the source branch exists.
+      createABranch:
+        description: >
+          Creates a new branch. Required body fields: name (branch name) and
+          target.hash (the commit SHA or an existing branch name to branch from).
+
+  # ── Code Search ──────────────────────────────────────────────────────────────
+  bitbucket_search:
+    description: >
+      Search for code across all repositories in a Bitbucket workspace.
+      Use operation searchWorkspace with the search_query parameter.
+    operations:
+      searchWorkspace:
+        description: >
+          Full-text and path search across all repos in a workspace.
+          search_query examples:
+            "MyClass"              — find a class or function name
+            "MyClass repo:backend" — scope to one repository
+            "TODO lang:python"     — filter by language
+            "config file:*.yaml"   — match file name pattern
+          Returns matching file paths and surrounding line snippets (content_matches).
+          Prefer this over getFileOrDirectoryContents when the file location is unknown.
+
+  # ── Issues ───────────────────────────────────────────────────────────────────
+  bitbucket_issues:
+    description: >
+      Manage the issue tracker for a Bitbucket repository.
+    operations:
+      listIssues:
+        description: >
+          Lists issues in the repository tracker. Filter with the q parameter:
+            q=status="open"         — open issues
+            q=assignee.uuid="{me}"  — assigned to current user
+            q=kind="bug"            — bugs only
+          Returns id, title, status, kind, priority, assignee, and created_on.
+      createAnIssue:
+        description: >
+          Creates a new issue. Required body fields: title. Optional: content.raw
+          (markdown body), kind ("bug", "enhancement", "proposal", "task"),
+          priority ("trivial", "minor", "major", "critical", "blocker"),
+          assignee.uuid.
+
+  # ── Commit Statuses ──────────────────────────────────────────────────────────
+  bitbucket_commit-statuses:
+    description: >
+      Read or post CI/CD build statuses tied to individual commits.
+    operations:
+      listCommitStatusesForACommit:
+        description: >
+          Returns all CI/lint/coverage status checks for a commit SHA. Each
+          entry has key (unique identifier), state (SUCCESSFUL/FAILED/INPROGRESS),
+          name, url (link to the build), and description. Check this before
+          approving or merging a PR.
+      listCommitStatusesForAPullRequest:
+        description: >
+          Returns the aggregate CI statuses across all commits in a pull request.
+          Useful to confirm that all required checks have passed before merging.
+
+  # ── Deployments ──────────────────────────────────────────────────────────────
+  bitbucket_deployments:
+    description: >
+      Track deployments across environments (staging, production, etc.).
+    operations:
+      findDeployments:
+        description: >
+          Lists recent deployments across all environments. Each entry includes
+          the environment name, state (IN_PROGRESS/COMPLETED/FAILED), the
+          deployed commit hash, and timestamps. Use this to check what version
+          is live before starting a hotfix.
+      findEnvironments:
+        description: >
+          Lists all deployment environments configured for the repository
+          (e.g., Test, Staging, Production) with their UUIDs. Use the UUID
+          in findDeployments or createDeploymentVariable calls.

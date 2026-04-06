@@ -9,12 +9,16 @@ package config
 
 import (
 	"bytes"
+	_ "embed"
 	"fmt"
 	"os"
 	"strings"
 
 	"gopkg.in/yaml.v3"
 )
+
+//go:embed default_mcp_config.yaml
+var defaultYAML []byte
 
 // DefaultConfigFile is the default filename looked for in the working directory.
 const DefaultConfigFile = "mcp_config.yaml"
@@ -33,16 +37,22 @@ type ServerConfig struct {
 
 // ToolOverrideItem holds per-tool overrides.
 type ToolOverrideItem struct {
+	Description string                        `yaml:"description"`
+	Operations  map[string]OperationOverride  `yaml:"operations"`
+}
+
+// OperationOverride holds per-operation overrides within a tool group.
+type OperationOverride struct {
 	Description string `yaml:"description"`
 }
 
 // Load reads the configuration from the given file path.
-// If the file does not exist, it returns a default (permissive) configuration.
+// If the file does not exist, it falls back to the embedded default configuration.
 func Load(path string) (*Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return DefaultConfig(), nil
+			return Parse(defaultYAML)
 		}
 		return nil, fmt.Errorf("reading config: %w", err)
 	}

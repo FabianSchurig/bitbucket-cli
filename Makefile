@@ -57,5 +57,7 @@ clean:
 	rm -rf dist/
 
 # Generate Terraform provider docs, examples, and test files
+# and the MCP tool reference page.
 generate-docs:
 	go run scripts/gen_tfdocs/main.go
+	go run scripts/gen_mcpdocs/main.go
