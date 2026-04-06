@@ -27,6 +27,8 @@ import (
 	"github.com/FabianSchurig/bitbucket-cli/internal/tfprovider"
 )
 
+const migrationGuideURL = "https://github.com/FabianSchurig/bitbucket-cli/blob/main/MIGRATION.md"
+
 // ─── Template data ────────────────────────────────────────────────────────────
 
 type GroupData struct {
@@ -590,7 +592,7 @@ Terraform provider for Bitbucket Cloud, exposing all Bitbucket API operations as
 generic resources and data sources. Auto-generated from the Bitbucket OpenAPI spec.
 
 Migrating from the legacy ` + "`DrFaust92/terraform-provider-bitbucket`" + ` provider? See
-[` + "`MIGRATION.md`" + `](../MIGRATION.md).
+[` + "`MIGRATION.md`" + `](` + migrationGuideURL + `).
 
 ## Authentication
 
@@ -1021,6 +1023,7 @@ func main() {
 		"Groups":         groups,
 		"CategoryGroups": groupByCategory(groups),
 	})
+	copyFile("docs/MIGRATION.md", "MIGRATION.md")
 
 	// Generate provider example.
 	writeFile("examples/provider/provider.tf", exampleProviderTemplate)
@@ -1079,6 +1082,18 @@ func writeTemplate(path, tmplStr string, data any) {
 func writeFile(path, content string) {
 	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 		fmt.Fprintf(os.Stderr, "writing %s: %v\n", path, err)
+		os.Exit(1)
+	}
+}
+
+func copyFile(dst, src string) {
+	content, err := os.ReadFile(src)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "reading %s: %v\n", src, err)
+		os.Exit(1)
+	}
+	if err := os.WriteFile(dst, content, 0o644); err != nil {
+		fmt.Fprintf(os.Stderr, "writing %s: %v\n", dst, err)
 		os.Exit(1)
 	}
 }
