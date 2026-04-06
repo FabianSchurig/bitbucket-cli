@@ -85,8 +85,12 @@ func fetchResult(ctx context.Context, c *client.BBClient, r Request, fetchURL, b
 	}
 
 	result, nonJSON, err := parseResponseRaw(resp)
-	if err != nil || nonJSON || result == nil {
+	if err != nil {
 		return nil, nil, err
+	}
+	if nonJSON || result == nil {
+		// Return raw text (e.g. diff/patch) without pagination.
+		return result, nil, nil
 	}
 
 	return result, extractPage(result), nil

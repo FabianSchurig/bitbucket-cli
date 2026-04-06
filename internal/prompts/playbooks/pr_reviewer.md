@@ -11,7 +11,7 @@ A step-by-step guide to reviewing a pull request on Bitbucket using the availabl
    Use `bitbucket_pr` with operation `getAPullRequest` and the PR `id` to read the title, description, source branch, destination branch, and author.
 
 3. **Review the diff**
-   Use `bitbucket_pr` with operation `listChangesInAPullRequest` to see which files changed. Use `getTheDiffStatForAPullRequest` for a summary of additions and deletions.
+   Use `bitbucket_pr` with operation `getThePatchForAPullRequest` to retrieve the full unified diff of all changes in the PR. This is the most informative single call for code review — it shows exactly what was added and removed in each file.
 
 4. **Check commits**
    Use `bitbucket_pr` with operation `listCommitsOnAPullRequest` to review the individual commits in the PR.

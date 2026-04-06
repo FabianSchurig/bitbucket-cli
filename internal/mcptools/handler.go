@@ -17,7 +17,13 @@ import (
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
+	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
+
+// Format controls the response format for MCP tool results.
+// Defaults to "markdown" for LLM-friendly output.
+// Valid values: markdown, table, json, id.
+var Format = "markdown"
 
 // ─── Operation metadata (shared with generators) ─────────────────────────────
 
@@ -282,10 +288,11 @@ func bodyFieldKey(path string) string {
 }
 
 func bodyFieldDescription(bf BodyFieldDef) string {
-	if bf.Desc != "" {
-		return bf.Desc
+	desc := bf.Desc
+	if desc == "" {
+		desc = bf.Path
 	}
-	return bf.Path
+	return fmt.Sprintf("%s (use parameter name: body_%s)", desc, strings.ReplaceAll(bf.Path, ".", "_"))
 }
 
 func formatToolResult(result any) (*mcp.CallToolResult, error) {
@@ -295,13 +302,13 @@ func formatToolResult(result any) (*mcp.CallToolResult, error) {
 		}, nil
 	}
 
-	jsonBytes, err := json.MarshalIndent(result, "", "  ")
-	if err != nil {
+	var buf strings.Builder
+	if err := output.RenderToFormat(&buf, result, Format); err != nil {
 		return errResult(fmt.Sprintf("failed to format response: %v", err)), nil
 	}
 
 	return &mcp.CallToolResult{
-		Content: []mcp.Content{&mcp.TextContent{Text: string(jsonBytes)}},
+		Content: []mcp.Content{&mcp.TextContent{Text: buf.String()}},
 	}, nil
 }
 

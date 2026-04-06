@@ -50,7 +50,10 @@ func main() {
 	transport := flag.String("transport", "stdio", "MCP transport: stdio or sse")
 	addr := flag.String("addr", ":8080", "Address to listen on (SSE transport only)")
 	configFile := flag.String("config", config.DefaultConfigFile, "Path to MCP configuration file")
+	outputFmt := flag.String("output", "markdown", "Response format for tool results: markdown, table, json, id")
 	flag.Parse()
+
+	mcptools.Format = *outputFmt
 
 	cfg, err := config.Load(*configFile)
 	if err != nil {
