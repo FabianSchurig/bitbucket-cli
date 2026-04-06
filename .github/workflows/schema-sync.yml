@@ -13,7 +13,7 @@ jobs:
     env:
       PYTHONHASHSEED: "0" # Deterministic hash ordering for stable schema output
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0 # Full history needed for tagging
 

@@ -13,7 +13,7 @@ jobs:
     name: Mirror to terraform-provider-bitbucket
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -32,7 +32,7 @@ jobs:
     needs: mirror
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 

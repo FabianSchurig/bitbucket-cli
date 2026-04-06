@@ -16,7 +16,7 @@ jobs:
     name: Mock Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -63,7 +63,7 @@ jobs:
           - properties
           - addon
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -99,7 +99,7 @@ jobs:
     name: Acceptance Tests (real API)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Go
         uses: actions/setup-go@v5
