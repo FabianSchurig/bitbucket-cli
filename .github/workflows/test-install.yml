@@ -68,7 +68,7 @@ jobs:
         shell: pwsh
         run: |
           Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-          iex "& {$(irm get.scoop.sh)} -RunAsAdmin"
+          iex "& {$(irm get.scoop.sh)}"
 
       - name: Add bucket and install bb-cli
         shell: pwsh
