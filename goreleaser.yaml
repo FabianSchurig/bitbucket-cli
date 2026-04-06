@@ -54,7 +54,7 @@ builds:
 
 archives:
   - id: bb-cli
-    builds:
+    ids:
       - bb-cli
     format_overrides:
       - goos: windows
@@ -64,7 +64,7 @@ archives:
       - tar.gz
     name_template: "bb-cli_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
   - id: bb-mcp
-    builds:
+    ids:
       - bb-mcp
     format_overrides:
       - goos: windows
@@ -74,7 +74,7 @@ archives:
       - tar.gz
     name_template: "bb-mcp_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
   - id: bb-tf
-    builds:
+    ids:
       - bb-tf
     format_overrides:
       - goos: windows
@@ -119,7 +119,7 @@ gomod:
 
 nfpms:
   - id: bb-cli
-    builds:
+    ids:
       - bb-cli
     package_name: bb-cli
     file_name_template: "{{ .PackageName }}_{{ .Version }}_{{ .Arch }}"
@@ -132,7 +132,7 @@ nfpms:
       - deb
       - rpm
   - id: bb-mcp
-    builds:
+    ids:
       - bb-mcp
     package_name: bb-mcp
     file_name_template: "{{ .PackageName }}_{{ .Version }}_{{ .Arch }}"
@@ -167,33 +167,11 @@ scoops:
     homepage: "https://github.com/FabianSchurig/bitbucket-cli"
     license: AGPL-3.0
 
-wingets:
-  - ids:
-      - bb-cli
-    name: bb-cli
-    publisher: FabianSchurig
-    short_description: "A CLI tool for interacting with Bitbucket."
-    license: AGPL-3.0
-    homepage: "https://github.com/FabianSchurig/bitbucket-cli"
-    repository:
-      owner: FabianSchurig
-      name: winget-pkgs
-      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
-  - ids:
-      - bb-mcp
-    name: bb-mcp
-    publisher: FabianSchurig
-    short_description: "An MCP server for interacting with Bitbucket via AI agents."
-    license: AGPL-3.0
-    homepage: "https://github.com/FabianSchurig/bitbucket-cli"
-    repository:
-      owner: FabianSchurig
-      name: winget-pkgs
-      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
-
-brews:
+homebrew_casks:
   - name: bitbucket-cli
     ids:
+      - bb-cli
+    binaries:
       - bb-cli
     repository:
       owner: FabianSchurig
@@ -201,10 +179,10 @@ brews:
       token: "{{ .Env.TAP_GITHUB_TOKEN }}"
     description: "A CLI tool for interacting with Bitbucket."
     homepage: "https://github.com/FabianSchurig/bitbucket-cli"
-    install: |
-      bin.install "bb-cli"
   - name: bitbucket-mcp
     ids:
+      - bb-mcp
+    binaries:
       - bb-mcp
     repository:
       owner: FabianSchurig
@@ -212,5 +190,3 @@ brews:
       token: "{{ .Env.TAP_GITHUB_TOKEN }}"
     description: "An MCP server for interacting with Bitbucket via AI agents."
     homepage: "https://github.com/FabianSchurig/bitbucket-cli"
-    install: |
-      bin.install "bb-mcp"
