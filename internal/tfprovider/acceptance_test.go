@@ -1,17 +1,23 @@
 package tfprovider_test
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
+	"github.com/hashicorp/terraform-plugin-testing/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 
+	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/tfprovider"
 )
 
@@ -1242,26 +1248,22 @@ func TestAccRealAPI_DataSourceUsers(t *testing.T) {
 }
 
 // TestAccRealAPI_ResourceProjects_CRUD creates, reads, updates, and deletes a project.
+// Uses a random project key to ensure idempotency across test runs.
 func TestAccRealAPI_ResourceProjects_CRUD(t *testing.T) {
 	workspace := skipIfNoRealAPI(t)
 
+	// Generate a unique project key (uppercase, max 10 chars) so tests are idempotent.
+	suffix := strings.ToUpper(acctest.RandStringFromCharSet(5, acctest.CharSetAlpha))
+	projectKey := "TF" + suffix
+	projectName := "Terraform Test " + suffix
+
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		CheckDestroy:             testAccCheckProjectDestroy(workspace, projectKey),
 		Steps: []resource.TestStep{
 			// Create
 			{
-				Config: fmt.Sprintf(`
-					provider "bitbucket" {}
-
-					resource "bitbucket_projects" "test" {
-						workspace    = %q
-						project_key  = "TFTEST"
-						request_body = jsonencode({
-							name = "Terraform Test Project"
-							key  = "TFTEST"
-						})
-					}
-				`, workspace),
+				Config: testAccProjectConfig(workspace, projectKey, projectName),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("bitbucket_projects.test", "id"),
 					resource.TestCheckResourceAttrSet("bitbucket_projects.test", "api_response"),
@@ -1270,18 +1272,7 @@ func TestAccRealAPI_ResourceProjects_CRUD(t *testing.T) {
 			},
 			// Update
 			{
-				Config: fmt.Sprintf(`
-					provider "bitbucket" {}
-
-					resource "bitbucket_projects" "test" {
-						workspace    = %q
-						project_key  = "TFTEST"
-						request_body = jsonencode({
-							name = "Terraform Test Project Updated"
-							key  = "TFTEST"
-						})
-					}
-				`, workspace),
+				Config: testAccProjectConfig(workspace, projectKey, projectName+" Updated"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("bitbucket_projects.test", "id"),
 				),
@@ -1289,6 +1280,46 @@ func TestAccRealAPI_ResourceProjects_CRUD(t *testing.T) {
 			// Destroy is handled automatically by the test framework
 		},
 	})
+}
+
+// testAccProjectConfig returns a Terraform config for a bitbucket_projects resource.
+func testAccProjectConfig(workspace, key, name string) string {
+	return fmt.Sprintf(`
+		provider "bitbucket" {}
+
+		resource "bitbucket_projects" "test" {
+			workspace    = %q
+			project_key  = %q
+			request_body = jsonencode({
+				name = %q
+				key  = %q
+			})
+		}
+	`, workspace, key, name, key)
+}
+
+// testAccCheckProjectDestroy verifies the project was deleted from the Bitbucket API.
+func testAccCheckProjectDestroy(workspace, projectKey string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		c, err := client.NewClient()
+		if err != nil {
+			return fmt.Errorf("failed to create client: %v", err)
+		}
+		_, err = handlers.DispatchRaw(context.Background(), c, handlers.Request{
+			Method:      "GET",
+			URLTemplate: "/workspaces/{workspace}/projects/{project_key}",
+			PathParams:  map[string]string{"workspace": workspace, "project_key": projectKey},
+			All:         false,
+		})
+		if err == nil {
+			return fmt.Errorf("project %s still exists in workspace %s after destroy", projectKey, workspace)
+		}
+		// Verify the error is a 404 (not a network/auth error).
+		if !strings.Contains(err.Error(), "404") {
+			return fmt.Errorf("unexpected error checking project %s destroy: %v", projectKey, err)
+		}
+		return nil
+	}
 }
 
 // TestAccRealAPI_DataSourceRepos reads a specific repository from the test workspace.
