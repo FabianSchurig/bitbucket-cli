@@ -69,6 +69,7 @@ jobs:
         run: |
           Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
           iex "& {$(irm get.scoop.sh)}"
+          "$env:USERPROFILE\scoop\shims" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Add bucket and install bb-cli
         shell: pwsh
