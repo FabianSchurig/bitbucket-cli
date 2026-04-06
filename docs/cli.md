@@ -4,8 +4,19 @@
 
 ## Install
 
+### Go install
+
 ```bash
 go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-cli@latest
+```
+
+### Docker
+
+Multi-arch container images are published to GHCR on every release:
+
+```bash
+docker pull ghcr.io/fabianschurig/bitbucket-cli:latest
+docker run -e BITBUCKET_USERNAME -e BITBUCKET_TOKEN ghcr.io/fabianschurig/bitbucket-cli:latest --help
 ```
 
 You can also download binaries from the [GitHub Releases](https://github.com/FabianSchurig/bitbucket-cli/releases) page.

@@ -4,9 +4,24 @@
 
 ## Install
 
+### Go install
+
 ```bash
 go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-mcp@latest
 ```
+
+### Docker
+
+Multi-arch container images are published to GHCR on every release:
+
+```bash
+docker pull ghcr.io/fabianschurig/bitbucket-mcp:latest
+docker run -e BITBUCKET_USERNAME -e BITBUCKET_TOKEN -p 8080:8080 ghcr.io/fabianschurig/bitbucket-mcp:latest --transport sse --addr :8080
+```
+
+### MCP Registry
+
+`bb-mcp` is published to the [MCP Registry](https://registry.modelcontextprotocol.io) automatically on every release. MCP-compatible clients can discover and install it from the registry.
 
 ## Authenticate
 

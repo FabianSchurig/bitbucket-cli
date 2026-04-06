@@ -83,15 +83,16 @@ flowchart TD
     G --> H[Build and test]
     H --> I[Tag new version]
     I --> J[release.yml]
-    I --> K[docker.yml]
+    J --> K[docker.yml]
     I --> L[terraform-release.yml]
+    K --> M[Publish to MCP Registry]
 ```
 
 - **`ci.yml`**: builds, lints, vets, runs Go tests, and sends analysis to SonarQube Cloud.
 - **`terraform-tests.yml`**: runs mock-based Terraform acceptance and `terraform test` suites, plus real API tests when credentials exist.
 - **`schema-sync.yml`**: daily/manual sync that fetches the live Bitbucket spec, regenerates generated artifacts, rebuilds docs, tests everything, and tags a release when the schema changed.
-- **`release.yml`**: publishes tagged binary releases.
-- **`docker.yml`**: publishes multi-arch container images for `bb-cli` and `bb-mcp`.
+- **`release.yml`**: publishes tagged binary releases via GoReleaser.
+- **`docker.yml`**: builds multi-arch container images for `bb-cli` and `bb-mcp`, pushes them to GHCR, and publishes the `bb-mcp` server to the [MCP Registry](https://registry.modelcontextprotocol.io).
 - **`terraform-release.yml`**: mirrors the tagged source into `terraform-provider-bitbucket` and publishes the Terraform provider release.
 
 ## How this differs from `DrFaust92/terraform-provider-bitbucket`
