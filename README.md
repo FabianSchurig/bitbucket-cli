@@ -41,6 +41,41 @@ brew tap FabianSchurig/tap
 brew install bitbucket-cli
 ```
 
+### APT (Debian / Ubuntu)
+
+Download the `.deb` package from the [latest release](https://github.com/FabianSchurig/bitbucket-cli/releases/latest) and install it:
+
+```bash
+VERSION=$(curl -s https://api.github.com/repos/FabianSchurig/bitbucket-cli/releases/latest | grep '"tag_name"' | sed 's/.*"v\(.*\)".*/\1/')
+ARCH=$(dpkg --print-architecture)
+curl -LO "https://github.com/FabianSchurig/bitbucket-cli/releases/download/v${VERSION}/bb-cli_${VERSION}_${ARCH}.deb"
+sudo dpkg -i "bb-cli_${VERSION}_${ARCH}.deb"
+```
+
+### RPM (Fedora / RHEL / CentOS)
+
+Download the `.rpm` package from the [latest release](https://github.com/FabianSchurig/bitbucket-cli/releases/latest) and install it:
+
+```bash
+VERSION=$(curl -s https://api.github.com/repos/FabianSchurig/bitbucket-cli/releases/latest | grep '"tag_name"' | sed 's/.*"v\(.*\)".*/\1/')
+ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
+curl -LO "https://github.com/FabianSchurig/bitbucket-cli/releases/download/v${VERSION}/bb-cli_${VERSION}_${ARCH}.rpm"
+sudo rpm -i "bb-cli_${VERSION}_${ARCH}.rpm"
+```
+
+### Scoop (Windows)
+
+```powershell
+scoop bucket add bitbucket https://github.com/FabianSchurig/scoop-bucket
+scoop install bb-cli
+```
+
+### Winget (Windows)
+
+```powershell
+winget install FabianSchurig.bb-cli
+```
+
 ### Install script
 
 ```bash
