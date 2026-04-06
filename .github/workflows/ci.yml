@@ -7,11 +7,13 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # needed for git-auto-commit-action on push
     steps:
       - uses: actions/checkout@v4
         with:
