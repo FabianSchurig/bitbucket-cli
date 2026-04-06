@@ -1,0 +1,56 @@
+name: Test Install
+
+on:
+  workflow_run:
+    workflows: ["Release"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+
+jobs:
+  test-homebrew:
+    name: Test Homebrew install
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    container:
+      image: homebrew/brew:latest
+    steps:
+      - name: Install bb-cli from tap
+        run: |
+          brew tap FabianSchurig/tap
+          brew install bitbucket-cli
+
+      - name: Verify bb-cli
+        run: bb-cli --help
+
+      - name: Install bb-mcp from tap
+        run: brew install bitbucket-mcp
+
+      - name: Verify bb-mcp
+        run: bb-mcp --help
+
+  test-install-script:
+    name: Test install script (${{ matrix.os }})
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run install script (bb-cli)
+        run: |
+          chmod +x install.sh
+          sudo ./install.sh --binary bb-cli
+
+      - name: Verify bb-cli
+        run: bb-cli --help
+
+      - name: Run install script (bb-mcp)
+        run: sudo ./install.sh --binary bb-mcp
+
+      - name: Verify bb-mcp
+        run: bb-mcp --help

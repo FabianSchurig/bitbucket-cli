@@ -4,6 +4,37 @@
 
 ## Install
 
+### Homebrew (macOS and Linux)
+
+```bash
+brew tap FabianSchurig/tap
+brew install bitbucket-cli
+```
+
+### Install script
+
+Download and install the latest release automatically:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/FabianSchurig/bitbucket-cli/main/install.sh | sh
+```
+
+Install a specific version or binary:
+
+```bash
+# Install a specific version
+curl -fsSL https://raw.githubusercontent.com/FabianSchurig/bitbucket-cli/main/install.sh | sh -s -- --version v1.2.3
+
+# Install bb-mcp instead of bb-cli
+curl -fsSL https://raw.githubusercontent.com/FabianSchurig/bitbucket-cli/main/install.sh | sh -s -- --binary bb-mcp
+
+# Install both bb-cli and bb-mcp
+curl -fsSL https://raw.githubusercontent.com/FabianSchurig/bitbucket-cli/main/install.sh | sh -s -- --binary all
+
+# Install to a custom directory
+curl -fsSL https://raw.githubusercontent.com/FabianSchurig/bitbucket-cli/main/install.sh | sh -s -- --install-dir ~/.local/bin
+```
+
 ### Go install
 
 ```bash
@@ -18,6 +49,8 @@ Multi-arch container images are published to GHCR on every release:
 docker pull ghcr.io/fabianschurig/bitbucket-cli:latest
 docker run -e BITBUCKET_USERNAME -e BITBUCKET_TOKEN ghcr.io/fabianschurig/bitbucket-cli:latest --help
 ```
+
+### Download binaries
 
 You can also download binaries from the [GitHub Releases](https://github.com/FabianSchurig/bitbucket-cli/releases) page.
 

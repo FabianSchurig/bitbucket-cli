@@ -32,6 +32,33 @@ Low-maintenance Bitbucket Cloud tooling built from the live OpenAPI spec: a CLI 
 - [SonarQube Cloud](https://sonarcloud.io/project/overview?id=FabianSchurig_bitbucket-cli&organization=fabianschurig)
 - [Contributing guide](./CONTRIBUTING.md)
 
+## Install
+
+### Homebrew (macOS and Linux)
+
+```bash
+brew tap FabianSchurig/tap
+brew install bitbucket-cli
+```
+
+### Install script
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/FabianSchurig/bitbucket-cli/main/install.sh | sh
+```
+
+See [install.sh options](./install.sh) for version selection, binary choice (`bb-cli`, `bb-mcp`, or `all`), and custom install directories.
+
+### Other methods
+
+| Method | Command |
+| --- | --- |
+| Go install | `go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-cli@latest` |
+| Docker | `docker pull ghcr.io/fabianschurig/bitbucket-cli:latest` |
+| Download binaries | [GitHub Releases](https://github.com/FabianSchurig/bitbucket-cli/releases) |
+
+For full installation details see the [CLI usage guide](./docs/cli.md) and the [MCP usage guide](./docs/mcp.md).
+
 ## What this project is
 
 This repository keeps Bitbucket Cloud tooling maintainable by generating most of the surface area from the live Bitbucket OpenAPI spec.

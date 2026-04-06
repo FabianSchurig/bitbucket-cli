@@ -82,3 +82,27 @@ gomod:
   env:
     - GOPROXY=https://proxy.golang.org,direct
     - GONOSUMCHECK=
+
+brews:
+  - name: bitbucket-cli
+    ids:
+      - bb-cli
+    repository:
+      owner: FabianSchurig
+      name: homebrew-tap
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+    description: "A CLI tool for interacting with Bitbucket."
+    homepage: "https://github.com/FabianSchurig/bitbucket-cli"
+    install: |
+      bin.install "bb-cli"
+  - name: bitbucket-mcp
+    ids:
+      - bb-mcp
+    repository:
+      owner: FabianSchurig
+      name: homebrew-tap
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+    description: "An MCP server for interacting with Bitbucket via AI agents."
+    homepage: "https://github.com/FabianSchurig/bitbucket-cli"
+    install: |
+      bin.install "bb-mcp"

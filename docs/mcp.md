@@ -4,6 +4,19 @@
 
 ## Install
 
+### Homebrew (macOS and Linux)
+
+```bash
+brew tap FabianSchurig/tap
+brew install bitbucket-mcp
+```
+
+### Install script
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/FabianSchurig/bitbucket-cli/main/install.sh | sh -s -- --binary bb-mcp
+```
+
 ### Go install
 
 ```bash
