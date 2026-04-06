@@ -116,133 +116,51 @@ class GenMigrationTests(unittest.TestCase):
         self.assertEqual(doc.name, "bitbucket_missing")
         self.assertEqual(doc.inputs, [])
 
-    def test_parse_legacy_endpoints_missing_source_falls_back_to_current(self):
-        current = gen_migration.DocObject(
-            kind="resource",
-            name="bitbucket_branch_restrictions",
-            endpoints=["Create POST /repositories/{workspace}/{repo_slug}/branch-restrictions"],
+    def test_legacy_doc_url_points_to_legacy_repository_docs(self):
+        self.assertEqual(
+            gen_migration.legacy_doc_url("resource", "bitbucket_repository"),
+            "https://github.com/DrFaust92/terraform-provider-bitbucket/blob/master/docs/resources/repository.md",
         )
 
-        with mock.patch.object(gen_migration, "fetch", return_value=None):
-            endpoints = gen_migration.parse_legacy_endpoints(
-                "resource",
-                "bitbucket_branch_restriction",
-                [current],
-            )
-
-        self.assertEqual(endpoints, current.endpoints)
-
-    def test_parse_legacy_endpoints_replaces_param_placeholders_with_mapped_endpoints(self):
-        source = """
-client.Put(fmt.Sprintf("2.0/repositories/%s/%s/override-settings", workspace, repoSlug))
-client.Get(fmt.Sprintf("2.0/repositories/%s/%s/override-settings", workspace, repoSlug))
-"""
-        current = gen_migration.DocObject(
-            kind="resource",
-            name="bitbucket_repo_settings",
-            endpoints=[
-                "Read GET /repositories/{workspace}/{repo_slug}/override-settings",
-                "Update PUT /repositories/{workspace}/{repo_slug}/override-settings",
-            ],
+    def test_current_doc_url_points_to_local_generated_docs(self):
+        self.assertEqual(
+            gen_migration.current_doc_url("data-source", "bitbucket_current_user"),
+            "./docs/data-sources/bitbucket_current_user.md",
         )
 
-        with mock.patch.object(gen_migration, "fetch", return_value=source):
-            endpoints = gen_migration.parse_legacy_endpoints(
-                "resource",
-                "bitbucket_repository",
-                [current],
-            )
+    def test_format_doc_link_handles_missing_legacy_docs(self):
+        doc = gen_migration.DocObject(
+            kind="resource",
+            name="bitbucket_missing",
+            doc_link="https://example.com/missing",
+            doc_available=False,
+        )
 
         self.assertEqual(
-            endpoints,
-            [
-                "Read GET /repositories/{workspace}/{repo_slug}/override-settings",
-                "Update PUT /repositories/{workspace}/{repo_slug}/override-settings",
-            ],
+            gen_migration.format_doc_link(doc),
+            "`bitbucket_missing` (legacy doc not available)",
         )
-
-    def test_diff_summary_reports_renames_dropped_and_added_fields(self):
-        legacy = gen_migration.DocObject(
-            kind="resource",
-            name="bitbucket_repository",
-            inputs_required=["owner", "repository"],
-            inputs_optional=["legacy_only"],
-        )
-        current = gen_migration.DocObject(
-            kind="resource",
-            name="bitbucket_repos",
-            inputs_required=["workspace", "repo_slug"],
-            inputs_optional=["request_body"],
-        )
-
-        summary = gen_migration.diff_summary(legacy, [current])
-
-        self.assertIn("`owner` → `workspace`", summary)
-        self.assertIn("`repository` → `repo_slug`", summary)
-        self.assertIn("`legacy_only`", summary)
-        self.assertIn("`request_body`", summary)
-
-    def test_build_legacy_hcl_renders_required_and_optional_fields(self):
-        legacy = gen_migration.DocObject(
-            kind="resource",
-            name="bitbucket_branch_restriction",
-            inputs_required=["repository", "kind", "owner"],
-            inputs_optional=["pattern"],
-        )
-
-        lines = gen_migration.build_legacy_hcl(legacy)
-        rendered = "\n".join(lines)
-
-        self.assertIn('resource "bitbucket_branch_restriction" "legacy" {', rendered)
-        self.assertLess(rendered.index('kind = "push"'), rendered.index('owner = "my-workspace"'))
-        self.assertLess(rendered.index('owner = "my-workspace"'), rendered.index('repository = "my-repo"'))
-        self.assertIn('owner = "my-workspace"', rendered)
-        self.assertIn('repository = "my-repo"', rendered)
-        self.assertIn('# pattern = "main"  # optional', rendered)
-
-    def test_build_current_hcl_shows_renamed_and_legacy_only_fields(self):
-        legacy = gen_migration.DocObject(
-            kind="resource",
-            name="bitbucket_default_reviewers",
-            inputs_required=["owner", "repository", "reviewers"],
-        )
-        current = gen_migration.DocObject(
-            kind="resource",
-            name="bitbucket_default_reviewers",
-            inputs_required=["workspace", "repo_slug", "target_username"],
-        )
-
-        lines = gen_migration.build_current_hcl(current, legacy)
-        rendered = "\n".join(lines)
-
-        self.assertIn('resource "bitbucket_default_reviewers" "migrated" {', rendered)
-        self.assertIn('repo_slug = "my-repo"', rendered)
-        self.assertIn('target_username = "example-user"', rendered)
-        self.assertIn('workspace = "my-workspace"', rendered)
-        self.assertLess(rendered.index('repo_slug = "my-repo"'), rendered.index('target_username = "example-user"'))
-        self.assertLess(rendered.index('target_username = "example-user"'), rendered.index('workspace = "my-workspace"'))
-        self.assertIn('# reviewers = ["example-user"]  # legacy-only', rendered)
 
     def test_render_uses_relative_docs_path(self):
         current = {
             ("resource", "bitbucket_branch_restrictions"): gen_migration.DocObject(
                 kind="resource",
                 name="bitbucket_branch_restrictions",
-                inputs_required=["workspace"],
-                endpoints=["Create POST /repositories/{workspace}/{repo_slug}/branch-restrictions"],
+                doc_link="./docs/resources/bitbucket_branch_restrictions.md",
             ),
             ("data-source", "bitbucket_current_user"): gen_migration.DocObject(
                 kind="data-source",
                 name="bitbucket_current_user",
-                endpoints=["Read GET /user"],
+                doc_link="./docs/data-sources/bitbucket_current_user.md",
             ),
         }
 
         def fake_parse_legacy_doc(kind, name):
-            return gen_migration.DocObject(kind=kind, name=name)
-
-        def fake_parse_legacy_endpoints(kind, name, mapped_current):
-            return ["GET /legacy"]
+            return gen_migration.DocObject(
+                kind=kind,
+                name=name,
+                doc_link=f"https://legacy.example/{kind}/{name}.md",
+            )
 
         with mock.patch.object(gen_migration, "current_objects", return_value=current), mock.patch.object(
             gen_migration,
@@ -255,20 +173,17 @@ client.Get(fmt.Sprintf("2.0/repositories/%s/%s/override-settings", workspace, re
             gen_migration,
             "parse_legacy_doc",
             side_effect=fake_parse_legacy_doc,
-        ), mock.patch.object(
-            gen_migration,
-            "parse_legacy_endpoints",
-            side_effect=fake_parse_legacy_endpoints,
         ):
             rendered = gen_migration.render(Path("/repo/root"))
 
         self.assertIn("- current docs from `./docs/`", rendered)
-        self.assertIn("best-effort migration baseline", rendered)
+        self.assertIn("It intentionally avoids generated field-by-field or HCL diffs", rendered)
         self.assertIn("`bitbucket_branch_restriction`", rendered)
         self.assertIn("`bitbucket_current_user`", rendered)
-        self.assertIn("#### Legacy HCL", rendered)
-        self.assertIn("#### New HCL", rendered)
-        self.assertIn('resource "bitbucket_branch_restrictions" "migrated" {', rendered)
+        self.assertIn("- Legacy docs: [`bitbucket_branch_restriction`](https://legacy.example/resource/bitbucket_branch_restriction.md)", rendered)
+        self.assertIn("- New docs: [`bitbucket_branch_restrictions`](./docs/resources/bitbucket_branch_restrictions.md)", rendered)
+        self.assertNotIn("#### Legacy HCL", rendered)
+        self.assertNotIn("- Diff summary:", rendered)
 
 
 if __name__ == "__main__":

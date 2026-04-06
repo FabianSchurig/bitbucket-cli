@@ -19,11 +19,6 @@ CURRENT_KIND_PATH = {
     "data-source": "data-sources",
 }
 
-LEGACY_KIND_PREFIX = {
-    "resource": "resource_",
-    "data-source": "data_",
-}
-
 CURRENT_ALIAS = {
     ("resource", "bitbucket_branch_restriction"): ["bitbucket_branch_restrictions"],
     ("resource", "bitbucket_branching_model"): ["bitbucket_branching_model"],
@@ -166,108 +161,13 @@ COMMON_RENAMES = [
     ),
 ]
 
-PARAM_RENAMES = {
-    "owner": "workspace",
-    "repository": "repo_slug",
-}
-
-EXAMPLE_VALUES = {
-    "active": "true",
-    "auto_add": "true",
-    "branch": '"main"',
-    "branch_match_kind": '"glob"',
-    "branch_type": '"feature"',
-    "commit": '"main"',
-    "commit_author": '"Jane Doe <jane@example.com>"',
-    "commit_message": '"Example commit"',
-    "content": '"example content"',
-    "cron_pattern": '"0 0 * * *"',
-    "description": '"Example description"',
-    "enabled": "true",
-    "events": '["repo:push"]',
-    "group_slug": '"example-group"',
-    "has_issues": "true",
-    "has_wiki": "true",
-    "hostname": '"github.com"',
-    "inherit_branching_model": "true",
-    "inherit_default_merge_strategy": "true",
-    "is_private": "true",
-    "key": '"example-key"',
-    "kind": '"push"',
-    "label": '"Example label"',
-    "language": '"go"',
-    "member": '"example-user"',
-    "name": '"my-repo"',
-    "owner": '"my-workspace"',
-    "path": '"README.md"',
-    "pattern": '"main"',
-    "permission": '"read"',
-    "private_key": '"---PRIVATE KEY---"',
-    "project": '"EXAMPLE"',
-    "project_key": '"EXAMPLE"',
-    "public_key": '"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDemo"',
-    "repo_slug": '"my-repo"',
-    "repository": '"my-repo"',
-    "request_body": 'jsonencode({})',
-    "reviewers": '["example-user"]',
-    "schedule_uuid": '"{schedule-uuid}"',
-    "scm": '"git"',
-    "secured": "true",
-    "secret": '"example-secret"',
-    "selected_user": '"example-user"',
-    "selected_user_id": '"{user-uuid}"',
-    "skip_cert_verification": "false",
-    "slug": '"my-repo"',
-    "stage": '"Test"',
-    "target": 'jsonencode({ ref_name = "main" })',
-    "target_username": '"example-user"',
-    "url": '"https://example.com/webhook"',
-    "user": '"example-user"',
-    "user_id": '"{user-uuid}"',
-    "username": '"example-user"',
-    "uuid": '"{resource-uuid}"',
-    "value": '"example-value"',
-    "variable_uuid": '"{variable-uuid}"',
-    "website": '"https://example.com"',
-    "workspace": '"my-workspace"',
-}
-
-PLACEHOLDER_TOKENS = {
-    ("Workspace",): "{workspace}",
-    ("Repo", "Slug"): "{repo_slug}",
-    ("Project", "Key"): "{project_key}",
-    ("Username",): "{username}",
-    ("Selected", "User"): "{selected_user}",
-    ("Node",): "{node}",
-    ("Id",): "{id}",
-    ("Key",): "{key}",
-    ("Target",): "{target}",
-    ("Path",): "{path}",
-    ("Commit",): "{commit}",
-    ("Environment", "Uuid"): "{environment_uuid}",
-    ("Variable", "Uuid"): "{variable_uuid}",
-    ("Hook", "Uuid"): "{hook_uuid}",
-    ("Schedule", "Uuid"): "{schedule_uuid}",
-    ("Runner", "Uuid"): "{runner_uuid}",
-    ("Email",): "{email}",
-}
-
-HTTP_VERBS = {
-    "Get": "GET",
-    "Post": "POST",
-    "Put": "PUT",
-    "Delete": "DELETE",
-    "Patch": "PATCH",
-}
-
-CAMEL_RE = re.compile(r"[A-Z]+(?=$|[A-Z][a-z0-9])|[A-Z]?[a-z0-9]+")
-
-
 @dataclass
 class DocObject:
     kind: str
     name: str
     title: str = ""
+    doc_link: str = ""
+    doc_available: bool = True
     inputs_required: list[str] = field(default_factory=list)
     inputs_optional: list[str] = field(default_factory=list)
     read_only: list[str] = field(default_factory=list)
@@ -331,6 +231,18 @@ def split_section(text: str, start: str, stops: list[str]) -> str:
     return tail[:end]
 
 
+def legacy_doc_url(kind: str, name: str) -> str:
+    base = name.removeprefix("bitbucket_")
+    return (
+        "https://github.com/DrFaust92/terraform-provider-bitbucket/blob/master/docs/"
+        f"{CURRENT_KIND_PATH[kind]}/{base}.md"
+    )
+
+
+def current_doc_url(kind: str, name: str) -> str:
+    return f"./docs/{CURRENT_KIND_PATH[kind]}/{name}.md"
+
+
 def parse_current_doc(path: Path, kind: str) -> DocObject:
     """Parse one generated doc in ./docs/resources or ./docs/data-sources."""
     text = path.read_text()
@@ -342,7 +254,7 @@ def parse_current_doc(path: Path, kind: str) -> DocObject:
     if name_match is None:
         raise ValueError(f"missing Terraform object name in heading for {path}")
     name = name_match.group(1)
-    doc = DocObject(kind=kind, name=name, title=title)
+    doc = DocObject(kind=kind, name=name, title=title, doc_link=current_doc_url(kind, name))
     doc.inputs_required = parse_bullets(
         split_section(text, "### Required", ["### Optional", "### Read-Only", "##"]),
         True,
@@ -372,14 +284,15 @@ def parse_legacy_doc(kind: str, name: str) -> DocObject:
     """Parse one legacy markdown doc from the DrFaust92 provider, if it exists."""
     base = name.removeprefix("bitbucket_")
     doc_url = f"{LEGACY_BASE}/docs/{CURRENT_KIND_PATH[kind]}/{base}.md"
+    link = legacy_doc_url(kind, name)
     text = fetch(doc_url, required=False)
     if text is None:
-        return DocObject(kind=kind, name=name, title=name)
+        return DocObject(kind=kind, name=name, title=name, doc_link=link, doc_available=False)
     title_match = re.search(r"^#\s+([^\n]+)", text, re.M)
     title = name
     if title_match:
         title = html.unescape(title_match.group(1).replace("\\_", "_"))
-    doc = DocObject(kind=kind, name=name, title=title)
+    doc = DocObject(kind=kind, name=name, title=title, doc_link=link)
     args = split_section(
         text,
         "## Argument Reference",
@@ -396,98 +309,6 @@ def parse_legacy_doc(kind: str, name: str) -> DocObject:
             doc.inputs_optional.append(match.group(1))
     doc.read_only = parse_bullets(attrs, False)
     return doc
-
-
-def source_filename(kind: str, name: str) -> str:
-    return f"bitbucket/{LEGACY_KIND_PREFIX[kind]}{name.removeprefix('bitbucket_')}.go"
-
-
-def tokens_from_method(method_name: str) -> tuple[str, str] | None:
-    parts = CAMEL_RE.findall(method_name)
-    if not parts or parts[-1] not in HTTP_VERBS:
-        return None
-    verb = HTTP_VERBS[parts[-1]]
-    parts = parts[:-1]
-    segments = []
-    static = []
-    index = 0
-    while index < len(parts):
-        matched = False
-        for size in (2, 1):
-            key = tuple(parts[index : index + size])
-            if key in PLACEHOLDER_TOKENS:
-                if static:
-                    segments.append("-".join(token.lower() for token in static))
-                    static = []
-                segments.append(PLACEHOLDER_TOKENS[key])
-                index += size
-                matched = True
-                break
-        if matched:
-            continue
-        static.append(parts[index])
-        index += 1
-    if static:
-        segments.append("-".join(token.lower() for token in static))
-    path = "/" + "/".join(segment for segment in segments if segment)
-    path = path.replace("/-/", "/")
-    path = re.sub(r"/2-0", "", path)
-    path = re.sub(r"//+", "/", path)
-    return verb, path
-
-
-def normalize_raw_path(path: str) -> str:
-    path = path.strip().strip('"')
-    path = path.replace("2.0/", "/")
-    path = path.replace("%s", "{param}")
-    path = re.sub(r"//+", "/", path)
-    if not path.startswith("/"):
-        path = "/" + path
-    return path
-
-
-def parse_legacy_endpoints(kind: str, name: str, mapped_current: list[DocObject]) -> list[str]:
-    """Extract legacy endpoints from source, replacing placeholder paths with mapped current endpoints."""
-    text = fetch(f"{LEGACY_BASE}/{source_filename(kind, name)}", required=False)
-    if text is None:
-        return dedupe(sum((doc.endpoints for doc in mapped_current), []))
-    endpoints = []
-    for match in re.finditer(r"\.([A-Z][A-Za-z0-9]+(?:Get|Post|Put|Delete|Patch))\(", text):
-        converted = tokens_from_method(match.group(1))
-        if converted:
-            endpoints.append(f"{converted[0]} {converted[1]}")
-    raw_patterns = [
-        ("GET", r'\.Get\("(2\.0/[^"]+)"\)'),
-        ("PUT", r'\.Put\(fmt\.Sprintf\("(2\.0/[^"]+)"'),
-        ("GET", r'\.Get\(fmt\.Sprintf\("(2\.0/[^"]+)"'),
-        ("POST", r'\.Post\(fmt\.Sprintf\("(2\.0/[^"]+)"'),
-        ("DELETE", r'\.Delete\(fmt\.Sprintf\("(2\.0/[^"]+)"'),
-    ]
-    for verb, pattern in raw_patterns:
-        for match in re.finditer(pattern, text):
-            endpoints.append(f"{verb} {normalize_raw_path(match.group(1))}")
-    endpoints = dedupe(endpoints)
-    if mapped_current:
-        mapped = dedupe(sum((doc.endpoints for doc in mapped_current), []))
-        if any("{param}" in endpoint for endpoint in endpoints):
-            verbs = {
-                endpoint.split(" ", 1)[0]
-                for endpoint in endpoints
-                if "{param}" in endpoint
-            }
-            endpoints = [
-                endpoint
-                for endpoint in endpoints
-                if "{param}" not in endpoint or endpoint.split(" ", 1)[0] not in verbs
-            ]
-            endpoints = dedupe(
-                endpoints
-                + [endpoint for endpoint in mapped if endpoint.split(" ", 1)[0] in verbs]
-            )
-        if not endpoints:
-            return mapped
-    return endpoints
-
 
 def current_objects(repo_root: Path) -> dict[tuple[str, str], DocObject]:
     docs = {}
@@ -517,158 +338,10 @@ def mapped_current_objects(
     ]
 
 
-def format_params(required: list[str], optional: list[str]) -> str:
-    parts = []
-    if required:
-        parts.append("required: " + ", ".join(f"`{item}`" for item in required))
-    if optional:
-        parts.append("optional: " + ", ".join(f"`{item}`" for item in optional))
-    return "; ".join(parts) if parts else "none"
-
-
-def format_endpoints(items: list[str]) -> str:
-    return "<br>".join(f"`{item}`" for item in items) if items else "none"
-
-
-def sample_value(param: str) -> str:
-    """Return a readable HCL sample value for a Terraform attribute name."""
-    if param in EXAMPLE_VALUES:
-        return EXAMPLE_VALUES[param]
-    if param.endswith("_uuid"):
-        return f'"{{{param.replace("_", "-")}}}"'
-    if param.endswith("_id") or param == "id":
-        return f'"example-{param.replace("_", "-")}"'
-    return f'"example-{param.replace("_", "-")}"'
-
-
-def render_assignment(name: str, value: str, *, commented: bool = False, note: str | None = None) -> str:
-    """Render a single HCL assignment, optionally as a comment with a note."""
-    prefix = "# " if commented else ""
-    suffix = f"  # {note}" if note else ""
-    return f"  {prefix}{name} = {value}{suffix}"
-
-
-def render_hcl_block(
-    block_kind: str,
-    object_name: str,
-    instance_name: str,
-    required: list[tuple[str, str]],
-    commented: list[tuple[str, str, str | None]],
-) -> list[str]:
-    """Render a Terraform resource/data block from required and commented assignments."""
-    lines = [f'{block_kind} "{object_name}" "{instance_name}" {{']
-    for name, value in sorted(required):
-        lines.append(render_assignment(name, value))
-    if commented:
-        if required:
-            lines.append("")
-        for name, value, note in sorted(commented, key=lambda item: item[0]):
-            lines.append(render_assignment(name, value, commented=True, note=note))
-    lines.append("}")
-    return lines
-
-
-def should_include_new_only_param(param: str) -> bool:
-    """Keep new-only HCL snippets focused on actionable migration fields."""
-    return (
-        param == "request_body"
-        or param.endswith("_uuid")
-        or param.endswith("_id")
-        or param
-        in {
-            "target_username",
-            "selected_user",
-            "selected_user_id",
-            "member",
-            "path",
-            "commit",
-            "project_key",
-            "repo_slug",
-            "workspace",
-            "key_id",
-            "uid",
-        }
-    )
-
-
-def build_legacy_hcl(doc: DocObject) -> list[str]:
-    """Build a legacy Terraform snippet using required fields plus commented optional fields."""
-    block_kind = "resource" if doc.kind == "resource" else "data"
-    required = [(param, sample_value(param)) for param in doc.inputs_required]
-    commented = [(param, sample_value(param), "optional") for param in doc.inputs_optional]
-    return render_hcl_block(block_kind, doc.name, "legacy", required, commented)
-
-
-def build_current_hcl(doc: DocObject, legacy_doc: DocObject) -> list[str]:
-    """Build a migrated Terraform snippet that highlights renamed and changed fields."""
-    block_kind = "resource" if doc.kind == "resource" else "data"
-    required = []
-    commented = []
-    used = set()
-
-    for param in doc.inputs_required:
-        legacy_source = next(
-            (source for source, target in PARAM_RENAMES.items() if target == param and source in legacy_doc.inputs),
-            param,
-        )
-        required.append((param, sample_value(legacy_source)))
-        used.add(param)
-
-    for param in legacy_doc.inputs_required:
-        target = PARAM_RENAMES.get(param, param)
-        if target in doc.inputs and target not in used:
-            required.append((target, sample_value(param)))
-            used.add(target)
-
-    for param in legacy_doc.inputs_optional:
-        target = PARAM_RENAMES.get(param, param)
-        if target in doc.inputs and target not in used:
-            commented.append((target, sample_value(param), "optional"))
-            used.add(target)
-        elif target not in doc.inputs:
-            commented.append((param, sample_value(param), "legacy-only"))
-
-    for param in legacy_doc.inputs_required:
-        target = PARAM_RENAMES.get(param, param)
-        if target not in doc.inputs:
-            commented.append((param, sample_value(param), "legacy-only"))
-
-    for param in doc.inputs_optional:
-        if param not in used and should_include_new_only_param(param):
-            commented.append((param, sample_value(param), "new-only"))
-            used.add(param)
-
-    return render_hcl_block(block_kind, doc.name, "migrated", required, commented)
-
-
-def normalized_params(params: Iterable[str]) -> set[str]:
-    normalized = set()
-    for param in params:
-        normalized.add(PARAM_RENAMES.get(param, param))
-    return normalized
-
-
-def diff_summary(legacy: DocObject, currents: list[DocObject]) -> str:
-    """Summarize renamed, dropped, and added parameters between legacy and current objects."""
-    current_inputs = dedupe(sum((doc.inputs for doc in currents), []))
-    legacy_norm = normalized_params(legacy.inputs)
-    current_set = set(current_inputs)
-    renamed = []
-    for source, target in PARAM_RENAMES.items():
-        if source in legacy.inputs and target in current_set:
-            renamed.append(f"`{source}` → `{target}`")
-    dropped = sorted(
-        param for param in legacy.inputs if PARAM_RENAMES.get(param, param) not in current_set
-    )
-    added = sorted(param for param in current_inputs if param not in legacy_norm)
-    parts = []
-    if renamed:
-        parts.append("renamed: " + ", ".join(renamed))
-    if dropped:
-        parts.append("legacy-only inputs: " + ", ".join(f"`{item}`" for item in dropped))
-    if added:
-        parts.append("new-only inputs: " + ", ".join(f"`{item}`" for item in added))
-    return "; ".join(parts) if parts else "input names are effectively unchanged"
+def format_doc_link(doc: DocObject) -> str:
+    if doc.doc_available:
+        return f"[`{doc.name}`]({doc.doc_link})"
+    return f"`{doc.name}` (legacy doc not available)"
 
 
 def make_overview(
@@ -708,9 +381,9 @@ def render(repo_root: Path) -> str:
     )
     lines.append("")
     lines.append(
-        "It is intentionally a best-effort migration baseline: the generated docs "
-        "sometimes list optional fields that are also computed by the API, so subtle "
-        "cases still need manual review."
+        "It intentionally avoids generated field-by-field or HCL diffs. Nested fields, "
+        "computed attributes, and generated doc structure can otherwise produce "
+        "misleading migration advice."
     )
     lines.append("")
     lines.append(
@@ -807,7 +480,6 @@ def render(repo_root: Path) -> str:
         for name in names:
             legacy_doc = parse_legacy_doc(kind, name)
             current_docs = mapped_current_objects(kind, name, current)
-            legacy_doc.endpoints = parse_legacy_endpoints(kind, name, current_docs)
             lines.append(f"### `{name}`")
             lines.append("")
             if current_docs:
@@ -817,28 +489,12 @@ def render(repo_root: Path) -> str:
                 )
             else:
                 lines.append("- New equivalent(s): none")
-            lines.append(f"- Legacy endpoints: {format_endpoints(legacy_doc.endpoints)}")
-            lines.append("")
-            lines.append("#### Legacy HCL")
-            lines.append("")
-            lines.append("```hcl")
-            lines.extend(build_legacy_hcl(legacy_doc))
-            lines.append("```")
+            lines.append(f"- Legacy docs: {format_doc_link(legacy_doc)}")
             if current_docs:
-                new_endpoints = dedupe(sum((doc.endpoints for doc in current_docs), []))
-                lines.append("")
-                lines.append(f"- New operations: {format_endpoints(new_endpoints)}")
-                lines.append("")
-                lines.append("#### New HCL")
-                lines.append("")
-                for doc in current_docs:
-                    lines.append(f"##### `{doc.name}`")
-                    lines.append("")
-                    lines.append("```hcl")
-                    lines.extend(build_current_hcl(doc, legacy_doc))
-                    lines.append("```")
-                    lines.append("")
-                lines.append(f"- Diff summary: {diff_summary(legacy_doc, current_docs)}")
+                lines.append(
+                    "- New docs: "
+                    + ", ".join(format_doc_link(doc) for doc in current_docs)
+                )
             note = OBJECT_NOTES.get((kind, name))
             if note:
                 lines.append(f"- Notes: {note}")
@@ -847,18 +503,18 @@ def render(repo_root: Path) -> str:
     lines.append("## New provider-only resources")
     lines.append("")
     for name in res_new_only:
-        lines.append(f"- `{name}`")
+        lines.append(f"- {format_doc_link(current[('resource', name)])}")
     lines.append("")
     lines.append("## New provider-only data sources")
     lines.append("")
     for name in ds_new_only:
-        lines.append(f"- `{name}`")
+        lines.append(f"- {format_doc_link(current[('data-source', name)])}")
     lines.append("")
     lines.append("## Can this be automated?")
     lines.append("")
     lines.append(
-        "Partly. A comparison script is practical today, but a fully automatic HCL "
-        "rewrite is only safe for the straightforward cases."
+        "Only partly. The rename tables are useful, but the actual migration still "
+        "needs a human review against the authoritative docs."
     )
     lines.append("")
     lines.append("Good candidates for an automated rewrite later:")
@@ -866,16 +522,13 @@ def render(repo_root: Path) -> str:
     lines.append("- provider source replacement")
     lines.append("- provider auth field rename (`password` → `token`)")
     lines.append("- direct resource/data source renames where there is a 1:1 mapping")
-    lines.append(
-        "- path argument renames like `owner` → `workspace` and `repository` → `repo_slug`"
-    )
     lines.append("")
     lines.append("Cases that still need manual review:")
     lines.append("")
     lines.append("- legacy objects that split into multiple generated resources")
     lines.append("- objects missing from one provider or the other")
+    lines.append("- nested or computed fields")
     lines.append("- fields whose semantics changed even when the name looks similar")
-    lines.append("- places where the generated provider expects `request_body` for uncommon fields")
     lines.append("")
     return "\n".join(lines) + "\n"
 
