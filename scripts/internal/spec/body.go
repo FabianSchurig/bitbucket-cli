@@ -143,13 +143,23 @@ func ResolveResponseFields(schemas map[string]any, ref, prefix string, visited m
 
 // FlattenBodyFields recursively flattens nested object BodyFields into flat
 // dot-separated paths. Array fields are preserved as-is (only object nesting
-// is flattened). This is used by CLI and MCP generators that need flat flags.
+// is flattened). Duplicate GoName entries (e.g. "subject.type" and
+// "subject_type" both map to "bodySubjectType") are deduplicated, keeping the
+// first occurrence. This is used by CLI and MCP generators that need flat flags.
 func FlattenBodyFields(fields []BodyField) []BodyField {
 	var flat []BodyField
 	for _, f := range fields {
 		flat = append(flat, flattenBodyFieldRec(f, "")...)
 	}
-	return flat
+	seen := make(map[string]bool, len(flat))
+	deduped := flat[:0]
+	for _, f := range flat {
+		if !seen[f.GoName] {
+			seen[f.GoName] = true
+			deduped = append(deduped, f)
+		}
+	}
+	return deduped
 }
 
 func flattenBodyFieldRec(f BodyField, prefix string) []BodyField {
@@ -259,6 +269,9 @@ func flattenProperties(schemas map[string]any, props map[string]any, prefix stri
 }
 
 func flattenProperty(schemas map[string]any, name, path string, prop map[string]any, visited map[string]bool, opts FieldResolveOpts) []BodyField {
+	if ro, _ := prop["readOnly"].(bool); ro {
+		return nil
+	}
 	if ref, ok := prop["$ref"].(string); ok {
 		return resolveRefProperty(schemas, name, path, ref, prop, visited, opts)
 	}

@@ -730,6 +730,29 @@ def post_process_schema(out: dict) -> None:
     # though url + events are required by the API. Injecting it here lets the
     # generator expose those fields as regular Terraform / CLI attributes instead
     # of falling back to the raw request_body escape hatch.
+    #
+    # Mark response-only fields on webhook_subscription as readOnly so the field
+    # resolver excludes them from body fields (they are set by the API, not the caller).
+    _webhook_schema = (
+        out.get("components", {})
+        .get("schemas", {})
+        .get("webhook_subscription")
+    )
+    if _webhook_schema is not None:
+        # Resolve to the mutable properties dict (webhook_subscription uses allOf).
+        _ws_props = None
+        if "properties" in _webhook_schema:
+            _ws_props = _webhook_schema["properties"]
+        elif "allOf" in _webhook_schema:
+            for _entry in _webhook_schema["allOf"]:
+                if "properties" in _entry:
+                    _ws_props = _entry["properties"]
+                    break
+        if _ws_props is not None:
+            for _ro_field in ("uuid", "created_at", "subject", "subject_type", "secret_set"):
+                if _ro_field in _ws_props:
+                    _ws_props[_ro_field]["readOnly"] = True
+
     webhook_request_body = {
         "content": {
             "application/json": {

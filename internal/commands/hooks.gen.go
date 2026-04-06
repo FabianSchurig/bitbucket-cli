@@ -192,15 +192,10 @@ func newHooksCreateAWebhookForARepositoryCmd() *cobra.Command {
 		repoSlug        string
 		workspace       string
 		bodyActive      bool
-		bodyCreatedAt   string
 		bodyDescription string
 		bodyEvents      string
 		bodySecret      string
-		bodySecretSet   bool
-		bodySubjectType string
-		bodySubjectType string
 		bodyUrl         string
-		bodyUuid        string
 		body            string
 	)
 
@@ -229,9 +224,6 @@ func newHooksCreateAWebhookForARepositoryCmd() *cobra.Command {
 				if bodyActive {
 					handlers.SetNested(bodyObj, "active", bodyActive)
 				}
-				if bodyCreatedAt != "" {
-					handlers.SetNested(bodyObj, "created_at", bodyCreatedAt)
-				}
 				if bodyDescription != "" {
 					handlers.SetNested(bodyObj, "description", bodyDescription)
 				}
@@ -241,20 +233,8 @@ func newHooksCreateAWebhookForARepositoryCmd() *cobra.Command {
 				if bodySecret != "" {
 					handlers.SetNested(bodyObj, "secret", bodySecret)
 				}
-				if bodySecretSet {
-					handlers.SetNested(bodyObj, "secret_set", bodySecretSet)
-				}
-				if bodySubjectType != "" {
-					handlers.SetNested(bodyObj, "subject.type", bodySubjectType)
-				}
-				if bodySubjectType != "" {
-					handlers.SetNested(bodyObj, "subject_type", bodySubjectType)
-				}
 				if bodyUrl != "" {
 					handlers.SetNested(bodyObj, "url", bodyUrl)
-				}
-				if bodyUuid != "" {
-					handlers.SetNested(bodyObj, "uuid", bodyUuid)
 				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
@@ -274,15 +254,10 @@ func newHooksCreateAWebhookForARepositoryCmd() *cobra.Command {
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().BoolVar(&bodyActive, "active", false, `active`)
-	cmd.Flags().StringVar(&bodyCreatedAt, "created-at", "", `created_at`)
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `A user-defined description of the webhook.`)
 	cmd.Flags().StringVar(&bodyEvents, "events", "", `The events this webhook is subscribed to. [issue:comment_created, issue:created, issue:updated, pipeline:span_created, project:updated, pullrequest:approved, pullrequest:changes_request_created, pullrequest:changes_request_removed, pullrequest:comment_created, pullrequest:comment_deleted, pullrequest:comment_reopened, pullrequest:comment_resolved, pullrequest:comment_updated, pullrequest:created, pullrequest:fulfilled, pullrequest:push, pullrequest:rejected, pullrequest:unapproved, pullrequest:updated, repo:commit_comment_created, repo:commit_status_created, repo:commit_status_updated, repo:created, repo:deleted, repo:fork, repo:imported, repo:push, repo:transfer, repo:updated]`)
 	cmd.Flags().StringVar(&bodySecret, "secret", "", "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.")
-	cmd.Flags().BoolVar(&bodySecretSet, "secret-set", false, `Indicates whether or not the hook has an associated secret. It is not possible to see the hook's secret. This field is ignored during updates.`)
-	cmd.Flags().StringVar(&bodySubjectType, "subject-type", "", `type`)
-	cmd.Flags().StringVar(&bodySubjectType, "subject-type", "", "The type of entity. Set to either `repository` or `workspace` based on where the subscription is defined. [repository, workspace]")
 	cmd.Flags().StringVar(&bodyUrl, "url", "", `The URL events get delivered to.`)
-	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The webhook's id`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -346,15 +321,10 @@ func newHooksUpdateAWebhookForARepositoryCmd() *cobra.Command {
 		uid             string
 		workspace       string
 		bodyActive      bool
-		bodyCreatedAt   string
 		bodyDescription string
 		bodyEvents      string
 		bodySecret      string
-		bodySecretSet   bool
-		bodySubjectType string
-		bodySubjectType string
 		bodyUrl         string
-		bodyUuid        string
 		body            string
 	)
 
@@ -387,9 +357,6 @@ func newHooksUpdateAWebhookForARepositoryCmd() *cobra.Command {
 				if bodyActive {
 					handlers.SetNested(bodyObj, "active", bodyActive)
 				}
-				if bodyCreatedAt != "" {
-					handlers.SetNested(bodyObj, "created_at", bodyCreatedAt)
-				}
 				if bodyDescription != "" {
 					handlers.SetNested(bodyObj, "description", bodyDescription)
 				}
@@ -399,20 +366,8 @@ func newHooksUpdateAWebhookForARepositoryCmd() *cobra.Command {
 				if bodySecret != "" {
 					handlers.SetNested(bodyObj, "secret", bodySecret)
 				}
-				if bodySecretSet {
-					handlers.SetNested(bodyObj, "secret_set", bodySecretSet)
-				}
-				if bodySubjectType != "" {
-					handlers.SetNested(bodyObj, "subject.type", bodySubjectType)
-				}
-				if bodySubjectType != "" {
-					handlers.SetNested(bodyObj, "subject_type", bodySubjectType)
-				}
 				if bodyUrl != "" {
 					handlers.SetNested(bodyObj, "url", bodyUrl)
-				}
-				if bodyUuid != "" {
-					handlers.SetNested(bodyObj, "uuid", bodyUuid)
 				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
@@ -433,15 +388,10 @@ func newHooksUpdateAWebhookForARepositoryCmd() *cobra.Command {
 	cmd.Flags().StringVar(&uid, "uid", "", "uid (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().BoolVar(&bodyActive, "active", false, `active`)
-	cmd.Flags().StringVar(&bodyCreatedAt, "created-at", "", `created_at`)
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `A user-defined description of the webhook.`)
 	cmd.Flags().StringVar(&bodyEvents, "events", "", `The events this webhook is subscribed to. [issue:comment_created, issue:created, issue:updated, pipeline:span_created, project:updated, pullrequest:approved, pullrequest:changes_request_created, pullrequest:changes_request_removed, pullrequest:comment_created, pullrequest:comment_deleted, pullrequest:comment_reopened, pullrequest:comment_resolved, pullrequest:comment_updated, pullrequest:created, pullrequest:fulfilled, pullrequest:push, pullrequest:rejected, pullrequest:unapproved, pullrequest:updated, repo:commit_comment_created, repo:commit_status_created, repo:commit_status_updated, repo:created, repo:deleted, repo:fork, repo:imported, repo:push, repo:transfer, repo:updated]`)
 	cmd.Flags().StringVar(&bodySecret, "secret", "", "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.")
-	cmd.Flags().BoolVar(&bodySecretSet, "secret-set", false, `Indicates whether or not the hook has an associated secret. It is not possible to see the hook's secret. This field is ignored during updates.`)
-	cmd.Flags().StringVar(&bodySubjectType, "subject-type", "", `type`)
-	cmd.Flags().StringVar(&bodySubjectType, "subject-type", "", "The type of entity. Set to either `repository` or `workspace` based on where the subscription is defined. [repository, workspace]")
 	cmd.Flags().StringVar(&bodyUrl, "url", "", `The URL events get delivered to.`)
-	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The webhook's id`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -550,15 +500,10 @@ func newHooksCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 	var (
 		workspace       string
 		bodyActive      bool
-		bodyCreatedAt   string
 		bodyDescription string
 		bodyEvents      string
 		bodySecret      string
-		bodySecretSet   bool
-		bodySubjectType string
-		bodySubjectType string
 		bodyUrl         string
-		bodyUuid        string
 		body            string
 	)
 
@@ -583,9 +528,6 @@ func newHooksCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 				if bodyActive {
 					handlers.SetNested(bodyObj, "active", bodyActive)
 				}
-				if bodyCreatedAt != "" {
-					handlers.SetNested(bodyObj, "created_at", bodyCreatedAt)
-				}
 				if bodyDescription != "" {
 					handlers.SetNested(bodyObj, "description", bodyDescription)
 				}
@@ -595,20 +537,8 @@ func newHooksCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 				if bodySecret != "" {
 					handlers.SetNested(bodyObj, "secret", bodySecret)
 				}
-				if bodySecretSet {
-					handlers.SetNested(bodyObj, "secret_set", bodySecretSet)
-				}
-				if bodySubjectType != "" {
-					handlers.SetNested(bodyObj, "subject.type", bodySubjectType)
-				}
-				if bodySubjectType != "" {
-					handlers.SetNested(bodyObj, "subject_type", bodySubjectType)
-				}
 				if bodyUrl != "" {
 					handlers.SetNested(bodyObj, "url", bodyUrl)
-				}
-				if bodyUuid != "" {
-					handlers.SetNested(bodyObj, "uuid", bodyUuid)
 				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
@@ -627,15 +557,10 @@ func newHooksCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().BoolVar(&bodyActive, "active", false, `active`)
-	cmd.Flags().StringVar(&bodyCreatedAt, "created-at", "", `created_at`)
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `A user-defined description of the webhook.`)
 	cmd.Flags().StringVar(&bodyEvents, "events", "", `The events this webhook is subscribed to. [issue:comment_created, issue:created, issue:updated, pipeline:span_created, project:updated, pullrequest:approved, pullrequest:changes_request_created, pullrequest:changes_request_removed, pullrequest:comment_created, pullrequest:comment_deleted, pullrequest:comment_reopened, pullrequest:comment_resolved, pullrequest:comment_updated, pullrequest:created, pullrequest:fulfilled, pullrequest:push, pullrequest:rejected, pullrequest:unapproved, pullrequest:updated, repo:commit_comment_created, repo:commit_status_created, repo:commit_status_updated, repo:created, repo:deleted, repo:fork, repo:imported, repo:push, repo:transfer, repo:updated]`)
 	cmd.Flags().StringVar(&bodySecret, "secret", "", "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.")
-	cmd.Flags().BoolVar(&bodySecretSet, "secret-set", false, `Indicates whether or not the hook has an associated secret. It is not possible to see the hook's secret. This field is ignored during updates.`)
-	cmd.Flags().StringVar(&bodySubjectType, "subject-type", "", `type`)
-	cmd.Flags().StringVar(&bodySubjectType, "subject-type", "", "The type of entity. Set to either `repository` or `workspace` based on where the subscription is defined. [repository, workspace]")
 	cmd.Flags().StringVar(&bodyUrl, "url", "", `The URL events get delivered to.`)
-	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The webhook's id`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -692,15 +617,10 @@ func newHooksUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 		uid             string
 		workspace       string
 		bodyActive      bool
-		bodyCreatedAt   string
 		bodyDescription string
 		bodyEvents      string
 		bodySecret      string
-		bodySecretSet   bool
-		bodySubjectType string
-		bodySubjectType string
 		bodyUrl         string
-		bodyUuid        string
 		body            string
 	)
 
@@ -729,9 +649,6 @@ func newHooksUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 				if bodyActive {
 					handlers.SetNested(bodyObj, "active", bodyActive)
 				}
-				if bodyCreatedAt != "" {
-					handlers.SetNested(bodyObj, "created_at", bodyCreatedAt)
-				}
 				if bodyDescription != "" {
 					handlers.SetNested(bodyObj, "description", bodyDescription)
 				}
@@ -741,20 +658,8 @@ func newHooksUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 				if bodySecret != "" {
 					handlers.SetNested(bodyObj, "secret", bodySecret)
 				}
-				if bodySecretSet {
-					handlers.SetNested(bodyObj, "secret_set", bodySecretSet)
-				}
-				if bodySubjectType != "" {
-					handlers.SetNested(bodyObj, "subject.type", bodySubjectType)
-				}
-				if bodySubjectType != "" {
-					handlers.SetNested(bodyObj, "subject_type", bodySubjectType)
-				}
 				if bodyUrl != "" {
 					handlers.SetNested(bodyObj, "url", bodyUrl)
-				}
-				if bodyUuid != "" {
-					handlers.SetNested(bodyObj, "uuid", bodyUuid)
 				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
@@ -774,15 +679,10 @@ func newHooksUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 	cmd.Flags().StringVar(&uid, "uid", "", "uid (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().BoolVar(&bodyActive, "active", false, `active`)
-	cmd.Flags().StringVar(&bodyCreatedAt, "created-at", "", `created_at`)
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `A user-defined description of the webhook.`)
 	cmd.Flags().StringVar(&bodyEvents, "events", "", `The events this webhook is subscribed to. [issue:comment_created, issue:created, issue:updated, pipeline:span_created, project:updated, pullrequest:approved, pullrequest:changes_request_created, pullrequest:changes_request_removed, pullrequest:comment_created, pullrequest:comment_deleted, pullrequest:comment_reopened, pullrequest:comment_resolved, pullrequest:comment_updated, pullrequest:created, pullrequest:fulfilled, pullrequest:push, pullrequest:rejected, pullrequest:unapproved, pullrequest:updated, repo:commit_comment_created, repo:commit_status_created, repo:commit_status_updated, repo:created, repo:deleted, repo:fork, repo:imported, repo:push, repo:transfer, repo:updated]`)
 	cmd.Flags().StringVar(&bodySecret, "secret", "", "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.")
-	cmd.Flags().BoolVar(&bodySecretSet, "secret-set", false, `Indicates whether or not the hook has an associated secret. It is not possible to see the hook's secret. This field is ignored during updates.`)
-	cmd.Flags().StringVar(&bodySubjectType, "subject-type", "", `type`)
-	cmd.Flags().StringVar(&bodySubjectType, "subject-type", "", "The type of entity. Set to either `repository` or `workspace` based on where the subscription is defined. [repository, workspace]")
 	cmd.Flags().StringVar(&bodyUrl, "url", "", `The URL events get delivered to.`)
-	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The webhook's id`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
