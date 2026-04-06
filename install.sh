@@ -134,6 +134,7 @@ install_binary() {
     mv "${tmpdir}/${bin_name}" "${INSTALL_DIR}/${bin_name}"
     chmod +x "${INSTALL_DIR}/${bin_name}"
   else
+    echo "Elevated permissions required to install to ${INSTALL_DIR}. Use --install-dir to choose a writable directory."
     sudo mv "${tmpdir}/${bin_name}" "${INSTALL_DIR}/${bin_name}"
     sudo chmod +x "${INSTALL_DIR}/${bin_name}"
   fi
