@@ -116,15 +116,15 @@ class GenMigrationTests(unittest.TestCase):
         self.assertEqual(doc.name, "bitbucket_missing")
         self.assertEqual(doc.inputs, [])
 
-    def test_legacy_doc_url_points_to_legacy_repository_docs(self):
+    def test_get_legacy_doc_url_points_to_legacy_repository_docs(self):
         self.assertEqual(
-            gen_migration.legacy_doc_url("resource", "bitbucket_repository"),
+            gen_migration.get_legacy_doc_url("resource", "bitbucket_repository"),
             "https://github.com/DrFaust92/terraform-provider-bitbucket/blob/master/docs/resources/repository.md",
         )
 
-    def test_current_doc_url_points_to_local_generated_docs(self):
+    def test_get_current_doc_url_points_to_local_generated_docs(self):
         self.assertEqual(
-            gen_migration.current_doc_url("data-source", "bitbucket_current_user"),
+            gen_migration.get_current_doc_url("data-source", "bitbucket_current_user"),
             "./docs/data-sources/bitbucket_current_user.md",
         )
 
@@ -180,6 +180,8 @@ class GenMigrationTests(unittest.TestCase):
         self.assertIn("It intentionally avoids generated field-by-field or HCL diffs", rendered)
         self.assertIn("`bitbucket_branch_restriction`", rendered)
         self.assertIn("`bitbucket_current_user`", rendered)
+        self.assertIn("Legacy docs:", rendered)
+        self.assertIn("New docs:", rendered)
         self.assertIn("- Legacy docs: [`bitbucket_branch_restriction`](https://legacy.example/resource/bitbucket_branch_restriction.md)", rendered)
         self.assertIn("- New docs: [`bitbucket_branch_restrictions`](./docs/resources/bitbucket_branch_restrictions.md)", rendered)
         self.assertNotIn("#### Legacy HCL", rendered)

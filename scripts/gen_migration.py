@@ -231,7 +231,7 @@ def split_section(text: str, start: str, stops: list[str]) -> str:
     return tail[:end]
 
 
-def legacy_doc_url(kind: str, name: str) -> str:
+def get_legacy_doc_url(kind: str, name: str) -> str:
     base = name.removeprefix("bitbucket_")
     return (
         "https://github.com/DrFaust92/terraform-provider-bitbucket/blob/master/docs/"
@@ -239,7 +239,7 @@ def legacy_doc_url(kind: str, name: str) -> str:
     )
 
 
-def current_doc_url(kind: str, name: str) -> str:
+def get_current_doc_url(kind: str, name: str) -> str:
     return f"./docs/{CURRENT_KIND_PATH[kind]}/{name}.md"
 
 
@@ -254,7 +254,7 @@ def parse_current_doc(path: Path, kind: str) -> DocObject:
     if name_match is None:
         raise ValueError(f"missing Terraform object name in heading for {path}")
     name = name_match.group(1)
-    doc = DocObject(kind=kind, name=name, title=title, doc_link=current_doc_url(kind, name))
+    doc = DocObject(kind=kind, name=name, title=title, doc_link=get_current_doc_url(kind, name))
     doc.inputs_required = parse_bullets(
         split_section(text, "### Required", ["### Optional", "### Read-Only", "##"]),
         True,
@@ -284,7 +284,7 @@ def parse_legacy_doc(kind: str, name: str) -> DocObject:
     """Parse one legacy markdown doc from the DrFaust92 provider, if it exists."""
     base = name.removeprefix("bitbucket_")
     doc_url = f"{LEGACY_BASE}/docs/{CURRENT_KIND_PATH[kind]}/{base}.md"
-    link = legacy_doc_url(kind, name)
+    link = get_legacy_doc_url(kind, name)
     text = fetch(doc_url, required=False)
     if text is None:
         return DocObject(kind=kind, name=name, title=name, doc_link=link, doc_available=False)
