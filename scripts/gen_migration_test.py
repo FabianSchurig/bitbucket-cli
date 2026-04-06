@@ -125,7 +125,7 @@ class GenMigrationTests(unittest.TestCase):
     def test_get_current_doc_url(self):
         self.assertEqual(
             gen_migration.get_current_doc_url("data-source", "bitbucket_current_user"),
-            "https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/bitbucket_current_user.md",
+            "https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/current-user.md",
         )
 
     def test_format_doc_link_handles_missing_legacy_docs(self):
@@ -146,12 +146,12 @@ class GenMigrationTests(unittest.TestCase):
             ("resource", "bitbucket_branch_restrictions"): gen_migration.DocObject(
                 kind="resource",
                 name="bitbucket_branch_restrictions",
-                doc_link="https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/bitbucket_branch_restrictions.md",
+                doc_link="https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/branch-restrictions.md",
             ),
             ("data-source", "bitbucket_current_user"): gen_migration.DocObject(
                 kind="data-source",
                 name="bitbucket_current_user",
-                doc_link="https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/bitbucket_current_user.md",
+                doc_link="https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/current-user.md",
             ),
         }
 
@@ -184,7 +184,7 @@ class GenMigrationTests(unittest.TestCase):
         self.assertIn("New docs:", rendered)
         self.assertIn("- Legacy docs: [`bitbucket_branch_restriction`](https://legacy.example/resource/bitbucket_branch_restriction.md)", rendered)
         self.assertIn(
-            "- New docs: [`bitbucket_branch_restrictions`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/bitbucket_branch_restrictions.md)",
+            "- New docs: [`bitbucket_branch_restrictions`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/branch-restrictions.md)",
             rendered,
         )
         self.assertNotIn("#### Legacy HCL", rendered)

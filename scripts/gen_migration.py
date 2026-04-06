@@ -241,7 +241,8 @@ def get_legacy_doc_url(kind: str, name: str) -> str:
 
 
 def get_current_doc_url(kind: str, name: str) -> str:
-    return f"{CURRENT_DOCS_BASE}/{CURRENT_KIND_PATH[kind]}/{name}.md"
+    base = name.removeprefix("bitbucket_").replace("_", "-")
+    return f"{CURRENT_DOCS_BASE}/{CURRENT_KIND_PATH[kind]}/{base}.md"
 
 
 def parse_current_doc(path: Path, kind: str) -> DocObject:
