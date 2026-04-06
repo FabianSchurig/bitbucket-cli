@@ -55,30 +55,13 @@ Available operations:
 				{Path: `label`, Type: `string`, Desc: `The user-defined label for the deploy key`},
 				{Path: `last_used`, Type: `string`, Desc: `last_used`},
 				{Path: `owner`, Type: `string`, Desc: `owner`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `name`, Type: `string`, Desc: `name`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_issues`, Type: `bool`, Desc: `
-The issue tracker for this repository is enabled. Issue Tracker
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -87,7 +70,24 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `name`, Type: `string`, Desc: `name`},
 					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 			},
 			HasBody:   false,
@@ -120,10 +120,8 @@ Controls the rules for forking this repository.
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -132,22 +130,24 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
-					{Path: `has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
 					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 			},
 			HasBody:   false,
@@ -182,20 +182,8 @@ administered through admin.atlassian.com.
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `name`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_issues`, Type: `bool`, Desc: `
-The issue tracker for this repository is enabled. Issue Tracker
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -204,12 +192,24 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
 					{Path: `has_wiki`, Type: `bool`, Desc: `
 The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 			},
 			HasBody:   false,
@@ -243,8 +243,8 @@ administered through admin.atlassian.com.
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -253,24 +253,24 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
-					{Path: `has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
 					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
-					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `size`, Type: `int`, Desc: `size`},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 			},
 			HasBody:   false,
@@ -317,14 +317,14 @@ administered through admin.atlassian.com.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `environment`, Type: `string`, Desc: `environment`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 				}},
 				{Path: `release`, Type: `string`, Desc: `release`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `The timestamp when the release was created.`},
-					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the release.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the release.`},
 					{Path: `url`, Type: `string`, Desc: `Link to the pipeline that produced the release.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the release.`},
 				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the deployment.`},
 			},
@@ -349,14 +349,14 @@ administered through admin.atlassian.com.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `environment`, Type: `string`, Desc: `environment`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 				}},
 				{Path: `release`, Type: `string`, Desc: `release`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `The timestamp when the release was created.`},
-					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the release.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the release.`},
 					{Path: `url`, Type: `string`, Desc: `Link to the pipeline that produced the release.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the release.`},
 				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the deployment.`},
 			},
@@ -504,19 +504,19 @@ administered through admin.atlassian.com.
 				{Path: `label`, Type: `string`, Desc: `The user-defined label for the deploy key`},
 				{Path: `last_used`, Type: `string`, Desc: `last_used`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
-					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
-					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
-					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
-Indicates whether the project contains publicly visible repositories.
-Note that private projects cannot contain public repositories.`},
+					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 				}},
 			},
 			HasBody:   false,
@@ -549,18 +549,18 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `label`, Type: `string`, Desc: `The user-defined label for the deploy key`},
 				{Path: `last_used`, Type: `string`, Desc: `last_used`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
-					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
-					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
-Indicates whether the project contains publicly visible repositories.
-Note that private projects cannot contain public repositories.`},
+					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 				}},
 			},
@@ -596,19 +596,19 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `label`, Type: `string`, Desc: `The user-defined label for the deploy key`},
 				{Path: `last_used`, Type: `string`, Desc: `last_used`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
-					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
-					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
-					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
-Indicates whether the project contains publicly visible repositories.
-Note that private projects cannot contain public repositories.`},
+					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 				}},
 			},
 			HasBody:   false,
@@ -661,30 +661,13 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `label`, Type: `string`, Desc: `The user-defined label for the deploy key`},
 				{Path: `last_used`, Type: `string`, Desc: `last_used`},
 				{Path: `owner`, Type: `string`, Desc: `owner`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `name`, Type: `string`, Desc: `name`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_issues`, Type: `bool`, Desc: `
-The issue tracker for this repository is enabled. Issue Tracker
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -693,7 +676,24 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `name`, Type: `string`, Desc: `name`},
 					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 			},
 			HasBody:   false,
@@ -726,10 +726,8 @@ Controls the rules for forking this repository.
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -738,22 +736,24 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
-					{Path: `has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
 					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 			},
 			HasBody:   false,
@@ -788,20 +788,8 @@ administered through admin.atlassian.com.
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `name`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_issues`, Type: `bool`, Desc: `
-The issue tracker for this repository is enabled. Issue Tracker
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -810,12 +798,24 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
 					{Path: `has_wiki`, Type: `bool`, Desc: `
 The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 			},
 			HasBody:   false,
@@ -849,8 +849,8 @@ administered through admin.atlassian.com.
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -859,24 +859,24 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
-					{Path: `has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 					{Path: `has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
 					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
-					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `size`, Type: `int`, Desc: `size`},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 			},
 			HasBody:   false,
@@ -923,14 +923,14 @@ administered through admin.atlassian.com.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `environment`, Type: `string`, Desc: `environment`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 				}},
 				{Path: `release`, Type: `string`, Desc: `release`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `The timestamp when the release was created.`},
-					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the release.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the release.`},
 					{Path: `url`, Type: `string`, Desc: `Link to the pipeline that produced the release.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the release.`},
 				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the deployment.`},
 			},
@@ -955,14 +955,14 @@ administered through admin.atlassian.com.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `environment`, Type: `string`, Desc: `environment`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 				}},
 				{Path: `release`, Type: `string`, Desc: `release`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `The timestamp when the release was created.`},
-					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the release.`},
 					{Path: `name`, Type: `string`, Desc: `The name of the release.`},
 					{Path: `url`, Type: `string`, Desc: `Link to the pipeline that produced the release.`},
+					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the release.`},
 				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the deployment.`},
 			},
@@ -1110,19 +1110,19 @@ administered through admin.atlassian.com.
 				{Path: `label`, Type: `string`, Desc: `The user-defined label for the deploy key`},
 				{Path: `last_used`, Type: `string`, Desc: `last_used`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
-					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
-					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
-					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
-Indicates whether the project contains publicly visible repositories.
-Note that private projects cannot contain public repositories.`},
+					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 				}},
 			},
 			HasBody:   false,
@@ -1155,18 +1155,18 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `label`, Type: `string`, Desc: `The user-defined label for the deploy key`},
 				{Path: `last_used`, Type: `string`, Desc: `last_used`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
-					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
-					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
-Indicates whether the project contains publicly visible repositories.
-Note that private projects cannot contain public repositories.`},
+					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 				}},
 			},
@@ -1202,19 +1202,19 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `label`, Type: `string`, Desc: `The user-defined label for the deploy key`},
 				{Path: `last_used`, Type: `string`, Desc: `last_used`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
-					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
-					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
 					{Path: `is_private`, Type: `bool`, Desc: `
 Indicates whether the project is publicly accessible, or whether it is
 private to the team and consequently only visible to team members.
 Note that private projects cannot contain public repositories.`},
-					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
-Indicates whether the project contains publicly visible repositories.
-Note that private projects cannot contain public repositories.`},
+					{Path: `key`, Type: `string`, Desc: `The project's key.`},
+					{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
 				}},
 			},
 			HasBody:   false,

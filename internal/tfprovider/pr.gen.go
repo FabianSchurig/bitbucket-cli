@@ -108,10 +108,10 @@ Available operations:
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
@@ -127,8 +127,8 @@ Available operations:
 				}},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
 				{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
@@ -270,11 +270,11 @@ new pull request that is created.`,
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `has_2fa_enabled`, Type: `bool`, Desc: `has_2fa_enabled`},
-					{Path: `nickname`, Type: `string`, Desc: `Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.`},
-					{Path: `is_staff`, Type: `bool`, Desc: `is_staff`},
 					{Path: `account_id`, Type: `string`, Desc: `The user's Atlassian account ID.`},
 					{Path: `account_status`, Type: `string`, Desc: `The status of the account. Currently the only possible value is "active", but more values may be added in the future.`},
+					{Path: `has_2fa_enabled`, Type: `bool`, Desc: `has_2fa_enabled`},
+					{Path: `is_staff`, Type: `bool`, Desc: `is_staff`},
+					{Path: `nickname`, Type: `string`, Desc: `Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.`},
 				}},
 			},
 			HasBody:   false,
@@ -300,15 +300,15 @@ new pull request that is created.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `author`, Type: `string`, Desc: `author`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 				{Path: `closed_by`, Type: `string`, Desc: `closed_by`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
@@ -336,10 +336,10 @@ new pull request that is created.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
-					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
@@ -440,10 +440,10 @@ new pull request that is created.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
-					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
@@ -459,8 +459,8 @@ new pull request that is created.`,
 				}},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
 				{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
@@ -507,9 +507,9 @@ new pull request that is created.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `author`, Type: `string`, Desc: `author`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 				{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 				{Path: `closed_by`, Type: `string`, Desc: `closed_by`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -543,10 +543,10 @@ new pull request that is created.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
@@ -622,9 +622,9 @@ Only open pull requests can be mutated.`,
 				}},
 				{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 				{Path: `closed_by`, Type: `string`, Desc: `closed_by`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
@@ -652,17 +652,17 @@ Only open pull requests can be mutated.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `source`, Type: `string`, Desc: `source`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -781,38 +781,25 @@ request.`,
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
 				{Path: `pullrequest`, Type: `string`, Desc: `pullrequest`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
-					}},
+					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
+					{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
+					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
+					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `hash`, Type: `string`, Desc: `hash`},
-					}},
-					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
-					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
-					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
-					{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
-					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
-					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
-					{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
-					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
-					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
-					{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
-					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `created_on`, Type: `string`, Desc: `created_on`},
-						{Path: `display_name`, Type: `string`, Desc: `display_name`},
-						{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					}},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
@@ -827,23 +814,36 @@ request.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 						{Path: `approved`, Type: `bool`, Desc: `approved`},
-						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 						{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					}},
-					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+					{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
+					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+						{Path: `created_on`, Type: `string`, Desc: `created_on`},
+						{Path: `display_name`, Type: `string`, Desc: `display_name`},
+						{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					}},
+					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
+					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					}},
+					{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
 					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
+					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
+					{Path: `type`, Type: `string`, Desc: `type`},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 			},
 			HasBody:   false,
@@ -868,14 +868,14 @@ Returns the newly created pull request comment.`,
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
-					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
 					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -883,17 +883,17 @@ Returns the newly created pull request comment.`,
 				}},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
 				{Path: `pullrequest`, Type: `string`, Desc: `pullrequest`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
+					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
 						{Path: `created_on`, Type: `string`, Desc: `created_on`},
 						{Path: `display_name`, Type: `string`, Desc: `display_name`},
 						{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					}},
-					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
-					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -902,29 +902,32 @@ Returns the newly created pull request comment.`,
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
 				{Path: `pullrequest`, Type: `string`, Desc: `pullrequest`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 					{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
-					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `display_name`, Type: `string`, Desc: `display_name`},
-						{Path: `uuid`, Type: `string`, Desc: `uuid`},
-						{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
+					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
+					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `hash`, Type: `string`, Desc: `hash`},
 					}},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
@@ -939,29 +942,26 @@ Returns the newly created pull request comment.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 						{Path: `approved`, Type: `bool`, Desc: `approved`},
-						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 						{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					}},
-					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
-					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
-					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-					}},
-					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `hash`, Type: `string`, Desc: `hash`},
-					}},
-					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
-					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
-					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
 					{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
-					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
+					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+						{Path: `created_on`, Type: `string`, Desc: `created_on`},
+						{Path: `display_name`, Type: `string`, Desc: `display_name`},
+						{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					}},
 					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
+					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					}},
 					{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
-					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
-					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
+					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
@@ -996,29 +996,32 @@ Returns the newly created pull request comment.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
 				{Path: `pullrequest`, Type: `string`, Desc: `pullrequest`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 					{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
-					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `created_on`, Type: `string`, Desc: `created_on`},
-						{Path: `display_name`, Type: `string`, Desc: `display_name`},
-						{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
+					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
+					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `hash`, Type: `string`, Desc: `hash`},
 					}},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
@@ -1033,33 +1036,30 @@ Returns the newly created pull request comment.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 						{Path: `approved`, Type: `bool`, Desc: `approved`},
-						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 						{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					}},
-					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
-					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
-					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-					}},
-					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `hash`, Type: `string`, Desc: `hash`},
-					}},
-					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
-					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
-					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
 					{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
-					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
+					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+						{Path: `created_on`, Type: `string`, Desc: `created_on`},
+						{Path: `display_name`, Type: `string`, Desc: `display_name`},
+						{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					}},
 					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
+					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					}},
 					{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
-					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
-					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
+					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
+					{Path: `type`, Type: `string`, Desc: `type`},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1089,32 +1089,32 @@ Returns the newly created pull request comment.`,
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
 				{Path: `pullrequest`, Type: `string`, Desc: `pullrequest`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
+					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
 						{Path: `created_on`, Type: `string`, Desc: `created_on`},
 						{Path: `display_name`, Type: `string`, Desc: `display_name`},
 						{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					}},
-					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
-					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1123,41 +1123,32 @@ Returns the newly created pull request comment.`,
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
 				{Path: `pullrequest`, Type: `string`, Desc: `pullrequest`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
+					{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
+					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
+					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `hash`, Type: `string`, Desc: `hash`},
-					}},
-					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
-					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
-					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
-					{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
-					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
-					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
-					{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
-					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
-					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
-					{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
-					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `display_name`, Type: `string`, Desc: `display_name`},
-						{Path: `uuid`, Type: `string`, Desc: `uuid`},
-						{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					}},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
@@ -1173,20 +1164,29 @@ Returns the newly created pull request comment.`,
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
 						{Path: `approved`, Type: `bool`, Desc: `approved`},
-						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 						{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					}},
-					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
-					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
+					{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
+					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+						{Path: `created_on`, Type: `string`, Desc: `created_on`},
+						{Path: `display_name`, Type: `string`, Desc: `display_name`},
+						{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					}},
+					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					}},
+					{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
+					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
+					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
+					{Path: `type`, Type: `string`, Desc: `type`},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1310,9 +1310,9 @@ branch when the pull requests gets accepted.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `author`, Type: `string`, Desc: `author`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 				{Path: `closed_by`, Type: `string`, Desc: `closed_by`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1346,17 +1346,17 @@ branch when the pull requests gets accepted.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 				{Path: `source`, Type: `string`, Desc: `source`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1365,8 +1365,8 @@ branch when the pull requests gets accepted.`,
 				}},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
 				{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
@@ -1478,10 +1478,10 @@ with the revspec that corresponds to the pull request.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
@@ -1497,8 +1497,8 @@ with the revspec that corresponds to the pull request.`,
 				}},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
 				{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
@@ -1669,28 +1669,28 @@ See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more det
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `comment`, Type: `string`, Desc: `comment`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					}},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `deleted`, Type: `bool`, Desc: `deleted`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 					{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 						{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 						{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
+						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 					}},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `id`, Type: `int`, Desc: `id`},
 					}},
-					{Path: `id`, Type: `int`, Desc: `id`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-					}},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1735,15 +1735,15 @@ will cause the task to appear below the comment on a pull request when viewed in
 			BodyFields: []BodyFieldDef{
 				{Path: `comment`, Type: `string`, Desc: `comment`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					}},
 					{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 						{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 						{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
+						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 					}},
 					{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `id`, Type: `int`, Desc: `id`},
@@ -1757,34 +1757,34 @@ will cause the task to appear below the comment on a pull request when viewed in
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `comment`, Type: `string`, Desc: `comment`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `id`, Type: `int`, Desc: `id`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					}},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `deleted`, Type: `bool`, Desc: `deleted`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 					{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 						{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 						{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+						{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 					}},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `id`, Type: `int`, Desc: `id`},
 					}},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
@@ -1819,28 +1819,28 @@ will cause the task to appear below the comment on a pull request when viewed in
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `comment`, Type: `string`, Desc: `comment`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					}},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `deleted`, Type: `bool`, Desc: `deleted`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 					{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 						{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 						{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
+						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 					}},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `id`, Type: `int`, Desc: `id`},
 					}},
-					{Path: `id`, Type: `int`, Desc: `id`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-					}},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1886,28 +1886,28 @@ will cause the task to appear below the comment on a pull request when viewed in
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `comment`, Type: `string`, Desc: `comment`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					}},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `deleted`, Type: `bool`, Desc: `deleted`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 					{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 						{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 						{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 						{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 					}},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `id`, Type: `int`, Desc: `id`},
 					}},
-					{Path: `id`, Type: `int`, Desc: `id`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-					}},
-					{Path: `deleted`, Type: `bool`, Desc: `deleted`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -2006,17 +2006,17 @@ will cause the task to appear below the comment on a pull request when viewed in
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 				{Path: `source`, Type: `string`, Desc: `source`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -2093,10 +2093,10 @@ will cause the task to appear below the comment on a pull request when viewed in
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
@@ -2112,8 +2112,8 @@ will cause the task to appear below the comment on a pull request when viewed in
 				}},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
 				{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
@@ -2255,11 +2255,11 @@ new pull request that is created.`,
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `has_2fa_enabled`, Type: `bool`, Desc: `has_2fa_enabled`},
-					{Path: `nickname`, Type: `string`, Desc: `Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.`},
-					{Path: `is_staff`, Type: `bool`, Desc: `is_staff`},
 					{Path: `account_id`, Type: `string`, Desc: `The user's Atlassian account ID.`},
 					{Path: `account_status`, Type: `string`, Desc: `The status of the account. Currently the only possible value is "active", but more values may be added in the future.`},
+					{Path: `has_2fa_enabled`, Type: `bool`, Desc: `has_2fa_enabled`},
+					{Path: `is_staff`, Type: `bool`, Desc: `is_staff`},
+					{Path: `nickname`, Type: `string`, Desc: `Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.`},
 				}},
 			},
 			HasBody:   false,
@@ -2285,15 +2285,15 @@ new pull request that is created.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `author`, Type: `string`, Desc: `author`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 				{Path: `closed_by`, Type: `string`, Desc: `closed_by`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
@@ -2321,10 +2321,10 @@ new pull request that is created.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
-					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
@@ -2425,10 +2425,10 @@ new pull request that is created.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
-					{Path: `approved`, Type: `bool`, Desc: `approved`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
@@ -2444,8 +2444,8 @@ new pull request that is created.`,
 				}},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
 				{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
@@ -2492,9 +2492,9 @@ new pull request that is created.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `author`, Type: `string`, Desc: `author`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 				{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 				{Path: `closed_by`, Type: `string`, Desc: `closed_by`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -2528,10 +2528,10 @@ new pull request that is created.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
@@ -2607,9 +2607,9 @@ Only open pull requests can be mutated.`,
 				}},
 				{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 				{Path: `closed_by`, Type: `string`, Desc: `closed_by`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
@@ -2637,17 +2637,17 @@ Only open pull requests can be mutated.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `source`, Type: `string`, Desc: `source`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -2766,38 +2766,25 @@ request.`,
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
 				{Path: `pullrequest`, Type: `string`, Desc: `pullrequest`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
-					}},
+					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
+					{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
+					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
+					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `hash`, Type: `string`, Desc: `hash`},
-					}},
-					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
-					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
-					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
-					{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
-					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
-					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
-					{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
-					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
-					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
-					{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
-					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `created_on`, Type: `string`, Desc: `created_on`},
-						{Path: `display_name`, Type: `string`, Desc: `display_name`},
-						{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					}},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
@@ -2812,23 +2799,36 @@ request.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 						{Path: `approved`, Type: `bool`, Desc: `approved`},
-						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 						{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					}},
-					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+					{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
+					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+						{Path: `created_on`, Type: `string`, Desc: `created_on`},
+						{Path: `display_name`, Type: `string`, Desc: `display_name`},
+						{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					}},
+					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
+					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					}},
+					{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
 					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
+					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
+					{Path: `type`, Type: `string`, Desc: `type`},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 			},
 			HasBody:   false,
@@ -2853,14 +2853,14 @@ Returns the newly created pull request comment.`,
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
-					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
 					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -2868,17 +2868,17 @@ Returns the newly created pull request comment.`,
 				}},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
 				{Path: `pullrequest`, Type: `string`, Desc: `pullrequest`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
+					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
 						{Path: `created_on`, Type: `string`, Desc: `created_on`},
 						{Path: `display_name`, Type: `string`, Desc: `display_name`},
 						{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					}},
-					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
-					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -2887,29 +2887,32 @@ Returns the newly created pull request comment.`,
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
 				{Path: `pullrequest`, Type: `string`, Desc: `pullrequest`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 					{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
-					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `display_name`, Type: `string`, Desc: `display_name`},
-						{Path: `uuid`, Type: `string`, Desc: `uuid`},
-						{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
+					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
+					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `hash`, Type: `string`, Desc: `hash`},
 					}},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
@@ -2924,29 +2927,26 @@ Returns the newly created pull request comment.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 						{Path: `approved`, Type: `bool`, Desc: `approved`},
-						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 						{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					}},
-					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
-					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
-					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-					}},
-					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `hash`, Type: `string`, Desc: `hash`},
-					}},
-					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
-					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
-					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
 					{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
-					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
+					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+						{Path: `created_on`, Type: `string`, Desc: `created_on`},
+						{Path: `display_name`, Type: `string`, Desc: `display_name`},
+						{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					}},
 					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
+					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					}},
 					{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
-					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
-					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
+					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
@@ -2981,29 +2981,32 @@ Returns the newly created pull request comment.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
 				{Path: `pullrequest`, Type: `string`, Desc: `pullrequest`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 					{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
-					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `created_on`, Type: `string`, Desc: `created_on`},
-						{Path: `display_name`, Type: `string`, Desc: `display_name`},
-						{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
+					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
+					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `hash`, Type: `string`, Desc: `hash`},
 					}},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
@@ -3018,33 +3021,30 @@ Returns the newly created pull request comment.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 						{Path: `approved`, Type: `bool`, Desc: `approved`},
-						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 						{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					}},
-					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
-					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
-					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-					}},
-					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `hash`, Type: `string`, Desc: `hash`},
-					}},
-					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
-					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
-					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
 					{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
-					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
+					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+						{Path: `created_on`, Type: `string`, Desc: `created_on`},
+						{Path: `display_name`, Type: `string`, Desc: `display_name`},
+						{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					}},
 					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
+					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					}},
 					{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
-					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
-					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
+					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
+					{Path: `type`, Type: `string`, Desc: `type`},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -3074,32 +3074,32 @@ Returns the newly created pull request comment.`,
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
 				{Path: `pullrequest`, Type: `string`, Desc: `pullrequest`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
+					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
 						{Path: `created_on`, Type: `string`, Desc: `created_on`},
 						{Path: `display_name`, Type: `string`, Desc: `display_name`},
 						{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					}},
-					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
-					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -3108,41 +3108,32 @@ Returns the newly created pull request comment.`,
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
 				{Path: `pullrequest`, Type: `string`, Desc: `pullrequest`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
+					{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
+					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
+					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
+					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `hash`, Type: `string`, Desc: `hash`},
-					}},
-					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
-					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was created.`},
-					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
-					{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
-					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
-					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
-					{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
-					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
-					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
-					{Path: `comment_count`, Type: `int`, Desc: `The number of comments for a specific pull request.`},
-					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `display_name`, Type: `string`, Desc: `display_name`},
-						{Path: `uuid`, Type: `string`, Desc: `uuid`},
-						{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					}},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
@@ -3158,20 +3149,29 @@ Returns the newly created pull request comment.`,
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
 						{Path: `approved`, Type: `bool`, Desc: `approved`},
-						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 						{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					}},
-					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
-					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
+					{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
+					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
+					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+						{Path: `created_on`, Type: `string`, Desc: `created_on`},
+						{Path: `display_name`, Type: `string`, Desc: `display_name`},
+						{Path: `uuid`, Type: `string`, Desc: `uuid`},
+					}},
+					{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					}},
+					{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
+					{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
+					{Path: `updated_on`, Type: `string`, Desc: `The ISO8601 timestamp the request was last updated.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
+					{Path: `type`, Type: `string`, Desc: `type`},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -3295,9 +3295,9 @@ branch when the pull requests gets accepted.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `author`, Type: `string`, Desc: `author`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 				{Path: `closed_by`, Type: `string`, Desc: `closed_by`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -3331,17 +3331,17 @@ branch when the pull requests gets accepted.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 				{Path: `source`, Type: `string`, Desc: `source`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -3350,8 +3350,8 @@ branch when the pull requests gets accepted.`,
 				}},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
 				{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
@@ -3463,10 +3463,10 @@ with the revspec that corresponds to the pull request.`,
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
@@ -3482,8 +3482,8 @@ with the revspec that corresponds to the pull request.`,
 				}},
 				{Path: `state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `task_count`, Type: `int`, Desc: `The number of open tasks for a specific pull request.`},
 				{Path: `title`, Type: `string`, Desc: `Title of the pull request.`},
@@ -3654,28 +3654,28 @@ See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more det
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `comment`, Type: `string`, Desc: `comment`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					}},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `deleted`, Type: `bool`, Desc: `deleted`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 					{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 						{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 						{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
+						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 					}},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `id`, Type: `int`, Desc: `id`},
 					}},
-					{Path: `id`, Type: `int`, Desc: `id`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-					}},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -3720,15 +3720,15 @@ will cause the task to appear below the comment on a pull request when viewed in
 			BodyFields: []BodyFieldDef{
 				{Path: `comment`, Type: `string`, Desc: `comment`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					}},
 					{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 						{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 						{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
+						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 					}},
 					{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `id`, Type: `int`, Desc: `id`},
@@ -3742,34 +3742,34 @@ will cause the task to appear below the comment on a pull request when viewed in
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `comment`, Type: `string`, Desc: `comment`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `id`, Type: `int`, Desc: `id`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					}},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `deleted`, Type: `bool`, Desc: `deleted`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 					{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 						{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 						{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+						{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 					}},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `id`, Type: `int`, Desc: `id`},
 					}},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
+					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
@@ -3804,28 +3804,28 @@ will cause the task to appear below the comment on a pull request when viewed in
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `comment`, Type: `string`, Desc: `comment`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					}},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `deleted`, Type: `bool`, Desc: `deleted`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 					{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 						{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 						{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
+						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 					}},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `id`, Type: `int`, Desc: `id`},
 					}},
-					{Path: `id`, Type: `int`, Desc: `id`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-					}},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -3871,28 +3871,28 @@ will cause the task to appear below the comment on a pull request when viewed in
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `comment`, Type: `string`, Desc: `comment`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					}},
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `deleted`, Type: `bool`, Desc: `deleted`},
+					{Path: `id`, Type: `int`, Desc: `id`},
 					{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 						{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+						{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 						{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 						{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
+						{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 					}},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 					{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `id`, Type: `int`, Desc: `id`},
 					}},
-					{Path: `id`, Type: `int`, Desc: `id`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-					}},
-					{Path: `deleted`, Type: `bool`, Desc: `deleted`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -3991,17 +3991,17 @@ will cause the task to appear below the comment on a pull request when viewed in
         the API only returns this list when an API requests a pull request by
         id.
         `, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `queued`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is queued`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
-					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				}},
 				{Path: `source`, Type: `string`, Desc: `source`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{

@@ -630,6 +630,12 @@ func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
 			ElementType: types.StringType,
 		}
 	}
+	if bf.Type == "int" {
+		return schema.Int64Attribute{
+			Description: desc,
+			Optional:    true,
+		}
+	}
 	return schema.StringAttribute{
 		Description: desc,
 		Optional:    true,
@@ -687,6 +693,12 @@ func responseFieldAttr(rf BodyFieldDef) schema.Attribute {
 			ElementType: types.StringType,
 		}
 	}
+	if rf.Type == "int" {
+		return schema.Int64Attribute{
+			Description: desc,
+			Computed:    true,
+		}
+	}
 	return schema.StringAttribute{
 		Description: desc,
 		Computed:    true,
@@ -697,6 +709,8 @@ func mergeResponseAttr(existing schema.Attribute, rf BodyFieldDef) schema.Attrib
 	switch sa := existing.(type) {
 	case schema.StringAttribute:
 		return mergeStringResponseAttr(sa, rf)
+	case schema.Int64Attribute:
+		return mergeInt64ResponseAttr(sa, rf)
 	case schema.SingleNestedAttribute:
 		return mergeSingleNestedResponseAttr(sa, rf)
 	case schema.ListNestedAttribute:
@@ -709,6 +723,15 @@ func mergeResponseAttr(existing schema.Attribute, rf BodyFieldDef) schema.Attrib
 }
 
 func mergeStringResponseAttr(attr schema.StringAttribute, rf BodyFieldDef) schema.Attribute {
+	if !canMergeComputedAttr(attr.Computed, attr.Required) {
+		return attr
+	}
+	attr.Computed = true
+	attr.Description = fieldDescription(rf)
+	return attr
+}
+
+func mergeInt64ResponseAttr(attr schema.Int64Attribute, rf BodyFieldDef) schema.Attribute {
 	if !canMergeComputedAttr(attr.Computed, attr.Required) {
 		return attr
 	}
@@ -833,6 +856,8 @@ func bodyFieldValue(ctx context.Context, source stateAccessor, bf BodyFieldDef, 
 	case bf.IsArray:
 		arr := readSimpleList(ctx, source, attrName, diags)
 		return arr, arr != nil
+	case bf.Type == "int":
+		return readBodyInt64Value(ctx, source, attrName, diags)
 	default:
 		return readBodyStringValue(ctx, source, attrName, diags)
 	}
@@ -846,6 +871,16 @@ func readBodyStringValue(ctx context.Context, source stateAccessor, attrName str
 		return "", false
 	}
 	return val.ValueString(), true
+}
+
+func readBodyInt64Value(ctx context.Context, source stateAccessor, attrName string, diags *diag.Diagnostics) (int64, bool) {
+	var val types.Int64
+	d := source.GetAttribute(ctx, attrPath(attrName), &val)
+	diags.Append(d...)
+	if d.HasError() || val.IsNull() || val.IsUnknown() {
+		return 0, false
+	}
+	return val.ValueInt64(), true
 }
 
 func marshalBodyObject(diags *diag.Diagnostics, bodyObj map[string]any) string {
@@ -933,12 +968,25 @@ func copyBodyAttributes(ctx context.Context, fields []BodyFieldDef, seen map[str
 		if bf.IsArray || bf.IsObject {
 			continue
 		}
-		copyStringAttribute(ctx, attrName, source, target, diags)
+		if bf.Type == "int" {
+			copyInt64Attribute(ctx, attrName, source, target, diags)
+		} else {
+			copyStringAttribute(ctx, attrName, source, target, diags)
+		}
 	}
 }
 
 func copyStringAttribute(ctx context.Context, attrName string, source, target stateAccessor, diags *diag.Diagnostics) {
 	var val types.String
+	d := source.GetAttribute(ctx, attrPath(attrName), &val)
+	diags.Append(d...)
+	if !d.HasError() && !val.IsNull() && !val.IsUnknown() {
+		diags.Append(target.SetAttribute(ctx, attrPath(attrName), val)...)
+	}
+}
+
+func copyInt64Attribute(ctx context.Context, attrName string, source, target stateAccessor, diags *diag.Diagnostics) {
+	var val types.Int64
 	d := source.GetAttribute(ctx, attrPath(attrName), &val)
 	diags.Append(d...)
 	if !d.HasError() && !val.IsNull() && !val.IsUnknown() {
@@ -1000,6 +1048,17 @@ func responseFieldValue(val any, rf BodyFieldDef) (any, bool) {
 			return nil, false
 		}
 		return buildSimpleListFromResponse(arr), true
+	}
+	if rf.Type == "int" {
+		switch v := val.(type) {
+		case float64:
+			return types.Int64Value(int64(v)), true
+		case int64:
+			return types.Int64Value(v), true
+		case int:
+			return types.Int64Value(int64(v)), true
+		}
+		return nil, false
 	}
 	return types.StringValue(stringifyComplexValue(val)), true
 }

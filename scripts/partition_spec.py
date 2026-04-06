@@ -725,6 +725,33 @@ def post_process_schema(out: dict) -> None:
                 "$ref": "#/components/schemas/pullrequest_endpoint_branch"
             }
 
+    # 3. Inject missing requestBody on webhook create/update operations.
+    # The Bitbucket OpenAPI spec omits requestBody on POST/PUT hooks even
+    # though url + events are required by the API. Injecting it here lets the
+    # generator expose those fields as regular Terraform / CLI attributes instead
+    # of falling back to the raw request_body escape hatch.
+    webhook_request_body = {
+        "content": {
+            "application/json": {
+                "schema": {"$ref": "#/components/schemas/webhook_subscription"},
+            },
+        },
+        "description": "The webhook subscription to create or update.",
+        "required": True,
+    }
+    _webhook_write_ops = {
+        "/repositories/{workspace}/{repo_slug}/hooks": {"post"},
+        "/repositories/{workspace}/{repo_slug}/hooks/{uid}": {"put"},
+        "/workspaces/{workspace}/hooks": {"post"},
+        "/workspaces/{workspace}/hooks/{uid}": {"put"},
+    }
+    for _path, _methods in _webhook_write_ops.items():
+        _path_item = out.get("paths", {}).get(_path, {})
+        for _method in _methods:
+            _op = _path_item.get(_method)
+            if _op is not None and "requestBody" not in _op:
+                _op["requestBody"] = copy.deepcopy(webhook_request_body)
+
 
 if __name__ == "__main__":
     main()

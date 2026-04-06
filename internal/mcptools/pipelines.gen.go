@@ -213,20 +213,6 @@ for specific details.
 				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 				{Path: `repository.is_private`, Type: `bool`, Desc: `is_private`},
 				{Path: `repository.description`, Type: `string`, Desc: `description`},
-				{Path: `repository.language`, Type: `string`, Desc: `language`},
-				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-				{Path: `repository.name`, Type: `string`, Desc: `name`},
-				{Path: `repository.size`, Type: `int`, Desc: `size`},
-				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
-				{Path: `repository.has_issues`, Type: `bool`, Desc: `
-The issue tracker for this repository is enabled. Issue Tracker
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
 				{Path: `repository.fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -235,6 +221,23 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `language`},
+				{Path: `repository.name`, Type: `string`, Desc: `name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
+				{Path: `repository.size`, Type: `int`, Desc: `size`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the pipeline.`},
 				{Path: `variables`, Type: `string`, Desc: `The variables for the pipeline.`},
 			},
@@ -552,12 +555,7 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `enabled`, Type: `bool`, Desc: `Whether Pipelines is enabled for the repository.`},
-				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
-				{Path: `repository.has_issues`, Type: `bool`, Desc: `
-The issue tracker for this repository is enabled. Issue Tracker
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
+				{Path: `repository.description`, Type: `string`, Desc: `description`},
 				{Path: `repository.fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -566,18 +564,23 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-				{Path: `repository.is_private`, Type: `bool`, Desc: `is_private`},
-				{Path: `repository.description`, Type: `string`, Desc: `description`},
-				{Path: `repository.language`, Type: `string`, Desc: `language`},
+				{Path: `repository.has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
 				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
 The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `is_private`},
+				{Path: `repository.language`, Type: `string`, Desc: `language`},
 				{Path: `repository.name`, Type: `string`, Desc: `name`},
+				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
 				{Path: `repository.size`, Type: `int`, Desc: `size`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 			},
 			HasBody:   true,
 			Paginated: false,
@@ -627,10 +630,10 @@ administered through admin.atlassian.com.
 			BodyFields: []BodyFieldDef{
 				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`},
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
-				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
-				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
 				{Path: `target.ref_name`, Type: `string`, Desc: `The name of the reference.`},
 				{Path: `target.ref_type`, Type: `string`, Desc: `The type of reference (branch only). [branch]`},
+				{Path: `target.selector.pattern`, Type: `string`, Desc: `The name of the matching pipeline definition.`},
+				{Path: `target.selector.type`, Type: `string`, Desc: `The type of selector. [branches, tags, bookmarks, default, custom]`},
 			},
 			HasBody:   true,
 			Paginated: false,
@@ -772,8 +775,8 @@ administered through admin.atlassian.com.
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
 				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
+				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
 				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
 				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
@@ -809,6 +812,8 @@ administered through admin.atlassian.com.
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
+				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
+				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
 				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
 				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
 				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},

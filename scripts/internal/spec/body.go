@@ -2,6 +2,7 @@ package spec
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -232,8 +233,15 @@ func resolveAllOf(schemas map[string]any, allOfRaw any, prefix string, visited m
 }
 
 func flattenProperties(schemas map[string]any, props map[string]any, prefix string, visited map[string]bool, opts FieldResolveOpts) []BodyField {
+	keys := make([]string, 0, len(props))
+	for k := range props {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
 	var fields []BodyField
-	for name, propRaw := range props {
+	for _, name := range keys {
+		propRaw := props[name]
 		if opts.SkipPropNames[name] {
 			continue
 		}

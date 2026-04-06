@@ -983,22 +983,22 @@ func newPRCreateACommentOnAPullRequestCmd() *cobra.Command {
 		pullRequestId                    int
 		repoSlug                         string
 		workspace                        string
-		bodyContentRaw                   string
 		bodyContentMarkup                string
+		bodyContentRaw                   string
 		bodyInlineFrom                   int
-		bodyInlineTo                     int
+		bodyInlinePath                   string
 		bodyInlineStartFrom              int
 		bodyInlineStartTo                int
-		bodyInlinePath                   string
+		bodyInlineTo                     int
 		bodyParentId                     int
 		bodyPending                      bool
-		bodyPullrequestTitle             string
-		bodyPullrequestState             string
-		bodyPullrequestDescription       string
-		bodyPullrequestReviewers         string
 		bodyPullrequestCloseSourceBranch bool
-		bodyPullrequestReason            string
+		bodyPullrequestDescription       string
 		bodyPullrequestDraft             bool
+		bodyPullrequestReason            string
+		bodyPullrequestReviewers         string
+		bodyPullrequestState             string
+		bodyPullrequestTitle             string
 		bodyPullrequestId                int
 		bodyResolutionType               string
 		body                             string
@@ -1032,17 +1032,17 @@ Returns the newly created pull request comment.`,
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyContentRaw != "" {
-					handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
-				}
 				if bodyContentMarkup != "" {
 					handlers.SetNested(bodyObj, "content.markup", bodyContentMarkup)
+				}
+				if bodyContentRaw != "" {
+					handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
 				}
 				if bodyInlineFrom != 0 {
 					handlers.SetNested(bodyObj, "inline.from", bodyInlineFrom)
 				}
-				if bodyInlineTo != 0 {
-					handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
+				if bodyInlinePath != "" {
+					handlers.SetNested(bodyObj, "inline.path", bodyInlinePath)
 				}
 				if bodyInlineStartFrom != 0 {
 					handlers.SetNested(bodyObj, "inline.start_from", bodyInlineStartFrom)
@@ -1050,8 +1050,8 @@ Returns the newly created pull request comment.`,
 				if bodyInlineStartTo != 0 {
 					handlers.SetNested(bodyObj, "inline.start_to", bodyInlineStartTo)
 				}
-				if bodyInlinePath != "" {
-					handlers.SetNested(bodyObj, "inline.path", bodyInlinePath)
+				if bodyInlineTo != 0 {
+					handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
 				}
 				if bodyParentId != 0 {
 					handlers.SetNested(bodyObj, "parent.id", bodyParentId)
@@ -1059,26 +1059,26 @@ Returns the newly created pull request comment.`,
 				if bodyPending {
 					handlers.SetNested(bodyObj, "pending", bodyPending)
 				}
-				if bodyPullrequestTitle != "" {
-					handlers.SetNested(bodyObj, "pullrequest.title", bodyPullrequestTitle)
-				}
-				if bodyPullrequestState != "" {
-					handlers.SetNested(bodyObj, "pullrequest.state", bodyPullrequestState)
+				if bodyPullrequestCloseSourceBranch {
+					handlers.SetNested(bodyObj, "pullrequest.close_source_branch", bodyPullrequestCloseSourceBranch)
 				}
 				if bodyPullrequestDescription != "" {
 					handlers.SetNested(bodyObj, "pullrequest.description", bodyPullrequestDescription)
 				}
-				if bodyPullrequestReviewers != "" {
-					handlers.SetNested(bodyObj, "pullrequest.reviewers", bodyPullrequestReviewers)
-				}
-				if bodyPullrequestCloseSourceBranch {
-					handlers.SetNested(bodyObj, "pullrequest.close_source_branch", bodyPullrequestCloseSourceBranch)
+				if bodyPullrequestDraft {
+					handlers.SetNested(bodyObj, "pullrequest.draft", bodyPullrequestDraft)
 				}
 				if bodyPullrequestReason != "" {
 					handlers.SetNested(bodyObj, "pullrequest.reason", bodyPullrequestReason)
 				}
-				if bodyPullrequestDraft {
-					handlers.SetNested(bodyObj, "pullrequest.draft", bodyPullrequestDraft)
+				if bodyPullrequestReviewers != "" {
+					handlers.SetNested(bodyObj, "pullrequest.reviewers", bodyPullrequestReviewers)
+				}
+				if bodyPullrequestState != "" {
+					handlers.SetNested(bodyObj, "pullrequest.state", bodyPullrequestState)
+				}
+				if bodyPullrequestTitle != "" {
+					handlers.SetNested(bodyObj, "pullrequest.title", bodyPullrequestTitle)
 				}
 				if bodyPullrequestId != 0 {
 					handlers.SetNested(bodyObj, "pullrequest.id", bodyPullrequestId)
@@ -1104,22 +1104,22 @@ Returns the newly created pull request comment.`,
 	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
 	cmd.Flags().StringVar(&bodyContentMarkup, "content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
+	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
 	cmd.Flags().IntVar(&bodyInlineFrom, "inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
-	cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
+	cmd.Flags().StringVar(&bodyInlinePath, "inline-path", "", `The path of the file this comment is anchored to.`)
 	cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
 	cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
-	cmd.Flags().StringVar(&bodyInlinePath, "inline-path", "", `The path of the file this comment is anchored to.`)
+	cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
 	cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `id`)
 	cmd.Flags().BoolVar(&bodyPending, "pending", false, `pending`)
-	cmd.Flags().StringVar(&bodyPullrequestTitle, "pullrequest-title", "", `Title of the pull request.`)
-	cmd.Flags().StringVar(&bodyPullrequestState, "pullrequest-state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)
-	cmd.Flags().StringVar(&bodyPullrequestDescription, "pullrequest-description", "", `Explains what the pull request does.`)
-	cmd.Flags().StringVar(&bodyPullrequestReviewers, "pullrequest-reviewers", "", "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.")
 	cmd.Flags().BoolVar(&bodyPullrequestCloseSourceBranch, "pullrequest-close-source-branch", false, `A boolean flag indicating if merging the pull request closes the source branch.`)
-	cmd.Flags().StringVar(&bodyPullrequestReason, "pullrequest-reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
+	cmd.Flags().StringVar(&bodyPullrequestDescription, "pullrequest-description", "", `Explains what the pull request does.`)
 	cmd.Flags().BoolVar(&bodyPullrequestDraft, "pullrequest-draft", false, `A boolean flag indicating whether the pull request is a draft.`)
+	cmd.Flags().StringVar(&bodyPullrequestReason, "pullrequest-reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
+	cmd.Flags().StringVar(&bodyPullrequestReviewers, "pullrequest-reviewers", "", "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.")
+	cmd.Flags().StringVar(&bodyPullrequestState, "pullrequest-state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)
+	cmd.Flags().StringVar(&bodyPullrequestTitle, "pullrequest-title", "", `Title of the pull request.`)
 	cmd.Flags().IntVar(&bodyPullrequestId, "pullrequest-id", 0, `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`)
 	cmd.Flags().StringVar(&bodyResolutionType, "resolution-type", "", `type`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
@@ -1190,22 +1190,22 @@ func newPRUpdateACommentOnAPullRequestCmd() *cobra.Command {
 		pullRequestId                    int
 		repoSlug                         string
 		workspace                        string
-		bodyContentRaw                   string
 		bodyContentMarkup                string
-		bodyInlinePath                   string
+		bodyContentRaw                   string
 		bodyInlineFrom                   int
-		bodyInlineTo                     int
+		bodyInlinePath                   string
 		bodyInlineStartFrom              int
 		bodyInlineStartTo                int
+		bodyInlineTo                     int
 		bodyParentId                     int
 		bodyPending                      bool
-		bodyPullrequestDescription       string
-		bodyPullrequestReviewers         string
 		bodyPullrequestCloseSourceBranch bool
-		bodyPullrequestReason            string
+		bodyPullrequestDescription       string
 		bodyPullrequestDraft             bool
-		bodyPullrequestTitle             string
+		bodyPullrequestReason            string
+		bodyPullrequestReviewers         string
 		bodyPullrequestState             string
+		bodyPullrequestTitle             string
 		bodyPullrequestId                int
 		bodyResolutionType               string
 		body                             string
@@ -1241,20 +1241,17 @@ func newPRUpdateACommentOnAPullRequestCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyContentRaw != "" {
-					handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
-				}
 				if bodyContentMarkup != "" {
 					handlers.SetNested(bodyObj, "content.markup", bodyContentMarkup)
 				}
-				if bodyInlinePath != "" {
-					handlers.SetNested(bodyObj, "inline.path", bodyInlinePath)
+				if bodyContentRaw != "" {
+					handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
 				}
 				if bodyInlineFrom != 0 {
 					handlers.SetNested(bodyObj, "inline.from", bodyInlineFrom)
 				}
-				if bodyInlineTo != 0 {
-					handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
+				if bodyInlinePath != "" {
+					handlers.SetNested(bodyObj, "inline.path", bodyInlinePath)
 				}
 				if bodyInlineStartFrom != 0 {
 					handlers.SetNested(bodyObj, "inline.start_from", bodyInlineStartFrom)
@@ -1262,32 +1259,35 @@ func newPRUpdateACommentOnAPullRequestCmd() *cobra.Command {
 				if bodyInlineStartTo != 0 {
 					handlers.SetNested(bodyObj, "inline.start_to", bodyInlineStartTo)
 				}
+				if bodyInlineTo != 0 {
+					handlers.SetNested(bodyObj, "inline.to", bodyInlineTo)
+				}
 				if bodyParentId != 0 {
 					handlers.SetNested(bodyObj, "parent.id", bodyParentId)
 				}
 				if bodyPending {
 					handlers.SetNested(bodyObj, "pending", bodyPending)
 				}
-				if bodyPullrequestDescription != "" {
-					handlers.SetNested(bodyObj, "pullrequest.description", bodyPullrequestDescription)
-				}
-				if bodyPullrequestReviewers != "" {
-					handlers.SetNested(bodyObj, "pullrequest.reviewers", bodyPullrequestReviewers)
-				}
 				if bodyPullrequestCloseSourceBranch {
 					handlers.SetNested(bodyObj, "pullrequest.close_source_branch", bodyPullrequestCloseSourceBranch)
 				}
-				if bodyPullrequestReason != "" {
-					handlers.SetNested(bodyObj, "pullrequest.reason", bodyPullrequestReason)
+				if bodyPullrequestDescription != "" {
+					handlers.SetNested(bodyObj, "pullrequest.description", bodyPullrequestDescription)
 				}
 				if bodyPullrequestDraft {
 					handlers.SetNested(bodyObj, "pullrequest.draft", bodyPullrequestDraft)
 				}
-				if bodyPullrequestTitle != "" {
-					handlers.SetNested(bodyObj, "pullrequest.title", bodyPullrequestTitle)
+				if bodyPullrequestReason != "" {
+					handlers.SetNested(bodyObj, "pullrequest.reason", bodyPullrequestReason)
+				}
+				if bodyPullrequestReviewers != "" {
+					handlers.SetNested(bodyObj, "pullrequest.reviewers", bodyPullrequestReviewers)
 				}
 				if bodyPullrequestState != "" {
 					handlers.SetNested(bodyObj, "pullrequest.state", bodyPullrequestState)
+				}
+				if bodyPullrequestTitle != "" {
+					handlers.SetNested(bodyObj, "pullrequest.title", bodyPullrequestTitle)
 				}
 				if bodyPullrequestId != 0 {
 					handlers.SetNested(bodyObj, "pullrequest.id", bodyPullrequestId)
@@ -1314,22 +1314,22 @@ func newPRUpdateACommentOnAPullRequestCmd() *cobra.Command {
 	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
 	cmd.Flags().StringVar(&bodyContentMarkup, "content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
-	cmd.Flags().StringVar(&bodyInlinePath, "inline-path", "", `The path of the file this comment is anchored to.`)
+	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The text as it was typed by a user.`)
 	cmd.Flags().IntVar(&bodyInlineFrom, "inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
-	cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
+	cmd.Flags().StringVar(&bodyInlinePath, "inline-path", "", `The path of the file this comment is anchored to.`)
 	cmd.Flags().IntVar(&bodyInlineStartFrom, "inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
 	cmd.Flags().IntVar(&bodyInlineStartTo, "inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
+	cmd.Flags().IntVar(&bodyInlineTo, "inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
 	cmd.Flags().IntVar(&bodyParentId, "parent-id", 0, `id`)
 	cmd.Flags().BoolVar(&bodyPending, "pending", false, `pending`)
-	cmd.Flags().StringVar(&bodyPullrequestDescription, "pullrequest-description", "", `Explains what the pull request does.`)
-	cmd.Flags().StringVar(&bodyPullrequestReviewers, "pullrequest-reviewers", "", "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.")
 	cmd.Flags().BoolVar(&bodyPullrequestCloseSourceBranch, "pullrequest-close-source-branch", false, `A boolean flag indicating if merging the pull request closes the source branch.`)
-	cmd.Flags().StringVar(&bodyPullrequestReason, "pullrequest-reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
+	cmd.Flags().StringVar(&bodyPullrequestDescription, "pullrequest-description", "", `Explains what the pull request does.`)
 	cmd.Flags().BoolVar(&bodyPullrequestDraft, "pullrequest-draft", false, `A boolean flag indicating whether the pull request is a draft.`)
-	cmd.Flags().StringVar(&bodyPullrequestTitle, "pullrequest-title", "", `Title of the pull request.`)
+	cmd.Flags().StringVar(&bodyPullrequestReason, "pullrequest-reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
+	cmd.Flags().StringVar(&bodyPullrequestReviewers, "pullrequest-reviewers", "", "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.")
 	cmd.Flags().StringVar(&bodyPullrequestState, "pullrequest-state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)
+	cmd.Flags().StringVar(&bodyPullrequestTitle, "pullrequest-title", "", `Title of the pull request.`)
 	cmd.Flags().IntVar(&bodyPullrequestId, "pullrequest-id", 0, `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`)
 	cmd.Flags().StringVar(&bodyResolutionType, "resolution-type", "", `type`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
@@ -2139,14 +2139,14 @@ func newPRCreateATaskOnAPullRequestCmd() *cobra.Command {
 		pullRequestId              int
 		repoSlug                   string
 		workspace                  string
-		bodyCommentParentId        int
-		bodyCommentInlineStartTo   int
-		bodyCommentInlinePath      string
-		bodyCommentInlineFrom      int
-		bodyCommentInlineTo        int
-		bodyCommentInlineStartFrom int
-		bodyCommentContentRaw      string
 		bodyCommentContentMarkup   string
+		bodyCommentContentRaw      string
+		bodyCommentInlineFrom      int
+		bodyCommentInlinePath      string
+		bodyCommentInlineStartFrom int
+		bodyCommentInlineStartTo   int
+		bodyCommentInlineTo        int
+		bodyCommentParentId        int
 		bodyCommentId              int
 		bodyContentRaw             string
 		bodyPending                bool
@@ -2184,29 +2184,29 @@ will cause the task to appear below the comment on a pull request when viewed in
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyCommentParentId != 0 {
-					handlers.SetNested(bodyObj, "comment.parent.id", bodyCommentParentId)
-				}
-				if bodyCommentInlineStartTo != 0 {
-					handlers.SetNested(bodyObj, "comment.inline.start_to", bodyCommentInlineStartTo)
-				}
-				if bodyCommentInlinePath != "" {
-					handlers.SetNested(bodyObj, "comment.inline.path", bodyCommentInlinePath)
-				}
-				if bodyCommentInlineFrom != 0 {
-					handlers.SetNested(bodyObj, "comment.inline.from", bodyCommentInlineFrom)
-				}
-				if bodyCommentInlineTo != 0 {
-					handlers.SetNested(bodyObj, "comment.inline.to", bodyCommentInlineTo)
-				}
-				if bodyCommentInlineStartFrom != 0 {
-					handlers.SetNested(bodyObj, "comment.inline.start_from", bodyCommentInlineStartFrom)
+				if bodyCommentContentMarkup != "" {
+					handlers.SetNested(bodyObj, "comment.content.markup", bodyCommentContentMarkup)
 				}
 				if bodyCommentContentRaw != "" {
 					handlers.SetNested(bodyObj, "comment.content.raw", bodyCommentContentRaw)
 				}
-				if bodyCommentContentMarkup != "" {
-					handlers.SetNested(bodyObj, "comment.content.markup", bodyCommentContentMarkup)
+				if bodyCommentInlineFrom != 0 {
+					handlers.SetNested(bodyObj, "comment.inline.from", bodyCommentInlineFrom)
+				}
+				if bodyCommentInlinePath != "" {
+					handlers.SetNested(bodyObj, "comment.inline.path", bodyCommentInlinePath)
+				}
+				if bodyCommentInlineStartFrom != 0 {
+					handlers.SetNested(bodyObj, "comment.inline.start_from", bodyCommentInlineStartFrom)
+				}
+				if bodyCommentInlineStartTo != 0 {
+					handlers.SetNested(bodyObj, "comment.inline.start_to", bodyCommentInlineStartTo)
+				}
+				if bodyCommentInlineTo != 0 {
+					handlers.SetNested(bodyObj, "comment.inline.to", bodyCommentInlineTo)
+				}
+				if bodyCommentParentId != 0 {
+					handlers.SetNested(bodyObj, "comment.parent.id", bodyCommentParentId)
 				}
 				if bodyCommentId != 0 {
 					handlers.SetNested(bodyObj, "comment.id", bodyCommentId)
@@ -2235,14 +2235,14 @@ will cause the task to appear below the comment on a pull request when viewed in
 	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().IntVar(&bodyCommentParentId, "comment-parent-id", 0, `id`)
-	cmd.Flags().IntVar(&bodyCommentInlineStartTo, "comment-inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
-	cmd.Flags().StringVar(&bodyCommentInlinePath, "comment-inline-path", "", `The path of the file this comment is anchored to.`)
-	cmd.Flags().IntVar(&bodyCommentInlineFrom, "comment-inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
-	cmd.Flags().IntVar(&bodyCommentInlineTo, "comment-inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
-	cmd.Flags().IntVar(&bodyCommentInlineStartFrom, "comment-inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
-	cmd.Flags().StringVar(&bodyCommentContentRaw, "comment-content-raw", "", `The text as it was typed by a user.`)
 	cmd.Flags().StringVar(&bodyCommentContentMarkup, "comment-content-markup", "", `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`)
+	cmd.Flags().StringVar(&bodyCommentContentRaw, "comment-content-raw", "", `The text as it was typed by a user.`)
+	cmd.Flags().IntVar(&bodyCommentInlineFrom, "comment-inline-from", 0, `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`)
+	cmd.Flags().StringVar(&bodyCommentInlinePath, "comment-inline-path", "", `The path of the file this comment is anchored to.`)
+	cmd.Flags().IntVar(&bodyCommentInlineStartFrom, "comment-inline-start-from", 0, `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`)
+	cmd.Flags().IntVar(&bodyCommentInlineStartTo, "comment-inline-start-to", 0, `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`)
+	cmd.Flags().IntVar(&bodyCommentInlineTo, "comment-inline-to", 0, `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`)
+	cmd.Flags().IntVar(&bodyCommentParentId, "comment-parent-id", 0, `id`)
 	cmd.Flags().IntVar(&bodyCommentId, "comment-id", 0, `id`)
 	cmd.Flags().StringVar(&bodyContentRaw, "content-raw", "", `The task contents`)
 	cmd.Flags().BoolVar(&bodyPending, "pending", false, `pending`)
