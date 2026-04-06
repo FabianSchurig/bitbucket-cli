@@ -53,13 +53,36 @@ builds:
       - -s -w -X main.version={{.Version}}
 
 archives:
-  - format_overrides:
+  - id: bb-cli
+    builds:
+      - bb-cli
+    format_overrides:
       - goos: windows
         formats:
           - zip
     formats:
       - tar.gz
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    name_template: "bb-cli_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  - id: bb-mcp
+    builds:
+      - bb-mcp
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    formats:
+      - tar.gz
+    name_template: "bb-mcp_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  - id: bb-tf
+    builds:
+      - bb-tf
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    formats:
+      - tar.gz
+    name_template: "terraform-provider-bitbucket_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 
 checksum:
   name_template: checksums.txt
