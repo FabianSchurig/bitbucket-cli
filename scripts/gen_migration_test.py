@@ -182,6 +182,47 @@ client.Get(fmt.Sprintf("2.0/repositories/%s/%s/override-settings", workspace, re
         self.assertIn("`legacy_only`", summary)
         self.assertIn("`request_body`", summary)
 
+    def test_build_legacy_hcl_renders_required_and_optional_fields(self):
+        legacy = gen_migration.DocObject(
+            kind="resource",
+            name="bitbucket_branch_restriction",
+            inputs_required=["repository", "kind", "owner"],
+            inputs_optional=["pattern"],
+        )
+
+        lines = gen_migration.build_legacy_hcl(legacy)
+        rendered = "\n".join(lines)
+
+        self.assertIn('resource "bitbucket_branch_restriction" "legacy" {', rendered)
+        self.assertLess(rendered.index('kind = "push"'), rendered.index('owner = "my-workspace"'))
+        self.assertLess(rendered.index('owner = "my-workspace"'), rendered.index('repository = "my-repo"'))
+        self.assertIn('owner = "my-workspace"', rendered)
+        self.assertIn('repository = "my-repo"', rendered)
+        self.assertIn('# pattern = "main"  # optional', rendered)
+
+    def test_build_current_hcl_shows_renamed_and_legacy_only_fields(self):
+        legacy = gen_migration.DocObject(
+            kind="resource",
+            name="bitbucket_default_reviewers",
+            inputs_required=["owner", "repository", "reviewers"],
+        )
+        current = gen_migration.DocObject(
+            kind="resource",
+            name="bitbucket_default_reviewers",
+            inputs_required=["workspace", "repo_slug", "target_username"],
+        )
+
+        lines = gen_migration.build_current_hcl(current, legacy)
+        rendered = "\n".join(lines)
+
+        self.assertIn('resource "bitbucket_default_reviewers" "migrated" {', rendered)
+        self.assertIn('repo_slug = "my-repo"', rendered)
+        self.assertIn('target_username = "example-user"', rendered)
+        self.assertIn('workspace = "my-workspace"', rendered)
+        self.assertLess(rendered.index('repo_slug = "my-repo"'), rendered.index('target_username = "example-user"'))
+        self.assertLess(rendered.index('target_username = "example-user"'), rendered.index('workspace = "my-workspace"'))
+        self.assertIn('# reviewers = ["example-user"]  # legacy-only', rendered)
+
     def test_render_uses_relative_docs_path(self):
         current = {
             ("resource", "bitbucket_branch_restrictions"): gen_migration.DocObject(
@@ -225,6 +266,9 @@ client.Get(fmt.Sprintf("2.0/repositories/%s/%s/override-settings", workspace, re
         self.assertIn("best-effort migration baseline", rendered)
         self.assertIn("`bitbucket_branch_restriction`", rendered)
         self.assertIn("`bitbucket_current_user`", rendered)
+        self.assertIn("#### Legacy HCL", rendered)
+        self.assertIn("#### New HCL", rendered)
+        self.assertIn('resource "bitbucket_branch_restrictions" "migrated" {', rendered)
 
 
 if __name__ == "__main__":

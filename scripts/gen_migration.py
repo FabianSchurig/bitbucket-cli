@@ -171,6 +171,67 @@ PARAM_RENAMES = {
     "repository": "repo_slug",
 }
 
+EXAMPLE_VALUES = {
+    "active": "true",
+    "auto_add": "true",
+    "branch": '"main"',
+    "branch_match_kind": '"glob"',
+    "branch_type": '"feature"',
+    "commit": '"main"',
+    "commit_author": '"Jane Doe <jane@example.com>"',
+    "commit_message": '"Example commit"',
+    "content": '"example content"',
+    "cron_pattern": '"0 0 * * *"',
+    "description": '"Example description"',
+    "enabled": "true",
+    "events": '["repo:push"]',
+    "group_slug": '"example-group"',
+    "has_issues": "true",
+    "has_wiki": "true",
+    "hostname": '"github.com"',
+    "inherit_branching_model": "true",
+    "inherit_default_merge_strategy": "true",
+    "is_private": "true",
+    "key": '"example-key"',
+    "kind": '"push"',
+    "label": '"Example label"',
+    "language": '"go"',
+    "member": '"example-user"',
+    "name": '"my-repo"',
+    "owner": '"my-workspace"',
+    "path": '"README.md"',
+    "pattern": '"main"',
+    "permission": '"read"',
+    "private_key": '"---PRIVATE KEY---"',
+    "project": '"EXAMPLE"',
+    "project_key": '"EXAMPLE"',
+    "public_key": '"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDemo"',
+    "repo_slug": '"my-repo"',
+    "repository": '"my-repo"',
+    "request_body": 'jsonencode({})',
+    "reviewers": '["example-user"]',
+    "schedule_uuid": '"{schedule-uuid}"',
+    "scm": '"git"',
+    "secured": "true",
+    "secret": '"example-secret"',
+    "selected_user": '"example-user"',
+    "selected_user_id": '"{user-uuid}"',
+    "skip_cert_verification": "false",
+    "slug": '"my-repo"',
+    "stage": '"Test"',
+    "target": 'jsonencode({ ref_name = "main" })',
+    "target_username": '"example-user"',
+    "url": '"https://example.com/webhook"',
+    "user": '"example-user"',
+    "user_id": '"{user-uuid}"',
+    "username": '"example-user"',
+    "uuid": '"{resource-uuid}"',
+    "value": '"example-value"',
+    "variable_uuid": '"{variable-uuid}"',
+    "website": '"https://example.com"',
+    "workspace": '"my-workspace"',
+}
+
 PLACEHOLDER_TOKENS = {
     ("Workspace",): "{workspace}",
     ("Repo", "Slug"): "{repo_slug}",
@@ -469,6 +530,117 @@ def format_endpoints(items: list[str]) -> str:
     return "<br>".join(f"`{item}`" for item in items) if items else "none"
 
 
+def sample_value(param: str) -> str:
+    """Return a readable HCL sample value for a Terraform attribute name."""
+    if param in EXAMPLE_VALUES:
+        return EXAMPLE_VALUES[param]
+    if param.endswith("_uuid"):
+        return f'"{{{param.replace("_", "-")}}}"'
+    if param.endswith("_id") or param == "id":
+        return f'"example-{param.replace("_", "-")}"'
+    return f'"example-{param.replace("_", "-")}"'
+
+
+def render_assignment(name: str, value: str, *, commented: bool = False, note: str | None = None) -> str:
+    """Render a single HCL assignment, optionally as a comment with a note."""
+    prefix = "# " if commented else ""
+    suffix = f"  # {note}" if note else ""
+    return f"  {prefix}{name} = {value}{suffix}"
+
+
+def render_hcl_block(
+    block_kind: str,
+    object_name: str,
+    instance_name: str,
+    required: list[tuple[str, str]],
+    commented: list[tuple[str, str, str | None]],
+) -> list[str]:
+    """Render a Terraform resource/data block from required and commented assignments."""
+    lines = [f'{block_kind} "{object_name}" "{instance_name}" {{']
+    for name, value in sorted(required):
+        lines.append(render_assignment(name, value))
+    if commented:
+        if required:
+            lines.append("")
+        for name, value, note in sorted(commented, key=lambda item: item[0]):
+            lines.append(render_assignment(name, value, commented=True, note=note))
+    lines.append("}")
+    return lines
+
+
+def should_include_new_only_param(param: str) -> bool:
+    """Keep new-only HCL snippets focused on actionable migration fields."""
+    return (
+        param == "request_body"
+        or param.endswith("_uuid")
+        or param.endswith("_id")
+        or param
+        in {
+            "target_username",
+            "selected_user",
+            "selected_user_id",
+            "member",
+            "path",
+            "commit",
+            "project_key",
+            "repo_slug",
+            "workspace",
+            "key_id",
+            "uid",
+        }
+    )
+
+
+def build_legacy_hcl(doc: DocObject) -> list[str]:
+    """Build a legacy Terraform snippet using required fields plus commented optional fields."""
+    block_kind = "resource" if doc.kind == "resource" else "data"
+    required = [(param, sample_value(param)) for param in doc.inputs_required]
+    commented = [(param, sample_value(param), "optional") for param in doc.inputs_optional]
+    return render_hcl_block(block_kind, doc.name, "legacy", required, commented)
+
+
+def build_current_hcl(doc: DocObject, legacy_doc: DocObject) -> list[str]:
+    """Build a migrated Terraform snippet that highlights renamed and changed fields."""
+    block_kind = "resource" if doc.kind == "resource" else "data"
+    required = []
+    commented = []
+    used = set()
+
+    for param in doc.inputs_required:
+        legacy_source = next(
+            (source for source, target in PARAM_RENAMES.items() if target == param and source in legacy_doc.inputs),
+            param,
+        )
+        required.append((param, sample_value(legacy_source)))
+        used.add(param)
+
+    for param in legacy_doc.inputs_required:
+        target = PARAM_RENAMES.get(param, param)
+        if target in doc.inputs and target not in used:
+            required.append((target, sample_value(param)))
+            used.add(target)
+
+    for param in legacy_doc.inputs_optional:
+        target = PARAM_RENAMES.get(param, param)
+        if target in doc.inputs and target not in used:
+            commented.append((target, sample_value(param), "optional"))
+            used.add(target)
+        elif target not in doc.inputs:
+            commented.append((param, sample_value(param), "legacy-only"))
+
+    for param in legacy_doc.inputs_required:
+        target = PARAM_RENAMES.get(param, param)
+        if target not in doc.inputs:
+            commented.append((param, sample_value(param), "legacy-only"))
+
+    for param in doc.inputs_optional:
+        if param not in used and should_include_new_only_param(param):
+            commented.append((param, sample_value(param), "new-only"))
+            used.add(param)
+
+    return render_hcl_block(block_kind, doc.name, "migrated", required, commented)
+
+
 def normalized_params(params: Iterable[str]) -> set[str]:
     normalized = set()
     for param in params:
@@ -645,20 +817,27 @@ def render(repo_root: Path) -> str:
                 )
             else:
                 lines.append("- New equivalent(s): none")
-            lines.append(
-                f"- Legacy inputs: {format_params(legacy_doc.inputs_required, legacy_doc.inputs_optional)}"
-            )
             lines.append(f"- Legacy endpoints: {format_endpoints(legacy_doc.endpoints)}")
+            lines.append("")
+            lines.append("#### Legacy HCL")
+            lines.append("")
+            lines.append("```hcl")
+            lines.extend(build_legacy_hcl(legacy_doc))
+            lines.append("```")
             if current_docs:
-                lines.append(
-                    "- New inputs: "
-                    + format_params(
-                        dedupe(sum((doc.inputs_required for doc in current_docs), [])),
-                        dedupe(sum((doc.inputs_optional for doc in current_docs), [])),
-                    )
-                )
                 new_endpoints = dedupe(sum((doc.endpoints for doc in current_docs), []))
+                lines.append("")
                 lines.append(f"- New operations: {format_endpoints(new_endpoints)}")
+                lines.append("")
+                lines.append("#### New HCL")
+                lines.append("")
+                for doc in current_docs:
+                    lines.append(f"##### `{doc.name}`")
+                    lines.append("")
+                    lines.append("```hcl")
+                    lines.extend(build_current_hcl(doc, legacy_doc))
+                    lines.append("```")
+                    lines.append("")
                 lines.append(f"- Diff summary: {diff_summary(legacy_doc, current_docs)}")
             note = OBJECT_NOTES.get((kind, name))
             if note:
