@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, PRToolGroup)
+}
+
 // PRToolGroup contains the MCP tool definition for the "bitbucket_pr" tool group.
 var PRToolGroup = ToolGroup{
 	Name: `bitbucket_pr`,

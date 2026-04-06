@@ -534,30 +534,7 @@ func TestToolHandler_AllGeneratedToolGroups(t *testing.T) {
 	// Smoke test: verify all generated tool groups can be registered.
 	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: testVersion}, nil)
 
-	groups := []mcptools.ToolGroup{
-		mcptools.PRToolGroup,
-		mcptools.HooksToolGroup,
-		mcptools.SearchToolGroup,
-		mcptools.RefsToolGroup,
-		mcptools.CommitsToolGroup,
-		mcptools.ReportsToolGroup,
-		mcptools.ReposToolGroup,
-		mcptools.WorkspacesToolGroup,
-		mcptools.ProjectsToolGroup,
-		mcptools.PipelinesToolGroup,
-		mcptools.IssuesToolGroup,
-		mcptools.SnippetsToolGroup,
-		mcptools.DeploymentsToolGroup,
-		mcptools.BranchRestrictionsToolGroup,
-		mcptools.BranchingModelToolGroup,
-		mcptools.CommitStatusesToolGroup,
-		mcptools.DownloadsToolGroup,
-		mcptools.UsersToolGroup,
-		mcptools.PropertiesToolGroup,
-		mcptools.AddonToolGroup,
-	}
-
-	for _, g := range groups {
+	for _, g := range mcptools.AllToolGroups {
 		mcptools.RegisterToolGroup(server, g)
 	}
 
@@ -585,7 +562,7 @@ func TestToolHandler_AllGeneratedToolGroups(t *testing.T) {
 		tools = append(tools, tool)
 	}
 
-	if len(tools) != 20 {
-		t.Errorf("expected 20 tools, got %d", len(tools))
+	if len(tools) != len(mcptools.AllToolGroups) {
+		t.Errorf("expected %d tools, got %d", len(mcptools.AllToolGroups), len(tools))
 	}
 }

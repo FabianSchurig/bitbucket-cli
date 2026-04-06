@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, HooksToolGroup)
+}
+
 // HooksToolGroup contains the MCP tool definition for the "bitbucket_hooks" tool group.
 var HooksToolGroup = ToolGroup{
 	Name: `bitbucket_hooks`,

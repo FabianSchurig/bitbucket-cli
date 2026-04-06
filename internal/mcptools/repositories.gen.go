@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, ReposToolGroup)
+}
+
 // ReposToolGroup contains the MCP tool definition for the "bitbucket_repos" tool group.
 var ReposToolGroup = ToolGroup{
 	Name: `bitbucket_repos`,

@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, AddonToolGroup)
+}
+
 // AddonToolGroup contains the MCP tool definition for the "bitbucket_addon" tool group.
 var AddonToolGroup = ToolGroup{
 	Name: `bitbucket_addon`,

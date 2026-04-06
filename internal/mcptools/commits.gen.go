@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, CommitsToolGroup)
+}
+
 // CommitsToolGroup contains the MCP tool definition for the "bitbucket_commits" tool group.
 var CommitsToolGroup = ToolGroup{
 	Name: `bitbucket_commits`,

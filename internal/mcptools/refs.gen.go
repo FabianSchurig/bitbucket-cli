@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, RefsToolGroup)
+}
+
 // RefsToolGroup contains the MCP tool definition for the "bitbucket_refs" tool group.
 var RefsToolGroup = ToolGroup{
 	Name: `bitbucket_refs`,

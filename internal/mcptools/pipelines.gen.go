@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, PipelinesToolGroup)
+}
+
 // PipelinesToolGroup contains the MCP tool definition for the "bitbucket_pipelines" tool group.
 var PipelinesToolGroup = ToolGroup{
 	Name: `bitbucket_pipelines`,

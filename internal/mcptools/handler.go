@@ -305,6 +305,49 @@ func formatToolResult(result any) (*mcp.CallToolResult, error) {
 	}, nil
 }
 
+// ─── Filtering ────────────────────────────────────────────────────────────────
+
+// FilterOperations returns a copy of the ToolGroup with only operations whose
+// HTTP method passes the filter function. The description is rebuilt to reflect
+// the surviving operations.
+func FilterOperations(group ToolGroup, allow func(method string) bool) ToolGroup {
+	var kept []OperationDef
+	for _, op := range group.Operations {
+		if allow(op.Method) {
+			kept = append(kept, op)
+		}
+	}
+	filtered := ToolGroup{
+		Name:       group.Name,
+		Operations: kept,
+	}
+	// Rebuild description to reflect surviving operations.
+	if len(kept) > 0 {
+		filtered.Description = rebuildDescription(group.Description, kept)
+	}
+	return filtered
+}
+
+// rebuildDescription preserves the first line of the original description and
+// rebuilds the operation list from the surviving operations.
+func rebuildDescription(original string, ops []OperationDef) string {
+	firstLine := original
+	if idx := strings.Index(original, "\n"); idx >= 0 {
+		firstLine = original[:idx]
+	}
+	var sb strings.Builder
+	sb.WriteString(firstLine)
+	sb.WriteString("\n\nAvailable operations:\n")
+	for _, op := range ops {
+		desc := op.Summary
+		if desc == "" {
+			desc = op.OperationID
+		}
+		fmt.Fprintf(&sb, "- %s: %s [%s]\n", op.OperationID, desc, op.Method)
+	}
+	return sb.String()
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 func jsonSchemaType(oaType string) string {

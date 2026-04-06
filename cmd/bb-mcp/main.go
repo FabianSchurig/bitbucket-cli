@@ -4,6 +4,9 @@
 // type (pull requests, repositories, pipelines, etc.). Each tool uses a
 // CRUD-combined design with an "operation" parameter.
 //
+// An optional mcp_config.yaml file in the working directory controls which
+// tools and HTTP methods are exposed at runtime.
+//
 // Install:
 //
 //	go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-mcp@latest
@@ -33,7 +36,9 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
+	"github.com/FabianSchurig/bitbucket-cli/internal/config"
 	"github.com/FabianSchurig/bitbucket-cli/internal/mcptools"
+	"github.com/FabianSchurig/bitbucket-cli/internal/prompts"
 )
 
 // Set via ldflags at build time (see goreleaser.yaml).
@@ -44,7 +49,13 @@ var (
 func main() {
 	transport := flag.String("transport", "stdio", "MCP transport: stdio or sse")
 	addr := flag.String("addr", ":8080", "Address to listen on (SSE transport only)")
+	configFile := flag.String("config", config.DefaultConfigFile, "Path to MCP configuration file")
 	flag.Parse()
+
+	cfg, err := config.Load(*configFile)
+	if err != nil {
+		log.Fatalf("loading config: %v", err)
+	}
 
 	server := mcp.NewServer(
 		&mcp.Implementation{
@@ -54,8 +65,11 @@ func main() {
 		nil,
 	)
 
-	// Register all Bitbucket tool groups.
-	registerAllTools(server)
+	// Register filtered Bitbucket tool groups.
+	registerAllTools(server, cfg)
+
+	// Register MCP prompts (playbooks).
+	prompts.Register(server)
 
 	ctx := context.Background()
 	switch *transport {
@@ -76,25 +90,24 @@ func main() {
 	}
 }
 
-func registerAllTools(server *mcp.Server) {
-	mcptools.RegisterToolGroup(server, mcptools.PRToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.HooksToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.SearchToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.RefsToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.CommitsToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.ReportsToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.ReposToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.WorkspacesToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.ProjectsToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.PipelinesToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.IssuesToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.SnippetsToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.DeploymentsToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.BranchRestrictionsToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.BranchingModelToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.CommitStatusesToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.DownloadsToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.UsersToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.PropertiesToolGroup)
-	mcptools.RegisterToolGroup(server, mcptools.AddonToolGroup)
+func registerAllTools(server *mcp.Server, cfg *config.Config) {
+	for _, group := range mcptools.AllToolGroups {
+		// Filter 1: Skip entirely if the tool name is ignored.
+		if cfg.IsToolIgnored(group.Name) {
+			continue
+		}
+
+		// Filter 2: Remove operations whose HTTP method is not allowed.
+		filtered := mcptools.FilterOperations(group, cfg.IsMethodAllowed)
+		if len(filtered.Operations) == 0 {
+			continue
+		}
+
+		// Override: Replace description if configured.
+		if override, ok := cfg.ToolOverrides[filtered.Name]; ok && override.Description != "" {
+			filtered.Description = override.Description
+		}
+
+		mcptools.RegisterToolGroup(server, filtered)
+	}
 }

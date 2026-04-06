@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, DeploymentsToolGroup)
+}
+
 // DeploymentsToolGroup contains the MCP tool definition for the "bitbucket_deployments" tool group.
 var DeploymentsToolGroup = ToolGroup{
 	Name: `bitbucket_deployments`,

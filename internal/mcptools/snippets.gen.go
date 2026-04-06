@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, SnippetsToolGroup)
+}
+
 // SnippetsToolGroup contains the MCP tool definition for the "bitbucket_snippets" tool group.
 var SnippetsToolGroup = ToolGroup{
 	Name: `bitbucket_snippets`,

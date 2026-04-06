@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, BranchRestrictionsToolGroup)
+}
+
 // BranchRestrictionsToolGroup contains the MCP tool definition for the "bitbucket_branch-restrictions" tool group.
 var BranchRestrictionsToolGroup = ToolGroup{
 	Name: `bitbucket_branch-restrictions`,
