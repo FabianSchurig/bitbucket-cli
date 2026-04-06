@@ -59,32 +59,14 @@ Available operations:
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
-					{Path: `approved`, Type: `bool`, Desc: `approved`},
 					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
-					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_issues`, Type: `bool`, Desc: `
-The issue tracker for this repository is enabled. Issue Tracker
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
-					{Path: `has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
+					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -93,10 +75,28 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 			},
 			HasBody:   false,
@@ -185,33 +185,33 @@ commits.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-					}},
-					{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
-					{Path: `hash`, Type: `string`, Desc: `hash`},
 					{Path: `date`, Type: `string`, Desc: `date`},
+					{Path: `hash`, Type: `string`, Desc: `hash`},
 					{Path: `message`, Type: `string`, Desc: `message`},
+					{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
+					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					}},
 					{Path: `participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
 						{Path: `approved`, Type: `bool`, Desc: `approved`},
-						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 						{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					}},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
-					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
 					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -244,20 +244,20 @@ commits.`,
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `date`, Type: `string`, Desc: `date`},
+					{Path: `hash`, Type: `string`, Desc: `hash`},
 					{Path: `message`, Type: `string`, Desc: `message`},
 					{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
-					{Path: `hash`, Type: `string`, Desc: `hash`},
-					{Path: `date`, Type: `string`, Desc: `date`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
-					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
 					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -287,34 +287,34 @@ commits.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `hash`, Type: `string`, Desc: `hash`},
 					{Path: `date`, Type: `string`, Desc: `date`},
+					{Path: `hash`, Type: `string`, Desc: `hash`},
 					{Path: `message`, Type: `string`, Desc: `message`},
+					{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					}},
-					{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 					{Path: `participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+						{Path: `approved`, Type: `bool`, Desc: `approved`},
 						{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
-						{Path: `approved`, Type: `bool`, Desc: `approved`},
+						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					}},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
@@ -348,20 +348,20 @@ commits.`,
 			BodyFields: []BodyFieldDef{
 				{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `date`, Type: `string`, Desc: `date`},
+					{Path: `hash`, Type: `string`, Desc: `hash`},
 					{Path: `message`, Type: `string`, Desc: `message`},
 					{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
-					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
@@ -421,8 +421,8 @@ commits.`,
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 			},
 			HasBody:   false,
@@ -457,8 +457,8 @@ commits.`,
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 			},
 			HasBody:   false,
@@ -494,8 +494,8 @@ commits.`,
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 			},
 			HasBody:   false,
@@ -531,8 +531,8 @@ commits.`,
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 			},
 			HasBody:   false,
@@ -592,16 +592,16 @@ commits.`,
 				{Path: `lines_added`, Type: `int`, Desc: `lines_added`},
 				{Path: `lines_removed`, Type: `int`, Desc: `lines_removed`},
 				{Path: `new`, Type: `string`, Desc: `A file object, representing a file at a commit in a repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
-					{Path: `path`, Type: `string`, Desc: `The path in the repository`},
 					{Path: `attributes`, Type: `string`, Desc: `[link, executable, subrepository, binary, lfs]`},
 					{Path: `escaped_path`, Type: `string`, Desc: `The escaped version of the path as it appears in a diff. If the path does not require escaping this will be the same as path.`},
+					{Path: `path`, Type: `string`, Desc: `The path in the repository`},
+					{Path: `type`, Type: `string`, Desc: `type`},
 				}},
 				{Path: `old`, Type: `string`, Desc: `A file object, representing a file at a commit in a repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
-					{Path: `path`, Type: `string`, Desc: `The path in the repository`},
 					{Path: `attributes`, Type: `string`, Desc: `[link, executable, subrepository, binary, lfs]`},
 					{Path: `escaped_path`, Type: `string`, Desc: `The escaped version of the path as it appears in a diff. If the path does not require escaping this will be the same as path.`},
+					{Path: `path`, Type: `string`, Desc: `The path in the repository`},
+					{Path: `type`, Type: `string`, Desc: `type`},
 				}},
 				{Path: `status`, Type: `string`, Desc: `[added, removed, modified, renamed]`},
 				{Path: `type`, Type: `string`, Desc: `type`},
@@ -641,29 +641,14 @@ unspecified which will be returned.`,
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
-					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_issues`, Type: `bool`, Desc: `
-The issue tracker for this repository is enabled. Issue Tracker
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
-					{Path: `has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
+					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -672,13 +657,28 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `size`, Type: `int`, Desc: `size`},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 			},
 			HasBody:   false,
@@ -734,32 +734,14 @@ Controls the rules for forking this repository.
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
+					{Path: `approved`, Type: `bool`, Desc: `approved`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
-					{Path: `approved`, Type: `bool`, Desc: `approved`},
 					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-					{Path: `name`, Type: `string`, Desc: `name`},
-					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
-					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_issues`, Type: `bool`, Desc: `
-The issue tracker for this repository is enabled. Issue Tracker
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
-					{Path: `has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
+					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -768,10 +750,28 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `language`, Type: `string`, Desc: `language`},
+					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `size`, Type: `int`, Desc: `size`},
+					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 			},
 			HasBody:   false,
@@ -860,33 +860,33 @@ commits.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
-						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
-					}},
-					{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
-					{Path: `hash`, Type: `string`, Desc: `hash`},
 					{Path: `date`, Type: `string`, Desc: `date`},
+					{Path: `hash`, Type: `string`, Desc: `hash`},
 					{Path: `message`, Type: `string`, Desc: `message`},
+					{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
+					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
+					}},
 					{Path: `participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
 						{Path: `approved`, Type: `bool`, Desc: `approved`},
-						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 						{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					}},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
-					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
 					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -919,20 +919,20 @@ commits.`,
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `date`, Type: `string`, Desc: `date`},
+					{Path: `hash`, Type: `string`, Desc: `hash`},
 					{Path: `message`, Type: `string`, Desc: `message`},
 					{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
-					{Path: `hash`, Type: `string`, Desc: `hash`},
-					{Path: `date`, Type: `string`, Desc: `date`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
-					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
 					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -962,34 +962,34 @@ commits.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `hash`, Type: `string`, Desc: `hash`},
 					{Path: `date`, Type: `string`, Desc: `date`},
+					{Path: `hash`, Type: `string`, Desc: `hash`},
 					{Path: `message`, Type: `string`, Desc: `message`},
+					{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 					{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 						{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					}},
-					{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 					{Path: `participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
-						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
+						{Path: `approved`, Type: `bool`, Desc: `approved`},
 						{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
 						{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
-						{Path: `approved`, Type: `bool`, Desc: `approved`},
+						{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					}},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
 				{Path: `deleted`, Type: `bool`, Desc: `deleted`},
 				{Path: `id`, Type: `int`, Desc: `id`},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
@@ -1023,20 +1023,20 @@ commits.`,
 			BodyFields: []BodyFieldDef{
 				{Path: `commit`, Type: `string`, Desc: `commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `date`, Type: `string`, Desc: `date`},
+					{Path: `hash`, Type: `string`, Desc: `hash`},
 					{Path: `message`, Type: `string`, Desc: `message`},
 					{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
-					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
 				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 				{Path: `inline`, Type: `string`, Desc: `inline`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `from`, Type: `int`, Desc: `The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.`},
-					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
+					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
 					{Path: `start_from`, Type: `int`, Desc: `The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.`},
 					{Path: `start_to`, Type: `int`, Desc: `The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.`},
-					{Path: `path`, Type: `string`, Desc: `The path of the file this comment is anchored to.`},
+					{Path: `to`, Type: `int`, Desc: `The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.`},
 				}},
 				{Path: `parent`, Type: `string`, Desc: `parent`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `id`, Type: `int`, Desc: `id`},
@@ -1096,8 +1096,8 @@ commits.`,
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 			},
 			HasBody:   false,
@@ -1132,8 +1132,8 @@ commits.`,
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 			},
 			HasBody:   false,
@@ -1169,8 +1169,8 @@ commits.`,
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 			},
 			HasBody:   false,
@@ -1206,8 +1206,8 @@ commits.`,
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 			},
 			HasBody:   false,
@@ -1267,16 +1267,16 @@ commits.`,
 				{Path: `lines_added`, Type: `int`, Desc: `lines_added`},
 				{Path: `lines_removed`, Type: `int`, Desc: `lines_removed`},
 				{Path: `new`, Type: `string`, Desc: `A file object, representing a file at a commit in a repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
-					{Path: `path`, Type: `string`, Desc: `The path in the repository`},
 					{Path: `attributes`, Type: `string`, Desc: `[link, executable, subrepository, binary, lfs]`},
 					{Path: `escaped_path`, Type: `string`, Desc: `The escaped version of the path as it appears in a diff. If the path does not require escaping this will be the same as path.`},
+					{Path: `path`, Type: `string`, Desc: `The path in the repository`},
+					{Path: `type`, Type: `string`, Desc: `type`},
 				}},
 				{Path: `old`, Type: `string`, Desc: `A file object, representing a file at a commit in a repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
-					{Path: `path`, Type: `string`, Desc: `The path in the repository`},
 					{Path: `attributes`, Type: `string`, Desc: `[link, executable, subrepository, binary, lfs]`},
 					{Path: `escaped_path`, Type: `string`, Desc: `The escaped version of the path as it appears in a diff. If the path does not require escaping this will be the same as path.`},
+					{Path: `path`, Type: `string`, Desc: `The path in the repository`},
+					{Path: `type`, Type: `string`, Desc: `type`},
 				}},
 				{Path: `status`, Type: `string`, Desc: `[added, removed, modified, renamed]`},
 				{Path: `type`, Type: `string`, Desc: `type`},
@@ -1316,29 +1316,14 @@ unspecified which will be returned.`,
 				{Path: `message`, Type: `string`, Desc: `message`},
 				{Path: `parents`, Type: `string`, Desc: `parents (JSON array)`},
 				{Path: `participants`, Type: `string`, Desc: `participants`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
 					{Path: `approved`, Type: `bool`, Desc: `approved`},
-					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 					{Path: `participated_on`, Type: `string`, Desc: `The ISO8601 timestamp of the participant's action. For approvers, this is the time of their approval. For commenters and pull request reviewers who are not approvers, this is the time they last commented, or null if they have not commented.`},
+					{Path: `role`, Type: `string`, Desc: `[PARTICIPANT, REVIEWER]`},
+					{Path: `state`, Type: `string`, Desc: `[approved, changes_requested, <nil>]`},
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
-					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-					{Path: `scm`, Type: `string`, Desc: `[git]`},
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
-					{Path: `has_issues`, Type: `bool`, Desc: `
-The issue tracker for this repository is enabled. Issue Tracker
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-					{Path: `size`, Type: `int`, Desc: `size`},
-					{Path: `language`, Type: `string`, Desc: `language`},
-					{Path: `has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
+					{Path: `description`, Type: `string`, Desc: `description`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -1347,13 +1332,28 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
-					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+					{Path: `full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+					{Path: `has_issues`, Type: `bool`, Desc: `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `has_wiki`, Type: `bool`, Desc: `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`},
+					{Path: `is_private`, Type: `bool`, Desc: `is_private`},
+					{Path: `language`, Type: `string`, Desc: `language`},
 					{Path: `name`, Type: `string`, Desc: `name`},
+					{Path: `scm`, Type: `string`, Desc: `[git]`},
+					{Path: `size`, Type: `int`, Desc: `size`},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 				{Path: `summary`, Type: `string`, Desc: `summary`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
+					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
 			},
 			HasBody:   false,
