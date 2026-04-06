@@ -1,12 +1,17 @@
-.PHONY: build test lint fmt vet check generate generate-docs clean
+.PHONY: build test test-python lint fmt vet check generate generate-docs clean
 
 # Build all binaries
 build:
 	go build ./...
 
-# Run tests with race detector
+# Run Go tests with race detector and Python unit tests
 test:
 	go test -race ./...
+	python3 -m unittest discover -s scripts -p '*_test.py'
+
+# Run Python unit tests
+test-python:
+	python3 -m unittest discover -s scripts -p '*_test.py'
 
 # Run golangci-lint (install via: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest)
 lint:

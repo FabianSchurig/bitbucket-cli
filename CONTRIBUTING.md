@@ -22,7 +22,8 @@ This repository includes a [Dev Container](https://containers.dev/) configuratio
 
 ```bash
 go build ./...              # build
-go test -race ./...         # test with race detector
+go test -race ./...         # Go tests with race detector
+python3 -m unittest discover -s scripts -p '*_test.py' # Python unit tests
 go run ./cmd/bb-cli --help  # run locally
 ```
 
@@ -30,7 +31,8 @@ Or use the Makefile:
 
 ```bash
 make build       # build all binaries
-make test        # run tests with race detector
+make test        # run Go tests with race detector + Python unit tests
+make test-python # run Python unit tests only
 make lint        # run golangci-lint
 make fmt         # format all Go files
 make fmt-check   # check formatting without modifying files
