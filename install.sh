@@ -157,7 +157,7 @@ install_binary() {
 
   echo "Installing ${bin_name} ${version} for ${os}/${arch}..."
 
-  archive_name="bb-cli_${version_num}_${os}_${arch}.tar.gz"
+  archive_name="${bin_name}_${version_num}_${os}_${arch}.tar.gz"
   download_url="https://github.com/${REPO}/releases/download/${version}/${archive_name}"
 
   tmpdir="$(mktemp -d)"
