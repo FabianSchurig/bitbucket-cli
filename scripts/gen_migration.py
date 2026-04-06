@@ -4,11 +4,13 @@
 import argparse
 import html
 import re
+import ssl
 import sys
 import urllib.request
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable
+from urllib.error import HTTPError, URLError
 
 LEGACY_BASE = "https://raw.githubusercontent.com/DrFaust92/terraform-provider-bitbucket/master"
 
@@ -225,9 +227,20 @@ def dedupe(items: Iterable[str]) -> list[str]:
     return result
 
 
-def fetch(url: str) -> str:
-    with urllib.request.urlopen(url) as response:
-        return response.read().decode("utf-8")
+def fetch(url: str, *, required: bool = True, timeout: int = 20) -> str | None:
+    request = urllib.request.Request(url, headers={"User-Agent": "bitbucket-cli-migration-generator"})
+    try:
+        with urllib.request.urlopen(
+            request,
+            timeout=timeout,
+            context=ssl.create_default_context(),
+        ) as response:
+            return response.read().decode("utf-8")
+    except (HTTPError, URLError, TimeoutError) as error:
+        if required:
+            raise RuntimeError(f"failed to fetch {url}: {error}") from error
+        print(f"warning: skipping unavailable URL {url}: {error}", file=sys.stderr)
+        return None
 
 
 def parse_bullets(section: str, current: bool) -> list[str]:
@@ -257,8 +270,14 @@ def split_section(text: str, start: str, stops: list[str]) -> str:
 
 def parse_current_doc(path: Path, kind: str) -> DocObject:
     text = path.read_text()
-    name = re.search(r"^#\s+(bitbucket_[^\s]+)", text, re.M).group(1)
-    title = re.search(r"^#\s+(.+)$", text, re.M).group(1)
+    name_match = re.search(r"^#\s+(bitbucket_[^\s]+)", text, re.M)
+    if name_match is None:
+        raise ValueError(f"missing Terraform object heading in {path}")
+    title_match = re.search(r"^#\s+(.+)$", text, re.M)
+    if title_match is None:
+        raise ValueError(f"missing markdown title in {path}")
+    name = name_match.group(1)
+    title = title_match.group(1)
     doc = DocObject(kind=kind, name=name, title=title)
     doc.inputs_required = parse_bullets(
         split_section(text, "### Required", ["### Optional", "### Read-Only", "##"]),
@@ -288,7 +307,9 @@ def parse_current_doc(path: Path, kind: str) -> DocObject:
 def parse_legacy_doc(kind: str, name: str) -> DocObject:
     base = name.removeprefix("bitbucket_")
     doc_url = f"{LEGACY_BASE}/docs/{CURRENT_KIND_PATH[kind]}/{base}.md"
-    text = fetch(doc_url)
+    text = fetch(doc_url, required=False)
+    if text is None:
+        return DocObject(kind=kind, name=name, title=name)
     title_match = re.search(r"^#\s+([^\n]+)", text, re.M)
     title = name
     if title_match:
@@ -361,7 +382,9 @@ def normalize_raw_path(path: str) -> str:
 
 
 def parse_legacy_endpoints(kind: str, name: str, mapped_current: list[DocObject]) -> list[str]:
-    text = fetch(f"{LEGACY_BASE}/{source_filename(kind, name)}")
+    text = fetch(f"{LEGACY_BASE}/{source_filename(kind, name)}", required=False)
+    if text is None:
+        return dedupe(sum((doc.endpoints for doc in mapped_current), []))
     endpoints = []
     for match in re.finditer(r"\.([A-Z][A-Za-z0-9]+(?:Get|Post|Put|Delete|Patch))\(", text):
         converted = tokens_from_method(match.group(1))
