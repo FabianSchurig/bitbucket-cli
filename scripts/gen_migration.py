@@ -518,7 +518,7 @@ def render(repo_root: Path) -> str:
         "using:"
     )
     lines.append("")
-    lines.append(f"- current docs from `{repo_root}/docs/`")
+    lines.append("- current docs from `./docs/`")
     lines.append(
         "- legacy docs and source from "
         "`https://github.com/DrFaust92/terraform-provider-bitbucket/tree/master`"

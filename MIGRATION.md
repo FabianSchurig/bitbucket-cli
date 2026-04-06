@@ -6,7 +6,7 @@ It is intentionally a best-effort migration baseline: the generated docs sometim
 
 It was generated with `python3 scripts/gen_migration.py --output MIGRATION.md`, using:
 
-- current docs from `/home/runner/work/bitbucket-cli/bitbucket-cli/docs/`
+- current docs from `./docs/`
 - legacy docs and source from `https://github.com/DrFaust92/terraform-provider-bitbucket/tree/master`
 
 ## What changes first
