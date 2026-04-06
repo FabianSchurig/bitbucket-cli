@@ -672,13 +672,6 @@ func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
 		desc = bf.Path
 	}
 	if bf.IsObject && len(bf.ItemFields) > 0 {
-		if bf.Required {
-			return schema.SingleNestedAttribute{
-				Description: desc,
-				Required:    true,
-				Attributes:  buildNestedItemAttrs(bf.ItemFields),
-			}
-		}
 		return schema.SingleNestedAttribute{
 			Description: desc,
 			Optional:    true,
@@ -686,15 +679,6 @@ func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
 		}
 	}
 	if bf.IsArray && len(bf.ItemFields) > 0 {
-		if bf.Required {
-			return schema.ListNestedAttribute{
-				Description: desc,
-				Required:    true,
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: buildNestedItemAttrs(bf.ItemFields),
-				},
-			}
-		}
 		return schema.ListNestedAttribute{
 			Description: desc,
 			Optional:    true,
@@ -704,13 +688,6 @@ func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
 		}
 	}
 	if bf.IsArray {
-		if bf.Required {
-			return schema.ListAttribute{
-				Description: desc,
-				Required:    true,
-				ElementType: types.StringType,
-			}
-		}
 		return schema.ListAttribute{
 			Description: desc,
 			Optional:    true,

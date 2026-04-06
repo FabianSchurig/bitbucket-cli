@@ -40,7 +40,8 @@ resource "bitbucket_commit_statuses" "example" {
   commit = "abc123def"
   repo_slug = "my-repo"
   workspace = "my-workspace"
-  state = "example-value"
+  key = "build-key"
+  state = "SUCCESSFUL"
 }
 ```
 
@@ -50,6 +51,7 @@ resource "bitbucket_commit_statuses" "example" {
 - `commit` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+- `key` (String) An identifier for the status that's unique to
 - `state` (String) Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]
 
 ### Optional

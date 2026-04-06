@@ -42,8 +42,7 @@ Manages Bitbucket pipeline-schedules via the Bitbucket Cloud API.
 resource "bitbucket_pipeline_schedules" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
-  cron_pattern = "example-value"
-  target = "example-value"
+  cron_pattern = "0 0 * * *"
 }
 ```
 

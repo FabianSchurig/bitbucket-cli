@@ -196,13 +196,15 @@ func buildGroups() []GroupData {
 		// Derive body fields, response fields, and overlaps.
 		requiredBodyFields, bodyFields, responseFields, overlapFields, hasBody := deriveFieldsFull(name, groupIndex)
 
-		// Remove body/overlap/response fields that collide with computed params
-		// (e.g., "name" may be both a computed path param and a body field).
+		// Remove optional body/overlap/response fields that collide with computed params
+		// (e.g., "name" may be both a computed path param and an optional body field).
+		// Required body fields are NOT filtered: the provider schema marks them Required
+		// (bodyFieldAttr overwrites the param attr), so they must appear in test/doc blocks.
 		computedSet := make(map[string]bool)
 		for _, p := range computedParams {
 			computedSet[p] = true
 		}
-		requiredBodyFields = filterFields(requiredBodyFields, computedSet)
+		// Do not filter requiredBodyFields — keep them even if they overlap with computed params.
 		bodyFields = filterFields(bodyFields, computedSet)
 		overlapFields = filterFields(overlapFields, computedSet)
 		responseFields = filterFields(responseFields, computedSet)
@@ -593,11 +595,20 @@ var funcMap = template.FuncMap{
 			return "Example description"
 		case "url":
 			return "https://example.com"
+		case "state":
+			return "SUCCESSFUL"
+		case "key":
+			return "build-key"
+		case "cron_pattern":
+			return "0 0 * * *"
 		case "branch_type":
 			return "development"
 		default:
 			return "example-value"
 		}
+	},
+	"isScalar": func(f FieldDoc) bool {
+		return !f.IsArray && !f.IsObject
 	},
 	"renderNestedFields": func(fields []FieldDoc) string {
 		if len(fields) == 0 {
@@ -774,9 +785,9 @@ resource "{{.TFName}}" "example" {
 {{- range .Params}}
   {{.}} = "{{index $.ParamValues .}}"
 {{- end}}
-{{- range .RequiredBodyFields}}
+{{- range .RequiredBodyFields}}{{if isScalar .}}
   {{.Name}} = "{{exampleBodyValue .Name}}"
-{{- end}}
+{{- end}}{{- end}}
 }
 ` + "```" + `
 
@@ -910,9 +921,9 @@ const exampleResourceTemplate = `resource "{{.TFName}}" "example" {
 {{- range .Params}}
   {{.}} = "{{index $.ParamValues .}}"
 {{- end}}
-{{- range .RequiredBodyFields}}
+{{- range .RequiredBodyFields}}{{if isScalar .}}
   {{.Name}} = "{{exampleBodyValue .Name}}"
-{{- end}}
+{{- end}}{{- end}}
 }
 `
 
@@ -1035,6 +1046,9 @@ resource "{{.TFName}}" "test" {
 {{- range .Params}}
   {{.}} = var.{{.}}
 {{- end}}
+{{- range .RequiredBodyFields}}{{if isScalar .}}
+  {{.Name}} = "{{exampleBodyValue .Name}}"
+{{- end}}{{- end}}
 }
 {{- end}}
 

@@ -339,9 +339,9 @@ func startMockServer(t *testing.T) *httptest.Server {
 		w.Header().Set("Content-Type", "application/json")
 		switch r.Method {
 		case http.MethodGet:
-			_ = json.NewEncoder(w).Encode(map[string]any{"uuid": "{schedule-uuid}", "enabled": true})
+			_ = json.NewEncoder(w).Encode(map[string]any{"uuid": "{schedule-uuid}", "enabled": true, "cron_pattern": "0 0 12 * * ? *", "target": map[string]any{}})
 		case http.MethodPut:
-			_ = json.NewEncoder(w).Encode(map[string]any{"uuid": "{schedule-uuid}", "enabled": true})
+			_ = json.NewEncoder(w).Encode(map[string]any{"uuid": "{schedule-uuid}", "enabled": true, "cron_pattern": "0 0 12 * * ? *", "target": map[string]any{}})
 		case http.MethodDelete:
 			w.WriteHeader(http.StatusNoContent)
 		}
@@ -349,7 +349,7 @@ func startMockServer(t *testing.T) *httptest.Server {
 	mux.HandleFunc("POST /repositories/{workspace}/{repo_slug}/pipelines_config/schedules", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		_ = json.NewEncoder(w).Encode(map[string]any{"uuid": "{schedule-uuid}", "enabled": true})
+		_ = json.NewEncoder(w).Encode(map[string]any{"uuid": "{schedule-uuid}", "enabled": true, "cron_pattern": "0 0 12 * * ? *", "target": map[string]any{}})
 	})
 
 	// Pipeline known hosts endpoint
@@ -878,6 +878,7 @@ func TestAccResourceTags_CRUD(t *testing.T) {
 						workspace = "testworkspace"
 						repo_slug = "test-repo"
 						name      = "v1.0.0"
+						type      = "tag"
 					}
 				`, srv.URL),
 				Check: resource.ComposeTestCheckFunc(
@@ -961,6 +962,7 @@ func TestAccResourcePipelineSchedules_CRUD(t *testing.T) {
 						workspace     = "testworkspace"
 						repo_slug     = "test-repo"
 						schedule_uuid = "{schedule-uuid}"
+						cron_pattern  = "0 0 12 * * ? *"
 					}
 				`, srv.URL),
 				Check: resource.ComposeTestCheckFunc(

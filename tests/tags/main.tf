@@ -35,4 +35,5 @@ data "bitbucket_tags" "test" {
 resource "bitbucket_tags" "test" {
   repo_slug = var.repo_slug
   workspace = var.workspace
+  type = "webhook"
 }

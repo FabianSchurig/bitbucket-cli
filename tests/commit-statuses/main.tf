@@ -42,4 +42,6 @@ resource "bitbucket_commit_statuses" "test" {
   commit = var.commit
   repo_slug = var.repo_slug
   workspace = var.workspace
+  key = "build-key"
+  state = "SUCCESSFUL"
 }

@@ -35,4 +35,7 @@ data "bitbucket_branch_restrictions" "test" {
 resource "bitbucket_branch_restrictions" "test" {
   repo_slug = var.repo_slug
   workspace = var.workspace
+  branch_match_kind = "glob"
+  kind = "require_approvals_to_merge"
+  pattern = "main"
 }
