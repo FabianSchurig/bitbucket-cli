@@ -116,13 +116,13 @@ class GenMigrationTests(unittest.TestCase):
         self.assertEqual(doc.name, "bitbucket_missing")
         self.assertEqual(doc.inputs, [])
 
-    def test_get_legacy_doc_url_points_to_legacy_repository_docs(self):
+    def test_get_legacy_doc_url(self):
         self.assertEqual(
             gen_migration.get_legacy_doc_url("resource", "bitbucket_repository"),
             "https://github.com/DrFaust92/terraform-provider-bitbucket/blob/master/docs/resources/repository.md",
         )
 
-    def test_get_current_doc_url_points_to_local_generated_docs(self):
+    def test_get_current_doc_url(self):
         self.assertEqual(
             gen_migration.get_current_doc_url("data-source", "bitbucket_current_user"),
             "./docs/data-sources/bitbucket_current_user.md",
