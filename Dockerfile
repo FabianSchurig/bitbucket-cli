@@ -1,8 +1,9 @@
 # ============================================================================
 # Dockerfile for bitbucket-cli
 #
-# Uses the hardened dhi.io/golang base image and installs pre-built binaries
-# directly from GitHub (bypassing the Go module proxy to avoid cache lag).
+# Uses the hardened dhi.io/golang base image and builds binaries from source
+# using `go install` (GOPROXY=direct bypasses the module proxy to avoid cache
+# lag for newly released versions).
 #
 # Targets:
 #   bb-cli  — Bitbucket CLI

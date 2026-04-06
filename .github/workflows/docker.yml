@@ -1,9 +1,6 @@
 name: Docker
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_run:
     workflows: ["Release"]
     types:
@@ -19,7 +16,6 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     if: >
-      github.event_name == 'push' ||
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     strategy:
@@ -31,6 +27,15 @@ jobs:
             image: bitbucket-mcp
     steps:
       - uses: actions/checkout@v4
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            echo "tag=${{ github.event.workflow_run.head_branch }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -58,9 +63,9 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
+            type=semver,pattern={{version}},value=${{ steps.version.outputs.tag }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.version.outputs.tag }}
+            type=semver,pattern={{major}},value=${{ steps.version.outputs.tag }}
             type=raw,value=latest
 
       - name: Build and push
@@ -75,20 +80,27 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            VERSION=${{ github.ref_name }}
+            VERSION=${{ steps.version.outputs.tag }}
 
   publish-mcp:
     name: Publish to MCP Registry
     needs: [docker]
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: >
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'workflow_run' && startsWith(github.event.workflow_run.head_branch, 'v'))
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set version in server.json
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            VERSION="${{ github.event.workflow_run.head_branch }}"
+            VERSION="${VERSION#v}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          fi
           jq --arg v "$VERSION" '.packages[0].version = $v' server.json > server.tmp && mv server.tmp server.json
 
       - name: Install mcp-publisher

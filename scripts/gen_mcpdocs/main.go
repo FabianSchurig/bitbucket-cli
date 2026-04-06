@@ -35,9 +35,9 @@ const defaultConfigPath = "internal/config/default_mcp_config.yaml"
 
 // ToolDoc holds the data for one tool group section in the rendered doc.
 type ToolDoc struct {
-	ToolName    string    // e.g., "bitbucket_pr"
-	Description string    // group-level description (overridden if configured)
-	Ignored     bool      // true when the default config hides this tool
+	ToolName    string // e.g., "bitbucket_pr"
+	Description string // group-level description (overridden if configured)
+	Ignored     bool   // true when the default config hides this tool
 	Operations  []OpDoc
 }
 
@@ -92,7 +92,7 @@ func oneliner(s string) string {
 
 var funcMap = template.FuncMap{
 	"oneliner": oneliner,
-	"not": func(b bool) bool { return !b },
+	"not":      func(b bool) bool { return !b },
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -176,10 +176,15 @@ func main() {
 		fmt.Fprintf(os.Stderr, "creating %s: %v\n", outputPath, err)
 		os.Exit(1)
 	}
-	defer f.Close()
 
 	if err := tmpl.Execute(f, tools); err != nil {
+		_ = f.Close()
 		fmt.Fprintf(os.Stderr, "rendering template: %v\n", err)
+		os.Exit(1)
+	}
+
+	if err := f.Close(); err != nil {
+		fmt.Fprintf(os.Stderr, "closing %s: %v\n", outputPath, err)
 		os.Exit(1)
 	}
 

@@ -37,8 +37,8 @@ type ServerConfig struct {
 
 // ToolOverrideItem holds per-tool overrides.
 type ToolOverrideItem struct {
-	Description string                        `yaml:"description"`
-	Operations  map[string]OperationOverride  `yaml:"operations"`
+	Description string                       `yaml:"description"`
+	Operations  map[string]OperationOverride `yaml:"operations"`
 }
 
 // OperationOverride holds per-operation overrides within a tool group.

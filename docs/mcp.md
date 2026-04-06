@@ -96,7 +96,7 @@ When no `mcp_config.yaml` is present in the working directory the server uses a 
 - **Hides** `bitbucket_addon` and `bitbucket_properties` (platform/admin tools).
 - **Applies** LLM-optimised descriptions for the eight most important daily tools.
 
-To override, create an `mcp_config.yaml` next to the binary (see `mcp_config.yaml` in the repo root for a commented template).
+To override, create an `mcp_config.yaml` in your working directory — use [`internal/config/default_mcp_config.yaml`](../internal/config/default_mcp_config.yaml) as a commented starting point.
 
 ## Example VS Code configuration
 

@@ -1,8 +1,13 @@
-.PHONY: build test test-python lint fmt vet check generate generate-docs clean
+.PHONY: build test test-python lint fmt vet check generate generate-docs clean install
 
 # Build all binaries
 build:
 	go build ./...
+
+# Install all binaries to $GOPATH/bin (or $HOME/go/bin)
+install:
+	go install ./cmd/bb-cli
+	go install ./cmd/bb-mcp
 
 # Run Go tests with race detector and Python unit tests
 test:
