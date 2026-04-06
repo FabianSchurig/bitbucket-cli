@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, SearchToolGroup)
+}
+
 // SearchToolGroup contains the MCP tool definition for the "bitbucket_search" tool group.
 var SearchToolGroup = ToolGroup{
 	Name: `bitbucket_search`,

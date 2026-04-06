@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, DownloadsToolGroup)
+}
+
 // DownloadsToolGroup contains the MCP tool definition for the "bitbucket_downloads" tool group.
 var DownloadsToolGroup = ToolGroup{
 	Name: `bitbucket_downloads`,

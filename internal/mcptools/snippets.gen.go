@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, SnippetsToolGroup)
+}
+
 // SnippetsToolGroup contains the MCP tool definition for the "bitbucket_snippets" tool group.
 var SnippetsToolGroup = ToolGroup{
 	Name: `bitbucket_snippets`,
@@ -198,9 +202,9 @@ Available operations:
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
+				{Path: `snippet.title`, Type: `string`, Desc: `title`},
 				{Path: `snippet.scm`, Type: `string`, Desc: `The DVCS used to store the snippet. [git]`},
 				{Path: `snippet.is_private`, Type: `bool`, Desc: `is_private`},
-				{Path: `snippet.title`, Type: `string`, Desc: `title`},
 				{Path: `snippet.id`, Type: `int`, Desc: `id`},
 			},
 			HasBody:   true,

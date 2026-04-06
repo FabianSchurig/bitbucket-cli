@@ -82,3 +82,64 @@ func TestToolHelperFunctions(t *testing.T) {
 		t.Fatal("expected marshaled schema data")
 	}
 }
+
+func TestFilterOperations(t *testing.T) {
+	group := ToolGroup{
+		Name:        "test_tool",
+		Description: "Test tool\n\nAvailable operations:\n- listItems: List [GET]\n- deleteItem: Delete [DELETE]\n",
+		Operations: []OperationDef{
+			{OperationID: "listItems", Method: "GET", Path: "/items", Summary: "List"},
+			{OperationID: "createItem", Method: "POST", Path: "/items", Summary: "Create"},
+			{OperationID: "deleteItem", Method: "DELETE", Path: "/items/{id}", Summary: "Delete"},
+		},
+	}
+
+	// Filter to only GET and POST.
+	allowGETandPOST := func(method string) bool {
+		return method == "GET" || method == "POST"
+	}
+	filtered := FilterOperations(group, allowGETandPOST)
+
+	if len(filtered.Operations) != 2 {
+		t.Fatalf("expected 2 operations, got %d", len(filtered.Operations))
+	}
+	if filtered.Operations[0].OperationID != "listItems" {
+		t.Errorf("expected listItems, got %s", filtered.Operations[0].OperationID)
+	}
+	if filtered.Operations[1].OperationID != "createItem" {
+		t.Errorf("expected createItem, got %s", filtered.Operations[1].OperationID)
+	}
+	if filtered.Name != "test_tool" {
+		t.Errorf("expected name test_tool, got %s", filtered.Name)
+	}
+
+	// Filter out everything.
+	allowNone := func(string) bool { return false }
+	empty := FilterOperations(group, allowNone)
+	if len(empty.Operations) != 0 {
+		t.Errorf("expected 0 operations, got %d", len(empty.Operations))
+	}
+
+	// Allow all.
+	allowAll := func(string) bool { return true }
+	all := FilterOperations(group, allowAll)
+	if len(all.Operations) != 3 {
+		t.Errorf("expected 3 operations, got %d", len(all.Operations))
+	}
+}
+
+func TestAllToolGroups_Registry(t *testing.T) {
+	if len(AllToolGroups) == 0 {
+		t.Fatal("expected AllToolGroups to be populated by generated init() functions")
+	}
+	found := false
+	for _, g := range AllToolGroups {
+		if g.Name == "bitbucket_pr" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("expected bitbucket_pr in AllToolGroups registry")
+	}
+}

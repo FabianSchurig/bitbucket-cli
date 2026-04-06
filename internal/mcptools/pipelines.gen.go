@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, PipelinesToolGroup)
+}
+
 // PipelinesToolGroup contains the MCP tool definition for the "bitbucket_pipelines" tool group.
 var PipelinesToolGroup = ToolGroup{
 	Name: `bitbucket_pipelines`,
@@ -205,18 +209,18 @@ for specific details.
 				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`},
 				{Path: `creator.display_name`, Type: `string`, Desc: `display_name`},
 				{Path: `creator.uuid`, Type: `string`, Desc: `uuid`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `is_private`},
 				{Path: `repository.description`, Type: `string`, Desc: `description`},
-				{Path: `repository.size`, Type: `int`, Desc: `size`},
+				{Path: `repository.language`, Type: `string`, Desc: `language`},
 				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
 The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
-				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
 				{Path: `repository.name`, Type: `string`, Desc: `name`},
-				{Path: `repository.language`, Type: `string`, Desc: `language`},
-				{Path: `repository.is_private`, Type: `bool`, Desc: `is_private`},
+				{Path: `repository.size`, Type: `int`, Desc: `size`},
 				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
 				{Path: `repository.has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
@@ -548,11 +552,6 @@ This endpoint supports (and encourages!) the use of [HTTP Range requests](https:
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `enabled`, Type: `bool`, Desc: `Whether Pipelines is enabled for the repository.`},
-				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-				{Path: `repository.name`, Type: `string`, Desc: `name`},
-				{Path: `repository.language`, Type: `string`, Desc: `language`},
-				{Path: `repository.is_private`, Type: `bool`, Desc: `is_private`},
 				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
 				{Path: `repository.has_issues`, Type: `bool`, Desc: `
 The issue tracker for this repository is enabled. Issue Tracker
@@ -567,13 +566,18 @@ Controls the rules for forking this repository.
   be made public later)
 * **no_forks**: deny all forking
  [allow_forks, no_public_forks, no_forks]`},
+				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
+				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
+				{Path: `repository.is_private`, Type: `bool`, Desc: `is_private`},
 				{Path: `repository.description`, Type: `string`, Desc: `description`},
-				{Path: `repository.size`, Type: `int`, Desc: `size`},
+				{Path: `repository.language`, Type: `string`, Desc: `language`},
 				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
 The wiki for this repository is enabled. Wiki
 features are not supported for repositories in workspaces
 administered through admin.atlassian.com.
 `},
+				{Path: `repository.name`, Type: `string`, Desc: `name`},
+				{Path: `repository.size`, Type: `int`, Desc: `size`},
 			},
 			HasBody:   true,
 			Paginated: false,
@@ -805,10 +809,10 @@ administered through admin.atlassian.com.
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `hostname`, Type: `string`, Desc: `The hostname of the known host.`},
-				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
-				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
 				{Path: `public_key.md5_fingerprint`, Type: `string`, Desc: `The MD5 fingerprint of the public key.`},
 				{Path: `public_key.sha256_fingerprint`, Type: `string`, Desc: `The SHA-256 fingerprint of the public key.`},
+				{Path: `public_key.key_type`, Type: `string`, Desc: `The type of the public key.`},
+				{Path: `public_key.key`, Type: `string`, Desc: `The base64 encoded public key.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the known host.`},
 			},
 			HasBody:   true,

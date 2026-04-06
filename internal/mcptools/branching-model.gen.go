@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, BranchingModelToolGroup)
+}
+
 // BranchingModelToolGroup contains the MCP tool definition for the "bitbucket_branching-model" tool group.
 var BranchingModelToolGroup = ToolGroup{
 	Name: `bitbucket_branching-model`,

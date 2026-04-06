@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, PropertiesToolGroup)
+}
+
 // PropertiesToolGroup contains the MCP tool definition for the "bitbucket_properties" tool group.
 var PropertiesToolGroup = ToolGroup{
 	Name: `bitbucket_properties`,

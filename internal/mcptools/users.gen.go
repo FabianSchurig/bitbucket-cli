@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, UsersToolGroup)
+}
+
 // UsersToolGroup contains the MCP tool definition for the "bitbucket_users" tool group.
 var UsersToolGroup = ToolGroup{
 	Name: `bitbucket_users`,

@@ -6,6 +6,10 @@
 
 package mcptools
 
+func init() {
+	AllToolGroups = append(AllToolGroups, ReportsToolGroup)
+}
+
 // ReportsToolGroup contains the MCP tool definition for the "bitbucket_reports" tool group.
 var ReportsToolGroup = ToolGroup{
 	Name: `bitbucket_reports`,
