@@ -227,6 +227,13 @@ paths:
       x-atlassian-auth-types:
       - api-token
       operationId: createAWebhookForARepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/webhook_subscription'
+        description: The webhook subscription to create or update.
+        required: true
     parameters:
     - name: repo_slug
       in: path
@@ -393,6 +400,13 @@ paths:
       x-atlassian-auth-types:
       - api-token
       operationId: updateAWebhookForARepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/webhook_subscription'
+        description: The webhook subscription to create or update.
+        required: true
     parameters:
     - name: repo_slug
       in: path
@@ -521,6 +535,13 @@ paths:
       x-atlassian-auth-types:
       - api-token
       operationId: createAWebhookForAWorkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/webhook_subscription'
+        description: The webhook subscription to create or update.
+        required: true
     parameters:
     - name: workspace
       in: path
@@ -675,6 +696,13 @@ paths:
       x-atlassian-auth-types:
       - api-token
       operationId: updateAWebhookForAWorkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/webhook_subscription'
+        description: The webhook subscription to create or update.
+        required: true
     parameters:
     - name: uid
       in: path
