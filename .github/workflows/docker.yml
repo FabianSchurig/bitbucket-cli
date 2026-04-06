@@ -30,11 +30,15 @@ jobs:
 
       - name: Determine version
         id: version
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_run" ]; then
-            echo "tag=${{ github.event.workflow_run.head_branch }}" >> $GITHUB_OUTPUT
+          if [ "$EVENT_NAME" = "workflow_run" ]; then
+            echo "tag=$HEAD_BRANCH" >> $GITHUB_OUTPUT
           else
-            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "tag=$REF_NAME" >> $GITHUB_OUTPUT
           fi
 
       - name: Set up QEMU
@@ -94,10 +98,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set version in server.json
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_run" ]; then
-            VERSION="${{ github.event.workflow_run.head_branch }}"
-            VERSION="${VERSION#v}"
+          if [ "$EVENT_NAME" = "workflow_run" ]; then
+            VERSION="${HEAD_BRANCH#v}"
           else
             VERSION="${GITHUB_REF#refs/tags/v}"
           fi
