@@ -1,0 +1,11 @@
+{
+	"servers": {
+		"bitbucket-mcp-server": {
+			"type": "stdio",
+			"command": "bb-mcp",
+			"args": [],
+			"envFile": "${workspaceFolder}/.env"
+		}
+	},
+	"inputs": []
+}
