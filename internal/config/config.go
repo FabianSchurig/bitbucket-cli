@@ -21,8 +21,8 @@ const DefaultConfigFile = "mcp_config.yaml"
 
 // Config holds the runtime MCP server configuration.
 type Config struct {
-	Server         ServerConfig               `yaml:"server"`
-	ToolOverrides  map[string]ToolOverrideItem `yaml:"tool_overrides"`
+	Server        ServerConfig                `yaml:"server"`
+	ToolOverrides map[string]ToolOverrideItem `yaml:"tool_overrides"`
 }
 
 // ServerConfig controls which tools are exposed.
