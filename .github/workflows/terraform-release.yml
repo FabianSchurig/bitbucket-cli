@@ -5,15 +5,17 @@ on:
     tags:
       - 'v*'
 
+# Only checkout is needed in this repo; the release is created in the
+# terraform-provider-bitbucket repo via TERRAFORM_REPO_TOKEN.
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   mirror:
     name: Mirror to terraform-provider-bitbucket
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -32,18 +34,18 @@ jobs:
     needs: mirror
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version-file: go.mod
           cache: true
 
       - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v6
+        uses: crazy-max/ghaction-import-gpg@e89d40939c28e39f97cf32126055eeae86ba74ec # v6
         id: import_gpg
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -52,8 +54,13 @@ jobs:
       - name: Build & test
         run: go build ./... && go test ./...
 
+      - name: Run govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@v1.1.4
+          govulncheck ./...
+
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6
         with:
           args: release --clean -f .goreleaser-terraform.yaml
         env:

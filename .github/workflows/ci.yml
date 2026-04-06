@@ -6,8 +6,7 @@ on:
   pull_request:
     branches: [main]
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   test:
@@ -15,12 +14,12 @@ jobs:
     permissions:
       contents: write # needed for git-auto-commit-action on push
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
           go-version-file: go.mod
           cache: true
@@ -29,7 +28,7 @@ jobs:
         run: go build ./...
 
       - name: Lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@9fae48acfc02a90574d7c304a1758ef9895495fa # v7
         with:
           version: v2.11.4
 
@@ -37,7 +36,8 @@ jobs:
         run: gofmt -w .
 
       - name: Commit formatting fixes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        if: github.event_name == 'push'
+        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5
         with:
           commit_message: "style: apply gofmt formatting [skip ci]"
           file_pattern: "*.go"
@@ -57,6 +57,7 @@ jobs:
           mv coverage.out.tmp coverage.out
 
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v6
+        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
