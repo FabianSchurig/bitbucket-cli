@@ -63,6 +63,7 @@ type TFBodyFieldData struct {
 	Path       string
 	Type       string
 	Desc       string
+	Required   bool
 	IsArray    bool
 	IsObject   bool
 	ItemFields []TFBodyFieldData
@@ -182,6 +183,9 @@ func renderBodyFieldDef(bf TFBodyFieldData, indent string) string {
 	var sb strings.Builder
 	sb.WriteString("{")
 	fmt.Fprintf(&sb, "Path: %s, Type: %s, Desc: %s", spec.GoStringLit(bf.Path), spec.GoStringLit(bf.Type), spec.GoStringLit(bf.Desc))
+	if bf.Required {
+		sb.WriteString(", Required: true")
+	}
 	if bf.IsArray {
 		sb.WriteString(", IsArray: true")
 	}
@@ -261,6 +265,7 @@ func specFieldToTFField(bf spec.BodyField) TFBodyFieldData {
 		Path:     bf.Path,
 		Type:     bf.GoType,
 		Desc:     bf.Desc,
+		Required: bf.Required,
 		IsArray:  bf.IsArray,
 		IsObject: bf.IsObject,
 	}

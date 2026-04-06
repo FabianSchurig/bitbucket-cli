@@ -42,6 +42,8 @@ Manages Bitbucket pipeline-schedules via the Bitbucket Cloud API.
 resource "bitbucket_pipeline_schedules" "example" {
   workspace = "my-workspace"
   repo_slug = "my-repo"
+  cron_pattern = "example-value"
+  target = "example-value"
 }
 ```
 
@@ -50,19 +52,19 @@ resource "bitbucket_pipeline_schedules" "example" {
 ### Required
 - `workspace` (String) Path parameter.
 - `repo_slug` (String) Path parameter.
+- `cron_pattern` (String) The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.
+- `target` (Object) The target on which the schedule will be executed.
+  Nested schema:
+  - `ref_name` (String) The name of the reference.
+  - `ref_type` (String) The type of reference (branch only). [branch]
+  - `selector` (Object) selector
+    - `pattern` (String) The name of the matching pipeline definition.
+    - `type` (String) The type of selector. [branches, tags, bookmarks, default, custom]
+
 
 ### Optional
 - `schedule_uuid` (String) Path parameter (auto-populated from API response).
-- `cron_pattern` (String) The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day. (also computed from API response)
 - `enabled` (String) Whether the schedule is enabled. (also computed from API response)
-- `target` (Object) The target on which the schedule will be executed. (also computed from API response)
-  Nested schema:
-  - `selector` (Object) selector
-    - `type` (String) The type of selector. [branches, tags, bookmarks, default, custom]
-    - `pattern` (String) The name of the matching pipeline definition.
-  - `ref_name` (String) The name of the reference.
-  - `ref_type` (String) The type of reference (branch only). [branch]
-
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

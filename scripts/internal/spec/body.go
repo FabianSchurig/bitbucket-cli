@@ -14,6 +14,7 @@ type BodyField struct {
 	GoType     string      // "string", "int", "bool"
 	Default    string      // Go zero-value literal
 	Desc       string      // human-readable description
+	Required   bool        // true when listed in the parent schema's "required" array
 	IsArray    bool        // true when the field is an array
 	IsObject   bool        // true when the field is a nested object ($ref or inline)
 	ItemFields []BodyField // nested fields for array item objects or object properties
@@ -218,7 +219,31 @@ func resolveSchemaObj(schemas map[string]any, schema map[string]any, prefix stri
 	if !ok {
 		return nil
 	}
-	return flattenProperties(schemas, props, prefix, visited, opts)
+
+	// Extract the required property names declared in this schema.
+	requiredSet := extractRequiredSet(schema)
+
+	return flattenProperties(schemas, props, prefix, visited, opts, requiredSet)
+}
+
+// extractRequiredSet reads the "required" array from a schema object and
+// returns a set of property names that are required.
+func extractRequiredSet(schema map[string]any) map[string]bool {
+	reqRaw, ok := schema["required"]
+	if !ok {
+		return nil
+	}
+	reqList, ok := reqRaw.([]any)
+	if !ok {
+		return nil
+	}
+	required := make(map[string]bool, len(reqList))
+	for _, r := range reqList {
+		if s, ok := r.(string); ok {
+			required[s] = true
+		}
+	}
+	return required
 }
 
 func resolveAllOf(schemas map[string]any, allOfRaw any, prefix string, visited map[string]bool, opts FieldResolveOpts) []BodyField {
@@ -242,7 +267,12 @@ func resolveAllOf(schemas map[string]any, allOfRaw any, prefix string, visited m
 	return fields
 }
 
-func flattenProperties(schemas map[string]any, props map[string]any, prefix string, visited map[string]bool, opts FieldResolveOpts) []BodyField {
+func flattenProperties(schemas map[string]any, props map[string]any, prefix string, visited map[string]bool, opts FieldResolveOpts, requiredProps ...map[string]bool) []BodyField {
+	var required map[string]bool
+	if len(requiredProps) > 0 {
+		required = requiredProps[0]
+	}
+
 	keys := make([]string, 0, len(props))
 	for k := range props {
 		keys = append(keys, k)
@@ -263,7 +293,14 @@ func flattenProperties(schemas map[string]any, props map[string]any, prefix stri
 		if prefix != "" {
 			path = prefix + "." + name
 		}
-		fields = append(fields, flattenProperty(schemas, name, path, prop, visited, opts)...)
+		propFields := flattenProperty(schemas, name, path, prop, visited, opts)
+		// Mark first-level fields as required based on the parent schema's required list.
+		if required[name] {
+			for i := range propFields {
+				propFields[i].Required = true
+			}
+		}
+		fields = append(fields, propFields...)
 	}
 	return fields
 }

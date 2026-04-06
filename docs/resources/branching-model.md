@@ -54,20 +54,20 @@ resource "bitbucket_branching_model" "example" {
 - `development` (Object) development
   Nested schema:
   - `branch` (Object) branch
-    - `type` (String) type
     - `name` (String) The name of the ref.
-    - `merge_strategies` (String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
+    - `type` (String) type
     - `default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch.
+    - `merge_strategies` (String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
   - `name` (String) Name of the target branch. Will be listed here even when the target branch does not exist. Will be `null` if targeting the main branch and the repository is empty.
   - `use_mainbranch` (String) Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`).
 
 - `production` (Object) production
   Nested schema:
   - `branch` (Object) branch
-    - `type` (String) type
     - `name` (String) The name of the ref.
-    - `merge_strategies` (String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
+    - `type` (String) type
     - `default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch.
+    - `merge_strategies` (String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
   - `name` (String) Name of the target branch. Will be listed here even when the target branch does not exist. Will be `null` if targeting the main branch and the repository is empty.
   - `use_mainbranch` (String) Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`).
 

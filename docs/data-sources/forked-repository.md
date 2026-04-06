@@ -55,10 +55,10 @@ output "forked_repository_response" {
 - `language` (String) language
 - `mainbranch` (Object) mainbranch
   Nested schema:
-  - `type` (String) type
   - `name` (String) The name of the ref.
-  - `merge_strategies` (List of String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
+  - `type` (String) type
   - `default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch.
+  - `merge_strategies` (List of String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
 
 - `name` (String) name
 - `owner` (Object) owner
@@ -70,9 +70,9 @@ output "forked_repository_response" {
   Nested schema:
   - `description` (String) description
   - `has_publicly_visible_repos` (String) 
+  - `is_private` (String) 
   - `key` (String) The project's key.
   - `name` (String) The name of the project.
-  - `is_private` (String) 
   - `uuid` (String) The project's immutable id.
 
 - `scm` (String) [git]

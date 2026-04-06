@@ -52,10 +52,10 @@ resource "bitbucket_forked_repository" "example" {
 - `language` (String) language (also computed from API response)
 - `mainbranch` (Object) mainbranch (also computed from API response)
   Nested schema:
-  - `type` (String) type
   - `name` (String) The name of the ref.
-  - `merge_strategies` (List of String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
+  - `type` (String) type
   - `default_merge_strategy` (String) The default merge strategy for pull requests targeting this branch.
+  - `merge_strategies` (List of String) Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]
 
 - `name` (String) name (also computed from API response)
 - `owner` (Object) owner (also computed from API response)
@@ -67,9 +67,9 @@ resource "bitbucket_forked_repository" "example" {
   Nested schema:
   - `description` (String) description
   - `has_publicly_visible_repos` (String) 
+  - `is_private` (String) 
   - `key` (String) The project's key.
   - `name` (String) The name of the project.
-  - `is_private` (String) 
   - `uuid` (String) The project's immutable id.
 
 - `scm` (String) [git] (also computed from API response)

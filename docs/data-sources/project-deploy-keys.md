@@ -62,12 +62,12 @@ output "project_deploy_keys_response" {
 - `last_used` (String) last_used
 - `project` (Object) project
   Nested schema:
-  - `uuid` (String) The project's immutable id.
-  - `name` (String) The name of the project.
-  - `description` (String) description
   - `created_on` (String) created_on
-  - `updated_on` (String) updated_on
-  - `key` (String) The project's key.
-  - `is_private` (String) 
+  - `description` (String) description
   - `has_publicly_visible_repos` (String) 
+  - `is_private` (String) 
+  - `key` (String) The project's key.
+  - `name` (String) The name of the project.
+  - `updated_on` (String) updated_on
+  - `uuid` (String) The project's immutable id.
 

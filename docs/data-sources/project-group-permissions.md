@@ -51,20 +51,20 @@ output "project_group_permissions_response" {
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `group` (Object) group
   Nested schema:
-  - `slug` (String) The "sluggified" version of the group's name. This contains only ASCII
   - `full_slug` (String) The concatenation of the workspace's slug and the group's slug,
   - `name` (String) name
+  - `slug` (String) The "sluggified" version of the group's name. This contains only ASCII
 
 - `permission` (String) [read, write, create-repo, admin, none]
 - `project` (Object) project
   Nested schema:
+  - `created_on` (String) created_on
   - `description` (String) description
-  - `updated_on` (String) updated_on
   - `has_publicly_visible_repos` (String) 
+  - `is_private` (String) 
   - `key` (String) The project's key.
   - `name` (String) The name of the project.
-  - `is_private` (String) 
-  - `created_on` (String) created_on
+  - `updated_on` (String) updated_on
   - `uuid` (String) The project's immutable id.
 
 - `type` (String) type

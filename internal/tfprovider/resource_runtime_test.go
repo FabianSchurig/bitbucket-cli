@@ -466,6 +466,13 @@ func TestResourceIDHelpers(t *testing.T) {
 	if val, ok := responseParamValue(map[string]any{"name": "demo"}, "missing"); !ok || val != "demo" {
 		t.Fatalf("expected extractID fallback, got %q ok=%v", val, ok)
 	}
+	// Large integer IDs from JSON (decoded as float64) must not use scientific notation.
+	if id := extractID(map[string]any{"id": float64(74332764)}); id != "74332764" {
+		t.Fatalf("expected integer id without scientific notation, got %q", id)
+	}
+	if val, ok := responseParamValue(map[string]any{"id": float64(74332764)}, "id"); !ok || val != "74332764" {
+		t.Fatalf("expected integer responseParamValue without scientific notation, got %q ok=%v", val, ok)
+	}
 }
 
 func TestGenericResourceDispatch(t *testing.T) {

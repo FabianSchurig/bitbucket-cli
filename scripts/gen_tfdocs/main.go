@@ -47,9 +47,10 @@ type GroupData struct {
 	DSRequiredParams []string // data source Required params (from List or Read base path)
 	DSOptionalParams []string // data source Optional params (Read-only, not in List)
 	ParamValues      map[string]string
-	BodyFields       []FieldDoc   // writable body fields (Optional)
-	ResponseFields   []FieldDoc   // computed response fields (Computed)
-	OverlapFields    []FieldDoc   // fields that are both writable and computed (Optional+Computed)
+	RequiredBodyFields []FieldDoc   // writable body fields that are Required per API schema
+	BodyFields         []FieldDoc   // writable body fields (Optional)
+	ResponseFields     []FieldDoc   // computed response fields (Computed)
+	OverlapFields      []FieldDoc   // fields that are both writable and computed (Optional+Computed)
 	CRUDOps          []CRUDOpInfo // CRUD operation details (scopes, doc links)
 }
 
@@ -57,6 +58,7 @@ type GroupData struct {
 type FieldDoc struct {
 	Name       string     // Terraform attribute name (snake_case)
 	Desc       string     // Human-readable description
+	Required   bool       // true when listed as required in the OpenAPI schema
 	IsArray    bool       // true when the field is a list-nested attribute
 	IsObject   bool       // true when the field is a single-nested object attribute
 	ItemFields []FieldDoc // nested fields for array items or object properties
@@ -192,7 +194,7 @@ func buildGroups() []GroupData {
 		}
 
 		// Derive body fields, response fields, and overlaps.
-		bodyFields, responseFields, overlapFields, hasBody := deriveFields(name, groupIndex)
+		requiredBodyFields, bodyFields, responseFields, overlapFields, hasBody := deriveFieldsFull(name, groupIndex)
 
 		// Remove body/overlap/response fields that collide with computed params
 		// (e.g., "name" may be both a computed path param and a body field).
@@ -200,6 +202,7 @@ func buildGroups() []GroupData {
 		for _, p := range computedParams {
 			computedSet[p] = true
 		}
+		requiredBodyFields = filterFields(requiredBodyFields, computedSet)
 		bodyFields = filterFields(bodyFields, computedSet)
 		overlapFields = filterFields(overlapFields, computedSet)
 		responseFields = filterFields(responseFields, computedSet)
@@ -208,25 +211,26 @@ func buildGroups() []GroupData {
 		crudOps := deriveCRUDOps(name, groupIndex)
 
 		groups = append(groups, GroupData{
-			Name:             name,
-			TFName:           "bitbucket_" + strings.ReplaceAll(name, "-", "_"),
-			Subcategory:      groupIndex[name].Category,
-			HasCreate:        crud.Create != "",
-			HasRead:          crud.Read != "",
-			HasUpdate:        crud.Update != "",
-			HasDelete:        crud.Delete != "",
-			HasList:          crud.List != "",
-			HasIDParam:       hasIDParam,
-			HasBody:          hasBody,
-			Params:           requiredParams,
-			ComputedParams:   computedParams,
-			DSRequiredParams: dsRequiredParams,
-			DSOptionalParams: dsOptionalParams,
-			ParamValues:      pv,
-			BodyFields:       bodyFields,
-			ResponseFields:   responseFields,
-			OverlapFields:    overlapFields,
-			CRUDOps:          crudOps,
+			Name:               name,
+			TFName:             "bitbucket_" + strings.ReplaceAll(name, "-", "_"),
+			Subcategory:        groupIndex[name].Category,
+			HasCreate:          crud.Create != "",
+			HasRead:            crud.Read != "",
+			HasUpdate:          crud.Update != "",
+			HasDelete:          crud.Delete != "",
+			HasList:            crud.List != "",
+			HasIDParam:         hasIDParam,
+			HasBody:            hasBody,
+			Params:             requiredParams,
+			ComputedParams:     computedParams,
+			DSRequiredParams:   dsRequiredParams,
+			DSOptionalParams:   dsOptionalParams,
+			ParamValues:        pv,
+			RequiredBodyFields: requiredBodyFields,
+			BodyFields:         bodyFields,
+			ResponseFields:     responseFields,
+			OverlapFields:      overlapFields,
+			CRUDOps:            crudOps,
 		})
 	}
 	sort.Slice(groups, func(i, j int) bool { return groups[i].Name < groups[j].Name })
@@ -353,9 +357,9 @@ func deriveDSParams(name string, index map[string]tfprovider.ResourceGroup) (req
 	return required, optional
 }
 
-// deriveFields extracts body fields, response fields, and their overlaps
-// from a resource group's CRUD operations for documentation.
-func deriveFields(name string, index map[string]tfprovider.ResourceGroup) (bodyFields, responseFields, overlapFields []FieldDoc, hasBody bool) {
+// deriveFieldsFull extracts required body fields, optional body fields, response fields,
+// and their overlaps from a resource group's CRUD operations for documentation.
+func deriveFieldsFull(name string, index map[string]tfprovider.ResourceGroup) (requiredBodyFields, bodyFields, responseFields, overlapFields []FieldDoc, hasBody bool) {
 	rg, ok := index[name]
 	if !ok {
 		return
@@ -378,7 +382,7 @@ func deriveFields(name string, index map[string]tfprovider.ResourceGroup) (bodyF
 				if desc == "" {
 					desc = bf.Path
 				}
-				bodyFieldMap[key] = bodyFieldInfo{desc: desc, isArray: bf.IsArray, isObject: bf.IsObject, itemFields: bf.ItemFields}
+				bodyFieldMap[key] = bodyFieldInfo{desc: desc, required: bf.Required, isArray: bf.IsArray, isObject: bf.IsObject, itemFields: bf.ItemFields}
 			}
 		}
 	}
@@ -403,10 +407,18 @@ func deriveFields(name string, index map[string]tfprovider.ResourceGroup) (bodyF
 		}
 	}
 
-	// Categorize into body-only, response-only, and overlap.
+	// Categorize into required-body, optional-body, response-only, and overlap.
+	// Required fields are always placed in requiredBodyFields even if they also appear
+	// in the response (the provider marks them Required, not Optional+Computed).
 	overlapSet := make(map[string]bool)
 	for key, info := range bodyFieldMap {
-		if _, isResp := responseFieldMap[key]; isResp {
+		_, isResp := responseFieldMap[key]
+		if info.required {
+			requiredBodyFields = append(requiredBodyFields, makeFieldDoc(key, info))
+			if isResp {
+				overlapSet[key] = true // prevent duplication in responseFields
+			}
+		} else if isResp {
 			overlapFields = append(overlapFields, makeFieldDoc(key, info))
 			overlapSet[key] = true
 		} else {
@@ -420,6 +432,7 @@ func deriveFields(name string, index map[string]tfprovider.ResourceGroup) (bodyF
 	}
 
 	// Sort all lists for deterministic output.
+	sort.Slice(requiredBodyFields, func(i, j int) bool { return requiredBodyFields[i].Name < requiredBodyFields[j].Name })
 	sort.Slice(bodyFields, func(i, j int) bool { return bodyFields[i].Name < bodyFields[j].Name })
 	sort.Slice(responseFields, func(i, j int) bool { return responseFields[i].Name < responseFields[j].Name })
 	sort.Slice(overlapFields, func(i, j int) bool { return overlapFields[i].Name < overlapFields[j].Name })
@@ -436,6 +449,7 @@ func snakeCaseField(path string) string {
 // bodyFieldInfo carries metadata needed to build FieldDoc from a BodyFieldDef.
 type bodyFieldInfo struct {
 	desc       string
+	required   bool
 	isArray    bool
 	isObject   bool
 	itemFields []tfprovider.BodyFieldDef
@@ -443,7 +457,7 @@ type bodyFieldInfo struct {
 
 // makeFieldDoc converts a bodyFieldInfo into a FieldDoc, including nested fields.
 func makeFieldDoc(key string, info bodyFieldInfo) FieldDoc {
-	fd := FieldDoc{Name: key, Desc: truncateDesc(info.desc), IsArray: info.isArray, IsObject: info.isObject}
+	fd := FieldDoc{Name: key, Desc: truncateDesc(info.desc), Required: info.required, IsArray: info.isArray, IsObject: info.isObject}
 	for _, item := range info.itemFields {
 		ikey := snakeCaseField(item.Path)
 		idesc := item.Desc
@@ -562,6 +576,28 @@ var funcMap = template.FuncMap{
 			return "List of String"
 		}
 		return "String"
+	},
+	"exampleBodyValue": func(field string) string {
+		switch field {
+		case "kind":
+			return "require_approvals_to_merge"
+		case "branch_match_kind":
+			return "glob"
+		case "pattern":
+			return "main"
+		case "type":
+			return "webhook"
+		case "name":
+			return "main"
+		case "description":
+			return "Example description"
+		case "url":
+			return "https://example.com"
+		case "branch_type":
+			return "development"
+		default:
+			return "example-value"
+		}
 	},
 	"renderNestedFields": func(fields []FieldDoc) string {
 		if len(fields) == 0 {
@@ -738,6 +774,9 @@ resource "{{.TFName}}" "example" {
 {{- range .Params}}
   {{.}} = "{{index $.ParamValues .}}"
 {{- end}}
+{{- range .RequiredBodyFields}}
+  {{.Name}} = "{{exampleBodyValue .Name}}"
+{{- end}}
 }
 ` + "```" + `
 
@@ -747,6 +786,9 @@ resource "{{.TFName}}" "example" {
 
 {{- range .Params}}
 - ` + "`" + `{{.}}` + "`" + ` (String) Path parameter.
+{{- end}}
+{{- range .RequiredBodyFields}}
+- ` + "`" + `{{.Name}}` + "`" + ` ({{fieldType .}}) {{.Desc}}{{renderNestedFields .ItemFields}}
 {{- end}}
 {{- if or .OverlapFields .BodyFields .HasBody .ComputedParams}}
 
@@ -867,6 +909,9 @@ provider "bitbucket" {}
 const exampleResourceTemplate = `resource "{{.TFName}}" "example" {
 {{- range .Params}}
   {{.}} = "{{index $.ParamValues .}}"
+{{- end}}
+{{- range .RequiredBodyFields}}
+  {{.Name}} = "{{exampleBodyValue .Name}}"
 {{- end}}
 }
 `

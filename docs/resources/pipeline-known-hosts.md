@@ -56,8 +56,8 @@ resource "bitbucket_pipeline_known_hosts" "example" {
 - `hostname` (String) The hostname of the known host. (also computed from API response)
 - `public_key` (Object) public_key (also computed from API response)
   Nested schema:
-  - `key_type` (String) The type of the public key.
   - `key` (String) The base64 encoded public key.
+  - `key_type` (String) The type of the public key.
   - `md5_fingerprint` (String) The MD5 fingerprint of the public key.
   - `sha256_fingerprint` (String) The SHA-256 fingerprint of the public key.
 

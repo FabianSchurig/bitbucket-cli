@@ -62,34 +62,34 @@ output "issue_comments_response" {
 
 - `content` (Object) content
   Nested schema:
-  - `raw` (String) The text as it was typed by a user.
   - `markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
+  - `raw` (String) The text as it was typed by a user.
 
 - `inline` (Object) inline
   Nested schema:
+  - `from` (String) The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.
+  - `path` (String) The path of the file this comment is anchored to.
   - `start_from` (String) The starting line number in the old version of the file, if the comment is a multi-line comment. This is null otherwise.
   - `start_to` (String) The starting line number in the new version of the file, if the comment is a multi-line comment. This is null otherwise.
-  - `path` (String) The path of the file this comment is anchored to.
-  - `from` (String) The comment's anchor line in the old version of the file. If the comment is a multi-line comment, this is the ending line number in the old version of the file.
   - `to` (String) The comment's anchor line in the new version of the file. If the comment is a multi-line comment, this is the ending line number in the new version of the file.
 
 - `issue` (Object) issue
   Nested schema:
-  - `edited_on` (String) edited_on
-  - `state` (String) [submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]
-  - `priority` (String) [trivial, minor, major, critical, blocker]
+  - `component` (Object) component
+    - `id` (String) id
   - `content` (Object) content
-    - `raw` (String) The text as it was typed by a user.
     - `markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
-  - `title` (String) title
+    - `raw` (String) The text as it was typed by a user.
+  - `edited_on` (String) edited_on
   - `kind` (String) [bug, enhancement, proposal, task]
   - `milestone` (Object) milestone
     - `id` (String) id
-  - `votes` (String) votes
+  - `priority` (String) [trivial, minor, major, critical, blocker]
+  - `state` (String) [submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed]
+  - `title` (String) title
   - `version` (Object) version
     - `id` (String) id
-  - `component` (Object) component
-    - `id` (String) id
+  - `votes` (String) votes
   - `id` (String) id
 
 - `parent` (Object) parent

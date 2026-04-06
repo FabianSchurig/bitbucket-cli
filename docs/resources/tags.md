@@ -39,6 +39,7 @@ Manages Bitbucket tags via the Bitbucket Cloud API.
 resource "bitbucket_tags" "example" {
   repo_slug = "my-repo"
   workspace = "my-workspace"
+  type = "webhook"
 }
 ```
 
@@ -47,6 +48,7 @@ resource "bitbucket_tags" "example" {
 ### Required
 - `repo_slug` (String) Path parameter.
 - `workspace` (String) Path parameter.
+- `type` (String) type
 
 ### Optional
 - `name` (String) Path parameter (auto-populated from API response).
@@ -58,12 +60,11 @@ resource "bitbucket_tags" "example" {
 
 - `target` (Object) target (also computed from API response)
   Nested schema:
-  - `parents` (String) parents (JSON array)
-  - `hash` (String) hash
   - `date` (String) date
+  - `hash` (String) hash
   - `message` (String) message
+  - `parents` (String) parents (JSON array)
 
-- `type` (String) type (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only

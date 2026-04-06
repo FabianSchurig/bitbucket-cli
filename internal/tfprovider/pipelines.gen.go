@@ -230,8 +230,8 @@ for specific details.
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
 				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
-					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`, Required: true},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`, Required: true},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -299,8 +299,8 @@ administered through admin.atlassian.com.
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
 				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
-					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`, Required: true},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`, Required: true},
 				}},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
@@ -347,8 +347,8 @@ administered through admin.atlassian.com.
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
 				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
-					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`, Required: true},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`, Required: true},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -681,8 +681,8 @@ administered through admin.atlassian.com.
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
 				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
-					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`, Required: true},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`, Required: true},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1142,9 +1142,9 @@ administered through admin.atlassian.com.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
-				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`},
+				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`, Required: true},
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
-				{Path: `target`, Type: `string`, Desc: `The target on which the schedule will be executed.`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `target`, Type: `string`, Desc: `The target on which the schedule will be executed.`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `ref_name`, Type: `string`, Desc: `The name of the reference.`},
 					{Path: `ref_type`, Type: `string`, Desc: `The type of reference (branch only). [branch]`},
 					{Path: `selector`, Type: `string`, Desc: `selector`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -2292,8 +2292,8 @@ for specific details.
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
 				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
-					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`, Required: true},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`, Required: true},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -2361,8 +2361,8 @@ administered through admin.atlassian.com.
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
 				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
-					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`, Required: true},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`, Required: true},
 				}},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
@@ -2409,8 +2409,8 @@ administered through admin.atlassian.com.
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
 				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
-					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`, Required: true},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`, Required: true},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -2743,8 +2743,8 @@ administered through admin.atlassian.com.
 				{Path: `build_seconds_used`, Type: `int`, Desc: `The number of build seconds used by this pipeline.`},
 				{Path: `completed_on`, Type: `string`, Desc: `The timestamp when the Pipeline was completed. This is not set if the pipeline is still in progress.`},
 				{Path: `configuration_sources`, Type: `string`, Desc: `An ordered list of sources of the pipeline configuration`, IsArray: true, ItemFields: []BodyFieldDef{
-					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`},
-					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`},
+					{Path: `source`, Type: `string`, Desc: `Identifier of the configuration source`, Required: true},
+					{Path: `uri`, Type: `string`, Desc: `Link to the configuration source view or its immediate content`, Required: true},
 				}},
 				{Path: `created_on`, Type: `string`, Desc: `The timestamp when the pipeline was created.`},
 				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -3204,9 +3204,9 @@ administered through admin.atlassian.com.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
-				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`},
+				{Path: `cron_pattern`, Type: `string`, Desc: `The cron expression with second precision (7 fields) that the schedule applies. For example, for expression: 0 0 12 * * ? *, will execute at 12pm UTC every day.`, Required: true},
 				{Path: `enabled`, Type: `bool`, Desc: `Whether the schedule is enabled.`},
-				{Path: `target`, Type: `string`, Desc: `The target on which the schedule will be executed.`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `target`, Type: `string`, Desc: `The target on which the schedule will be executed.`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `ref_name`, Type: `string`, Desc: `The name of the reference.`},
 					{Path: `ref_type`, Type: `string`, Desc: `The type of reference (branch only). [branch]`},
 					{Path: `selector`, Type: `string`, Desc: `selector`, IsObject: true, ItemFields: []BodyFieldDef{

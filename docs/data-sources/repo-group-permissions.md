@@ -51,25 +51,25 @@ output "repo_group_permissions_response" {
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `group` (Object) group
   Nested schema:
+  - `full_slug` (String) The concatenation of the workspace's slug and the group's slug,
   - `name` (String) name
   - `slug` (String) The "sluggified" version of the group's name. This contains only ASCII
-  - `full_slug` (String) The concatenation of the workspace's slug and the group's slug,
 
 - `permission` (String) [read, write, admin, none]
 - `repository` (Object) repository
   Nested schema:
-  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
-  - `name` (String) name
-  - `description` (String) description
-  - `updated_on` (String) updated_on
-  - `fork_policy` (String) 
-  - `is_private` (String) is_private
-  - `scm` (String) [git]
-  - `has_wiki` (String) 
-  - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
-  - `size` (String) size
-  - `language` (String) language
-  - `has_issues` (String) 
   - `created_on` (String) created_on
+  - `description` (String) description
+  - `fork_policy` (String) 
+  - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
+  - `has_issues` (String) 
+  - `has_wiki` (String) 
+  - `is_private` (String) is_private
+  - `language` (String) language
+  - `name` (String) name
+  - `scm` (String) [git]
+  - `size` (String) size
+  - `updated_on` (String) updated_on
+  - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
 
 - `type` (String) type

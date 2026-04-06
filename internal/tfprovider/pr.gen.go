@@ -265,7 +265,7 @@ new pull request that is created.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `reviewer_type`, Type: `string`, Desc: `reviewer_type`},
-				{Path: `type`, Type: `string`, Desc: `type`},
+				{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
@@ -837,7 +837,7 @@ request.`,
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
-					{Path: `type`, Type: `string`, Desc: `type`},
+					{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -897,7 +897,7 @@ Returns the newly created pull request comment.`,
 					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
+					{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				}},
 			},
 			ResponseFields: []BodyFieldDef{
@@ -965,7 +965,7 @@ Returns the newly created pull request comment.`,
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
-					{Path: `type`, Type: `string`, Desc: `type`},
+					{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1059,7 +1059,7 @@ Returns the newly created pull request comment.`,
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
-					{Path: `type`, Type: `string`, Desc: `type`},
+					{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1118,7 +1118,7 @@ Returns the newly created pull request comment.`,
 					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
+					{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				}},
 			},
 			ResponseFields: []BodyFieldDef{
@@ -1186,7 +1186,7 @@ Returns the newly created pull request comment.`,
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
-					{Path: `type`, Type: `string`, Desc: `type`},
+					{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1238,7 +1238,7 @@ Returns the newly created pull request comment.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
-				{Path: `type`, Type: `string`, Desc: `type`},
+				{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
@@ -1438,7 +1438,7 @@ with the revspec that corresponds to the pull request.`,
 				{Path: `close_source_branch`, Type: `bool`, Desc: `Whether the source branch should be deleted. If this is not provided, we fallback to the value used when the pull request was created, which defaults to False`},
 				{Path: `merge_strategy`, Type: `string`, Desc: `The merge strategy that will be used to merge the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`},
 				{Path: `message`, Type: `string`, Desc: `The commit message that will be used on the resulting commit. Note that the size of the message is limited to 128 KiB.`},
-				{Path: `type`, Type: `string`, Desc: `type`},
+				{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `author`, Type: `string`, Desc: `author`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1627,7 +1627,7 @@ request.`,
 				{Path: `description`, Type: `string`, Desc: `A description of the build (e.g. "Unit tests in Bamboo")`},
 				{Path: `key`, Type: `string`, Desc: `An identifier for the status that's unique to
         its type (current "build" is the only supported type) and the vendor,
-        e.g. BB-DEPLOY`},
+        e.g. BB-DEPLOY`, Required: true},
 				{Path: `name`, Type: `string`, Desc: `An identifier for the build itself, e.g. BB-DEPLOY-1`},
 				{Path: `refname`, Type: `string`, Desc: `
 The name of the ref that pointed to this commit at the time the status
@@ -1637,7 +1637,7 @@ build triggers and configuration are branch-dependent (e.g. a Pipeline
 build).
 It is legitimate for this field to not be set, or even apply (e.g. a
 static linting job).`},
-				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
+				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`, Required: true},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
 			},
@@ -1688,12 +1688,12 @@ See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more det
 					}},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
-				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `content`, Type: `string`, Desc: `content`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
-				{Path: `created_on`, Type: `string`, Desc: `created_on`},
-				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`, Required: true},
+				{Path: `creator`, Type: `string`, Desc: `creator`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
@@ -1706,8 +1706,8 @@ See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more det
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `resolved_on`, Type: `string`, Desc: `The ISO8601 timestamp for when the task was resolved.`},
-				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`},
-				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`, Required: true},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`, Required: true},
 			},
 			HasBody:   false,
 			Paginated: true,
@@ -1750,7 +1750,7 @@ will cause the task to appear below the comment on a pull request when viewed in
 					}},
 					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
-				{Path: `content`, Type: `string`, Desc: `task raw content`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `content`, Type: `string`, Desc: `task raw content`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `raw`, Type: `string`, Desc: `The task contents`},
 				}},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
@@ -1776,12 +1776,12 @@ will cause the task to appear below the comment on a pull request when viewed in
 					}},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
-				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `content`, Type: `string`, Desc: `content`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
-				{Path: `created_on`, Type: `string`, Desc: `created_on`},
-				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`, Required: true},
+				{Path: `creator`, Type: `string`, Desc: `creator`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
@@ -1794,8 +1794,8 @@ will cause the task to appear below the comment on a pull request when viewed in
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `resolved_on`, Type: `string`, Desc: `The ISO8601 timestamp for when the task was resolved.`},
-				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`},
-				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`, Required: true},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`, Required: true},
 			},
 			HasBody:   true,
 			Paginated: false,
@@ -1838,12 +1838,12 @@ will cause the task to appear below the comment on a pull request when viewed in
 					}},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
-				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `content`, Type: `string`, Desc: `content`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
-				{Path: `created_on`, Type: `string`, Desc: `created_on`},
-				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`, Required: true},
+				{Path: `creator`, Type: `string`, Desc: `creator`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
@@ -1856,8 +1856,8 @@ will cause the task to appear below the comment on a pull request when viewed in
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `resolved_on`, Type: `string`, Desc: `The ISO8601 timestamp for when the task was resolved.`},
-				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`},
-				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`, Required: true},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`, Required: true},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -1905,12 +1905,12 @@ will cause the task to appear below the comment on a pull request when viewed in
 					}},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
-				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `content`, Type: `string`, Desc: `content`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
-				{Path: `created_on`, Type: `string`, Desc: `created_on`},
-				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`, Required: true},
+				{Path: `creator`, Type: `string`, Desc: `creator`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
@@ -1923,8 +1923,8 @@ will cause the task to appear below the comment on a pull request when viewed in
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `resolved_on`, Type: `string`, Desc: `The ISO8601 timestamp for when the task was resolved.`},
-				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`},
-				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`, Required: true},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`, Required: true},
 			},
 			HasBody:   true,
 			Paginated: false,
@@ -2250,7 +2250,7 @@ new pull request that is created.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `reviewer_type`, Type: `string`, Desc: `reviewer_type`},
-				{Path: `type`, Type: `string`, Desc: `type`},
+				{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
@@ -2822,7 +2822,7 @@ request.`,
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
-					{Path: `type`, Type: `string`, Desc: `type`},
+					{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -2882,7 +2882,7 @@ Returns the newly created pull request comment.`,
 					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
+					{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				}},
 			},
 			ResponseFields: []BodyFieldDef{
@@ -2950,7 +2950,7 @@ Returns the newly created pull request comment.`,
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
-					{Path: `type`, Type: `string`, Desc: `type`},
+					{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -3044,7 +3044,7 @@ Returns the newly created pull request comment.`,
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
-					{Path: `type`, Type: `string`, Desc: `type`},
+					{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -3103,7 +3103,7 @@ Returns the newly created pull request comment.`,
 					{Path: `id`, Type: `int`, Desc: `The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.`},
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `type`, Type: `string`, Desc: `type`},
+					{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				}},
 			},
 			ResponseFields: []BodyFieldDef{
@@ -3171,7 +3171,7 @@ Returns the newly created pull request comment.`,
 				}},
 				{Path: `resolution`, Type: `string`, Desc: `The resolution object for a Comment.`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
-					{Path: `type`, Type: `string`, Desc: `type`},
+					{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				}},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -3223,7 +3223,7 @@ Returns the newly created pull request comment.`,
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `The ISO8601 timestamp the resolution was created.`},
-				{Path: `type`, Type: `string`, Desc: `type`},
+				{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 				{Path: `user`, Type: `string`, Desc: `user`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
@@ -3423,7 +3423,7 @@ with the revspec that corresponds to the pull request.`,
 				{Path: `close_source_branch`, Type: `bool`, Desc: `Whether the source branch should be deleted. If this is not provided, we fallback to the value used when the pull request was created, which defaults to False`},
 				{Path: `merge_strategy`, Type: `string`, Desc: `The merge strategy that will be used to merge the pull request. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`},
 				{Path: `message`, Type: `string`, Desc: `The commit message that will be used on the resulting commit. Note that the size of the message is limited to 128 KiB.`},
-				{Path: `type`, Type: `string`, Desc: `type`},
+				{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `author`, Type: `string`, Desc: `author`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -3612,7 +3612,7 @@ request.`,
 				{Path: `description`, Type: `string`, Desc: `A description of the build (e.g. "Unit tests in Bamboo")`},
 				{Path: `key`, Type: `string`, Desc: `An identifier for the status that's unique to
         its type (current "build" is the only supported type) and the vendor,
-        e.g. BB-DEPLOY`},
+        e.g. BB-DEPLOY`, Required: true},
 				{Path: `name`, Type: `string`, Desc: `An identifier for the build itself, e.g. BB-DEPLOY-1`},
 				{Path: `refname`, Type: `string`, Desc: `
 The name of the ref that pointed to this commit at the time the status
@@ -3622,7 +3622,7 @@ build triggers and configuration are branch-dependent (e.g. a Pipeline
 build).
 It is legitimate for this field to not be set, or even apply (e.g. a
 static linting job).`},
-				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`},
+				{Path: `state`, Type: `string`, Desc: `Provides some indication of the status of this commit [FAILED, INPROGRESS, STOPPED, SUCCESSFUL]`, Required: true},
 				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				{Path: `url`, Type: `string`, Desc: "A URL linking back to the vendor or build system, for providing more information about whatever process produced this status. Accepts context variables `repository` and `commit` that Bitbucket will evaluate at runtime whenever at runtime. For example, one could use https://foo.com/builds/{repository.full_name} which Bitbucket will turn into https://foo.com/builds/foo/bar at render time."},
 			},
@@ -3673,12 +3673,12 @@ See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more det
 					}},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
-				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `content`, Type: `string`, Desc: `content`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
-				{Path: `created_on`, Type: `string`, Desc: `created_on`},
-				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`, Required: true},
+				{Path: `creator`, Type: `string`, Desc: `creator`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
@@ -3691,8 +3691,8 @@ See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more det
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `resolved_on`, Type: `string`, Desc: `The ISO8601 timestamp for when the task was resolved.`},
-				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`},
-				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`, Required: true},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`, Required: true},
 			},
 			HasBody:   false,
 			Paginated: true,
@@ -3735,7 +3735,7 @@ will cause the task to appear below the comment on a pull request when viewed in
 					}},
 					{Path: `id`, Type: `int`, Desc: `id`},
 				}},
-				{Path: `content`, Type: `string`, Desc: `task raw content`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `content`, Type: `string`, Desc: `task raw content`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `raw`, Type: `string`, Desc: `The task contents`},
 				}},
 				{Path: `pending`, Type: `bool`, Desc: `pending`},
@@ -3761,12 +3761,12 @@ will cause the task to appear below the comment on a pull request when viewed in
 					}},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
-				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `content`, Type: `string`, Desc: `content`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
-				{Path: `created_on`, Type: `string`, Desc: `created_on`},
-				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`, Required: true},
+				{Path: `creator`, Type: `string`, Desc: `creator`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
@@ -3779,8 +3779,8 @@ will cause the task to appear below the comment on a pull request when viewed in
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `resolved_on`, Type: `string`, Desc: `The ISO8601 timestamp for when the task was resolved.`},
-				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`},
-				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`, Required: true},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`, Required: true},
 			},
 			HasBody:   true,
 			Paginated: false,
@@ -3823,12 +3823,12 @@ will cause the task to appear below the comment on a pull request when viewed in
 					}},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
-				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `content`, Type: `string`, Desc: `content`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
-				{Path: `created_on`, Type: `string`, Desc: `created_on`},
-				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`, Required: true},
+				{Path: `creator`, Type: `string`, Desc: `creator`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
@@ -3841,8 +3841,8 @@ will cause the task to appear below the comment on a pull request when viewed in
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `resolved_on`, Type: `string`, Desc: `The ISO8601 timestamp for when the task was resolved.`},
-				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`},
-				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`, Required: true},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`, Required: true},
 			},
 			HasBody:   false,
 			Paginated: false,
@@ -3890,12 +3890,12 @@ will cause the task to appear below the comment on a pull request when viewed in
 					}},
 					{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
 				}},
-				{Path: `content`, Type: `string`, Desc: `content`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `content`, Type: `string`, Desc: `content`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `markup`, Type: `string`, Desc: `The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]`},
 					{Path: `raw`, Type: `string`, Desc: `The text as it was typed by a user.`},
 				}},
-				{Path: `created_on`, Type: `string`, Desc: `created_on`},
-				{Path: `creator`, Type: `string`, Desc: `creator`, IsObject: true, ItemFields: []BodyFieldDef{
+				{Path: `created_on`, Type: `string`, Desc: `created_on`, Required: true},
+				{Path: `creator`, Type: `string`, Desc: `creator`, Required: true, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `display_name`, Type: `string`, Desc: `display_name`},
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
@@ -3908,8 +3908,8 @@ will cause the task to appear below the comment on a pull request when viewed in
 					{Path: `uuid`, Type: `string`, Desc: `uuid`},
 				}},
 				{Path: `resolved_on`, Type: `string`, Desc: `The ISO8601 timestamp for when the task was resolved.`},
-				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`},
-				{Path: `updated_on`, Type: `string`, Desc: `updated_on`},
+				{Path: `state`, Type: `string`, Desc: `[RESOLVED, UNRESOLVED]`, Required: true},
+				{Path: `updated_on`, Type: `string`, Desc: `updated_on`, Required: true},
 			},
 			HasBody:   true,
 			Paginated: false,

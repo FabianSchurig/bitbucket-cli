@@ -45,7 +45,7 @@ Available operations:
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `branch`, Type: `string`, Desc: `branch`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `name`, Type: `string`, Desc: `The name of the ref.`},
-						{Path: `type`, Type: `string`, Desc: `type`},
+						{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 						{Path: `default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
 						{Path: `merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 					}},
@@ -55,7 +55,7 @@ Available operations:
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `branch`, Type: `string`, Desc: `branch`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `name`, Type: `string`, Desc: `The name of the ref.`},
-						{Path: `type`, Type: `string`, Desc: `type`},
+						{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 						{Path: `default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
 						{Path: `merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 					}},
@@ -161,7 +161,7 @@ Available operations:
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `branch`, Type: `string`, Desc: `branch`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `name`, Type: `string`, Desc: `The name of the ref.`},
-						{Path: `type`, Type: `string`, Desc: `type`},
+						{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 						{Path: `default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
 						{Path: `merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 					}},
@@ -171,7 +171,7 @@ Available operations:
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `branch`, Type: `string`, Desc: `branch`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `name`, Type: `string`, Desc: `The name of the ref.`},
-						{Path: `type`, Type: `string`, Desc: `type`},
+						{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 						{Path: `default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
 						{Path: `merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 					}},
@@ -311,7 +311,7 @@ Available operations:
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `branch`, Type: `string`, Desc: `branch`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `name`, Type: `string`, Desc: `The name of the ref.`},
-						{Path: `type`, Type: `string`, Desc: `type`},
+						{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 						{Path: `default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
 						{Path: `merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 					}},
@@ -321,7 +321,7 @@ Available operations:
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `branch`, Type: `string`, Desc: `branch`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `name`, Type: `string`, Desc: `The name of the ref.`},
-						{Path: `type`, Type: `string`, Desc: `type`},
+						{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 						{Path: `default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
 						{Path: `merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 					}},
@@ -427,7 +427,7 @@ Available operations:
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `branch`, Type: `string`, Desc: `branch`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `name`, Type: `string`, Desc: `The name of the ref.`},
-						{Path: `type`, Type: `string`, Desc: `type`},
+						{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 						{Path: `default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
 						{Path: `merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 					}},
@@ -437,7 +437,7 @@ Available operations:
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `branch`, Type: `string`, Desc: `branch`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `name`, Type: `string`, Desc: `The name of the ref.`},
-						{Path: `type`, Type: `string`, Desc: `type`},
+						{Path: `type`, Type: `string`, Desc: `type`, Required: true},
 						{Path: `default_merge_strategy`, Type: `string`, Desc: `The default merge strategy for pull requests targeting this branch.`},
 						{Path: `merge_strategies`, Type: `string`, Desc: `Available merge strategies for pull requests targeting this branch. [merge_commit, squash, fast_forward, squash_fast_forward, rebase_fast_forward, rebase_merge]`, IsArray: true},
 					}},

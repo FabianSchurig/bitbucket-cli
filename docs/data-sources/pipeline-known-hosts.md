@@ -52,8 +52,8 @@ output "pipeline_known_hosts_response" {
 - `hostname` (String) The hostname of the known host.
 - `public_key` (Object) public_key
   Nested schema:
-  - `key_type` (String) The type of the public key.
   - `key` (String) The base64 encoded public key.
+  - `key_type` (String) The type of the public key.
   - `md5_fingerprint` (String) The MD5 fingerprint of the public key.
   - `sha256_fingerprint` (String) The SHA-256 fingerprint of the public key.
 

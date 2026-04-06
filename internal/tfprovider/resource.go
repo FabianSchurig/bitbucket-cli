@@ -48,9 +48,10 @@ type ParamDef struct {
 
 // BodyFieldDef describes a request body field, potentially nested.
 type BodyFieldDef struct {
-	Path       string // relative field name (e.g., "hash" inside a "target" object)
-	Type       string // "string", "integer", "boolean"
+	Path       string         // relative field name (e.g., "hash" inside a "target" object)
+	Type       string         // "string", "integer", "boolean"
 	Desc       string
+	Required   bool           // true when the API schema lists this field as required
 	IsArray    bool           // true when the field is an array
 	IsObject   bool           // true when the field is a nested object
 	ItemFields []BodyFieldDef // nested fields for array items or object properties
@@ -608,6 +609,13 @@ func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
 		desc = bf.Path
 	}
 	if bf.IsObject && len(bf.ItemFields) > 0 {
+		if bf.Required {
+			return schema.SingleNestedAttribute{
+				Description: desc,
+				Required:    true,
+				Attributes:  buildNestedItemAttrs(bf.ItemFields),
+			}
+		}
 		return schema.SingleNestedAttribute{
 			Description: desc,
 			Optional:    true,
@@ -615,6 +623,15 @@ func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
 		}
 	}
 	if bf.IsArray && len(bf.ItemFields) > 0 {
+		if bf.Required {
+			return schema.ListNestedAttribute{
+				Description: desc,
+				Required:    true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: buildNestedItemAttrs(bf.ItemFields),
+				},
+			}
+		}
 		return schema.ListNestedAttribute{
 			Description: desc,
 			Optional:    true,
@@ -624,6 +641,13 @@ func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
 		}
 	}
 	if bf.IsArray {
+		if bf.Required {
+			return schema.ListAttribute{
+				Description: desc,
+				Required:    true,
+				ElementType: types.StringType,
+			}
+		}
 		return schema.ListAttribute{
 			Description: desc,
 			Optional:    true,
@@ -631,9 +655,21 @@ func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
 		}
 	}
 	if bf.Type == "int" {
+		if bf.Required {
+			return schema.Int64Attribute{
+				Description: desc,
+				Required:    true,
+			}
+		}
 		return schema.Int64Attribute{
 			Description: desc,
 			Optional:    true,
+		}
+	}
+	if bf.Required {
+		return schema.StringAttribute{
+			Description: desc,
+			Required:    true,
 		}
 	}
 	return schema.StringAttribute{
@@ -1178,10 +1214,20 @@ func extractID(m map[string]any) string {
 	// Try common ID fields.
 	for _, key := range []string{"uuid", "id", "slug", "name"} {
 		if v, ok := m[key]; ok {
-			return fmt.Sprintf("%v", v)
+			return formatResponseValue(v)
 		}
 	}
 	return ""
+}
+
+// formatResponseValue converts an API response value to a string,
+// formatting float64 integer values (JSON numbers) as plain integers
+// to avoid scientific notation (e.g. 7.4332764e+07 instead of 74332764).
+func formatResponseValue(v any) string {
+	if f, ok := v.(float64); ok && f == float64(int64(f)) {
+		return fmt.Sprintf("%d", int64(f))
+	}
+	return fmt.Sprintf("%v", v)
 }
 
 func responseParamValue(m map[string]any, paramName string) (string, bool) {
@@ -1199,7 +1245,7 @@ func responseParamValue(m map[string]any, paramName string) (string, bool) {
 			continue
 		}
 		if v, ok := m[key]; ok && v != nil {
-			return fmt.Sprintf("%v", v), true
+			return formatResponseValue(v), true
 		}
 	}
 	if id := extractID(m); id != "" {
