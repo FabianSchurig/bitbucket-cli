@@ -11,11 +11,15 @@ permissions:
   contents: read
   packages: write
   id-token: write
-  security-events: write
 
 jobs:
   docker:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
@@ -28,8 +32,8 @@ jobs:
             image: bitbucket-mcp
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-
-      - name: Determine version
+        with:
+          persist-credentials: false
         id: version
         env:
           EVENT_NAME: ${{ github.event_name }}

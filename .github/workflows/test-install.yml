@@ -98,8 +98,8 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-
-      - name: Run install script (bb-cli)
+        with:
+          persist-credentials: false
         run: |
           chmod +x install.sh
           sudo ./install.sh --binary bb-cli

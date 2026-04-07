@@ -1,6 +1,6 @@
 module github.com/FabianSchurig/bitbucket-cli
 
-go 1.25.0
+go 1.25.8
 
 require (
 	github.com/fatih/color v1.19.0

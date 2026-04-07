@@ -10,13 +10,15 @@ permissions: {}
 
 jobs:
   test:
+    name: Test
     runs-on: ubuntu-latest
     permissions:
-      contents: write # needed for git-auto-commit-action on push
+      contents: read
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Go
         uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
@@ -31,16 +33,6 @@ jobs:
         uses: golangci/golangci-lint-action@9fae48acfc02a90574d7c304a1758ef9895495fa # v7
         with:
           version: v2.11.4
-
-      - name: Format
-        run: gofmt -w .
-
-      - name: Commit formatting fixes
-        if: github.event_name == 'push'
-        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5
-        with:
-          commit_message: "style: apply gofmt formatting [skip ci]"
-          file_pattern: "*.go"
 
       - name: Vet
         run: go vet ./...
@@ -61,3 +53,31 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  # Runs only on push to main so that the GITHUB_TOKEN write scope is never
+  # issued to a pull-request runner (including fork PRs).
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Format
+        run: gofmt -w .
+
+      - name: Commit formatting fixes
+        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5
+        with:
+          commit_message: "style: apply gofmt formatting [skip ci]"
+          file_pattern: "*.go"
