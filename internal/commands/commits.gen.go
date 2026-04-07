@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -26,6 +27,7 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
+	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -74,6 +76,15 @@ func newCommitsGetACommitCmd() *cobra.Command {
 		Short: `Get a commit`,
 		Long:  `Returns the specified commit.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if commit == "" {
 				return fmt.Errorf("--commit is required")
 			}
@@ -129,6 +140,15 @@ the repository. In contrast, just the fact that a repository is
 publicly accessible to users does not give them the ability to approve
 commits.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if commit == "" {
 				return fmt.Errorf("--commit is required")
 			}
@@ -184,6 +204,15 @@ the repository. In contrast, just the fact that a repository is
 publicly accessible to users does not give them the ability to approve
 commits.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if commit == "" {
 				return fmt.Errorf("--commit is required")
 			}
@@ -239,6 +268,15 @@ func newCommitsListACommitsCommentsCmd() *cobra.Command {
 		Short: `List a commit's comments`,
 		Long:  "Returns the commit's comments.\n\nThis includes both global and inline comments.\n\nThe default sorting is oldest to newest and can be overridden with\nthe `sort` query parameter.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if commit == "" {
 				return fmt.Errorf("--commit is required")
 			}
@@ -312,6 +350,15 @@ func newCommitsCreateCommentForACommitCmd() *cobra.Command {
 		Short: `Create comment for a commit`,
 		Long:  "Creates new comment on the specified commit.\n\nTo post a reply to an existing comment, include the `parent.id` field:\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/prlinks/commit/db9ba1e031d07a02603eae0e559a7adc010257fc/comments/ \\\n  -X POST -u evzijst \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"content\": {\"raw\": \"One more thing!\"},\n       \"parent\": {\"id\": 5728901}}'\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if commit == "" {
 				return fmt.Errorf("--commit is required")
 			}
@@ -418,6 +465,15 @@ func newCommitsGetACommitCommentCmd() *cobra.Command {
 		Short: `Get a commit comment`,
 		Long:  `Returns the specified commit comment.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if commentId == 0 {
 				return fmt.Errorf("--comment-id is required")
 			}
@@ -487,6 +543,15 @@ func newCommitsUpdateACommitCommentCmd() *cobra.Command {
 		Short: `Update a commit comment`,
 		Long:  "Used to update the contents of a comment. Only the content of the comment can be updated.\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/prlinks/commit/7f71b5/comments/5728901 \\\n  -X PUT -u evzijst \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"content\": {\"raw\": \"One more thing!\"}'\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if commentId == 0 {
 				return fmt.Errorf("--comment-id is required")
 			}
@@ -598,6 +663,15 @@ func newCommitsDeleteACommitCommentCmd() *cobra.Command {
 		Short: `Delete a commit comment`,
 		Long:  "Deletes the specified commit comment.\n\nNote that deleting comments that have visible replies that point to\nthem will not really delete the resource. This is to retain the integrity\nof the original comment tree. Instead, the `deleted` element is set to\n`true` and the content is blanked out. The comment will continue to be\nreturned by the collections and self endpoints.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if commentId == 0 {
 				return fmt.Errorf("--comment-id is required")
 			}
@@ -655,6 +729,15 @@ func newCommitsListCommitsCmd() *cobra.Command {
 		Short: `List commits`,
 		Long:  "These are the repository's commits. They are paginated and returned\nin reverse chronological order, similar to the output of `git log`.\nLike these tools, the DAG can be filtered.\n\n#### GET /repositories/{workspace}/{repo_slug}/commits/\n\nReturns all commits in the repo in topological order (newest commit\nfirst). All branches and tags are included (similar to\n`git log --all`).\n\n#### GET /repositories/{workspace}/{repo_slug}/commits/?exclude=master\n\nReturns all commits in the repo that are not on master\n(similar to `git log --all ^master`).\n\n#### GET /repositories/{workspace}/{repo_slug}/commits/?include=foo&include=bar&exclude=fu&exclude=fubar\n\nReturns all commits that are on refs `foo` or `bar`, but not on `fu` or\n`fubar` (similar to `git log foo bar ^fu ^fubar`).\n\nAn optional `path` parameter can be specified that will limit the\nresults to commits that affect that path. `path` can either be a file\nor a directory. If a directory is specified, commits are returned that\nhave modified any file in the directory tree rooted by `path`. It is\nimportant to note that if the `path` parameter is specified, the commits\nreturned by this endpoint may no longer be a DAG, parent commits that\ndo not modify the path will be omitted from the response.\n\n#### GET /repositories/{workspace}/{repo_slug}/commits/?path=README.md&include=foo&include=bar&exclude=master\n\nReturns all commits that are on refs `foo` or `bar`, but not on `master`\nthat changed the file README.md.\n\n#### GET /repositories/{workspace}/{repo_slug}/commits/?path=src/&include=foo&include=bar&exclude=master\n\nReturns all commits that are on refs `foo` or `bar`, but not on `master`\nthat changed to a file in any file in the directory src or its children.\n\nBecause the response could include a very large number of commits, it\nis paginated. Follow the 'next' link in the response to navigate to the\nnext page of commits. As with other paginated resources, do not\nconstruct your own links.\n\nWhen the include and exclude parameters are more than can fit in a\nquery string, clients can use a `x-www-form-urlencoded` POST instead.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -708,6 +791,15 @@ func newCommitsListCommitsWithIncludeexcludeCmd() *cobra.Command {
 		Short: `List commits with include/exclude`,
 		Long:  "Identical to `GET /repositories/{workspace}/{repo_slug}/commits`,\nexcept that POST allows clients to place the include and exclude\nparameters in the request body to avoid URL length issues.\n\n**Note that this resource does NOT support new commit creation.**",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -762,6 +854,15 @@ func newCommitsListCommitsForRevisionCmd() *cobra.Command {
 		Short: `List commits for revision`,
 		Long:  "These are the repository's commits. They are paginated and returned\nin reverse chronological order, similar to the output of `git log`.\nLike these tools, the DAG can be filtered.\n\n#### GET /repositories/{workspace}/{repo_slug}/commits/master\n\nReturns all commits on ref `master` (similar to `git log master`).\n\n#### GET /repositories/{workspace}/{repo_slug}/commits/dev?include=foo&exclude=master\n\nReturns all commits on ref `dev` or `foo`, except those that are reachable on\n`master` (similar to `git log dev foo ^master`).\n\nAn optional `path` parameter can be specified that will limit the\nresults to commits that affect that path. `path` can either be a file\nor a directory. If a directory is specified, commits are returned that\nhave modified any file in the directory tree rooted by `path`. It is\nimportant to note that if the `path` parameter is specified, the commits\nreturned by this endpoint may no longer be a DAG, parent commits that\ndo not modify the path will be omitted from the response.\n\n#### GET /repositories/{workspace}/{repo_slug}/commits/dev?path=README.md&include=foo&include=bar&exclude=master\n\nReturns all commits that are on refs `dev` or `foo` or `bar`, but not on `master`\nthat changed the file README.md.\n\n#### GET /repositories/{workspace}/{repo_slug}/commits/dev?path=src/&include=foo&exclude=master\n\nReturns all commits that are on refs `dev` or `foo`, but not on `master`\nthat changed to a file in any file in the directory src or its children.\n\nBecause the response could include a very large number of commits, it\nis paginated. Follow the 'next' link in the response to navigate to the\nnext page of commits. As with other paginated resources, do not\nconstruct your own links.\n\nWhen the include and exclude parameters are more than can fit in a\nquery string, clients can use a `x-www-form-urlencoded` POST instead.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -821,6 +922,15 @@ func newCommitsListCommitsForRevisionUsingIncludeexcludeCmd() *cobra.Command {
 		Short: `List commits for revision using include/exclude`,
 		Long:  "Identical to `GET /repositories/{workspace}/{repo_slug}/commits/{revision}`,\nexcept that POST allows clients to place the include and exclude\nparameters in the request body to avoid URL length issues.\n\n**Note that this resource does NOT support new commit creation.**",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -884,6 +994,15 @@ func newCommitsCompareTwoCommitsCmd() *cobra.Command {
 		Short: `Compare two commits`,
 		Long:  "Produces a raw git-style diff.\n\n#### Single commit spec\n\nIf the `spec` argument to this API is a single commit, the diff is\nproduced against the first parent of the specified commit.\n\n#### Two commit spec\n\nTwo commits separated by `..` may be provided as the `spec`, e.g.,\n`3a8b42..9ff173`. When two commits are provided and the `topic` query\nparameter is true, this API produces a 2-way three dot diff.\nThis is the diff between source commit and the merge base of the source\ncommit and the destination commit. When the `topic` query param is false,\na simple git-style diff is produced.\n\nThe two commits are interpreted as follows:\n\n* First commit: the commit containing the changes we wish to preview\n* Second commit: the commit representing the state to which we want to\n  compare the first commit\n* **Note**: This is the opposite of the order used in `git diff`.\n\n#### Comparison to patches\n\nWhile similar to patches, diffs:\n\n* Don't have a commit header (username, commit message, etc)\n* Support the optional `path=foo/bar.py` query param to filter\n  the diff to just that one file diff\n\n#### Response\n\nThe raw diff is returned as-is, in whatever encoding the files in the\nrepository use. It is not decoded into unicode. As such, the\ncontent-type is `text/plain`.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -957,6 +1076,15 @@ func newCommitsCompareTwoCommitDiffStatsCmd() *cobra.Command {
 		Short: `Compare two commit diff stats`,
 		Long:  "Produces a response in JSON format with a record for every path\nmodified, including information on the type of the change and the\nnumber of lines added and removed.\n\n#### Single commit spec\n\nIf the `spec` argument to this API is a single commit, the diff is\nproduced against the first parent of the specified commit.\n\n#### Two commit spec\n\nTwo commits separated by `..` may be provided as the `spec`, e.g.,\n`3a8b42..9ff173`. When two commits are provided and the `topic` query\nparameter is true, this API produces a 2-way three dot diff.\nThis is the diff between source commit and the merge base of the source\ncommit and the destination commit. When the `topic` query param is false,\na simple git-style diff is produced.\n\nThe two commits are interpreted as follows:\n\n* First commit: the commit containing the changes we wish to preview\n* Second commit: the commit representing the state to which we want to\n  compare the first commit\n* **Note**: This is the opposite of the order used in `git diff`.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1027,6 +1155,15 @@ of 2 commits (e.g. 3a8b42..9ff173).
 If more than one best common ancestor exists, only one will be returned. It is
 unspecified which will be returned.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1077,6 +1214,15 @@ func newCommitsGetAPatchForTwoCommitsCmd() *cobra.Command {
 		Short: `Get a patch for two commits`,
 		Long:  "Produces a raw patch for a single commit (diffed against its first\nparent), or a patch-series for a revspec of 2 commits (e.g.\n`3a8b42..9ff173` where the first commit represents the source and the\nsecond commit the destination).\n\nIn case of the latter (diffing a revspec), a patch series is returned\nfor the commits on the source branch (`3a8b42` and its ancestors in\nour example).\n\nWhile similar to diffs, patches:\n\n* Have a commit header (username, commit message, etc)\n* Do not support the `path=foo/bar.py` query parameter\n\nThe raw patch is returned as-is, in whatever encoding the files in the\nrepository use. It is not decoded into unicode. As such, the\ncontent-type is `text/plain`.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}

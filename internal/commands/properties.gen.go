@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -26,6 +27,7 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
+	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -72,6 +74,15 @@ func newPropertiesGetCommitHostedPropertyValueCmd() *cobra.Command {
 		Short: `Get a commit application property`,
 		Long:  `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -135,6 +146,15 @@ func newPropertiesUpdateCommitHostedPropertyValueCmd() *cobra.Command {
 		Short: `Update a commit application property`,
 		Long:  `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -204,6 +224,15 @@ func newPropertiesDeleteCommitHostedPropertyValueCmd() *cobra.Command {
 		Short: `Delete a commit application property`,
 		Long:  `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -265,6 +294,15 @@ func newPropertiesGetRepositoryHostedPropertyValueCmd() *cobra.Command {
 		Short: `Get a repository application property`,
 		Long:  `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -322,6 +360,15 @@ func newPropertiesUpdateRepositoryHostedPropertyValueCmd() *cobra.Command {
 		Short: `Update a repository application property`,
 		Long:  `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -385,6 +432,15 @@ func newPropertiesDeleteRepositoryHostedPropertyValueCmd() *cobra.Command {
 		Short: `Delete a repository application property`,
 		Long:  `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -442,6 +498,15 @@ func newPropertiesGetPullRequestHostedPropertyValueCmd() *cobra.Command {
 		Short: `Get a pull request application property`,
 		Long:  `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a pull request.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -505,6 +570,15 @@ func newPropertiesUpdatePullRequestHostedPropertyValueCmd() *cobra.Command {
 		Short: `Update a pull request application property`,
 		Long:  `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a pull request.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -574,6 +648,15 @@ func newPropertiesDeletePullRequestHostedPropertyValueCmd() *cobra.Command {
 		Short: `Delete a pull request application property`,
 		Long:  `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a pull request.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}

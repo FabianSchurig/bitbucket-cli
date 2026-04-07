@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -26,6 +27,7 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
+	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -70,6 +72,15 @@ func newReportsGetReportsForCommitCmd() *cobra.Command {
 		Short: `List reports`,
 		Long:  `Returns a paginated list of Reports linked to this commit.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -127,6 +138,15 @@ func newReportsGetReportCmd() *cobra.Command {
 		Short: `Get a report`,
 		Long:  `Returns a single Report matching the provided ID.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -195,6 +215,15 @@ func newReportsCreateOrUpdateReportCmd() *cobra.Command {
 		Short: `Create or update a report`,
 		Long:  "Creates or updates a report for the specified commit.\nTo upload a report, make sure to generate an ID that is unique across all reports for that commit. If you want to use an existing id from your own system, we recommend prefixing it with your system's name to avoid collisions, for example, mySystem-001.\n\n### Sample cURL request:\n```\ncurl --request PUT 'https://api.bitbucket.org/2.0/repositories/<username>/<reposity-name>/commit/<commit-hash>/reports/mysystem-001' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    \"title\": \"Security scan report\",\n    \"details\": \"This pull request introduces 10 new dependency vulnerabilities.\",\n    \"report_type\": \"SECURITY\",\n    \"reporter\": \"mySystem\",\n    \"link\": \"http://www.mysystem.com/reports/001\",\n    \"result\": \"FAILED\",\n    \"data\": [\n        {\n            \"title\": \"Duration (seconds)\",\n            \"type\": \"DURATION\",\n            \"value\": 14\n        },\n        {\n            \"title\": \"Safe to merge?\",\n            \"type\": \"BOOLEAN\",\n            \"value\": false\n        }\n    ]\n}'\n```\n\n### Possible field values:\nreport_type: SECURITY, COVERAGE, TEST, BUG\nresult: PASSED, FAILED, PENDING\ndata.type: BOOLEAN, DATE, DURATION, LINK, NUMBER, PERCENTAGE, TEXT\n\n#### Data field formats\n| Type  Field   | Value Field Type  | Value Field Display |\n|:--------------|:------------------|:--------------------|\n| None/ Omitted | Number, String or Boolean (not an array or object) | Plain text |\n| BOOLEAN\t| Boolean | The value will be read as a JSON boolean and displayed as 'Yes' or 'No'. |\n| DATE  | Number | The value will be read as a JSON number in the form of a Unix timestamp (milliseconds) and will be displayed as a relative date if the date is less than one week ago, otherwise  it will be displayed as an absolute date. |\n| DURATION | Number | The value will be read as a JSON number in milliseconds and will be displayed in a human readable duration format. |\n| LINK | Object: `{\"text\": \"Link text here\", \"href\": \"https://link.to.annotation/in/external/tool\"}` | The value will be read as a JSON object containing the fields \"text\" and \"href\" and will be displayed as a clickable link on the report. |\n| NUMBER | Number | The value will be read as a JSON number and large numbers will be  displayed in a human readable format (e.g. 14.3k). |\n| PERCENTAGE | Number (between 0 and 100) | The value will be read as a JSON number between 0 and 100 and will be displayed with a percentage sign. |\n| TEXT | String | The value will be read as a JSON string and will be displayed as-is |\n\nPlease refer to the [Code Insights documentation](https://confluence.atlassian.com/bitbucket/code-insights-994316785.html) for more information.\n",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -302,6 +331,15 @@ func newReportsDeleteReportCmd() *cobra.Command {
 		Short: `Delete a report`,
 		Long:  `Deletes a single Report matching the provided ID.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -361,6 +399,15 @@ func newReportsGetAnnotationsForReportCmd() *cobra.Command {
 		Short: `List annotations`,
 		Long:  `Returns a paginated list of Annotations for a specified report.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -424,6 +471,15 @@ func newReportsBulkCreateOrUpdateAnnotationsCmd() *cobra.Command {
 		Short: `Bulk create or update annotations`,
 		Long:  "Bulk upload of annotations.\nAnnotations are individual findings that have been identified as part of a report, for example, a line of code that represents a vulnerability. These annotations can be attached to a specific file and even a specific line in that file, however, that is optional. Annotations are not mandatory and a report can contain up to 1000 annotations.\n\nAdd the annotations you want to upload as objects in a JSON array and make sure each annotation has the external_id field set to a unique value. If you want to use an existing id from your own system, we recommend prefixing it with your system's name to avoid collisions, for example, mySystem-annotation001. The external id can later be used to identify the report as an alternative to the generated [UUID](https://developer.atlassian.com/bitbucket/api/2/reference/meta/uri-uuid#uuid). You can upload up to 100 annotations per POST request.\n\n### Sample cURL request:\n```\ncurl --location 'https://api.bitbucket.org/2.0/repositories/<username>/<reposity-name>/commit/<commit-hash>/reports/mysystem-001/annotations' \\\n--header 'Content-Type: application/json' \\\n--data-raw '[\n  {\n        \"external_id\": \"mysystem-annotation001\",\n        \"title\": \"Security scan report\",\n        \"annotation_type\": \"VULNERABILITY\",\n        \"summary\": \"This line represents a security threat.\",\n        \"severity\": \"HIGH\",\n      \"path\": \"my-service/src/main/java/com/myCompany/mysystem/logic/Main.java\",\n        \"line\": 42\n  },\n  {\n        \"external_id\": \"mySystem-annotation002\",\n        \"title\": \"Bug report\",\n        \"annotation_type\": \"BUG\",\n        \"result\": \"FAILED\",\n        \"summary\": \"This line might introduce a bug.\",\n        \"severity\": \"MEDIUM\",\n      \"path\": \"my-service/src/main/java/com/myCompany/mysystem/logic/Helper.java\",\n        \"line\": 13\n  }\n]'\n```\n\n### Possible field values:\nannotation_type: VULNERABILITY, CODE_SMELL, BUG\nresult: PASSED, FAILED, IGNORED, SKIPPED\nseverity: HIGH, MEDIUM, LOW, CRITICAL\n\nPlease refer to the [Code Insights documentation](https://confluence.atlassian.com/bitbucket/code-insights-994316785.html) for more information.\n",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -488,6 +544,15 @@ func newReportsGetAnnotationCmd() *cobra.Command {
 		Short: `Get an annotation`,
 		Long:  `Returns a single Annotation matching the provided ID.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -560,6 +625,15 @@ func newReportsCreateOrUpdateAnnotationCmd() *cobra.Command {
 		Short: `Create or update an annotation`,
 		Long:  "Creates or updates an individual annotation for the specified report.\nAnnotations are individual findings that have been identified as part of a report, for example, a line of code that represents a vulnerability. These annotations can be attached to a specific file and even a specific line in that file, however, that is optional. Annotations are not mandatory and a report can contain up to 1000 annotations.\n\nJust as reports, annotation needs to be uploaded with a unique ID that can later be used to identify the report as an alternative to the generated [UUID](https://developer.atlassian.com/bitbucket/api/2/reference/meta/uri-uuid#uuid). If you want to use an existing id from your own system, we recommend prefixing it with your system's name to avoid collisions, for example, mySystem-annotation001.\n\n### Sample cURL request:\n```\ncurl --request PUT 'https://api.bitbucket.org/2.0/repositories/<username>/<reposity-name>/commit/<commit-hash>/reports/mySystem-001/annotations/mysystem-annotation001' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\n    \"title\": \"Security scan report\",\n    \"annotation_type\": \"VULNERABILITY\",\n    \"summary\": \"This line represents a security thread.\",\n    \"severity\": \"HIGH\",\n    \"path\": \"my-service/src/main/java/com/myCompany/mysystem/logic/Main.java\",\n    \"line\": 42\n}'\n```\n\n### Possible field values:\nannotation_type: VULNERABILITY, CODE_SMELL, BUG\nresult: PASSED, FAILED, IGNORED, SKIPPED\nseverity: HIGH, MEDIUM, LOW, CRITICAL\n\nPlease refer to the [Code Insights documentation](https://confluence.atlassian.com/bitbucket/code-insights-994316785.html) for more information.\n",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -665,6 +739,15 @@ func newReportsDeleteAnnotationCmd() *cobra.Command {
 		Short: `Delete an annotation`,
 		Long:  `Deletes a single Annotation matching the provided ID.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}

@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -567,5 +569,167 @@ func TestToolHandler_AllGeneratedToolGroups(t *testing.T) {
 
 	if len(tools) != len(mcptools.AllToolGroups) {
 		t.Errorf("expected %d tools, got %d", len(mcptools.AllToolGroups), len(tools))
+	}
+}
+
+// ─── Git context inference tests ──────────────────────────────────────────────
+
+// setupFakeGitRepo creates a temporary directory with a minimal .git/config
+// pointing to the given remote URL and changes the working directory there.
+func setupFakeGitRepo(t *testing.T, remoteURL string) {
+	t.Helper()
+	root := t.TempDir()
+	gitDir := filepath.Join(root, ".git")
+	if err := os.Mkdir(gitDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	config := "[remote \"origin\"]\n\turl = " + remoteURL + "\n"
+	if err := os.WriteFile(filepath.Join(gitDir, "config"), []byte(config), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	origDir, _ := os.Getwd()
+	t.Cleanup(func() { os.Chdir(origDir) })
+	if err := os.Chdir(root); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestToolHandler_InferWorkspaceRepoFromGit(t *testing.T) {
+	setupEnv(t)
+	setupFakeGitRepo(t, "git@bitbucket.org:git-ws/git-repo.git")
+	t.Setenv("BITBUCKET_WORKSPACE", "")
+	t.Setenv("BITBUCKET_REPO_SLUG", "")
+
+	var receivedPath string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedPath = r.URL.Path
+		w.Header().Set(headerContentType, contentTypeJSON)
+		_ = json.NewEncoder(w).Encode(map[string]any{"id": 42, "title": "Test Item"})
+	}))
+	defer srv.Close()
+	t.Setenv("BITBUCKET_BASE_URL", srv.URL+"/2.0")
+
+	// Call without workspace or repo_slug — should infer from git remote.
+	res := callTool(t, testToolGroup(), map[string]any{
+		"operation": "getItem",
+		"item_id":   42,
+	})
+	if res.IsError {
+		t.Fatalf("expected success but got error: %s", textContent(t, res))
+	}
+
+	if !strings.Contains(receivedPath, "/repositories/git-ws/git-repo/") {
+		t.Errorf("expected inferred workspace/repo in path, got %s", receivedPath)
+	}
+}
+
+func TestToolHandler_InferWorkspaceRepoFromHTTPS(t *testing.T) {
+	setupEnv(t)
+	setupFakeGitRepo(t, "https://bitbucket.org/https-ws/https-repo.git")
+	t.Setenv("BITBUCKET_WORKSPACE", "")
+	t.Setenv("BITBUCKET_REPO_SLUG", "")
+
+	var receivedPath string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedPath = r.URL.Path
+		w.Header().Set(headerContentType, contentTypeJSON)
+		_ = json.NewEncoder(w).Encode(map[string]any{"id": 1, "title": "Item"})
+	}))
+	defer srv.Close()
+	t.Setenv("BITBUCKET_BASE_URL", srv.URL+"/2.0")
+
+	res := callTool(t, testToolGroup(), map[string]any{
+		"operation": "getItem",
+		"item_id":   1,
+	})
+	if res.IsError {
+		t.Fatalf("expected success but got error: %s", textContent(t, res))
+	}
+
+	if !strings.Contains(receivedPath, "/repositories/https-ws/https-repo/") {
+		t.Errorf("expected HTTPS-inferred path, got %s", receivedPath)
+	}
+}
+
+func TestToolHandler_ExplicitParamsOverrideGit(t *testing.T) {
+	setupEnv(t)
+	setupFakeGitRepo(t, "git@bitbucket.org:inferred-ws/inferred-repo.git")
+	t.Setenv("BITBUCKET_WORKSPACE", "")
+	t.Setenv("BITBUCKET_REPO_SLUG", "")
+
+	var receivedPath string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedPath = r.URL.Path
+		w.Header().Set(headerContentType, contentTypeJSON)
+		_ = json.NewEncoder(w).Encode(map[string]any{"id": 42, "title": "Test Item"})
+	}))
+	defer srv.Close()
+	t.Setenv("BITBUCKET_BASE_URL", srv.URL+"/2.0")
+
+	// Provide explicit workspace/repo_slug — should override git remote.
+	res := callTool(t, testToolGroup(), map[string]any{
+		"operation": "getItem",
+		"workspace": "explicit-ws",
+		"repo_slug": "explicit-repo",
+		"item_id":   42,
+	})
+	if res.IsError {
+		t.Fatalf("expected success but got error: %s", textContent(t, res))
+	}
+
+	if !strings.Contains(receivedPath, "/repositories/explicit-ws/explicit-repo/") {
+		t.Errorf("expected explicit params to override git, got %s", receivedPath)
+	}
+}
+
+func TestToolHandler_EnvVarOverridesGit(t *testing.T) {
+	setupEnv(t)
+	setupFakeGitRepo(t, "git@bitbucket.org:inferred-ws/inferred-repo.git")
+	t.Setenv("BITBUCKET_WORKSPACE", "env-ws")
+	t.Setenv("BITBUCKET_REPO_SLUG", "env-repo")
+
+	var receivedPath string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedPath = r.URL.Path
+		w.Header().Set(headerContentType, contentTypeJSON)
+		_ = json.NewEncoder(w).Encode(map[string]any{"id": 42, "title": "Test Item"})
+	}))
+	defer srv.Close()
+	t.Setenv("BITBUCKET_BASE_URL", srv.URL+"/2.0")
+
+	// No workspace/repo_slug in args — env vars should win over git.
+	res := callTool(t, testToolGroup(), map[string]any{
+		"operation": "getItem",
+		"item_id":   42,
+	})
+	if res.IsError {
+		t.Fatalf("expected success but got error: %s", textContent(t, res))
+	}
+
+	if !strings.Contains(receivedPath, "/repositories/env-ws/env-repo/") {
+		t.Errorf("expected env vars to override git inference, got %s", receivedPath)
+	}
+}
+
+func TestToolHandler_NoGitRepo_StillRequiresParams(t *testing.T) {
+	// Change to a directory with no .git
+	origDir, _ := os.Getwd()
+	t.Cleanup(func() { os.Chdir(origDir) })
+	os.Chdir(t.TempDir())
+
+	t.Setenv("BITBUCKET_WORKSPACE", "")
+	t.Setenv("BITBUCKET_REPO_SLUG", "")
+
+	res := callTool(t, testToolGroup(), map[string]any{
+		"operation": "getItem",
+		"item_id":   42,
+	})
+	if !res.IsError {
+		t.Error("expected error for missing workspace/repo_slug when not in git repo")
+	}
+	text := textContent(t, res)
+	if !strings.Contains(text, "missing required parameter") {
+		t.Errorf("expected missing required parameter error, got: %s", text)
 	}
 }

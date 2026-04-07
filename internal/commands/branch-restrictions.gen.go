@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -26,6 +27,7 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
+	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -68,6 +70,15 @@ func newBranchRestrictionsListBranchRestrictionsCmd() *cobra.Command {
 		Long: `Returns a paginated list of all branch restrictions on the
 repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -130,6 +141,15 @@ func newBranchRestrictionsCreateABranchRestrictionRuleCmd() *cobra.Command {
 		Short: `Create a branch restriction rule`,
 		Long:  "Creates a new branch restriction rule for a repository.\n\n`kind` describes what will be restricted. Allowed values include:\n`push`, `force`, `delete`, `restrict_merges`, `require_tasks_to_be_completed`,\n`require_approvals_to_merge`, `require_default_reviewer_approvals_to_merge`,\n`require_no_changes_requested`, `require_passing_builds_to_merge`, `require_commits_behind`,\n`reset_pullrequest_approvals_on_change`, `smart_reset_pullrequest_approvals`,\n`reset_pullrequest_changes_requested_on_change`, `require_all_dependencies_merged`,\n`enforce_merge_checks`, and `allow_auto_merge_when_builds_pass`.\n\nDifferent kinds of branch restrictions have different requirements:\n\n* `push` and `restrict_merges` require `users` and `groups` to be\n  specified. Empty lists are allowed, in which case permission is\n  denied for everybody.\n\nThe restriction applies to all branches that match. There are\ntwo ways to match a branch. It is configured in `branch_match_kind`:\n\n1. `glob`: Matches a branch against the `pattern`. A `'*'` in\n   `pattern` will expand to match zero or more characters, and every\n   other character matches itself. For example, `'foo*'` will match\n   `'foo'` and `'foobar'`, but not `'barfoo'`. `'*'` will match all\n   branches.\n2. `branching_model`: Matches a branch against the repository's\n   branching model. The `branch_type` controls the type of branch\n   to match. Allowed values include: `production`, `development`,\n   `bugfix`, `release`, `feature` and `hotfix`.\n\nThe combination of `kind` and match must be unique. This means that\ntwo `glob` restrictions in a repository cannot have the same `kind` and\n`pattern`. Additionally, two `branching_model` restrictions in a\nrepository cannot have the same `kind` and `branch_type`.\n\n`users` and `groups` are lists of users and groups that are except from\nthe restriction. They can only be configured in `push` and\n`restrict_merges` restrictions. The `push` restriction stops a user\npushing to matching branches unless that user is in `users` or is a\nmember of a group in `groups`. The `restrict_merges` stops a user\nmerging pull requests to matching branches unless that user is in\n`users` or is a member of a group in `groups`. Adding new users or\ngroups to an existing restriction should be done via `PUT`.\n\nNote that branch restrictions with overlapping matchers is allowed,\nbut the resulting behavior may be surprising.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -210,6 +230,15 @@ func newBranchRestrictionsGetABranchRestrictionRuleCmd() *cobra.Command {
 		Short: `Get a branch restriction rule`,
 		Long:  `Returns a specific branch restriction rule.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if id == "" {
 				return fmt.Errorf("--id is required")
 			}
@@ -268,6 +297,15 @@ func newBranchRestrictionsUpdateABranchRestrictionRuleCmd() *cobra.Command {
 		Short: `Update a branch restriction rule`,
 		Long:  "Updates an existing branch restriction rule.\n\nFields not present in the request body are ignored.\n\nSee [`POST`](/cloud/bitbucket/rest/api-group-branch-restrictions/#api-repositories-workspace-repo-slug-branch-restrictions-post) for details.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if id == "" {
 				return fmt.Errorf("--id is required")
 			}
@@ -353,6 +391,15 @@ func newBranchRestrictionsDeleteABranchRestrictionRuleCmd() *cobra.Command {
 		Short: `Delete a branch restriction rule`,
 		Long:  `Deletes an existing branch restriction rule.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if id == "" {
 				return fmt.Errorf("--id is required")
 			}

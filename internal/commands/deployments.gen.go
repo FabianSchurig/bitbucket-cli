@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -26,6 +27,7 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
+	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -76,6 +78,15 @@ func newDeploymentsListRepositoryDeployKeysCmd() *cobra.Command {
 		Short: `List repository deploy keys`,
 		Long:  `Returns all deploy-keys belonging to a repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -126,6 +137,15 @@ func newDeploymentsAddARepositoryDeployKeyCmd() *cobra.Command {
 		Short: `Add a repository deploy key`,
 		Long:  "Create a new deploy key in a repository. Note: If authenticating a deploy key\nwith an OAuth consumer, any changes to the OAuth consumer will subsequently\ninvalidate the deploy key.\n\n\nExample:\n```\n$ curl -X POST \\\n-H \"Authorization <auth header>\" \\\n-H \"Content-type: application/json\" \\\nhttps://api.bitbucket.org/2.0/repositories/mleu/test/deploy-keys -d \\\n'{\n    \"key\": \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAK/b1cHHDr/TEV1JGQl+WjCwStKG6Bhrv0rFpEsYlyTBm1fzN0VOJJYn4ZOPCPJwqse6fGbXntEs+BbXiptR+++HycVgl65TMR0b5ul5AgwrVdZdT7qjCOCgaSV74/9xlHDK8oqgGnfA7ZoBBU+qpVyaloSjBdJfLtPY/xqj4yHnXKYzrtn/uFc4Kp9Tb7PUg9Io3qohSTGJGVHnsVblq/rToJG7L5xIo0OxK0SJSQ5vuId93ZuFZrCNMXj8JDHZeSEtjJzpRCBEXHxpOPhAcbm4MzULgkFHhAVgp4JbkrT99/wpvZ7r9AdkTg7HGqL3rlaDrEcWfL7Lu6TnhBdq5 mleu@C02W454JHTD8\",\n    \"label\": \"mydeploykey\"\n}'\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -171,6 +191,15 @@ func newDeploymentsGetARepositoryDeployKeyCmd() *cobra.Command {
 		Short: `Get a repository deploy key`,
 		Long:  `Returns the deploy key belonging to a specific key.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if keyId == "" {
 				return fmt.Errorf("--key-id is required")
 			}
@@ -221,6 +250,15 @@ func newDeploymentsUpdateARepositoryDeployKeyCmd() *cobra.Command {
 		Short: `Update a repository deploy key`,
 		Long:  "Create a new deploy key in a repository.\n\nThe same key needs to be passed in but the comment and label can change.\n\nExample:\n```\n$ curl -X PUT \\\n-H \"Authorization <auth header>\" \\\n-H \"Content-type: application/json\" \\\nhttps://api.bitbucket.org/2.0/repositories/mleu/test/deploy-keys/1234 -d \\\n'{\n    \"label\": \"newlabel\",\n    \"key\": \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAK/b1cHHDr/TEV1JGQl+WjCwStKG6Bhrv0rFpEsYlyTBm1fzN0VOJJYn4ZOPCPJwqse6fGbXntEs+BbXiptR+++HycVgl65TMR0b5ul5AgwrVdZdT7qjCOCgaSV74/9xlHDK8oqgGnfA7ZoBBU+qpVyaloSjBdJfLtPY/xqj4yHnXKYzrtn/uFc4Kp9Tb7PUg9Io3qohSTGJGVHnsVblq/rToJG7L5xIo0OxK0SJSQ5vuId93ZuFZrCNMXj8JDHZeSEtjJzpRCBEXHxpOPhAcbm4MzULgkFHhAVgp4JbkrT99/wpvZ7r9AdkTg7HGqL3rlaDrEcWfL7Lu6TnhBdq5 newcomment\",\n}'\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if keyId == "" {
 				return fmt.Errorf("--key-id is required")
 			}
@@ -271,6 +309,15 @@ func newDeploymentsDeleteARepositoryDeployKeyCmd() *cobra.Command {
 		Short: `Delete a repository deploy key`,
 		Long:  `This deletes a deploy key from a repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if keyId == "" {
 				return fmt.Errorf("--key-id is required")
 			}
@@ -323,6 +370,15 @@ func newDeploymentsGetDeploymentsForRepositoryCmd() *cobra.Command {
 		Short: `List deployments`,
 		Long:  `Find deployments`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -374,6 +430,15 @@ func newDeploymentsGetDeploymentForRepositoryCmd() *cobra.Command {
 		Short: `Get a deployment`,
 		Long:  `Retrieve a deployment`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -426,6 +491,15 @@ func newDeploymentsGetEnvironmentsForRepositoryCmd() *cobra.Command {
 		Short: `List environments`,
 		Long:  `Find environments`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -479,6 +553,15 @@ func newDeploymentsCreateEnvironmentCmd() *cobra.Command {
 		Short: `Create an environment`,
 		Long:  `Create an environment.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -539,6 +622,15 @@ func newDeploymentsGetEnvironmentForRepositoryCmd() *cobra.Command {
 		Short: `Get an environment`,
 		Long:  `Retrieve an environment`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -589,6 +681,15 @@ func newDeploymentsDeleteEnvironmentForRepositoryCmd() *cobra.Command {
 		Short: `Delete an environment`,
 		Long:  `Delete an environment`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -639,6 +740,15 @@ func newDeploymentsUpdateEnvironmentForRepositoryCmd() *cobra.Command {
 		Short: `Update an environment`,
 		Long:  `Update an environment`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -691,6 +801,9 @@ func newDeploymentsListProjectDeployKeysCmd() *cobra.Command {
 		Short: `List project deploy keys`,
 		Long:  `Returns all deploy keys belonging to a project.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if projectKey == "" {
 				return fmt.Errorf("--project-key is required")
 			}
@@ -741,6 +854,9 @@ func newDeploymentsCreateAProjectDeployKeyCmd() *cobra.Command {
 		Short: `Create a project deploy key`,
 		Long:  "Create a new deploy key in a project.\n\nExample:\n```\n$ curl -X POST \\\n-H \"Authorization <auth header>\" \\\n-H \"Content-type: application/json\" \\\nhttps://api.bitbucket.org/2.0/workspaces/standard/projects/TEST_PROJECT/deploy-keys/ -d \\\n'{\n    \"key\": \"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAK/b1cHHDr/TEV1JGQl+WjCwStKG6Bhrv0rFpEsYlyTBm1fzN0VOJJYn4ZOPCPJwqse6fGbXntEs+BbXiptR+++HycVgl65TMR0b5ul5AgwrVdZdT7qjCOCgaSV74/9xlHDK8oqgGnfA7ZoBBU+qpVyaloSjBdJfLtPY/xqj4yHnXKYzrtn/uFc4Kp9Tb7PUg9Io3qohSTGJGVHnsVblq/rToJG7L5xIo0OxK0SJSQ5vuId93ZuFZrCNMXj8JDHZeSEtjJzpRCBEXHxpOPhAcbm4MzULgkFHhAVgp4JbkrT99/wpvZ7r9AdkTg7HGqL3rlaDrEcWfL7Lu6TnhBdq5 mleu@C02W454JHTD8\",\n    \"label\": \"mydeploykey\"\n}'\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if projectKey == "" {
 				return fmt.Errorf("--project-key is required")
 			}
@@ -786,6 +902,9 @@ func newDeploymentsGetAProjectDeployKeyCmd() *cobra.Command {
 		Short: `Get a project deploy key`,
 		Long:  `Returns the deploy key belonging to a specific key ID.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if keyId == "" {
 				return fmt.Errorf("--key-id is required")
 			}
@@ -836,6 +955,9 @@ func newDeploymentsDeleteADeployKeyFromAProjectCmd() *cobra.Command {
 		Short: `Delete a deploy key from a project`,
 		Long:  `This deletes a deploy key from a project.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if keyId == "" {
 				return fmt.Errorf("--key-id is required")
 			}

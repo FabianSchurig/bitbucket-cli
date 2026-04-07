@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -26,6 +27,7 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
+	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -151,6 +153,9 @@ func newReposListRepositoriesInAWorkspaceCmd() *cobra.Command {
 		Long:  "Returns a paginated list of all repositories owned by the specified\nworkspace.\n\nThe result can be narrowed down based on the authenticated user's role.\n\nE.g. with `?role=contributor`, only those repositories that the\nauthenticated user has write access to are returned (this includes any\nrepo the user is an admin on, as that implies write access).\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
+			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
@@ -201,6 +206,15 @@ func newReposGetARepositoryCmd() *cobra.Command {
 		Short: `Get a repository`,
 		Long:  `Returns the object describing this repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -269,6 +283,15 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 		Short: `Create a repository`,
 		Long:  "Creates a new repository.\n\nNote: In order to set the project for the newly created repository,\npass in either the project key or the project UUID as part of the\nrequest body as shown in the examples below:\n\n```\n$ curl -X POST -H \"Content-Type: application/json\" -d '{\n    \"scm\": \"git\",\n    \"project\": {\n        \"key\": \"MARS\"\n    }\n}' https://api.bitbucket.org/2.0/repositories/teamsinspace/hablanding\n```\n\nor\n\n```\n$ curl -X POST -H \"Content-Type: application/json\" -d '{\n    \"scm\": \"git\",\n    \"project\": {\n        \"key\": \"{ba516952-992a-4c2d-acbd-17d502922f96}\"\n    }\n}' https://api.bitbucket.org/2.0/repositories/teamsinspace/hablanding\n```\n\nThe project must be assigned for all repositories. If the project is not provided,\nthe repository is automatically assigned to the oldest project in the workspace.\n\nNote: In the examples above, the workspace ID `teamsinspace`,\nand/or the repository name `hablanding` can be replaced by UUIDs.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -456,6 +479,15 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 		Short: `Update a repository`,
 		Long:  "Since this endpoint can be used to both update and to create a\nrepository, the request body depends on the intent.\n\n#### Creation\n\nSee the POST documentation for the repository endpoint for an example\nof the request body.\n\n#### Update\n\nNote: Changing the `name` of the repository will cause the location to\nbe changed. This is because the URL of the repo is derived from the\nname (a process called slugification). In such a scenario, it is\npossible for the request to fail if the newly created slug conflicts\nwith an existing repository's slug. But if there is no conflict,\nthe new location will be returned in the `Location` header of the\nresponse.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -622,6 +654,15 @@ func newReposDeleteARepositoryCmd() *cobra.Command {
 
 This does not affect its forks.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -677,6 +718,15 @@ func newReposListCommitsThatModifiedAFileCmd() *cobra.Command {
 		Short: `List commits that modified a file`,
 		Long:  "Returns a paginated list of commits that modified the specified file.\n\nCommits are returned in reverse chronological order. This is roughly\nequivalent to the following commands:\n\n    $ git log --follow --date-order <sha> <path>\n\nBy default, Bitbucket will follow renames and the path name in the\nreturned entries reflects that. This can be turned off using the\n`?renames=false` query parameter.\n\nResults are returned in descending chronological order by default, and\nlike most endpoints you can\n[filter and sort](/cloud/bitbucket/rest/intro/#filtering) the response to\nonly provide exactly the data you want.\n\nThe example response returns commits made before 2011-05-18 against a file\nnamed `README.rst`. The results are filtered to only return the path and\ndate. This request can be made using:\n\n```\n$ curl 'https://api.bitbucket.org/2.0/repositories/evzijst/dogslow/filehistory/master/README.rst'\\\n  '?fields=values.next,values.path,values.commit.date&q=commit.date<=2011-05-18'\n```\n\nIn the response you can see that the file was renamed to `README.rst`\nby the commit made on 2011-05-16, and was previously named `README.txt`.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if commit == "" {
 				return fmt.Errorf("--commit is required")
 			}
@@ -750,6 +800,15 @@ func newReposListRepositoryForksCmd() *cobra.Command {
 		Long: `Returns a paginated list of all the forks of the specified
 repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -830,6 +889,15 @@ func newReposForkARepositoryCmd() *cobra.Command {
 		Short: `Fork a repository`,
 		Long:  "Creates a new fork of the specified repository.\n\n#### Forking a repository\n\nTo create a fork, specify the workspace explicitly as part of the\nrequest body:\n\n```\n$ curl -X POST -u jdoe https://api.bitbucket.org/2.0/repositories/atlassian/bbql/forks \\\n  -H 'Content-Type: application/json' -d '{\n    \"name\": \"bbql_fork\",\n    \"workspace\": {\n      \"slug\": \"atlassian\"\n    }\n}'\n```\n\nTo fork a repository into the same workspace, also specify a new `name`.\n\nWhen you specify a value for `name`, it will also affect the `slug`.\nThe `slug` is reflected in the repository URL of the new fork. It is\nderived from `name` by substituting non-ASCII characters, removes\nwhitespace, and changes characters to lower case. For example,\n`My repo` would turn into `my_repo`.\n\nYou need contributor access to create new forks within a workspace.\n\n\n#### Change the properties of a new fork\n\nBy default the fork inherits most of its properties from the parent.\nHowever, since the optional POST body document follows the normal\n`repository` JSON schema and you can override the new fork's\nproperties.\n\nProperties that can be overridden include:\n\n* description\n* fork_policy\n* language\n* mainbranch\n* is_private (note that a private repo's fork_policy might prohibit\n  the creation of public forks, in which `is_private=False` would fail)\n* has_issues (to initialize or disable the new repo's issue tracker --\n  note that the actual contents of the parent repository's issue\n  tracker are not copied during forking)\n* has_wiki (to initialize or disable the new repo's wiki --\n  note that the actual contents of the parent repository's wiki are not\n  copied during forking)\n* project (when forking into a private project, the fork's `is_private`\n  must be `true`)\n\nProperties that cannot be modified include:\n\n* scm\n* parent\n* full_name",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -996,6 +1064,15 @@ func newReposListWebhooksForARepositoryCmd() *cobra.Command {
 		Short: `List webhooks for a repository`,
 		Long:  `Returns a paginated list of webhooks installed on this repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1052,6 +1129,15 @@ func newReposCreateAWebhookForARepositoryCmd() *cobra.Command {
 		Short: `Create a webhook for a repository`,
 		Long:  "Creates a new webhook on the specified repository.\n\nExample:\n\n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n  https://api.bitbucket.org/2.0/repositories/my-workspace/my-repo-slug/hooks\n  -d '\n    {\n      \"description\": \"Webhook Description\",\n      \"url\": \"https://example.com/\",\n      \"active\": true,\n      \"secret\": \"this is a really bad secret\",\n      \"events\": [\n        \"repo:push\",\n        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n```\n\nWhen the `secret` is provided it will be used as the key to generate a HMAC\ndigest value sent in the `X-Hub-Signature` header at delivery time. Passing\na `null` or empty `secret` or not passing a `secret` will leave the webhook's\nsecret unset. Bitbucket only generates the `X-Hub-Signature` when the webhook's\nsecret is set.\n\nNote that this call requires the webhook scope, as well as any scope\nthat applies to the events that the webhook subscribes to. In the\nexample above that means: `webhook`, `repository` and `issue`.\n\nAlso note that the `url` must properly resolve and cannot be an\ninternal, non-routed address.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1125,6 +1211,15 @@ func newReposGetAWebhookForARepositoryCmd() *cobra.Command {
 		Long: `Returns the webhook with the specified id installed on the specified
 repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1181,6 +1276,15 @@ func newReposUpdateAWebhookForARepositoryCmd() *cobra.Command {
 		Short: `Update a webhook for a repository`,
 		Long:  "Updates the specified webhook subscription.\n\nThe following properties can be mutated:\n\n* `description`\n* `url`\n* `secret`\n* `active`\n* `events`\n\nThe hook's secret is used as a key to generate the HMAC hex digest sent in the\n`X-Hub-Signature` header at delivery time. This signature is only generated\nwhen the hook has a secret.\n\nSet the hook's secret by passing the new value in the `secret` field. Passing a\n`null` value in the `secret` field will remove the secret from the hook. The\nhook's secret can be left unchanged by not passing the `secret` field in the\nrequest.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1259,6 +1363,15 @@ func newReposDeleteAWebhookForARepositoryCmd() *cobra.Command {
 		Long: `Deletes the specified webhook subscription from the given
 repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1308,6 +1421,15 @@ func newReposRetrieveTheInheritanceStateForRepositorySettingsCmd() *cobra.Comman
 		Short: `Retrieve the inheritance state for repository settings`,
 		Long:  ``,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1353,6 +1475,15 @@ func newReposSetTheInheritanceStateForRepositorySettingsCmd() *cobra.Command {
                 `,
 		Long: ``,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1401,6 +1532,15 @@ func newReposListExplicitGroupPermissionsForARepositoryCmd() *cobra.Command {
 		Long: `Returns a paginated list of explicit group permissions for the given repository.
 This endpoint does not support BBQL features.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1452,6 +1592,15 @@ func newReposGetAnExplicitGroupPermissionForARepositoryCmd() *cobra.Command {
 		Short: `Get an explicit group permission for a repository`,
 		Long:  "Returns the group permission for a given group slug and repository\n\nOnly users with admin permission for the repository may access this resource.\n\nPermissions can be:\n\n* `admin`\n* `write`\n* `read`\n* `none`",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if groupSlug == "" {
 				return fmt.Errorf("--group-slug is required")
 			}
@@ -1503,6 +1652,15 @@ func newReposUpdateAnExplicitGroupPermissionForARepositoryCmd() *cobra.Command {
 		Short: `Update an explicit group permission for a repository`,
 		Long:  "Updates the group permission, or grants a new permission if one does not already exist.\n\nOnly users with admin permission for the repository may access this resource.\n\nThe only authentication method supported for this endpoint is via app passwords.\n\nPermissions can be:\n\n* `admin`\n* `write`\n* `read`",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if groupSlug == "" {
 				return fmt.Errorf("--group-slug is required")
 			}
@@ -1564,6 +1722,15 @@ Only users with admin permission for the repository may access this resource.
 
 The only authentication method supported for this endpoint is via app passwords.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if groupSlug == "" {
 				return fmt.Errorf("--group-slug is required")
 			}
@@ -1617,6 +1784,15 @@ func newReposListExplicitUserPermissionsForARepositoryCmd() *cobra.Command {
 		Long: `Returns a paginated list of explicit user permissions for the given repository.
 This endpoint does not support BBQL features.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1668,6 +1844,15 @@ func newReposGetAnExplicitUserPermissionForARepositoryCmd() *cobra.Command {
 		Short: `Get an explicit user permission for a repository`,
 		Long:  "Returns the explicit user permission for a given user and repository.\n\nOnly users with admin permission for the repository may access this resource.\n\nPermissions can be:\n\n* `admin`\n* `write`\n* `read`\n* `none`",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1719,6 +1904,15 @@ func newReposUpdateAnExplicitUserPermissionForARepositoryCmd() *cobra.Command {
 		Short: `Update an explicit user permission for a repository`,
 		Long:  "Updates the explicit user permission for a given user and repository. The selected user must be a member of\nthe workspace, and cannot be the workspace owner.\nOnly users with admin permission for the repository may access this resource.\n\nThe only authentication method for this endpoint is via app passwords.\n\nPermissions can be:\n\n* `admin`\n* `write`\n* `read`",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1780,6 +1974,15 @@ Only users with admin permission for the repository may access this resource.
 
 The only authentication method for this endpoint is via app passwords.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1840,6 +2043,15 @@ without having to know the name or SHA1 of the repo's main branch.
 
 To create new commits, [POST to this endpoint](#post)`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1897,6 +2109,15 @@ func newReposCreateACommitByUploadingAFileCmd() *cobra.Command {
 		Short: `Create a commit by uploading a file`,
 		Long:  "This endpoint is used to create new commits in the repository by\nuploading files.\n\nTo add a new file to a repository:\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/username/slug/src \\\n  -F /repo/path/to/image.png=@image.png\n```\n\nThis will create a new commit on top of the main branch, inheriting the\ncontents of the main branch, but adding (or overwriting) the\n`image.png` file to the repository in the `/repo/path/to` directory.\n\nTo create a commit that deletes files, use the `files` parameter:\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/username/slug/src \\\n  -F files=/file/to/delete/1.txt \\\n  -F files=/file/to/delete/2.txt\n```\n\nYou can add/modify/delete multiple files in a request. Rename/move a\nfile by deleting the old path and adding the content at the new path.\n\nThis endpoint accepts `multipart/form-data` (as in the examples above),\nas well as `application/x-www-form-urlencoded`.\n\nNote: `multipart/form-data` is currently not supported by Forge apps\nfor this API.\n\n#### multipart/form-data\n\nA `multipart/form-data` post contains a series of \"form fields\" that\nidentify both the individual files that are being uploaded, as well as\nadditional, optional meta data.\n\nFiles are uploaded in file form fields (those that have a\n`Content-Disposition` parameter) whose field names point to the remote\npath in the repository where the file should be stored. Path field\nnames are always interpreted to be absolute from the root of the\nrepository, regardless whether the client uses a leading slash (as the\nabove `curl` example did).\n\nFile contents are treated as bytes and are not decoded as text.\n\nThe commit message, as well as other non-file meta data for the\nrequest, is sent along as normal form field elements. Meta data fields\nshare the same namespace as the file objects. For `multipart/form-data`\nbodies that should not lead to any ambiguity, as the\n`Content-Disposition` header will contain the `filename` parameter to\ndistinguish between a file named \"message\" and the commit message field.\n\n#### application/x-www-form-urlencoded\n\nIt is also possible to upload new files using a simple\n`application/x-www-form-urlencoded` POST. This can be convenient when\nuploading pure text files:\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/bbql/src \\\n  --data-urlencode \"/path/to/me.txt=Lorem ipsum.\" \\\n  --data-urlencode \"message=Initial commit\" \\\n  --data-urlencode \"author=Erik van Zijst <erik.van.zijst@gmail.com>\"\n```\n\nThere could be a field name clash if a client were to upload a file\nnamed \"message\", as this filename clashes with the meta data property\nfor the commit message. To avoid this and to upload files whose names\nclash with the meta data properties, use a leading slash for the files,\ne.g. `curl --data-urlencode \"/message=file contents\"`.\n\nWhen an explicit slash is omitted for a file whose path matches that of\na meta data parameter, then it is interpreted as meta data, not as a\nfile.\n\n#### Executables and links\n\nWhile this API aims to facilitate the most common use cases, it is\npossible to perform some more advanced operations like creating a new\nsymlink in the repository, or creating an executable file.\n\nFiles can be supplied with a `x-attributes` value in the\n`Content-Disposition` header. For example, to upload an executable\nfile, as well as create a symlink from `README.txt` to `README`:\n\n```\n--===============1438169132528273974==\nContent-Type: text/plain; charset=\"us-ascii\"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nContent-ID: \"bin/shutdown.sh\"\nContent-Disposition: attachment; filename=\"shutdown.sh\"; x-attributes:\"executable\"\n\n#!/bin/sh\nhalt\n\n--===============1438169132528273974==\nContent-Type: text/plain; charset=\"us-ascii\"\nMIME-Version: 1.0\nContent-Transfer-Encoding: 7bit\nContent-ID: \"/README.txt\"\nContent-Disposition: attachment; filename=\"README.txt\"; x-attributes:\"link\"\n\nREADME\n--===============1438169132528273974==--\n```\n\nLinks are files that contain the target path and have\n`x-attributes:\"link\"` set.\n\nWhen overwriting links with files, or vice versa, the newly uploaded\nfile determines both the new contents, as well as the attributes. That\nmeans uploading a file without specifying `x-attributes=\"link\"` will\ncreate a regular file, even if the parent commit hosted a symlink at\nthe same path.\n\nThe same applies to executables. When modifying an existing executable\nfile, the form-data file element must include\n`x-attributes=\"executable\"` in order to preserve the executable status\nof the file.\n\nNote that this API does not support the creation or manipulation of\nsubrepos / submodules.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -1961,6 +2182,15 @@ func newReposGetFileOrDirectoryContentsCmd() *cobra.Command {
 		Short: `Get file or directory contents`,
 		Long:  "This endpoints is used to retrieve the contents of a single file,\nor the contents of a directory at a specified revision.\n\n#### Raw file contents\n\nWhen `path` points to a file, this endpoint returns the raw contents.\nThe response's Content-Type is derived from the filename\nextension (not from the contents). The file contents are not processed\nand no character encoding/recoding is performed and as a result no\ncharacter encoding is included as part of the Content-Type.\n\nThe `Content-Disposition` header will be \"attachment\" to prevent\nbrowsers from running executable files.\n\nIf the file is managed by LFS, then a 301 redirect pointing to\nAtlassian's media services platform is returned.\n\nThe response includes an ETag that is based on the contents of the file\nand its attributes. This means that an empty `__init__.py` always\nreturns the same ETag, regardless on the directory it lives in, or the\ncommit it is on.\n\n#### File meta data\n\nWhen the request for a file path includes the query parameter\n`?format=meta`, instead of returning the file's raw contents, Bitbucket\ninstead returns the JSON object describing the file's properties:\n\n```javascript\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/bbql/src/eefd5ef/tests/__init__.py?format=meta\n{\n  \"links\": {\n    \"self\": {\n      \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bbql/src/eefd5ef5d3df01aed629f650959d6706d54cd335/tests/__init__.py\"\n    },\n    \"meta\": {\n      \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bbql/src/eefd5ef5d3df01aed629f650959d6706d54cd335/tests/__init__.py?format=meta\"\n    }\n  },\n  \"path\": \"tests/__init__.py\",\n  \"commit\": {\n    \"type\": \"commit\",\n    \"hash\": \"eefd5ef5d3df01aed629f650959d6706d54cd335\",\n    \"links\": {\n      \"self\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bbql/commit/eefd5ef5d3df01aed629f650959d6706d54cd335\"\n      },\n      \"html\": {\n        \"href\": \"https://bitbucket.org/atlassian/bbql/commits/eefd5ef5d3df01aed629f650959d6706d54cd335\"\n      }\n    }\n  },\n  \"attributes\": [],\n  \"type\": \"commit_file\",\n  \"size\": 0\n}\n```\n\nFile objects contain an `attributes` element that contains a list of\npossible modifiers. Currently defined values are:\n\n* `link` -- indicates that the entry is a symbolic link. The contents\n    of the file represent the path the link points to.\n* `executable` -- indicates that the file has the executable bit set.\n* `subrepository` -- indicates that the entry points to a submodule or\n    subrepo. The contents of the file is the SHA1 of the repository\n    pointed to.\n* `binary` -- indicates whether Bitbucket thinks the file is binary.\n\nThis endpoint can provide an alternative to how a HEAD request can be\nused to check for the existence of a file, or a file's size without\nincurring the overhead of receiving its full contents.\n\n\n#### Directory listings\n\nWhen `path` points to a directory instead of a file, the response is a\npaginated list of directory and file objects in the same order as the\nunderlying SCM system would return them.\n\nFor example:\n\n```javascript\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/bbql/src/eefd5ef/tests\n{\n  \"pagelen\": 10,\n  \"values\": [\n    {\n      \"path\": \"tests/test_project\",\n      \"type\": \"commit_directory\",\n      \"links\": {\n        \"self\": {\n          \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bbql/src/eefd5ef5d3df01aed629f650959d6706d54cd335/tests/test_project/\"\n        },\n        \"meta\": {\n          \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bbql/src/eefd5ef5d3df01aed629f650959d6706d54cd335/tests/test_project/?format=meta\"\n        }\n      },\n      \"commit\": {\n        \"type\": \"commit\",\n        \"hash\": \"eefd5ef5d3df01aed629f650959d6706d54cd335\",\n        \"links\": {\n          \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bbql/commit/eefd5ef5d3df01aed629f650959d6706d54cd335\"\n          },\n          \"html\": {\n            \"href\": \"https://bitbucket.org/atlassian/bbql/commits/eefd5ef5d3df01aed629f650959d6706d54cd335\"\n          }\n        }\n      }\n    },\n    {\n      \"links\": {\n        \"self\": {\n          \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bbql/src/eefd5ef5d3df01aed629f650959d6706d54cd335/tests/__init__.py\"\n        },\n        \"meta\": {\n          \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bbql/src/eefd5ef5d3df01aed629f650959d6706d54cd335/tests/__init__.py?format=meta\"\n        }\n      },\n      \"path\": \"tests/__init__.py\",\n      \"commit\": {\n        \"type\": \"commit\",\n        \"hash\": \"eefd5ef5d3df01aed629f650959d6706d54cd335\",\n        \"links\": {\n          \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bbql/commit/eefd5ef5d3df01aed629f650959d6706d54cd335\"\n          },\n          \"html\": {\n            \"href\": \"https://bitbucket.org/atlassian/bbql/commits/eefd5ef5d3df01aed629f650959d6706d54cd335\"\n          }\n        }\n      },\n      \"attributes\": [],\n      \"type\": \"commit_file\",\n      \"size\": 0\n    }\n  ],\n  \"page\": 1,\n  \"size\": 2\n}\n```\n\nWhen listing the contents of the repo's root directory, the use of a\ntrailing slash at the end of the URL is required.\n\nThe response by default is not recursive, meaning that only the direct contents of\na path are returned. The response does not recurse down into\nsubdirectories. In order to \"walk\" the entire directory tree, the\nclient can either parse each response and follow the `self` links of each\n`commit_directory` object, or can specify a `max_depth` to recurse to.\n\nThe max_depth parameter will do a breadth-first search to return the contents of the subdirectories\nup to the depth specified. Breadth-first search was chosen as it leads to the least amount of\nfile system operations for git. If the `max_depth` parameter is specified to be too\nlarge, the call will time out and return a 555.\n\nEach returned object is either a `commit_file`, or a `commit_directory`,\nboth of which contain a `path` element. This path is the absolute path\nfrom the root of the repository. Each object also contains a `commit`\nobject which embeds the commit the file is on. Note that this is merely\nthe commit that was used in the URL. It is *not* the commit that last\nmodified the file.\n\nDirectory objects have 2 representations. Their `self` link returns the\npaginated contents of the directory. The `meta` link on the other hand\nreturns the actual `directory` object itself, e.g.:\n\n```javascript\n{\n  \"path\": \"tests/test_project\",\n  \"type\": \"commit_directory\",\n  \"links\": {\n    \"self\": {\n      \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bbql/src/eefd5ef5d3df01aed629f650959d6706d54cd335/tests/test_project/\"\n    },\n    \"meta\": {\n      \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bbql/src/eefd5ef5d3df01aed629f650959d6706d54cd335/tests/test_project/?format=meta\"\n    }\n  },\n  \"commit\": { ... }\n}\n```\n\n#### Querying, filtering and sorting\n\nLike most API endpoints, this API supports the Bitbucket\nquerying/filtering syntax and so you could filter a directory listing\nto only include entries that match certain criteria. For instance, to\nlist all binary files over 1kb use the expression:\n\n`size > 1024 and attributes = \"binary\"`\n\nwhich after urlencoding yields the query string:\n\n`?q=size%3E1024+and+attributes%3D%22binary%22`\n\nTo change the ordering of the response, use the `?sort` parameter:\n\n`.../src/eefd5ef/?sort=-size`\n\nSee [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more\ndetails.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if commit == "" {
 				return fmt.Errorf("--commit is required")
 			}
@@ -2033,6 +2263,15 @@ func newReposListRepositoriesWatchersCmd() *cobra.Command {
 		Long: `Returns a paginated list of all the watchers on the specified
 repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -2133,6 +2372,9 @@ func newReposListRepositoryPermissionsInAWorkspaceForAUserCmd() *cobra.Command {
 		Short: `List repository permissions in a workspace for a user`,
 		Long:  "Returns an object for each repository the caller has explicit access to in the\nspecified workspace and their effective permission — the highest level of\npermission the caller has. This does not return public repositories that the\nuser was not granted any specific permission in, and does not distinguish between\nexplicit and implicit privileges.\n\nPermissions can be:\n\n* `admin`\n* `write`\n* `read`\n\nResults may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering) by\nrepository or permission by adding the following query string\nparameters:\n\n* `q=repository.name=\"bits\"` or `q=permission>\"read\"`\n* `sort=repository.name`\n\nNote that the query parameter values need to be URL escaped so that `=`\nwould become `%3D`.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}

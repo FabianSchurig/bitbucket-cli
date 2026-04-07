@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -26,6 +27,7 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
+	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -82,6 +84,15 @@ sorted ["branch1", "branch10", "branch2", "v10", "v11", "v9"] instead of ["branc
 Sorting can be changed using the ?sort= query parameter. When using ?sort=name to explicitly sort on ref name,
 Bitbucket will apply natural sorting and interpret numerical values as numbers instead of strings.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -141,6 +152,15 @@ func newRefsListOpenBranchesCmd() *cobra.Command {
 		Short: `List open branches`,
 		Long:  "Returns a list of all open branches within the specified repository.\nResults will be in the order the source control manager returns them.\n\nBranches support [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering)\nthat can be used to search for specific branches. For instance, to find\nall branches that have \"stab\" in their name:\n\n```\ncurl -s https://api.bitbucket.org/2.0/repositories/atlassian/aui/refs/branches -G --data-urlencode 'q=name ~ \"stab\"'\n```\n\nBy default, results will be in the order the underlying source control system returns them and identical to\nthe ordering one sees when running \"$ git branch --list\". Note that this follows simple\nlexical ordering of the ref names.\n\nThis can be undesirable as it does apply any natural sorting semantics, meaning for instance that tags are\nsorted [\"v10\", \"v11\", \"v9\"] instead of [\"v9\", \"v10\", \"v11\"].\n\nSorting can be changed using the ?q= query parameter. When using ?q=name to explicitly sort on ref name,\nBitbucket will apply natural sorting and interpret numerical values as numbers instead of strings.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -195,6 +215,15 @@ func newRefsCreateABranchCmd() *cobra.Command {
 		Short: `Create a branch`,
 		Long:  "Creates a new branch in the specified repository.\n\nThe payload of the POST should consist of a JSON document that\ncontains the name of the tag and the target hash.\n\n```\ncurl https://api.bitbucket.org/2.0/repositories/seanfarley/hg/refs/branches \\\n-s -u seanfarley -X POST -H \"Content-Type: application/json\" \\\n-d '{\n    \"name\" : \"smf/create-feature\",\n    \"target\" : {\n        \"hash\" : \"default\",\n    }\n}'\n```\n\nThis call requires authentication. Private repositories require the\ncaller to authenticate with an account that has appropriate\nauthorization.\n\nThe branch name should not include any prefixes (e.g.\nrefs/heads). This endpoint does support using short hash prefixes for\nthe commit hash, but it may return a 400 response if the provided\nprefix is ambiguous. Using a full commit hash is the preferred\napproach.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -247,6 +276,15 @@ authorization.
 For Git, the branch name should not include any prefixes (e.g.
 refs/heads).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if name == "" {
 				return fmt.Errorf("--name is required")
 			}
@@ -303,6 +341,15 @@ response.
 The branch name should not include any prefixes (e.g.
 refs/heads).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if name == "" {
 				return fmt.Errorf("--name is required")
 			}
@@ -367,6 +414,15 @@ sorted ["v10", "v11", "v9"] instead of ["v9", "v10", "v11"].
 Sorting can be changed using the ?sort= query parameter. When using ?sort=name to explicitly sort on ref name,
 Bitbucket will apply natural sorting and interpret numerical values as numbers instead of strings.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -431,6 +487,15 @@ func newRefsCreateATagCmd() *cobra.Command {
 		Short: `Create a tag`,
 		Long:  "Creates a new annotated tag in the specified repository.\n\nThe payload of the POST should consist of a JSON document that\ncontains the name of the tag and the target hash.\n\n```\ncurl https://api.bitbucket.org/2.0/repositories/jdoe/myrepo/refs/tags \\\n-s -u jdoe -X POST -H \"Content-Type: application/json\" \\\n-d '{\n    \"name\" : \"new-tag-name\",\n    \"target\" : {\n        \"hash\" : \"a1b2c3d4e5f6\",\n    }\n}'\n```\n\nThis endpoint does support using short hash prefixes for the commit\nhash, but it may return a 400 response if the provided prefix is\nambiguous. Using a full commit hash is the preferred approach.\n\nA message for the tag object may optionally be provided. If it is\nomitted or the provided message is empty, a default message of\n\"Added tag <tagname> for changeset <shorthash>\" will be used.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -519,6 +584,15 @@ func newRefsGetATagCmd() *cobra.Command {
 		Short: `Get a tag`,
 		Long:  "Returns the specified tag.\n\n```\n$ curl -s https://api.bitbucket.org/2.0/repositories/seanfarley/hg/refs/tags/3.8 -G | jq .\n{\n  \"name\": \"3.8\",\n  \"links\": {\n    \"commits\": {\n      \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commits/3.8\"\n    },\n    \"self\": {\n      \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/refs/tags/3.8\"\n    },\n    \"html\": {\n      \"href\": \"https://bitbucket.org/seanfarley/hg/commits/tag/3.8\"\n    }\n  },\n  \"tagger\": {\n    \"raw\": \"Matt Mackall <mpm@selenic.com>\",\n    \"type\": \"author\",\n    \"user\": {\n      \"username\": \"mpmselenic\",\n      \"nickname\": \"mpmselenic\",\n      \"display_name\": \"Matt Mackall\",\n      \"type\": \"user\",\n      \"uuid\": \"{a4934530-db4c-419c-a478-9ab4964c2ee7}\",\n      \"links\": {\n        \"self\": {\n          \"href\": \"https://api.bitbucket.org/2.0/users/mpmselenic\"\n        },\n        \"html\": {\n          \"href\": \"https://bitbucket.org/mpmselenic/\"\n        },\n        \"avatar\": {\n          \"href\": \"https://bitbucket.org/account/mpmselenic/avatar/32/\"\n        }\n      }\n    }\n  },\n  \"date\": \"2016-05-01T18:52:25+00:00\",\n  \"message\": \"Added tag 3.8 for changeset f85de28eae32\",\n  \"type\": \"tag\",\n  \"target\": {\n    \"hash\": \"f85de28eae32e7d3064b1a1321309071bbaaa069\",\n    \"repository\": {\n      \"links\": {\n        \"self\": {\n          \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg\"\n        },\n        \"html\": {\n          \"href\": \"https://bitbucket.org/seanfarley/hg\"\n        },\n        \"avatar\": {\n          \"href\": \"https://bitbucket.org/seanfarley/hg/avatar/32/\"\n        }\n      },\n      \"type\": \"repository\",\n      \"name\": \"hg\",\n      \"full_name\": \"seanfarley/hg\",\n      \"uuid\": \"{c75687fb-e99d-4579-9087-190dbd406d30}\"\n    },\n    \"links\": {\n      \"self\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/f85de28eae32e7d3064b1a1321309071bbaaa069\"\n      },\n      \"comments\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/f85de28eae32e7d3064b1a1321309071bbaaa069/comments\"\n      },\n      \"patch\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/patch/f85de28eae32e7d3064b1a1321309071bbaaa069\"\n      },\n      \"html\": {\n        \"href\": \"https://bitbucket.org/seanfarley/hg/commits/f85de28eae32e7d3064b1a1321309071bbaaa069\"\n      },\n      \"diff\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/diff/f85de28eae32e7d3064b1a1321309071bbaaa069\"\n      },\n      \"approve\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/f85de28eae32e7d3064b1a1321309071bbaaa069/approve\"\n      },\n      \"statuses\": {\n        \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/f85de28eae32e7d3064b1a1321309071bbaaa069/statuses\"\n      }\n    },\n    \"author\": {\n      \"raw\": \"Sean Farley <sean@farley.io>\",\n      \"type\": \"author\",\n      \"user\": {\n        \"username\": \"seanfarley\",\n        \"nickname\": \"seanfarley\",\n        \"display_name\": \"Sean Farley\",\n        \"type\": \"user\",\n        \"uuid\": \"{a295f8a8-5876-4d43-89b5-3ad8c6c3c51d}\",\n        \"links\": {\n          \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/users/seanfarley\"\n          },\n          \"html\": {\n            \"href\": \"https://bitbucket.org/seanfarley/\"\n          },\n          \"avatar\": {\n            \"href\": \"https://bitbucket.org/account/seanfarley/avatar/32/\"\n          }\n        }\n      }\n    },\n    \"parents\": [\n      {\n        \"hash\": \"9a98d0e5b07fc60887f9d3d34d9ac7d536f470d2\",\n        \"type\": \"commit\",\n        \"links\": {\n          \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/repositories/seanfarley/hg/commit/9a98d0e5b07fc60887f9d3d34d9ac7d536f470d2\"\n          },\n          \"html\": {\n            \"href\": \"https://bitbucket.org/seanfarley/hg/commits/9a98d0e5b07fc60887f9d3d34d9ac7d536f470d2\"\n          }\n        }\n      }\n    ],\n    \"date\": \"2016-05-01T04:21:17+00:00\",\n    \"message\": \"debian: alphabetize build deps\",\n    \"type\": \"commit\"\n  }\n}\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if name == "" {
 				return fmt.Errorf("--name is required")
 			}
@@ -571,6 +645,15 @@ func newRefsDeleteATagCmd() *cobra.Command {
 
 The tag name should not include any prefixes (e.g. refs/tags).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if name == "" {
 				return fmt.Errorf("--name is required")
 			}

@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -26,6 +27,7 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
+	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -148,6 +150,15 @@ func newHooksListWebhooksForARepositoryCmd() *cobra.Command {
 		Short: `List webhooks for a repository`,
 		Long:  `Returns a paginated list of webhooks installed on this repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -204,6 +215,15 @@ func newHooksCreateAWebhookForARepositoryCmd() *cobra.Command {
 		Short: `Create a webhook for a repository`,
 		Long:  "Creates a new webhook on the specified repository.\n\nExample:\n\n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n  https://api.bitbucket.org/2.0/repositories/my-workspace/my-repo-slug/hooks\n  -d '\n    {\n      \"description\": \"Webhook Description\",\n      \"url\": \"https://example.com/\",\n      \"active\": true,\n      \"secret\": \"this is a really bad secret\",\n      \"events\": [\n        \"repo:push\",\n        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n```\n\nWhen the `secret` is provided it will be used as the key to generate a HMAC\ndigest value sent in the `X-Hub-Signature` header at delivery time. Passing\na `null` or empty `secret` or not passing a `secret` will leave the webhook's\nsecret unset. Bitbucket only generates the `X-Hub-Signature` when the webhook's\nsecret is set.\n\nNote that this call requires the webhook scope, as well as any scope\nthat applies to the events that the webhook subscribes to. In the\nexample above that means: `webhook`, `repository` and `issue`.\n\nAlso note that the `url` must properly resolve and cannot be an\ninternal, non-routed address.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -277,6 +297,15 @@ func newHooksGetAWebhookForARepositoryCmd() *cobra.Command {
 		Long: `Returns the webhook with the specified id installed on the specified
 repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -333,6 +362,15 @@ func newHooksUpdateAWebhookForARepositoryCmd() *cobra.Command {
 		Short: `Update a webhook for a repository`,
 		Long:  "Updates the specified webhook subscription.\n\nThe following properties can be mutated:\n\n* `description`\n* `url`\n* `secret`\n* `active`\n* `events`\n\nThe hook's secret is used as a key to generate the HMAC hex digest sent in the\n`X-Hub-Signature` header at delivery time. This signature is only generated\nwhen the hook has a secret.\n\nSet the hook's secret by passing the new value in the `secret` field. Passing a\n`null` value in the `secret` field will remove the secret from the hook. The\nhook's secret can be left unchanged by not passing the `secret` field in the\nrequest.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -411,6 +449,15 @@ func newHooksDeleteAWebhookForARepositoryCmd() *cobra.Command {
 		Long: `Deletes the specified webhook subscription from the given
 repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" || repoSlug == "" {
+				inferredWs, inferredSlug := gitcontext.InferDefaults()
+				if workspace == "" {
+					workspace = inferredWs
+				}
+				if repoSlug == "" {
+					repoSlug = inferredSlug
+				}
+			}
 			if repoSlug == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
@@ -463,6 +510,9 @@ func newHooksListWebhooksForAWorkspaceCmd() *cobra.Command {
 		Long:  `Returns a paginated list of webhooks installed on this workspace.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
+			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
@@ -512,6 +562,9 @@ func newHooksCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 		Short: `Create a webhook for a workspace`,
 		Long:  "Creates a new webhook on the specified workspace.\n\nWorkspace webhooks are fired for events from all repositories contained\nby that workspace.\n\nExample:\n\n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n  https://api.bitbucket.org/2.0/workspaces/my-workspace/hooks\n  -d '\n    {\n      \"description\": \"Webhook Description\",\n      \"url\": \"https://example.com/\",\n      \"active\": true,\n      \"secret\": \"this is a really bad secret\",\n      \"events\": [\n        \"repo:push\",\n        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n```\n\nWhen the `secret` is provided it will be used as the key to generate a HMAC\ndigest value sent in the `X-Hub-Signature` header at delivery time. Passing\na `null` or empty `secret` or not passing a `secret` will leave the webhook's\nsecret unset. Bitbucket only generates the `X-Hub-Signature` when the webhook's\nsecret is set.\n\nThis call requires the webhook scope, as well as any scope\nthat applies to the events that the webhook subscribes to. In the\nexample above that means: `webhook`, `repository` and `issue`.\n\nThe `url` must properly resolve and cannot be an internal, non-routed address.\n\nOnly workspace owners can install webhooks on workspaces.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
@@ -579,6 +632,9 @@ func newHooksGetAWebhookForAWorkspaceCmd() *cobra.Command {
 		Long: `Returns the webhook with the specified id installed on the given
 workspace.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if uid == "" {
 				return fmt.Errorf("--uid is required")
 			}
@@ -629,6 +685,9 @@ func newHooksUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 		Short: `Update a webhook for a workspace`,
 		Long:  "Updates the specified webhook subscription.\n\nThe following properties can be mutated:\n\n* `description`\n* `url`\n* `secret`\n* `active`\n* `events`\n\nThe hook's secret is used as a key to generate the HMAC hex digest sent in the\n`X-Hub-Signature` header at delivery time. This signature is only generated\nwhen the hook has a secret.\n\nSet the hook's secret by passing the new value in the `secret` field. Passing a\n`null` value in the `secret` field will remove the secret from the hook. The\nhook's secret can be left unchanged by not passing the `secret` field in the\nrequest.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if uid == "" {
 				return fmt.Errorf("--uid is required")
 			}
@@ -700,6 +759,9 @@ func newHooksDeleteAWebhookForAWorkspaceCmd() *cobra.Command {
 		Short: `Delete a webhook for a workspace`,
 		Long:  `Deletes the specified webhook subscription from the given workspace.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if uid == "" {
 				return fmt.Errorf("--uid is required")
 			}

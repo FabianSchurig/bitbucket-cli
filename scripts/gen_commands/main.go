@@ -28,16 +28,18 @@ import (
 
 // CommandData holds the data for a single generated Cobra command.
 type CommandData struct {
-	OperationID string
-	Use         string
-	Short       string
-	Long        string
-	Method      string
-	Path        string
-	Flags       []FlagData
-	BodyFields  []spec.BodyField
-	HasBody     bool
-	Paginated   bool
+	OperationID      string
+	Use              string
+	Short            string
+	Long             string
+	Method           string
+	Path             string
+	Flags            []FlagData
+	BodyFields       []spec.BodyField
+	HasBody          bool
+	Paginated        bool
+	HasWorkspaceFlag bool // true when "workspace" is a path parameter
+	HasRepoSlugFlag  bool // true when "repo_slug" is a path parameter
 }
 
 // FlagData holds the data for a single CLI flag.
@@ -54,12 +56,13 @@ type FlagData struct {
 
 // FileData holds the complete template data for one generated file.
 type FileData struct {
-	SchemaPath   string
-	CommandName  string // e.g., "PR", "Hooks" — used in function name NewXxxCommand()
-	CommandUse   string // e.g., "pr", "hooks" — Cobra Use field
-	CommandShort string // Cobra Short field
-	CommandLong  string // Cobra Long field
-	Commands     []CommandData
+	SchemaPath      string
+	CommandName     string // e.g., "PR", "Hooks" — used in function name NewXxxCommand()
+	CommandUse      string // e.g., "pr", "hooks" — Cobra Use field
+	CommandShort    string // Cobra Short field
+	CommandLong     string // Cobra Long field
+	Commands        []CommandData
+	NeedsGitContext bool // true when any command needs workspace/repo-slug inference
 }
 
 // ─── Conversion: spec.OperationDef → CommandData ──────────────────────────────
@@ -100,7 +103,7 @@ func operationToCommand(op spec.OperationDef) CommandData {
 		}
 	}
 
-	return CommandData{
+	cmd := CommandData{
 		OperationID: op.OperationID,
 		Use:         spec.ToKebab(op.OperationID),
 		Short:       op.Summary,
@@ -112,6 +115,17 @@ func operationToCommand(op spec.OperationDef) CommandData {
 		HasBody:     op.HasBody,
 		Paginated:   op.Paginated,
 	}
+
+	for _, f := range flags {
+		if f.In == "path" && f.RawName == "workspace" {
+			cmd.HasWorkspaceFlag = true
+		}
+		if f.In == "path" && f.RawName == "repo_slug" {
+			cmd.HasRepoSlugFlag = true
+		}
+	}
+
+	return cmd
 }
 
 // ─── Code generation template ─────────────────────────────────────────────────
@@ -133,6 +147,9 @@ import (
 "github.com/spf13/cobra"
 
 "github.com/FabianSchurig/bitbucket-cli/internal/client"
+{{- if .NeedsGitContext}}
+"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
+{{- end}}
 "github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 "github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -144,6 +161,9 @@ _ = fmt.Errorf
 _ = json.Marshal
 _ = strconv.Itoa
 _ = client.NewClient
+{{- if .NeedsGitContext}}
+_ = gitcontext.InferDefaults
+{{- end}}
 _ = handlers.Dispatch
 _ = output.Format
 )
@@ -190,6 +210,21 @@ Use:   "{{.Use}}",
 Short: {{goStringLit .Short}},
 Long:  {{goStringLit .Long}},
 RunE: func(cmd *cobra.Command, args []string) error {
+{{- if and .HasWorkspaceFlag .HasRepoSlugFlag}}
+if workspace == "" || repoSlug == "" {
+inferredWs, inferredSlug := gitcontext.InferDefaults()
+if workspace == "" { workspace = inferredWs }
+if repoSlug == "" { repoSlug = inferredSlug }
+}
+{{- else if .HasWorkspaceFlag}}
+if workspace == "" {
+workspace, _ = gitcontext.InferDefaults()
+}
+{{- else if .HasRepoSlugFlag}}
+if repoSlug == "" {
+_, repoSlug = gitcontext.InferDefaults()
+}
+{{- end}}
 {{- range .Flags}}
 {{- if .Required}}
 {{- if eq .GoType "int"}}
@@ -346,17 +381,23 @@ func main() {
 
 	operations := spec.BuildOperations(schema)
 	commands := make([]CommandData, 0, len(operations))
+	needsGitContext := false
 	for _, op := range operations {
-		commands = append(commands, operationToCommand(op))
+		cmd := operationToCommand(op)
+		if cmd.HasWorkspaceFlag || cmd.HasRepoSlugFlag {
+			needsGitContext = true
+		}
+		commands = append(commands, cmd)
 	}
 
 	data := FileData{
-		SchemaPath:   schemaPath,
-		CommandName:  cmdName,
-		CommandUse:   cmdUse,
-		CommandShort: cmdShort,
-		CommandLong:  cmdLong,
-		Commands:     commands,
+		SchemaPath:      schemaPath,
+		CommandName:     cmdName,
+		CommandUse:      cmdUse,
+		CommandShort:    cmdShort,
+		CommandLong:     cmdLong,
+		Commands:        commands,
+		NeedsGitContext: needsGitContext,
 	}
 
 	if err := generate(data, outputPath); err != nil {

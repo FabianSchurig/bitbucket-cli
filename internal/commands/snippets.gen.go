@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
+	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -26,6 +27,7 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
+	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -168,6 +170,9 @@ func newSnippetsListSnippetsInAWorkspaceCmd() *cobra.Command {
 		Long:  "Identical to [`/snippets`](/cloud/bitbucket/rest/api-group-snippets/#api-snippets-get), except that the result is further filtered\nby the snippet owner and only those that are owned by `{workspace}` are\nreturned.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
+			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
@@ -215,6 +220,9 @@ func newSnippetsCreateASnippetForAWorkspaceCmd() *cobra.Command {
 		Long:  "Identical to [`/snippets`](/cloud/bitbucket/rest/api-group-snippets/#api-snippets-post), except that the new snippet will be\ncreated under the workspace specified in the path parameter\n`{workspace}`.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
+			if workspace == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
@@ -260,6 +268,9 @@ func newSnippetsGetASnippetCmd() *cobra.Command {
 		Short: `Get a snippet`,
 		Long:  "Retrieves a single snippet.\n\nSnippets support multiple content types:\n\n* application/json\n* multipart/related\n* multipart/form-data\n\n\napplication/json\n----------------\n\nThe default content type of the response is `application/json`.\nSince JSON is always `utf-8`, it cannot reliably contain file contents\nfor files that are not text. Therefore, JSON snippet documents only\ncontain the filename and links to the file contents.\n\nThis means that in order to retrieve all parts of a snippet, N+1\nrequests need to be made (where N is the number of files in the\nsnippet).\n\n\nmultipart/related\n-----------------\n\nTo retrieve an entire snippet in a single response, use the\n`Accept: multipart/related` HTTP request header.\n\n    $ curl -H \"Accept: multipart/related\" https://api.bitbucket.org/2.0/snippets/evzijst/1\n\nResponse:\n\n    HTTP/1.1 200 OK\n    Content-Length: 2214\n    Content-Type: multipart/related; start=\"snippet\"; boundary=\"===============1438169132528273974==\"\n    MIME-Version: 1.0\n\n    --===============1438169132528273974==\n    Content-Type: application/json; charset=\"utf-8\"\n    MIME-Version: 1.0\n    Content-ID: snippet\n\n    {\n      \"links\": {\n        \"self\": {\n          \"href\": \"https://api.bitbucket.org/2.0/snippets/evzijst/kypj\"\n        },\n        \"html\": {\n          \"href\": \"https://bitbucket.org/snippets/evzijst/kypj\"\n        },\n        \"comments\": {\n          \"href\": \"https://api.bitbucket.org/2.0/snippets/evzijst/kypj/comments\"\n        },\n        \"watchers\": {\n          \"href\": \"https://api.bitbucket.org/2.0/snippets/evzijst/kypj/watchers\"\n        },\n        \"commits\": {\n          \"href\": \"https://api.bitbucket.org/2.0/snippets/evzijst/kypj/commits\"\n        }\n      },\n      \"id\": kypj,\n      \"title\": \"My snippet\",\n      \"created_on\": \"2014-12-29T22:22:04.790331+00:00\",\n      \"updated_on\": \"2014-12-29T22:22:04.790331+00:00\",\n      \"is_private\": false,\n      \"files\": {\n        \"foo.txt\": {\n          \"links\": {\n            \"self\": {\n              \"href\": \"https://api.bitbucket.org/2.0/snippets/evzijst/kypj/files/367ab19/foo.txt\"\n            },\n            \"html\": {\n              \"href\": \"https://bitbucket.org/snippets/evzijst/kypj#file-foo.txt\"\n            }\n          }\n        },\n        \"image.png\": {\n          \"links\": {\n            \"self\": {\n              \"href\": \"https://api.bitbucket.org/2.0/snippets/evzijst/kypj/files/367ab19/image.png\"\n            },\n            \"html\": {\n              \"href\": \"https://bitbucket.org/snippets/evzijst/kypj#file-image.png\"\n            }\n          }\n        }\n      ],\n      \"owner\": {\n        \"username\": \"evzijst\",\n        \"nickname\": \"evzijst\",\n        \"display_name\": \"Erik van Zijst\",\n        \"uuid\": \"{d301aafa-d676-4ee0-88be-962be7417567}\",\n        \"links\": {\n          \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/users/evzijst\"\n          },\n          \"html\": {\n            \"href\": \"https://bitbucket.org/evzijst\"\n          },\n          \"avatar\": {\n            \"href\": \"https://bitbucket-staging-assetroot.s3.amazonaws.com/c/photos/2013/Jul/31/erik-avatar-725122544-0_avatar.png\"\n          }\n        }\n      },\n      \"creator\": {\n        \"username\": \"evzijst\",\n        \"nickname\": \"evzijst\",\n        \"display_name\": \"Erik van Zijst\",\n        \"uuid\": \"{d301aafa-d676-4ee0-88be-962be7417567}\",\n        \"links\": {\n          \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/users/evzijst\"\n          },\n          \"html\": {\n            \"href\": \"https://bitbucket.org/evzijst\"\n          },\n          \"avatar\": {\n            \"href\": \"https://bitbucket-staging-assetroot.s3.amazonaws.com/c/photos/2013/Jul/31/erik-avatar-725122544-0_avatar.png\"\n          }\n        }\n      }\n    }\n\n    --===============1438169132528273974==\n    Content-Type: text/plain; charset=\"us-ascii\"\n    MIME-Version: 1.0\n    Content-Transfer-Encoding: 7bit\n    Content-ID: \"foo.txt\"\n    Content-Disposition: attachment; filename=\"foo.txt\"\n\n    foo\n\n    --===============1438169132528273974==\n    Content-Type: image/png\n    MIME-Version: 1.0\n    Content-Transfer-Encoding: base64\n    Content-ID: \"image.png\"\n    Content-Disposition: attachment; filename=\"image.png\"\n\n    iVBORw0KGgoAAAANSUhEUgAAABQAAAAoCAYAAAD+MdrbAAABD0lEQVR4Ae3VMUoDQRTG8ccUaW2m\n    TKONFxArJYJamCvkCnZTaa+VnQdJSBFl2SMsLFrEWNjZBZs0JgiL/+KrhhVmJRbCLPx4O+/DT2TB\n    cbblJxf+UWFVVRNsEGAtgvJxnLm2H+A5RQ93uIl+3632PZyl/skjfOn9Gvdwmlcw5aPUwimG+NT5\n    EnNN036IaZePUuIcK533NVfal7/5yjWeot2z9ta1cAczHEf7I+3J0ws9Cgx0fsOFpmlfwKcWPuBQ\n    73Oc4FHzBaZ8llq4q1mr5B2mOUCt815qYR8eB1hG2VJ7j35q4RofaH7IG+Xrf/PfJhfmwtfFYoIN\n    AqxFUD6OMxcvkO+UfKfkOyXfKdsv/AYCHMLVkHAFWgAAAABJRU5ErkJggg==\n    --===============1438169132528273974==--\n\nmultipart/form-data\n-------------------\n\nAs with creating new snippets, `multipart/form-data` can be used as an\nalternative to `multipart/related`. However, the inherently flat\nstructure of form-data means that only basic, root-level properties\ncan be returned, while nested elements like `links` are omitted:\n\n    $ curl -H \"Accept: multipart/form-data\" https://api.bitbucket.org/2.0/snippets/evzijst/kypj\n\nResponse:\n\n    HTTP/1.1 200 OK\n    Content-Length: 951\n    Content-Type: multipart/form-data; boundary=----------------------------63a4b224c59f\n\n    ------------------------------63a4b224c59f\n    Content-Disposition: form-data; name=\"title\"\n    Content-Type: text/plain; charset=\"utf-8\"\n\n    My snippet\n    ------------------------------63a4b224c59f--\n    Content-Disposition: attachment; name=\"file\"; filename=\"foo.txt\"\n    Content-Type: text/plain\n\n    foo\n\n    ------------------------------63a4b224c59f\n    Content-Disposition: attachment; name=\"file\"; filename=\"image.png\"\n    Content-Transfer-Encoding: base64\n    Content-Type: application/octet-stream\n\n    iVBORw0KGgoAAAANSUhEUgAAABQAAAAoCAYAAAD+MdrbAAABD0lEQVR4Ae3VMUoDQRTG8ccUaW2m\n    TKONFxArJYJamCvkCnZTaa+VnQdJSBFl2SMsLFrEWNjZBZs0JgiL/+KrhhVmJRbCLPx4O+/DT2TB\n    cbblJxf+UWFVVRNsEGAtgvJxnLm2H+A5RQ93uIl+3632PZyl/skjfOn9Gvdwmlcw5aPUwimG+NT5\n    EnNN036IaZePUuIcK533NVfal7/5yjWeot2z9ta1cAczHEf7I+3J0ws9Cgx0fsOFpmlfwKcWPuBQ\n    73Oc4FHzBaZ8llq4q1mr5B2mOUCt815qYR8eB1hG2VJ7j35q4RofaH7IG+Xrf/PfJhfmwtfFYoIN\n    AqxFUD6OMxcvkO+UfKfkOyXfKdsv/AYCHMLVkHAFWgAAAABJRU5ErkJggg==\n    ------------------------------5957323a6b76--",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -304,6 +315,9 @@ func newSnippetsUpdateASnippetCmd() *cobra.Command {
 		Short: `Update a snippet`,
 		Long:  "Used to update a snippet. Use this to add and delete files and to\nchange a snippet's title.\n\nTo update a snippet, one can either PUT a full snapshot, or only the\nparts that need to be changed.\n\nThe contract for PUT on this API is that properties missing from the\nrequest remain untouched so that snippets can be efficiently\nmanipulated with differential payloads.\n\nTo delete a property (e.g. the title, or a file), include its name in\nthe request, but omit its value (use `null`).\n\nAs in Git, explicit renaming of files is not supported. Instead, to\nrename a file, delete it and add it again under another name. This can\nbe done atomically in a single request. Rename detection is left to\nthe SCM.\n\nPUT supports three different content types for both request and\nresponse bodies:\n\n* `application/json`\n* `multipart/related`\n* `multipart/form-data`\n\nThe content type used for the request body can be different than that\nused for the response. Content types are specified using standard HTTP\nheaders.\n\nUse the `Content-Type` and `Accept` headers to select the desired\nrequest and response format.\n\n\napplication/json\n----------------\n\nAs with creation and retrieval, the content type determines what\nproperties can be manipulated. `application/json` does not support\nfile contents and is therefore limited to a snippet's meta data.\n\nTo update the title, without changing any of its files:\n\n    $ curl -X POST -H \"Content-Type: application/json\" https://api.bitbucket.org/2.0/snippets/evzijst/kypj             -d '{\"title\": \"Updated title\"}'\n\n\nTo delete the title:\n\n    $ curl -X POST -H \"Content-Type: application/json\" https://api.bitbucket.org/2.0/snippets/evzijst/kypj             -d '{\"title\": null}'\n\nNot all parts of a snippet can be manipulated. The owner and creator\nfor instance are immutable.\n\n\nmultipart/related\n-----------------\n\n`multipart/related` can be used to manipulate all of a snippet's\nproperties. The body is identical to a POST. properties omitted from\nthe request are left unchanged. Since the `start` part contains JSON,\nthe mechanism for manipulating the snippet's meta data is identical\nto `application/json` requests.\n\nTo update one of a snippet's file contents, while also changing its\ntitle:\n\n    PUT /2.0/snippets/evzijst/kypj HTTP/1.1\n    Content-Length: 288\n    Content-Type: multipart/related; start=\"snippet\"; boundary=\"===============1438169132528273974==\"\n    MIME-Version: 1.0\n\n    --===============1438169132528273974==\n    Content-Type: application/json; charset=\"utf-8\"\n    MIME-Version: 1.0\n    Content-ID: snippet\n\n    {\n      \"title\": \"My updated snippet\",\n      \"files\": {\n          \"foo.txt\": {}\n        }\n    }\n\n    --===============1438169132528273974==\n    Content-Type: text/plain; charset=\"us-ascii\"\n    MIME-Version: 1.0\n    Content-Transfer-Encoding: 7bit\n    Content-ID: \"foo.txt\"\n    Content-Disposition: attachment; filename=\"foo.txt\"\n\n    Updated file contents.\n\n    --===============1438169132528273974==--\n\nHere only the parts that are changed are included in the body. The\nother files remain untouched.\n\nNote the use of the `files` list in the JSON part. This list contains\nthe files that are being manipulated. This list should have\ncorresponding multiparts in the request that contain the new contents\nof these files.\n\nIf a filename in the `files` list does not have a corresponding part,\nit will be deleted from the snippet, as shown below:\n\n    PUT /2.0/snippets/evzijst/kypj HTTP/1.1\n    Content-Length: 188\n    Content-Type: multipart/related; start=\"snippet\"; boundary=\"===============1438169132528273974==\"\n    MIME-Version: 1.0\n\n    --===============1438169132528273974==\n    Content-Type: application/json; charset=\"utf-8\"\n    MIME-Version: 1.0\n    Content-ID: snippet\n\n    {\n      \"files\": {\n        \"image.png\": {}\n      }\n    }\n\n    --===============1438169132528273974==--\n\nTo simulate a rename, delete a file and add the same file under\nanother name:\n\n    PUT /2.0/snippets/evzijst/kypj HTTP/1.1\n    Content-Length: 212\n    Content-Type: multipart/related; start=\"snippet\"; boundary=\"===============1438169132528273974==\"\n    MIME-Version: 1.0\n\n    --===============1438169132528273974==\n    Content-Type: application/json; charset=\"utf-8\"\n    MIME-Version: 1.0\n    Content-ID: snippet\n\n    {\n        \"files\": {\n          \"foo.txt\": {},\n          \"bar.txt\": {}\n        }\n    }\n\n    --===============1438169132528273974==\n    Content-Type: text/plain; charset=\"us-ascii\"\n    MIME-Version: 1.0\n    Content-Transfer-Encoding: 7bit\n    Content-ID: \"bar.txt\"\n    Content-Disposition: attachment; filename=\"bar.txt\"\n\n    foo\n\n    --===============1438169132528273974==--\n\n\nmultipart/form-data\n-----------------\n\nAgain, one can also use `multipart/form-data` to manipulate file\ncontents and meta data atomically.\n\n    $ curl -X PUT http://localhost:12345/2.0/snippets/evzijst/kypj             -F title=\"My updated snippet\" -F file=@foo.txt\n\n    PUT /2.0/snippets/evzijst/kypj HTTP/1.1\n    Content-Length: 351\n    Content-Type: multipart/form-data; boundary=----------------------------63a4b224c59f\n\n    ------------------------------63a4b224c59f\n    Content-Disposition: form-data; name=\"file\"; filename=\"foo.txt\"\n    Content-Type: text/plain\n\n    foo\n\n    ------------------------------63a4b224c59f\n    Content-Disposition: form-data; name=\"title\"\n\n    My updated snippet\n    ------------------------------63a4b224c59f\n\nTo delete a file, omit its contents while including its name in the\n`files` field:\n\n    $ curl -X PUT https://api.bitbucket.org/2.0/snippets/evzijst/kypj -F files=image.png\n\n    PUT /2.0/snippets/evzijst/kypj HTTP/1.1\n    Content-Length: 149\n    Content-Type: multipart/form-data; boundary=----------------------------ef8871065a86\n\n    ------------------------------ef8871065a86\n    Content-Disposition: form-data; name=\"files\"\n\n    image.png\n    ------------------------------ef8871065a86--\n\nThe explicit use of the `files` element in `multipart/related` and\n`multipart/form-data` is only required when deleting files.\nThe default mode of operation is for file parts to be processed,\nregardless of whether or not they are listed in `files`, as a\nconvenience to the client.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -348,6 +362,9 @@ func newSnippetsDeleteASnippetCmd() *cobra.Command {
 		Short: `Delete a snippet`,
 		Long:  `Deletes a snippet and returns an empty response.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -395,6 +412,9 @@ func newSnippetsListCommentsOnASnippetCmd() *cobra.Command {
 		Short: `List comments on a snippet`,
 		Long:  "Used to retrieve a paginated list of all comments for a specific\nsnippet.\n\nThis resource works identical to commit and pull request comments.\n\nThe default sorting is oldest to newest and can be overridden with\nthe `sort` query parameter.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -450,6 +470,9 @@ func newSnippetsCreateACommentOnASnippetCmd() *cobra.Command {
 		Short: `Create a comment on a snippet`,
 		Long:  "Creates a new comment.\n\nThe only required field in the body is `content.raw`.\n\nTo create a threaded reply to an existing comment, include `parent.id`.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -518,6 +541,9 @@ func newSnippetsGetACommentOnASnippetCmd() *cobra.Command {
 		Short: `Get a comment on a snippet`,
 		Long:  `Returns the specific snippet comment.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if commentId == 0 {
 				return fmt.Errorf("--comment-id is required")
 			}
@@ -573,6 +599,9 @@ func newSnippetsUpdateACommentOnASnippetCmd() *cobra.Command {
 		Short: `Update a comment on a snippet`,
 		Long:  "Updates a comment.\n\nThe only required field in the body is `content.raw`.\n\nComments can only be updated by their author.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if commentId == 0 {
 				return fmt.Errorf("--comment-id is required")
 			}
@@ -648,6 +677,9 @@ func newSnippetsDeleteACommentOnASnippetCmd() *cobra.Command {
 
 Comments can only be removed by the comment author, snippet creator, or workspace admin.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if commentId == 0 {
 				return fmt.Errorf("--comment-id is required")
 			}
@@ -700,6 +732,9 @@ func newSnippetsListSnippetChangesCmd() *cobra.Command {
 		Short: `List snippet changes`,
 		Long:  `Returns the changes (commits) made on this snippet.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -751,6 +786,9 @@ func newSnippetsGetAPreviousSnippetChangeCmd() *cobra.Command {
 		Short: `Get a previous snippet change`,
 		Long:  `Returns the changes made on this snippet in this commit.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -803,6 +841,9 @@ func newSnippetsGetASnippetsRawFileAtHeadCmd() *cobra.Command {
 need for first having to retrieve the snippet itself and having to pull
 out the versioned file links.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -857,6 +898,9 @@ not.
 
 Hitting this endpoint anonymously always returns a 404.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -901,6 +945,9 @@ func newSnippetsWatchASnippetCmd() *cobra.Command {
 		Short: `Watch a snippet`,
 		Long:  `Used to start watching a specific snippet. Returns 204 (No Content).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -946,6 +993,9 @@ func newSnippetsStopWatchingASnippetCmd() *cobra.Command {
 		Long: `Used to stop watching a specific snippet. Returns 204 (No Content)
 to indicate success.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -993,6 +1043,9 @@ func newSnippetsListUsersWatchingASnippetCmd() *cobra.Command {
 		Short: `List users watching a snippet`,
 		Long:  `Returns a paginated list of all users watching a specific snippet.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -1044,6 +1097,9 @@ func newSnippetsGetAPreviousRevisionOfASnippetCmd() *cobra.Command {
 		Short: `Get a previous revision of a snippet`,
 		Long:  "Identical to `GET /snippets/encoded_id`, except that this endpoint\ncan be used to retrieve the contents of the snippet as it was at an\nolder revision, while `/snippets/encoded_id` always returns the\nsnippet's current revision.\n\nNote that only the snippet's file contents are versioned, not its\nmeta data properties like the title.\n\nOther than that, the two endpoints are identical in behavior.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -1094,6 +1150,9 @@ func newSnippetsUpdateAPreviousRevisionOfASnippetCmd() *cobra.Command {
 		Short: `Update a previous revision of a snippet`,
 		Long:  "Identical to `UPDATE /snippets/encoded_id`, except that this endpoint\ntakes an explicit commit revision. Only the snippet's \"HEAD\"/\"tip\"\n(most recent) version can be updated and requests on all other,\nolder revisions fail by returning a 405 status.\n\nUsage of this endpoint over the unrestricted `/snippets/encoded_id`\ncould be desired if the caller wants to be sure no concurrent\nmodifications have taken place between the moment of the UPDATE\nrequest and the original GET.\n\nThis can be considered a so-called \"Compare And Swap\", or CAS\noperation.\n\nOther than that, the two endpoints are identical in behavior.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -1144,6 +1203,9 @@ func newSnippetsDeleteAPreviousRevisionOfASnippetCmd() *cobra.Command {
 		Short: `Delete a previous revision of a snippet`,
 		Long:  "Deletes the snippet.\n\nNote that this only works for versioned URLs that point to the latest\ncommit of the snippet. Pointing to an older commit results in a 405\nstatus code.\n\nTo delete a snippet, regardless of whether or not concurrent changes\nare being made to it, use `DELETE /snippets/{encoded_id}` instead.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -1195,6 +1257,9 @@ func newSnippetsGetASnippetsRawFileCmd() *cobra.Command {
 		Short: `Get a snippet's raw file`,
 		Long:  "Retrieves the raw contents of a specific file in the snippet. The\n`Content-Disposition` header will be \"attachment\" to avoid issues with\nmalevolent executable files.\n\nThe file's mime type is derived from its filename and returned in the\n`Content-Type` header.\n\nNote that for text files, no character encoding is included as part of\nthe content type.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -1251,6 +1316,9 @@ func newSnippetsGetSnippetChangesBetweenVersionsCmd() *cobra.Command {
 		Short: `Get snippet changes between versions`,
 		Long:  "Returns the diff of the specified commit against its first parent.\n\nNote that this resource is different in functionality from the `patch`\nresource.\n\nThe differences between a diff and a patch are:\n\n* patches have a commit header with the username, message, etc\n* diffs support the optional `path=foo/bar.py` query param to filter the\n  diff to just that one file diff (not supported for patches)\n* for a merge, the diff will show the diff between the merge commit and\n  its first parent (identical to how PRs work), while patch returns a\n  response containing separate patches for each commit on the second\n  parent's ancestry, up to the oldest common ancestor (identical to\n  its reachability).\n\nNote that the character encoding of the contents of the diff is\nunspecified as Git does not track this, making it hard for\nBitbucket to reliably determine this.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
@@ -1304,6 +1372,9 @@ func newSnippetsGetSnippetPatchBetweenVersionsCmd() *cobra.Command {
 		Short: `Get snippet patch between versions`,
 		Long:  "Returns the patch of the specified commit against its first\nparent.\n\nNote that this resource is different in functionality from the `diff`\nresource.\n\nThe differences between a diff and a patch are:\n\n* patches have a commit header with the username, message, etc\n* diffs support the optional `path=foo/bar.py` query param to filter the\n  diff to just that one file diff (not supported for patches)\n* for a merge, the diff will show the diff between the merge commit and\n  its first parent (identical to how PRs work), while patch returns a\n  response containing separate patches for each commit on the second\n  parent's ancestry, up to the oldest common ancestor (identical to\n  its reachability).\n\nNote that the character encoding of the contents of the patch is\nunspecified as Git does not track this, making it hard for\nBitbucket to reliably determine this.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if workspace == "" {
+				workspace, _ = gitcontext.InferDefaults()
+			}
 			if encodedId == "" {
 				return fmt.Errorf("--encoded-id is required")
 			}
