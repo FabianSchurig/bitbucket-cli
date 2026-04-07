@@ -22,8 +22,6 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    cooldown:
-      default: 7
     commit-message:
       prefix: "deps"
     labels:
@@ -33,8 +31,6 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    cooldown:
-      default: 7
     commit-message:
       prefix: "deps"
     labels:
