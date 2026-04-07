@@ -8,10 +8,10 @@ import (
 
 func TestParseBitbucketURL(t *testing.T) {
 	tests := []struct {
-		name      string
-		url       string
-		wantWS    string
-		wantSlug  string
+		name     string
+		url      string
+		wantWS   string
+		wantSlug string
 	}{
 		{
 			name:     "SSH standard",
@@ -159,8 +159,11 @@ func TestFindGitDir(t *testing.T) {
 	}
 
 	// Change to the subdirectory
-	origDir, _ := os.Getwd()
-	t.Cleanup(func() { os.Chdir(origDir) })
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(origDir) })
 
 	if err := os.Chdir(subDir); err != nil {
 		t.Fatal(err)
@@ -189,8 +192,11 @@ func TestFindGitDir_WorktreeFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	origDir, _ := os.Getwd()
-	t.Cleanup(func() { os.Chdir(origDir) })
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(origDir) })
 
 	if err := os.Chdir(worktree); err != nil {
 		t.Fatal(err)
@@ -218,9 +224,14 @@ func TestInferDefaults_EnvVarsPartial(t *testing.T) {
 	t.Setenv("BITBUCKET_REPO_SLUG", "")
 
 	// No git repo in temp dir, so repoSlug stays empty
-	origDir, _ := os.Getwd()
-	t.Cleanup(func() { os.Chdir(origDir) })
-	os.Chdir(t.TempDir())
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(origDir) })
+	if err := os.Chdir(t.TempDir()); err != nil {
+		t.Fatal(err)
+	}
 
 	ws, slug := InferDefaults()
 	if ws != "envws" {
@@ -248,9 +259,14 @@ func TestInferDefaults_GitRemote(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	origDir, _ := os.Getwd()
-	t.Cleanup(func() { os.Chdir(origDir) })
-	os.Chdir(root)
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(origDir) })
+	if err := os.Chdir(root); err != nil {
+		t.Fatal(err)
+	}
 
 	ws, slug := InferDefaults()
 	if ws != "myteam" || slug != "myrepo" {

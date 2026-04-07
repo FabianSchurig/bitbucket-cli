@@ -83,8 +83,17 @@ func paramToFlag(p spec.ParamDef) FlagData {
 
 func operationToCommand(op spec.OperationDef) CommandData {
 	flags := make([]FlagData, 0, len(op.Params))
+	hasWorkspace := false
+	hasRepoSlug := false
 	for _, p := range op.Params {
-		flags = append(flags, paramToFlag(p))
+		f := paramToFlag(p)
+		if f.In == "path" && f.RawName == "workspace" {
+			hasWorkspace = true
+		}
+		if f.In == "path" && f.RawName == "repo_slug" {
+			hasRepoSlug = true
+		}
+		flags = append(flags, f)
 	}
 
 	bodyFields := spec.FlattenBodyFields(op.BodyFields)
@@ -103,29 +112,20 @@ func operationToCommand(op spec.OperationDef) CommandData {
 		}
 	}
 
-	cmd := CommandData{
-		OperationID: op.OperationID,
-		Use:         spec.ToKebab(op.OperationID),
-		Short:       op.Summary,
-		Long:        op.Description,
-		Method:      op.Method,
-		Path:        op.Path,
-		Flags:       flags,
-		BodyFields:  bodyFields,
-		HasBody:     op.HasBody,
-		Paginated:   op.Paginated,
+	return CommandData{
+		OperationID:      op.OperationID,
+		Use:              spec.ToKebab(op.OperationID),
+		Short:            op.Summary,
+		Long:             op.Description,
+		Method:           op.Method,
+		Path:             op.Path,
+		Flags:            flags,
+		BodyFields:       bodyFields,
+		HasBody:          op.HasBody,
+		Paginated:        op.Paginated,
+		HasWorkspaceFlag: hasWorkspace,
+		HasRepoSlugFlag:  hasRepoSlug,
 	}
-
-	for _, f := range flags {
-		if f.In == "path" && f.RawName == "workspace" {
-			cmd.HasWorkspaceFlag = true
-		}
-		if f.In == "path" && f.RawName == "repo_slug" {
-			cmd.HasRepoSlugFlag = true
-		}
-	}
-
-	return cmd
 }
 
 // ─── Code generation template ─────────────────────────────────────────────────

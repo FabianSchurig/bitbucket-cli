@@ -588,8 +588,11 @@ func setupFakeGitRepo(t *testing.T, remoteURL string) {
 		t.Fatal(err)
 	}
 
-	origDir, _ := os.Getwd()
-	t.Cleanup(func() { os.Chdir(origDir) })
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(origDir) })
 	if err := os.Chdir(root); err != nil {
 		t.Fatal(err)
 	}
@@ -714,9 +717,14 @@ func TestToolHandler_EnvVarOverridesGit(t *testing.T) {
 
 func TestToolHandler_NoGitRepo_StillRequiresParams(t *testing.T) {
 	// Change to a directory with no .git
-	origDir, _ := os.Getwd()
-	t.Cleanup(func() { os.Chdir(origDir) })
-	os.Chdir(t.TempDir())
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(origDir) })
+	if err := os.Chdir(t.TempDir()); err != nil {
+		t.Fatal(err)
+	}
 
 	t.Setenv("BITBUCKET_WORKSPACE", "")
 	t.Setenv("BITBUCKET_REPO_SLUG", "")

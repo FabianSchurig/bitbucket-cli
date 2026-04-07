@@ -15,7 +15,7 @@ import (
 // setupFakeGitRepo creates a temporary directory containing a minimal .git/config
 // that points at the given Bitbucket remote URL. It changes the working directory
 // to that repository root and restores the original directory on cleanup.
-func setupFakeGitRepo(t *testing.T, remoteURL string) string {
+func setupFakeGitRepo(t *testing.T, remoteURL string) {
 	t.Helper()
 	root := t.TempDir()
 	gitDir := filepath.Join(root, ".git")
@@ -27,12 +27,14 @@ func setupFakeGitRepo(t *testing.T, remoteURL string) string {
 		t.Fatal(err)
 	}
 
-	origDir, _ := os.Getwd()
-	t.Cleanup(func() { os.Chdir(origDir) })
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(origDir) })
 	if err := os.Chdir(root); err != nil {
 		t.Fatal(err)
 	}
-	return root
 }
 
 // setupInferenceEnv sets auth and base-URL env vars for the test server and
@@ -237,9 +239,14 @@ func TestInference_NoGitRepo_StillRequiresFlags(t *testing.T) {
 	output.Format = "json"
 
 	// Use a temporary directory with no .git
-	origDir, _ := os.Getwd()
-	t.Cleanup(func() { os.Chdir(origDir) })
-	os.Chdir(t.TempDir())
+	origDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(origDir) })
+	if err := os.Chdir(t.TempDir()); err != nil {
+		t.Fatal(err)
+	}
 
 	t.Setenv("BITBUCKET_TOKEN", "test-token")
 	t.Setenv("BITBUCKET_USERNAME", "testuser")
@@ -248,7 +255,7 @@ func TestInference_NoGitRepo_StillRequiresFlags(t *testing.T) {
 
 	cmd := newRootCmd()
 	cmd.SetArgs([]string{"commits", "get-a-commit", "--commit", "abc123"})
-	err := cmd.Execute()
+	err = cmd.Execute()
 	if err == nil {
 		t.Fatal("expected error for missing workspace/repo-slug when not in git repo")
 	}

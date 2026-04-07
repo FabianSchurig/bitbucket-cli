@@ -72,6 +72,20 @@ bb-mcp --transport sse --addr :8080
 - Parameters map closely to the Bitbucket API, so required path/query/body inputs stay easy to trace.
 - The grouped design keeps the MCP surface smaller while still exposing broad API coverage.
 
+## Workspace and repository inference
+
+When a tool requires `workspace` or `repo_slug` parameters, `bb-mcp` can infer them automatically from the server's working directory.
+
+**Precedence** (highest to lowest):
+
+1. Explicit tool parameters (`workspace`, `repo_slug`)
+2. Environment variables (`BITBUCKET_WORKSPACE`, `BITBUCKET_REPO_SLUG`)
+3. Git remote URL of the current directory's `origin` remote
+
+Supported remote URL formats: SSH (`git@bitbucket.org:ws/repo.git`) and HTTPS (`https://bitbucket.org/ws/repo.git`).
+
+This allows agents to call tools without specifying `workspace` and `repo_slug` when the MCP server runs inside a cloned Bitbucket repository.
+
 ## Available tools
 
 A complete auto-generated reference — every tool group, every operation, and all active description overrides — lives in [tools-reference.md](./tools-reference.md).

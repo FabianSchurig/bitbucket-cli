@@ -77,6 +77,36 @@ export BITBUCKET_TOKEN="your-access-token"
 - Pagination follows Bitbucket `next` links automatically unless you pass `--all=false`.
 - Nested request body fields become flattened flags such as `source.branch.name` → `--source-branch-name`.
 
+## Workspace and repository inference
+
+When you run a command that requires `--workspace` or `--repo-slug`, `bb-cli` can infer them automatically so you don't have to type them every time.
+
+**Precedence** (highest to lowest):
+
+1. Explicit CLI flags (`--workspace`, `--repo-slug`)
+2. Environment variables (`BITBUCKET_WORKSPACE`, `BITBUCKET_REPO_SLUG`)
+3. Git remote URL of the current directory's `origin` remote
+
+Supported remote URL formats:
+
+- SSH: `git@bitbucket.org:workspace/repo.git`
+- HTTPS: `https://bitbucket.org/workspace/repo.git`
+- HTTPS with user: `https://user@bitbucket.org/workspace/repo.git`
+
+This means that inside a cloned Bitbucket repository you can simply run:
+
+```bash
+bb-cli pr list-pull-requests
+```
+
+instead of:
+
+```bash
+bb-cli pr list-pull-requests --workspace myteam --repo-slug myrepo
+```
+
+If inference fails (not inside a git repo, or the remote is not on Bitbucket), the command reports the usual `--workspace is required` / `--repo-slug is required` error.
+
 ## Common workflows
 
 List pull requests:
