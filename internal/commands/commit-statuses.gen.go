@@ -15,7 +15,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
-	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -27,7 +26,6 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
-	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -71,32 +69,24 @@ func newCommitStatusesListCommitStatusesForACommitCmd() *cobra.Command {
 		Short: `List commit statuses for a commit`,
 		Long:  `Returns all statuses (e.g. build results) for a specific commit.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"commit":    commit,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if commit == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["commit"] == "" {
 				return fmt.Errorf("--commit is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"commit":    commit,
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{
 				"refname": refname,
@@ -149,32 +139,24 @@ func newCommitStatusesCreateABuildStatusForACommitCmd() *cobra.Command {
 		Short: `Create a build status for a commit`,
 		Long:  "Creates a new build status against the specified commit.\n\nIf the specified key already exists, the existing status object will\nbe overwritten.\n\nExample:\n\n```\ncurl https://api.bitbucket.org/2.0/repositories/my-workspace/my-repo/commit/e10dae226959c2194f2b07b077c07762d93821cf/statuses/build/           -X POST -u jdoe -H 'Content-Type: application/json'           -d '{\n    \"key\": \"MY-BUILD\",\n    \"state\": \"SUCCESSFUL\",\n    \"description\": \"42 tests passed\",\n    \"url\": \"https://www.example.org/my-build-result\"\n  }'\n```\n\nWhen creating a new commit status, you can use a URI template for the URL.\nTemplates are URLs that contain variable names that Bitbucket will\nevaluate at runtime whenever the URL is displayed anywhere similar to\nparameter substitution in\n[Bitbucket Connect](https://developer.atlassian.com/bitbucket/concepts/context-parameters.html).\nFor example, one could use `https://foo.com/builds/{repository.full_name}`\nwhich Bitbucket will turn into `https://foo.com/builds/foo/bar` at render time.\nThe context variables available are `repository` and `commit`.\n\nTo associate a commit status to a pull request, the refname field must be set to the source branch\nof the pull request.\n\nExample:\n```\ncurl https://api.bitbucket.org/2.0/repositories/my-workspace/my-repo/commit/e10dae226959c2194f2b07b077c07762d93821cf/statuses/build/           -X POST -u jdoe -H 'Content-Type: application/json'           -d '{\n    \"key\": \"MY-BUILD\",\n    \"state\": \"SUCCESSFUL\",\n    \"description\": \"42 tests passed\",\n    \"url\": \"https://www.example.org/my-build-result\",\n    \"refname\": \"my-pr-branch\"\n  }'\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"commit":    commit,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if commit == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["commit"] == "" {
 				return fmt.Errorf("--commit is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"commit":    commit,
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -249,36 +231,28 @@ func newCommitStatusesGetABuildStatusForACommitCmd() *cobra.Command {
 		Short: `Get a build status for a commit`,
 		Long:  `Returns the specified build status for a commit.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
-			}
-			if commit == "" {
-				return fmt.Errorf("--commit is required")
-			}
-			if key == "" {
-				return fmt.Errorf("--key is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
 			pathParams := map[string]string{
 				"commit":    commit,
 				"key":       key,
 				"repo_slug": repoSlug,
 				"workspace": workspace,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["commit"] == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			if pathParams["key"] == "" {
+				return fmt.Errorf("--key is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -321,36 +295,28 @@ func newCommitStatusesUpdateABuildStatusForACommitCmd() *cobra.Command {
 		Short: `Update a build status for a commit`,
 		Long:  "Used to update the current status of a build status object on the\nspecific commit.\n\nThis operation can also be used to change other properties of the\nbuild status:\n\n* `state`\n* `name`\n* `description`\n* `url`\n* `refname`\n\nThe `key` cannot be changed.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
-			}
-			if commit == "" {
-				return fmt.Errorf("--commit is required")
-			}
-			if key == "" {
-				return fmt.Errorf("--key is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
 			pathParams := map[string]string{
 				"commit":    commit,
 				"key":       key,
 				"repo_slug": repoSlug,
 				"workspace": workspace,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["commit"] == "" {
+				return fmt.Errorf("--commit is required")
+			}
+			if pathParams["key"] == "" {
+				return fmt.Errorf("--key is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -431,32 +397,24 @@ func newCommitStatusesListCommitStatusesForAPullRequestCmd() *cobra.Command {
 		Long: `Returns all statuses (e.g. build results) for the given pull
 request.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{
 				"q":       q,

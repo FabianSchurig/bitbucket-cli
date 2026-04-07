@@ -15,7 +15,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
-	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -27,7 +26,6 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
-	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -65,15 +63,16 @@ func newSearchSearchTeamCmd() *cobra.Command {
 		Short: `Search for code in a team's repositories`,
 		Long:  "Search for code in the repositories of the specified team.\n\nNote that searches can match in the file's text (`content_matches`),\nthe path (`path_matches`), or both.\n\nYou can use the same syntax for the search query as in the UI.\nE.g. to search for \"foo\" only within the repository \"demo\",\nuse the query parameter `search_query=foo+repo:demo`.\n\nSimilar to other APIs, you can request more fields using a\n`fields` query parameter. E.g. to get some more information about\nthe repository of matched files, use the query parameter\n`search_query=foo&fields=%2Bvalues.file.commit.repository`\n(the `%2B` is a URL-encoded `+`).\n\nTry `fields=%2Bvalues.*.*.*.*` to get an idea what's possible.\n",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if username == "" {
+			pathParams := map[string]string{
+				"username": username,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["username"] == "" {
 				return fmt.Errorf("--username is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"username": username,
 			}
 			queryParams := map[string]string{
 				"search_query": searchQuery,
@@ -115,15 +114,16 @@ func newSearchSearchAccountCmd() *cobra.Command {
 		Short: `Search for code in a user's repositories`,
 		Long:  "Search for code in the repositories of the specified user.\n\nNote that searches can match in the file's text (`content_matches`),\nthe path (`path_matches`), or both.\n\nYou can use the same syntax for the search query as in the UI.\nE.g. to search for \"foo\" only within the repository \"demo\",\nuse the query parameter `search_query=foo+repo:demo`.\n\nSimilar to other APIs, you can request more fields using a\n`fields` query parameter. E.g. to get some more information about\nthe repository of matched files, use the query parameter\n`search_query=foo&fields=%2Bvalues.file.commit.repository`\n(the `%2B` is a URL-encoded `+`).\n",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if selectedUser == "" {
+			pathParams := map[string]string{
+				"selected_user": selectedUser,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"selected_user": selectedUser,
 			}
 			queryParams := map[string]string{
 				"search_query": searchQuery,
@@ -165,18 +165,16 @@ func newSearchSearchWorkspaceCmd() *cobra.Command {
 		Short: `Search for code in a workspace`,
 		Long:  "Search for code in the repositories of the specified workspace.\n\nNote that searches can match in the file's text (`content_matches`),\nthe path (`path_matches`), or both.\n\nYou can use the same syntax for the search query as in the UI.\nE.g. to search for \"foo\" only within the repository \"demo\",\nuse the query parameter `search_query=foo+repo:demo`.\n\nSimilar to other APIs, you can request more fields using a\n`fields` query parameter. E.g. to get some more information about\nthe repository of matched files, use the query parameter\n`search_query=foo&fields=%2Bvalues.file.commit.repository`\n(the `%2B` is a URL-encoded `+`).\n\nTry `fields=%2Bvalues.*.*.*.*` to get an idea what's possible.\n",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{
 				"search_query": searchQuery,

@@ -62,6 +62,18 @@ func TestParseBitbucketURL(t *testing.T) {
 			wantSlug: "",
 		},
 		{
+			name:     "SCP spoofed host suffix",
+			url:      "git@evilbitbucket.org:ws/repo.git",
+			wantWS:   "",
+			wantSlug: "",
+		},
+		{
+			name:     "HTTPS spoofed host suffix",
+			url:      "https://evilbitbucket.org/ws/repo.git",
+			wantWS:   "",
+			wantSlug: "",
+		},
+		{
 			name:     "empty string",
 			url:      "",
 			wantWS:   "",

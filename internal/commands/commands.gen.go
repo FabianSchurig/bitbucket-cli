@@ -15,7 +15,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
-	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -27,7 +26,6 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
-	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -100,32 +98,24 @@ func newPRGetPullrequestsForCommitCmd() *cobra.Command {
 		Short: `List pull requests that contain a commit`,
 		Long:  `Returns a paginated list of all pull requests as part of which this commit was reviewed. Pull Request Commit Links app must be installed first before using this API; installation automatically occurs when 'Go to pull request' is clicked from the web interface for a commit's details.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
+				"commit":    commit,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if commit == "" {
+			if pathParams["commit"] == "" {
 				return fmt.Errorf("--commit is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
-				"commit":    commit,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -172,28 +162,20 @@ new pull request that is created. To obtain the repository's default reviewers
 as well as the default reviewers inherited from the project, use the
 [effective-default-reveiwers](#api-repositories-workspace-repo-slug-effective-default-reviewers-get) endpoint.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -236,32 +218,24 @@ This can be used to test whether a user is among the repository's
 default reviewers list. A 404 indicates that that specified user is not
 a default reviewer.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug":       repoSlug,
+				"target_username": targetUsername,
+				"workspace":       workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if targetUsername == "" {
+			if pathParams["target_username"] == "" {
 				return fmt.Errorf("--target-username is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug":       repoSlug,
-				"target_username": targetUsername,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -298,32 +272,24 @@ reviewers.
 
 This method is idempotent. Adding a user a second time has no effect.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug":       repoSlug,
+				"target_username": targetUsername,
+				"workspace":       workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if targetUsername == "" {
+			if pathParams["target_username"] == "" {
 				return fmt.Errorf("--target-username is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug":       repoSlug,
-				"target_username": targetUsername,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -357,32 +323,24 @@ func newPRRemoveAUserFromTheDefaultReviewersCmd() *cobra.Command {
 		Short: `Remove a user from the default reviewers`,
 		Long:  `Removes a default reviewer from the repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug":       repoSlug,
+				"target_username": targetUsername,
+				"workspace":       workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if targetUsername == "" {
+			if pathParams["target_username"] == "" {
 				return fmt.Errorf("--target-username is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug":       repoSlug,
-				"target_username": targetUsername,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -422,28 +380,20 @@ reviewers defined at the repository level as well as those inherited from its pr
 These are the users that are automatically added as reviewers on every
 new pull request that is created.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -485,28 +435,20 @@ func newPRListPullRequestsCmd() *cobra.Command {
 		Short: `List pull requests`,
 		Long:  "Returns all pull requests on the specified repository.\n\nBy default only open pull requests are returned. This can be controlled\nusing the `state` query parameter. To retrieve pull requests that are\nin one of multiple states, repeat the `state` parameter for each\nindividual state.\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{
 				"state":   state,
@@ -556,28 +498,20 @@ func newPRCreateAPullRequestCmd() *cobra.Command {
 		Short: `Create a pull request`,
 		Long:  "Creates a new pull request where the destination repository is\nthis repository and the author is the authenticated user.\n\nThe minimum required fields to create a pull request are `title` and\n`source`, specified by a branch name.\n\n```\ncurl https://api.bitbucket.org/2.0/repositories/my-workspace/my-repository/pullrequests \\\n    -u my-username:my-password \\\n    --request POST \\\n    --header 'Content-Type: application/json' \\\n    --data '{\n        \"title\": \"My Title\",\n        \"source\": {\n            \"branch\": {\n                \"name\": \"staging\"\n            }\n        }\n    }'\n```\n\nIf the pull request's `destination` is not specified, it will default\nto the `repository.mainbranch`. To open a pull request to a\ndifferent branch, say from a feature branch to a staging branch,\nspecify a `destination` (same format as the `source`):\n\n```\n{\n    \"title\": \"My Title\",\n    \"source\": {\n        \"branch\": {\n            \"name\": \"my-feature-branch\"\n        }\n    },\n    \"destination\": {\n        \"branch\": {\n            \"name\": \"staging\"\n        }\n    }\n}\n```\n\nReviewers can be specified by adding an array of user objects as the\n`reviewers` property.\n\n```\n{\n    \"title\": \"My Title\",\n    \"source\": {\n        \"branch\": {\n            \"name\": \"my-feature-branch\"\n        }\n    },\n    \"reviewers\": [\n        {\n            \"uuid\": \"{504c3b62-8120-4f0c-a7bc-87800b9d6f70}\"\n        }\n    ]\n}\n```\n\nOther fields:\n\n* `description` - a string\n* `close_source_branch` - boolean that specifies if the source branch should be closed upon merging\n* `draft` - boolean that specifies whether the pull request is a draft",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -652,28 +586,20 @@ func newPRListAPullRequestActivityLogCmd() *cobra.Command {
 		Short: `List a pull request activity log`,
 		Long:  "Returns a paginated list of the pull request's activity log.\n\nThis handler serves both a v20 and internal endpoint. The v20 endpoint\nreturns reviewer comments, updates, approvals and request changes. The internal\nendpoint includes those plus tasks and attachments.\n\nComments created on a file or a line of code have an inline property.\n\nComment example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"comment\": {\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695/comments/118571088\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695/_/diff#comment-118571088\"\n                    }\n                },\n                \"deleted\": false,\n                \"pullrequest\": {\n                    \"type\": \"pullrequest\",\n                    \"id\": 5695,\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                        }\n                    },\n                    \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n                },\n                \"content\": {\n                    \"raw\": \"inline with to a dn from lines\",\n                    \"markup\": \"markdown\",\n                    \"html\": \"<p>inline with to a dn from lines</p>\",\n                    \"type\": \"rendered\"\n                },\n                \"created_on\": \"2019-09-27T00:33:46.039178+00:00\",\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"created_on\": \"2019-09-27T00:33:46.039178+00:00\",\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"updated_on\": \"2019-09-27T00:33:46.055384+00:00\",\n                \"inline\": {\n                    \"context_lines\": \"\",\n                    \"to\": null,\n                    \"path\": \"\",\n                    \"outdated\": false,\n                    \"from\": 211\n                },\n                \"type\": \"pullrequest_comment\",\n                \"id\": 118571088\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```\n\nUpdates include a state property of OPEN, MERGED, or DECLINED.\n\nUpdate example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"update\": {\n                \"description\": \"\",\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\",\n                \"destination\": {\n                    \"commit\": {\n                        \"type\": \"commit\",\n                        \"hash\": \"6a2c16e4a152\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/commit/6a2c16e4a152\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/commits/6a2c16e4a152\"\n                            }\n                        }\n                    },\n                    \"branch\": {\n                        \"name\": \"master\"\n                    },\n                    \"repository\": {\n                        \"name\": \"Atlaskit-MK-2\",\n                        \"type\": \"repository\",\n                        \"full_name\": \"atlassian/atlaskit-mk-2\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2\"\n                            },\n                            \"avatar\": {\n                                \"href\": \"https://bytebucket.org/ravatar/%7B%7D?ts=js\"\n                            }\n                        },\n                        \"uuid\": \"{}\"\n                    }\n                },\n                \"reason\": \"\",\n                \"source\": {\n                    \"commit\": {\n                        \"type\": \"commit\",\n                        \"hash\": \"728c8bad1813\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/commit/728c8bad1813\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/commits/728c8bad1813\"\n                            }\n                        }\n                    },\n                    \"branch\": {\n                        \"name\": \"username/NONE-add-onClick-prop-for-accessibility\"\n                    },\n                    \"repository\": {\n                        \"name\": \"Atlaskit-MK-2\",\n                        \"type\": \"repository\",\n                        \"full_name\": \"atlassian/atlaskit-mk-2\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2\"\n                            },\n                            \"avatar\": {\n                                \"href\": \"https://bytebucket.org/ravatar/%7B%7D?ts=js\"\n                            }\n                        },\n                        \"uuid\": \"{}\"\n                    }\n                },\n                \"state\": \"OPEN\",\n                \"author\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"date\": \"2019-05-10T06:48:25.305565+00:00\"\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```\n\nApproval example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"approval\": {\n                \"date\": \"2019-09-27T00:37:19.849534+00:00\",\n                \"pullrequest\": {\n                    \"type\": \"pullrequest\",\n                    \"id\": 5695,\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                        }\n                    },\n                    \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n                },\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                }\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -706,32 +632,24 @@ func newPRGetAPullRequestCmd() *cobra.Command {
 		Short: `Get a pull request`,
 		Long:  `Returns the specified pull request.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -779,32 +697,24 @@ This can be used to change the pull request's branches or description.
 
 Only open pull requests can be mutated.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -881,32 +791,24 @@ func newPRGetRepositoriesPullrequestsActivityCmd() *cobra.Command {
 		Short: `List a pull request activity log`,
 		Long:  "Returns a paginated list of the pull request's activity log.\n\nThis handler serves both a v20 and internal endpoint. The v20 endpoint\nreturns reviewer comments, updates, approvals and request changes. The internal\nendpoint includes those plus tasks and attachments.\n\nComments created on a file or a line of code have an inline property.\n\nComment example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"comment\": {\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695/comments/118571088\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695/_/diff#comment-118571088\"\n                    }\n                },\n                \"deleted\": false,\n                \"pullrequest\": {\n                    \"type\": \"pullrequest\",\n                    \"id\": 5695,\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                        }\n                    },\n                    \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n                },\n                \"content\": {\n                    \"raw\": \"inline with to a dn from lines\",\n                    \"markup\": \"markdown\",\n                    \"html\": \"<p>inline with to a dn from lines</p>\",\n                    \"type\": \"rendered\"\n                },\n                \"created_on\": \"2019-09-27T00:33:46.039178+00:00\",\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"created_on\": \"2019-09-27T00:33:46.039178+00:00\",\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"updated_on\": \"2019-09-27T00:33:46.055384+00:00\",\n                \"inline\": {\n                    \"context_lines\": \"\",\n                    \"to\": null,\n                    \"path\": \"\",\n                    \"outdated\": false,\n                    \"from\": 211\n                },\n                \"type\": \"pullrequest_comment\",\n                \"id\": 118571088\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```\n\nUpdates include a state property of OPEN, MERGED, or DECLINED.\n\nUpdate example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"update\": {\n                \"description\": \"\",\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\",\n                \"destination\": {\n                    \"commit\": {\n                        \"type\": \"commit\",\n                        \"hash\": \"6a2c16e4a152\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/commit/6a2c16e4a152\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/commits/6a2c16e4a152\"\n                            }\n                        }\n                    },\n                    \"branch\": {\n                        \"name\": \"master\"\n                    },\n                    \"repository\": {\n                        \"name\": \"Atlaskit-MK-2\",\n                        \"type\": \"repository\",\n                        \"full_name\": \"atlassian/atlaskit-mk-2\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2\"\n                            },\n                            \"avatar\": {\n                                \"href\": \"https://bytebucket.org/ravatar/%7B%7D?ts=js\"\n                            }\n                        },\n                        \"uuid\": \"{}\"\n                    }\n                },\n                \"reason\": \"\",\n                \"source\": {\n                    \"commit\": {\n                        \"type\": \"commit\",\n                        \"hash\": \"728c8bad1813\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/commit/728c8bad1813\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/commits/728c8bad1813\"\n                            }\n                        }\n                    },\n                    \"branch\": {\n                        \"name\": \"username/NONE-add-onClick-prop-for-accessibility\"\n                    },\n                    \"repository\": {\n                        \"name\": \"Atlaskit-MK-2\",\n                        \"type\": \"repository\",\n                        \"full_name\": \"atlassian/atlaskit-mk-2\",\n                        \"links\": {\n                            \"self\": {\n                                \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2\"\n                            },\n                            \"html\": {\n                                \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2\"\n                            },\n                            \"avatar\": {\n                                \"href\": \"https://bytebucket.org/ravatar/%7B%7D?ts=js\"\n                            }\n                        },\n                        \"uuid\": \"{}\"\n                    }\n                },\n                \"state\": \"OPEN\",\n                \"author\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                },\n                \"date\": \"2019-05-10T06:48:25.305565+00:00\"\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```\n\nApproval example:\n```\n{\n    \"pagelen\": 20,\n    \"values\": [\n        {\n            \"approval\": {\n                \"date\": \"2019-09-27T00:37:19.849534+00:00\",\n                \"pullrequest\": {\n                    \"type\": \"pullrequest\",\n                    \"id\": 5695,\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                        }\n                    },\n                    \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n                },\n                \"user\": {\n                    \"display_name\": \"Name Lastname\",\n                    \"uuid\": \"{}\",\n                    \"links\": {\n                        \"self\": {\n                            \"href\": \"https://api.bitbucket.org/2.0/users/%7B%7D\"\n                        },\n                        \"html\": {\n                            \"href\": \"https://bitbucket.org/%7B%7D/\"\n                        },\n                        \"avatar\": {\n                            \"href\": \"https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/:/128\"\n                        }\n                    },\n                    \"type\": \"user\",\n                    \"nickname\": \"Name\",\n                    \"account_id\": \"\"\n                }\n            },\n            \"pull_request\": {\n                \"type\": \"pullrequest\",\n                \"id\": 5695,\n                \"links\": {\n                    \"self\": {\n                        \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/atlaskit-mk-2/pullrequests/5695\"\n                    },\n                    \"html\": {\n                        \"href\": \"https://bitbucket.org/atlassian/atlaskit-mk-2/pull-requests/5695\"\n                    }\n                },\n                \"title\": \"username/NONE: small change from onFocus to onClick to handle tabbing through the page and not expand the editor unless a click event triggers it\"\n            }\n        }\n    ]\n}\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -940,32 +842,24 @@ func newPRApproveAPullRequestCmd() *cobra.Command {
 		Short: `Approve a pull request`,
 		Long:  `Approve the specified pull request as the authenticated user.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1000,32 +894,24 @@ func newPRUnapproveAPullRequestCmd() *cobra.Command {
 		Long: `Redact the authenticated user's approval of the specified pull
 request.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1062,32 +948,24 @@ func newPRListCommentsOnAPullRequestCmd() *cobra.Command {
 		Short: `List comments on a pull request`,
 		Long:  "Returns a paginated list of the pull request's comments.\n\nThis includes both global, inline comments and replies.\n\nThe default sorting is oldest to newest and can be overridden with\nthe `sort` query parameter.\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more\ndetails.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -1148,32 +1026,24 @@ func newPRCreateACommentOnAPullRequestCmd() *cobra.Command {
 
 Returns the newly created pull request comment.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -1287,36 +1157,28 @@ func newPRGetACommentOnAPullRequestCmd() *cobra.Command {
 		Short: `Get a comment on a pull request`,
 		Long:  `Returns a specific pull request comment.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"comment_id":      strconv.Itoa(commentId),
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if commentId == 0 {
 				return fmt.Errorf("--comment-id is required")
 			}
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"comment_id":      strconv.Itoa(commentId),
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1371,36 +1233,28 @@ func newPRUpdateACommentOnAPullRequestCmd() *cobra.Command {
 		Short: `Update a comment on a pull request`,
 		Long:  `Updates a specific pull request comment.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"comment_id":      strconv.Itoa(commentId),
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if commentId == 0 {
 				return fmt.Errorf("--comment-id is required")
 			}
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"comment_id":      strconv.Itoa(commentId),
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -1515,36 +1369,28 @@ func newPRDeleteACommentOnAPullRequestCmd() *cobra.Command {
 		Short: `Delete a comment on a pull request`,
 		Long:  `Deletes a specific pull request comment.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"comment_id":      strconv.Itoa(commentId),
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if commentId == 0 {
 				return fmt.Errorf("--comment-id is required")
 			}
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"comment_id":      strconv.Itoa(commentId),
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1580,36 +1426,28 @@ func newPRResolveACommentThreadCmd() *cobra.Command {
 		Short: `Resolve a comment thread`,
 		Long:  ``,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"comment_id":      strconv.Itoa(commentId),
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if commentId == 0 {
 				return fmt.Errorf("--comment-id is required")
 			}
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"comment_id":      strconv.Itoa(commentId),
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1645,36 +1483,28 @@ func newPRReopenACommentThreadCmd() *cobra.Command {
 		Short: `Reopen a comment thread`,
 		Long:  ``,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"comment_id":      strconv.Itoa(commentId),
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if commentId == 0 {
 				return fmt.Errorf("--comment-id is required")
 			}
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"comment_id":      strconv.Itoa(commentId),
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1712,32 +1542,24 @@ func newPRListCommitsOnAPullRequestCmd() *cobra.Command {
 These are the commits that are being merged into the destination
 branch when the pull requests gets accepted.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1771,32 +1593,24 @@ func newPRDeclineAPullRequestCmd() *cobra.Command {
 		Short: `Decline a pull request`,
 		Long:  `Declines the pull request.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1831,32 +1645,24 @@ func newPRListChangesInAPullRequestCmd() *cobra.Command {
 		Long: `Redirects to the [repository diff](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diff-spec-get)
 with the revspec that corresponds to the pull request.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1891,32 +1697,24 @@ func newPRGetTheDiffStatForAPullRequestCmd() *cobra.Command {
 		Long: `Redirects to the [repository diffstat](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get)
 with the revspec that corresponds to the pull request.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1956,32 +1754,24 @@ func newPRMergeAPullRequestCmd() *cobra.Command {
 		Short: `Merge a pull request`,
 		Long:  `Merges the pull request.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{
 				"async": strconv.FormatBool(async),
@@ -2042,36 +1832,28 @@ func newPRGetTheMergeTaskStatusForAPullRequestCmd() *cobra.Command {
 		Short: `Get the merge task status for a pull request`,
 		Long:  "When merging a pull request takes too long, the client receives a\ntask ID along with a 202 status code. The task ID can be used in a call\nto this endpoint to check the status of a merge task.\n\n```\ncurl -X GET https://api.bitbucket.org/2.0/repositories/atlassian/bitbucket/pullrequests/2286/merge/task-status/<task_id>\n```\n\nIf the merge task is not yet finished, a PENDING status will be returned.\n\n```\nHTTP/2 200\n{\n    \"task_status\": \"PENDING\",\n    \"links\": {\n        \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bitbucket/pullrequests/2286/merge/task-status/<task_id>\"\n        }\n    }\n}\n```\n\nIf the merge was successful, a SUCCESS status will be returned.\n\n```\nHTTP/2 200\n{\n    \"task_status\": \"SUCCESS\",\n    \"links\": {\n        \"self\": {\n            \"href\": \"https://api.bitbucket.org/2.0/repositories/atlassian/bitbucket/pullrequests/2286/merge/task-status/<task_id>\"\n        }\n    },\n    \"merge_result\": <the merged pull request object>\n}\n```\n\nIf the merge task failed, an error will be returned.\n\n```\n{\n    \"type\": \"error\",\n    \"error\": {\n        \"message\": \"<error message>\"\n    }\n}\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
-			}
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if taskId == "" {
-				return fmt.Errorf("--task-id is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
 			pathParams := map[string]string{
 				"pull_request_id": strconv.Itoa(pullRequestId),
 				"repo_slug":       repoSlug,
 				"task_id":         taskId,
 				"workspace":       workspace,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pullRequestId == 0 {
+				return fmt.Errorf("--pull-request-id is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if pathParams["task_id"] == "" {
+				return fmt.Errorf("--task-id is required")
+			}
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -2107,32 +1889,24 @@ func newPRGetThePatchForAPullRequestCmd() *cobra.Command {
 		Long: `Redirects to the [repository patch](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-patch-spec-get)
 with the revspec that corresponds to pull request.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -2166,32 +1940,24 @@ func newPRRequestChangesForAPullRequestCmd() *cobra.Command {
 		Short: `Request changes for a pull request`,
 		Long:  ``,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -2225,32 +1991,24 @@ func newPRRemoveChangeRequestForAPullRequestCmd() *cobra.Command {
 		Short: `Remove change request for a pull request`,
 		Long:  ``,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -2290,32 +2048,24 @@ func newPRListCommitStatusesForAPullRequestCmd() *cobra.Command {
 		Long: `Returns all statuses (e.g. build results) for the given pull
 request.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{
 				"q":       q,
@@ -2367,32 +2117,24 @@ func newPRListTasksOnAPullRequestCmd() *cobra.Command {
 This endpoint supports filtering and sorting of the results by the 'task' field.
 See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{
 				"q":       q,
@@ -2453,32 +2195,24 @@ Returns the newly created pull request task.
 Tasks can optionally be created in relation to a comment specified by the comment's ID which
 will cause the task to appear below the comment on a pull request when viewed in Bitbucket.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
 			}
+			handlers.InferRepoContext(pathParams)
 			if pullRequestId == 0 {
 				return fmt.Errorf("--pull-request-id is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"pull_request_id": strconv.Itoa(pullRequestId),
-				"repo_slug":       repoSlug,
-				"workspace":       workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -2564,36 +2298,28 @@ func newPRGetATaskOnAPullRequestCmd() *cobra.Command {
 		Short: `Get a task on a pull request`,
 		Long:  `Returns a specific pull request task.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
-			}
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if taskId == 0 {
-				return fmt.Errorf("--task-id is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
 			pathParams := map[string]string{
 				"pull_request_id": strconv.Itoa(pullRequestId),
 				"repo_slug":       repoSlug,
 				"task_id":         strconv.Itoa(taskId),
 				"workspace":       workspace,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pullRequestId == 0 {
+				return fmt.Errorf("--pull-request-id is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if taskId == 0 {
+				return fmt.Errorf("--task-id is required")
+			}
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -2632,36 +2358,28 @@ func newPRUpdateATaskOnAPullRequestCmd() *cobra.Command {
 		Short: `Update a task on a pull request`,
 		Long:  `Updates a specific pull request task.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
-			}
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if taskId == 0 {
-				return fmt.Errorf("--task-id is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
 			pathParams := map[string]string{
 				"pull_request_id": strconv.Itoa(pullRequestId),
 				"repo_slug":       repoSlug,
 				"task_id":         strconv.Itoa(taskId),
 				"workspace":       workspace,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pullRequestId == 0 {
+				return fmt.Errorf("--pull-request-id is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if taskId == 0 {
+				return fmt.Errorf("--task-id is required")
+			}
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -2712,36 +2430,28 @@ func newPRDeleteATaskOnAPullRequestCmd() *cobra.Command {
 		Short: `Delete a task on a pull request`,
 		Long:  `Deletes a specific pull request task.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
-			}
-			if pullRequestId == 0 {
-				return fmt.Errorf("--pull-request-id is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if taskId == 0 {
-				return fmt.Errorf("--task-id is required")
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
 			pathParams := map[string]string{
 				"pull_request_id": strconv.Itoa(pullRequestId),
 				"repo_slug":       repoSlug,
 				"task_id":         strconv.Itoa(taskId),
 				"workspace":       workspace,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pullRequestId == 0 {
+				return fmt.Errorf("--pull-request-id is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if taskId == 0 {
+				return fmt.Errorf("--task-id is required")
+			}
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -2779,22 +2489,20 @@ func newPRListWorkspacePullRequestsForAUserCmd() *cobra.Command {
 		Short: `List workspace pull requests for a user`,
 		Long:  "Returns all workspace pull requests authored by the specified user.\n\nBy default only open pull requests are returned. This can be controlled\nusing the `state` query parameter. To retrieve pull requests that are\nin one of multiple states, repeat the `state` parameter for each\nindividual state.\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"selected_user": selectedUser,
+				"workspace":     workspace,
 			}
-			if selectedUser == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"selected_user": selectedUser,
-				"workspace":     workspace,
 			}
 			queryParams := map[string]string{
 				"state":   state,

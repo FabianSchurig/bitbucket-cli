@@ -15,7 +15,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
-	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -27,7 +26,6 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
-	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -131,32 +129,24 @@ func newPipelinesGetDeploymentVariablesCmd() *cobra.Command {
 		Short: `List variables for an environment`,
 		Long:  `Find deployment environment level variables.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":        workspace,
+				"repo_slug":        repoSlug,
+				"environment_uuid": environmentUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if environmentUuid == "" {
+			if pathParams["environment_uuid"] == "" {
 				return fmt.Errorf("--environment-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":        workspace,
-				"repo_slug":        repoSlug,
-				"environment_uuid": environmentUuid,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -201,32 +191,24 @@ func newPipelinesCreateDeploymentVariableCmd() *cobra.Command {
 		Short: `Create a variable for an environment`,
 		Long:  `Create a deployment environment level variable.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":        workspace,
+				"repo_slug":        repoSlug,
+				"environment_uuid": environmentUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if environmentUuid == "" {
+			if pathParams["environment_uuid"] == "" {
 				return fmt.Errorf("--environment-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":        workspace,
-				"repo_slug":        repoSlug,
-				"environment_uuid": environmentUuid,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -289,36 +271,28 @@ func newPipelinesUpdateDeploymentVariableCmd() *cobra.Command {
 		Short: `Update a variable for an environment`,
 		Long:  `Update a deployment environment level variable.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if environmentUuid == "" {
-				return fmt.Errorf("--environment-uuid is required")
-			}
-			if variableUuid == "" {
-				return fmt.Errorf("--variable-uuid is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
 			pathParams := map[string]string{
 				"workspace":        workspace,
 				"repo_slug":        repoSlug,
 				"environment_uuid": environmentUuid,
 				"variable_uuid":    variableUuid,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if pathParams["environment_uuid"] == "" {
+				return fmt.Errorf("--environment-uuid is required")
+			}
+			if pathParams["variable_uuid"] == "" {
+				return fmt.Errorf("--variable-uuid is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -377,36 +351,28 @@ func newPipelinesDeleteDeploymentVariableCmd() *cobra.Command {
 		Short: `Delete a variable for an environment`,
 		Long:  `Delete a deployment environment level variable.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if environmentUuid == "" {
-				return fmt.Errorf("--environment-uuid is required")
-			}
-			if variableUuid == "" {
-				return fmt.Errorf("--variable-uuid is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
 			pathParams := map[string]string{
 				"workspace":        workspace,
 				"repo_slug":        repoSlug,
 				"environment_uuid": environmentUuid,
 				"variable_uuid":    variableUuid,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if pathParams["environment_uuid"] == "" {
+				return fmt.Errorf("--environment-uuid is required")
+			}
+			if pathParams["variable_uuid"] == "" {
+				return fmt.Errorf("--variable-uuid is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -459,28 +425,20 @@ and sorting of returned results. See [query parameters](#api-repositories-worksp
 for specific details.
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{
 				"creator.uuid":            creatorUuid,
@@ -560,28 +518,20 @@ func newPipelinesCreatePipelineForRepositoryCmd() *cobra.Command {
 		Short: `Run a pipeline`,
 		Long:  "Endpoint to create and initiate a pipeline.\nThere are a number of different options to initiate a pipeline, where the payload of the request will determine which type of pipeline will be instantiated.\n\n## Trigger a pipeline for a branch\n\nOne way to trigger pipelines is by specifying the branch for which you want to trigger a pipeline.\nThe specified branch will be used to determine which pipeline definition from the `bitbucket-pipelines.yml` file will be applied to initiate the pipeline. The pipeline will then do a clone of the repository and checkout the latest revision of the specified branch.\n\n### Example\n\n```\n$ curl -X POST -is -u '{atlassian_account_email}:{api_token}' \\\n      -H 'Content-Type: application/json' \\\n      https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_slug}/pipelines/ \\\n      -d '\n      {\n        \"target\": {\n          \"ref_type\": \"branch\",\n          \"type\": \"pipeline_ref_target\",\n          \"ref_name\": \"master\"\n        }\n      }'\n```\n\n## Trigger a pipeline for a commit on a branch or tag\n\nYou can initiate a pipeline for a specific commit and in the context of a specified reference (e.g. a branch, tag or bookmark).\nThe specified reference will be used to determine which pipeline definition from the bitbucket-pipelines.yml file will be applied to initiate the pipeline. The pipeline will clone the repository and then do a checkout the specified reference.\n\nThe following reference types are supported:\n\n* `branch`\n* `named_branch`\n* `bookmark`\n * `tag`\n\n### Example\n\n```\n$ curl -X POST -is -u '{atlassian_account_email}:{api_token}' \\\n      -H 'Content-Type: application/json' \\\n      https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_slug}/pipelines/ \\\n      -d '\n      {\n        \"target\": {\n          \"commit\": {\n            \"type\": \"commit\",\n            \"hash\": \"ce5b7431602f7cbba007062eeb55225c6e18e956\"\n          },\n          \"ref_type\": \"branch\",\n          \"type\": \"pipeline_ref_target\",\n          \"ref_name\": \"master\"\n        }\n      }'\n```\n\n## Trigger a specific pipeline definition for a commit\n\nYou can trigger a specific pipeline that is defined in your `bitbucket-pipelines.yml` file for a specific commit.\nIn addition to the commit revision, you specify the type and pattern of the selector that identifies the pipeline definition. The resulting pipeline will then clone the repository and checkout the specified revision.\n\n### Example\n\n```\n$ curl -X POST -is -u '{atlassian_account_email}:{api_token}' \\\n      -H 'Content-Type: application/json' \\\n      https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_slug}/pipelines/ \\\n      -d '\n      {\n        \"target\": {\n          \"commit\": {\n            \"hash\":\"a3c4e02c9a3755eccdc3764e6ea13facdf30f923\",\n            \"type\":\"commit\"\n          },\n          \"selector\": {\n            \"type\":\"custom\",\n            \"pattern\":\"Deploy to production\"\n          },\n          \"type\":\"pipeline_commit_target\"\n        }\n      }'\n```\n\n## Trigger a specific pipeline definition for a commit on a branch or tag\n\nYou can trigger a specific pipeline that is defined in your `bitbucket-pipelines.yml` file for a specific commit in the context of a specified reference.\nIn addition to the commit revision, you specify the type and pattern of the selector that identifies the pipeline definition, as well as the reference information. The resulting pipeline will then clone the repository a checkout the specified reference.\n\n### Example\n\n```\n$ curl -X POST -is -u '{atlassian_account_email}:{api_token}' \\\n      -H 'Content-Type: application/json' \\\n      https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_slug}/pipelines/ \\\n      -d '\n      {\n        \"target\": {\n          \"commit\": {\n            \"hash\":\"a3c4e02c9a3755eccdc3764e6ea13facdf30f923\",\n            \"type\":\"commit\"\n          },\n          \"selector\": {\n            \"type\": \"custom\",\n            \"pattern\": \"Deploy to production\"\n          },\n          \"type\": \"pipeline_ref_target\",\n          \"ref_name\": \"master\",\n          \"ref_type\": \"branch\"\n        }\n      }'\n```\n\n## Trigger a custom pipeline with variables\n\nIn addition to triggering a custom pipeline that is defined in your `bitbucket-pipelines.yml` file as shown in the examples above, you can specify variables that will be available for your build. In the request, provide a list of variables, specifying the following for each variable: key, value, and whether it should be secured or not (this field is optional and defaults to not secured).\n\n### Example\n\n```\n$ curl -X POST -is -u '{atlassian_account_email}:{api_token}' \\\n      -H 'Content-Type: application/json' \\\n      https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_slug}/pipelines/ \\\n      -d '\n      {\n        \"target\": {\n          \"type\": \"pipeline_ref_target\",\n          \"ref_type\": \"branch\",\n          \"ref_name\": \"master\",\n          \"selector\": {\n            \"type\": \"custom\",\n            \"pattern\": \"Deploy to production\"\n          }\n        },\n        \"variables\": [\n          {\n            \"key\": \"var1key\",\n            \"value\": \"var1value\",\n            \"secured\": true\n          },\n          {\n            \"key\": \"var2key\",\n            \"value\": \"var2value\"\n          }\n        ]\n      }'\n```\n\n## Trigger a pull request pipeline\n\nYou can also initiate a pipeline for a specific pull request.\n\n### Example\n\n```\n$ curl -X POST -is -u '{atlassian_account_email}:{api_token}' \\\n      -H 'Content-Type: application/json' \\\n      https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_slug}/pipelines/ \\\n      -d '\n      {\n        \"target\": {\n          \"type\": \"pipeline_pullrequest_target\",\n          \"source\": \"pull-request-branch\",\n          \"destination\": \"master\",\n          \"destination_commit\": {\n            \"hash\": \"9f848b7\"\n          },\n          \"commit\": {\n            \"hash\": \"1a372fc\"\n          },\n          \"pullrequest\": {\n            \"id\": \"3\"\n          },\n          \"selector\": {\n            \"type\": \"pull-requests\",\n            \"pattern\": \"**\"\n          }\n        }\n      }'\n```\n\n# On-demand pipeline\n\nBy default, pipelines run using the YAML in the repository’s `bitbucket-pipelines.yml` configuration file.\nWith an _on-demand_ pipeline, you include the pipeline’s YAML in the request body. That YAML applies only\nto that run and overrides the YAML in `bitbucket-pipelines.yml`.\n\nJust like with regular pipelines, there is a number of different options to initiate an on-demand pipeline.\nHowever, since the payload contains YAML configuration in this case, _query parameters_ are used to supply\nthe necessary metadata to determine which type of pipeline will be instantiated. These query parameters\nare derived from the JSON equivalent by turning each property into a key-value pair with the JSON path\nof the property as the new key.\n\n## Trigger on-demand pipeline for a branch\n\nYou can initiate an on-demand pipeline for a specific branch. This branch will be used to determine\nwhich pipeline definition from the supplied YAML configuration will be applied to initiate the pipeline.\nThe pipeline will then do a clone of the repository and check out the latest revision of the specified branch.\n\nTo trigger an on-demand pipeline for a _branch_ the requesting user must have **write permission** for\nthat branch (which can be limited by [branch restrictions](https://support.atlassian.com/bitbucket-cloud/docs/use-branch-permissions/)).\n\n### Example\n\n```\n$ curl -X POST -is -u '{atlassian_account_email}:{api_token}' \\\n      -H 'Content-Type: application/yaml' \\\n      https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_slug}/pipelines?target.type=pipeline_ref_target&target.ref_type=branch&target.ref_name=master \\\n      -d '\npipelines:\n  default:\n    - step:\n        script:\n          - echo This is an on-demand pipeline'\n```\n\n## Trigger on-demand pipeline for a commit on a branch or tag\n\nYou can initiate an on-demand pipeline for a specific commit and in the context of a specified reference\n(branch or tag). The specified reference will be used to determine which pipeline definition from the supplied\nYAML configuration will be applied to initiate the pipeline. The pipeline will clone the repository and\ncheck out the specified reference.\n\nTo trigger an on-demand pipeline for a _branch_ the requesting user must have **write permission** for\nthat branch (which can be limited by [branch restrictions](https://support.atlassian.com/bitbucket-cloud/docs/use-branch-permissions/)).\n\n### Example\n\n```\n$ curl -X POST -is -u '{atlassian_account_email}:{api_token}' \\\n      -H 'Content-Type: application/yaml' \\\n      https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_slug}/pipelines?target.type=pipeline_ref_target&target.ref_type=branch&target.ref_name=master&target.commit.hash=ce5b7431602f7cbba007062eeb55225c6e18e956 \\\n      -d '\npipelines:\n  default:\n    - step:\n        script:\n          - echo This is an on-demand pipeline'\n```\n\n## Trigger a specific on-demand pipeline definition for a commit\n\nYou can trigger a specific pipeline that is defined in the supplied YAML configuration for a specific commit.\nIn addition to the commit revision, you specify the type and pattern of the selector that identifies\nthe pipeline definition. The resulting pipeline will then clone the repository and checkout the specified revision.\n\n### Example\n\n```\n$ curl -X POST -is -u '{atlassian_account_email}:{api_token}' \\\n      -H 'Content-Type: application/yaml' \\\n      https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_slug}/pipelines?target.type=pipeline_commit_target&target.commit.hash=a3c4e02c9a3755eccdc3764e6ea13facdf30f923&target.selector.type=custom&target.selector.pattern=security-scan \\\n      -d '\npipelines:\n  custom:\n    security-scan:\n      - step:\n          script:\n            - echo Run on-demand security scan\n```\n\n## Trigger a custom on-demand pipeline with variables\n\nIn addition to triggering a custom on-demand pipeline that is defined in the supplied YAML configuration\nas shown in the examples above, you can specify variables that will be available for your build.\nIn the request, provide each variable as an indexed set of query parameters representing its key, value,\nand whether it should be secured or not (this field is optional and defaults to not secured).\n\n### Example\n\n```\n$ curl -X POST -is -u '{atlassian_account_email}:{api_token}' \\\n      -H 'Content-Type: application/yaml' \\\n      https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_slug}/pipelines?target.type=pipeline_ref_target&target.ref_type=branch&target.ref_name=master&target.selector.type=custom&target.selector.pattern=security-scan&variables[0].key=var1key&variables[0].value=var1value&variables[0].secured=true&variables[1].key=var2key&variables[1].value=var2value \\\n      -d '\npipelines:\n  custom:\n    security-scan:\n      - variables:\n          - name: var1key\n          - name: var2key\n      - step:\n          script:\n            - echo Run on-demand security scan'\n```\n\n## Trigger a pull request pipeline\n\nYou can also initiate an on-demand pipeline for a specific pull request.\n\n### Example\n\n```\n$ curl -X POST -is -u '{atlassian_account_email}:{api_token}' \\\n      -H 'Content-Type: application/yaml' \\\n      https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_slug}/pipelines?target.type=pipeline_pullrequest_target&target.source=pull-request-branch&target.destination=destination&target.destination_commit.hash=9f848b7&target.commit.hash=1a372fc&target.pullrequest.id=3&target.selector.type=pull-requests&target.selector.pattern=** \\\n      -d '\npipelines:\n  pull-requests:\n    \"**\":\n      - step:\n          script:\n            - echo This is an on-demand pipeline'\n```\n",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -714,28 +664,20 @@ func newPipelinesGetRepositoryPipelineCachesCmd() *cobra.Command {
 		Short: `List caches`,
 		Long:  `Retrieve the repository pipelines caches.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -774,28 +716,20 @@ func newPipelinesDeleteRepositoryPipelineCachesCmd() *cobra.Command {
 		Short: `Delete caches`,
 		Long:  `Delete repository cache versions by name.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{
 				"name": name,
@@ -831,32 +765,24 @@ func newPipelinesDeleteRepositoryPipelineCacheCmd() *cobra.Command {
 		Short: `Delete a cache`,
 		Long:  `Delete a repository cache.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":  workspace,
+				"repo_slug":  repoSlug,
+				"cache_uuid": cacheUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if cacheUuid == "" {
+			if pathParams["cache_uuid"] == "" {
 				return fmt.Errorf("--cache-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":  workspace,
-				"repo_slug":  repoSlug,
-				"cache_uuid": cacheUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -890,32 +816,24 @@ func newPipelinesGetRepositoryPipelineCacheContentURICmd() *cobra.Command {
 		Short: `Get cache content URI`,
 		Long:  `Retrieve the URI of the content of the specified cache.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":  workspace,
+				"repo_slug":  repoSlug,
+				"cache_uuid": cacheUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if cacheUuid == "" {
+			if pathParams["cache_uuid"] == "" {
 				return fmt.Errorf("--cache-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":  workspace,
-				"repo_slug":  repoSlug,
-				"cache_uuid": cacheUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -951,28 +869,20 @@ func newPipelinesGetRepositoryRunnersCmd() *cobra.Command {
 		Short: `Get repository runners`,
 		Long:  `Retrieve repository runners.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -1010,28 +920,20 @@ func newPipelinesCreateRepositoryRunnerCmd() *cobra.Command {
 		Short: `Create repository runner`,
 		Long:  `Create repository runner.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1064,32 +966,24 @@ func newPipelinesGetRepositoryRunnerCmd() *cobra.Command {
 		Short: `Get repository runner`,
 		Long:  `Retrieve repository runner by uuid.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":   workspace,
+				"repo_slug":   repoSlug,
+				"runner_uuid": runnerUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if runnerUuid == "" {
+			if pathParams["runner_uuid"] == "" {
 				return fmt.Errorf("--runner-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":   workspace,
-				"repo_slug":   repoSlug,
-				"runner_uuid": runnerUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1123,32 +1017,24 @@ func newPipelinesUpdateRepositoryRunnerCmd() *cobra.Command {
 		Short: `Update repository runner`,
 		Long:  `Update repository runner.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":   workspace,
+				"repo_slug":   repoSlug,
+				"runner_uuid": runnerUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if runnerUuid == "" {
+			if pathParams["runner_uuid"] == "" {
 				return fmt.Errorf("--runner-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":   workspace,
-				"repo_slug":   repoSlug,
-				"runner_uuid": runnerUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1182,32 +1068,24 @@ func newPipelinesDeleteRepositoryRunnerCmd() *cobra.Command {
 		Short: `Delete repository runner`,
 		Long:  `Delete repository runner by uuid.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":   workspace,
+				"repo_slug":   repoSlug,
+				"runner_uuid": runnerUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if runnerUuid == "" {
+			if pathParams["runner_uuid"] == "" {
 				return fmt.Errorf("--runner-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":   workspace,
-				"repo_slug":   repoSlug,
-				"runner_uuid": runnerUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1241,32 +1119,24 @@ func newPipelinesGetPipelineForRepositoryCmd() *cobra.Command {
 		Short: `Get a pipeline`,
 		Long:  `Retrieve a specified pipeline`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":     workspace,
+				"repo_slug":     repoSlug,
+				"pipeline_uuid": pipelineUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if pipelineUuid == "" {
+			if pathParams["pipeline_uuid"] == "" {
 				return fmt.Errorf("--pipeline-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":     workspace,
-				"repo_slug":     repoSlug,
-				"pipeline_uuid": pipelineUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1303,32 +1173,24 @@ func newPipelinesGetPipelineStepsForRepositoryCmd() *cobra.Command {
 		Short: `List steps for a pipeline`,
 		Long:  `Find steps for the given pipeline.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":     workspace,
+				"repo_slug":     repoSlug,
+				"pipeline_uuid": pipelineUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if pipelineUuid == "" {
+			if pathParams["pipeline_uuid"] == "" {
 				return fmt.Errorf("--pipeline-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":     workspace,
-				"repo_slug":     repoSlug,
-				"pipeline_uuid": pipelineUuid,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -1369,36 +1231,28 @@ func newPipelinesGetPipelineStepForRepositoryCmd() *cobra.Command {
 		Short: `Get a step of a pipeline`,
 		Long:  `Retrieve a given step of a pipeline.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if pipelineUuid == "" {
-				return fmt.Errorf("--pipeline-uuid is required")
-			}
-			if stepUuid == "" {
-				return fmt.Errorf("--step-uuid is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
 			pathParams := map[string]string{
 				"workspace":     workspace,
 				"repo_slug":     repoSlug,
 				"pipeline_uuid": pipelineUuid,
 				"step_uuid":     stepUuid,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if pathParams["pipeline_uuid"] == "" {
+				return fmt.Errorf("--pipeline-uuid is required")
+			}
+			if pathParams["step_uuid"] == "" {
+				return fmt.Errorf("--step-uuid is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1436,36 +1290,28 @@ func newPipelinesGetPipelineStepLogForRepositoryCmd() *cobra.Command {
 
 This endpoint supports (and encourages!) the use of [HTTP Range requests](https://tools.ietf.org/html/rfc7233) to deal with potentially very large log files.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if pipelineUuid == "" {
-				return fmt.Errorf("--pipeline-uuid is required")
-			}
-			if stepUuid == "" {
-				return fmt.Errorf("--step-uuid is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
 			pathParams := map[string]string{
 				"workspace":     workspace,
 				"repo_slug":     repoSlug,
 				"pipeline_uuid": pipelineUuid,
 				"step_uuid":     stepUuid,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if pathParams["pipeline_uuid"] == "" {
+				return fmt.Errorf("--pipeline-uuid is required")
+			}
+			if pathParams["step_uuid"] == "" {
+				return fmt.Errorf("--step-uuid is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1504,40 +1350,32 @@ func newPipelinesGetPipelineContainerLogCmd() *cobra.Command {
 
 This endpoint supports (and encourages!) the use of [HTTP Range requests](https://tools.ietf.org/html/rfc7233) to deal with potentially very large log files.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if pipelineUuid == "" {
-				return fmt.Errorf("--pipeline-uuid is required")
-			}
-			if stepUuid == "" {
-				return fmt.Errorf("--step-uuid is required")
-			}
-			if logUuid == "" {
-				return fmt.Errorf("--log-uuid is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
 			pathParams := map[string]string{
 				"workspace":     workspace,
 				"repo_slug":     repoSlug,
 				"pipeline_uuid": pipelineUuid,
 				"step_uuid":     stepUuid,
 				"log_uuid":      logUuid,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if pathParams["pipeline_uuid"] == "" {
+				return fmt.Errorf("--pipeline-uuid is required")
+			}
+			if pathParams["step_uuid"] == "" {
+				return fmt.Errorf("--step-uuid is required")
+			}
+			if pathParams["log_uuid"] == "" {
+				return fmt.Errorf("--log-uuid is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1574,36 +1412,28 @@ func newPipelinesGetPipelineTestReportsCmd() *cobra.Command {
 		Short: `Get a summary of test reports for a given step of a pipeline.`,
 		Long:  ``,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if pipelineUuid == "" {
-				return fmt.Errorf("--pipeline-uuid is required")
-			}
-			if stepUuid == "" {
-				return fmt.Errorf("--step-uuid is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
 			pathParams := map[string]string{
 				"workspace":     workspace,
 				"repo_slug":     repoSlug,
 				"pipeline_uuid": pipelineUuid,
 				"step_uuid":     stepUuid,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if pathParams["pipeline_uuid"] == "" {
+				return fmt.Errorf("--pipeline-uuid is required")
+			}
+			if pathParams["step_uuid"] == "" {
+				return fmt.Errorf("--step-uuid is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1639,36 +1469,28 @@ func newPipelinesGetPipelineTestReportTestCasesCmd() *cobra.Command {
 		Short: `Get test cases for a given step of a pipeline.`,
 		Long:  ``,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if pipelineUuid == "" {
-				return fmt.Errorf("--pipeline-uuid is required")
-			}
-			if stepUuid == "" {
-				return fmt.Errorf("--step-uuid is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
 			pathParams := map[string]string{
 				"workspace":     workspace,
 				"repo_slug":     repoSlug,
 				"pipeline_uuid": pipelineUuid,
 				"step_uuid":     stepUuid,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if pathParams["pipeline_uuid"] == "" {
+				return fmt.Errorf("--pipeline-uuid is required")
+			}
+			if pathParams["step_uuid"] == "" {
+				return fmt.Errorf("--step-uuid is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1705,40 +1527,32 @@ func newPipelinesGetPipelineTestReportTestCaseReasonsCmd() *cobra.Command {
 		Short: `Get test case reasons (output) for a given test case in a step of a pipeline.`,
 		Long:  ``,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
-			}
-			if workspace == "" {
-				return fmt.Errorf("--workspace is required")
-			}
-			if repoSlug == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
-			if pipelineUuid == "" {
-				return fmt.Errorf("--pipeline-uuid is required")
-			}
-			if stepUuid == "" {
-				return fmt.Errorf("--step-uuid is required")
-			}
-			if testCaseUuid == "" {
-				return fmt.Errorf("--test-case-uuid is required")
-			}
-			c, err := client.NewClient()
-			if err != nil {
-				return err
-			}
 			pathParams := map[string]string{
 				"workspace":      workspace,
 				"repo_slug":      repoSlug,
 				"pipeline_uuid":  pipelineUuid,
 				"step_uuid":      stepUuid,
 				"test_case_uuid": testCaseUuid,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if pathParams["pipeline_uuid"] == "" {
+				return fmt.Errorf("--pipeline-uuid is required")
+			}
+			if pathParams["step_uuid"] == "" {
+				return fmt.Errorf("--step-uuid is required")
+			}
+			if pathParams["test_case_uuid"] == "" {
+				return fmt.Errorf("--test-case-uuid is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1774,32 +1588,24 @@ func newPipelinesStopPipelineCmd() *cobra.Command {
 		Short: `Stop a pipeline`,
 		Long:  `Signal the stop of a pipeline and all of its steps that not have completed yet.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":     workspace,
+				"repo_slug":     repoSlug,
+				"pipeline_uuid": pipelineUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if pipelineUuid == "" {
+			if pathParams["pipeline_uuid"] == "" {
 				return fmt.Errorf("--pipeline-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":     workspace,
-				"repo_slug":     repoSlug,
-				"pipeline_uuid": pipelineUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1832,28 +1638,20 @@ func newPipelinesGetRepositoryPipelineConfigCmd() *cobra.Command {
 		Short: `Get configuration`,
 		Long:  `Retrieve the repository pipelines configuration.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1898,28 +1696,20 @@ func newPipelinesUpdateRepositoryPipelineConfigCmd() *cobra.Command {
 		Short: `Update configuration`,
 		Long:  `Update the pipelines configuration for a repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -2023,28 +1813,20 @@ func newPipelinesUpdateRepositoryBuildNumberCmd() *cobra.Command {
 		Short: `Update the next build number`,
 		Long:  `Update the next build number that should be assigned to a pipeline. The next build number that will be configured has to be strictly higher than the current latest build number for this repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -2090,28 +1872,20 @@ func newPipelinesGetRepositoryPipelineSchedulesCmd() *cobra.Command {
 		Short: `List schedules`,
 		Long:  `Retrieve the configured schedules for the given repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -2156,28 +1930,20 @@ func newPipelinesCreateRepositoryPipelineScheduleCmd() *cobra.Command {
 		Short: `Create a schedule`,
 		Long:  `Create a schedule for the given repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -2241,32 +2007,24 @@ func newPipelinesGetRepositoryPipelineScheduleCmd() *cobra.Command {
 		Short: `Get a schedule`,
 		Long:  `Retrieve a schedule by its UUID.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":     workspace,
+				"repo_slug":     repoSlug,
+				"schedule_uuid": scheduleUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if scheduleUuid == "" {
+			if pathParams["schedule_uuid"] == "" {
 				return fmt.Errorf("--schedule-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":     workspace,
-				"repo_slug":     repoSlug,
-				"schedule_uuid": scheduleUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -2302,32 +2060,24 @@ func newPipelinesUpdateRepositoryPipelineScheduleCmd() *cobra.Command {
 		Short: `Update a schedule`,
 		Long:  `Update a schedule.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":     workspace,
+				"repo_slug":     repoSlug,
+				"schedule_uuid": scheduleUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if scheduleUuid == "" {
+			if pathParams["schedule_uuid"] == "" {
 				return fmt.Errorf("--schedule-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":     workspace,
-				"repo_slug":     repoSlug,
-				"schedule_uuid": scheduleUuid,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -2372,32 +2122,24 @@ func newPipelinesDeleteRepositoryPipelineScheduleCmd() *cobra.Command {
 		Short: `Delete a schedule`,
 		Long:  `Delete a schedule.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":     workspace,
+				"repo_slug":     repoSlug,
+				"schedule_uuid": scheduleUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if scheduleUuid == "" {
+			if pathParams["schedule_uuid"] == "" {
 				return fmt.Errorf("--schedule-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":     workspace,
-				"repo_slug":     repoSlug,
-				"schedule_uuid": scheduleUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -2434,32 +2176,24 @@ func newPipelinesGetRepositoryPipelineScheduleExecutionsCmd() *cobra.Command {
 		Short: `List executions of a schedule`,
 		Long:  `Retrieve the executions of a given schedule.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":     workspace,
+				"repo_slug":     repoSlug,
+				"schedule_uuid": scheduleUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if scheduleUuid == "" {
+			if pathParams["schedule_uuid"] == "" {
 				return fmt.Errorf("--schedule-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":     workspace,
-				"repo_slug":     repoSlug,
-				"schedule_uuid": scheduleUuid,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -2498,28 +2232,20 @@ func newPipelinesGetRepositoryPipelineSshKeyPairCmd() *cobra.Command {
 		Short: `Get SSH key pair`,
 		Long:  `Retrieve the repository SSH key pair excluding the SSH private key. The private key is a write only field and will never be exposed in the logs or the REST API.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -2554,28 +2280,20 @@ func newPipelinesUpdateRepositoryPipelineKeyPairCmd() *cobra.Command {
 		Short: `Update SSH key pair`,
 		Long:  `Create or update the repository SSH key pair. The private key will be set as a default SSH identity in your build container.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -2622,28 +2340,20 @@ func newPipelinesDeleteRepositoryPipelineKeyPairCmd() *cobra.Command {
 		Short: `Delete SSH key pair`,
 		Long:  `Delete the repository SSH key pair.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -2678,28 +2388,20 @@ func newPipelinesGetRepositoryPipelineKnownHostsCmd() *cobra.Command {
 		Short: `List known hosts`,
 		Long:  `Find repository level known hosts.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -2744,28 +2446,20 @@ func newPipelinesCreateRepositoryPipelineKnownHostCmd() *cobra.Command {
 		Short: `Create a known host`,
 		Long:  `Create a repository level known host.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -2829,32 +2523,24 @@ func newPipelinesGetRepositoryPipelineKnownHostCmd() *cobra.Command {
 		Short: `Get a known host`,
 		Long:  `Retrieve a repository level known host.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":       workspace,
+				"repo_slug":       repoSlug,
+				"known_host_uuid": knownHostUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if knownHostUuid == "" {
+			if pathParams["known_host_uuid"] == "" {
 				return fmt.Errorf("--known-host-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":       workspace,
-				"repo_slug":       repoSlug,
-				"known_host_uuid": knownHostUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -2895,32 +2581,24 @@ func newPipelinesUpdateRepositoryPipelineKnownHostCmd() *cobra.Command {
 		Short: `Update a known host`,
 		Long:  `Update a repository level known host.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":       workspace,
+				"repo_slug":       repoSlug,
+				"known_host_uuid": knownHostUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if knownHostUuid == "" {
+			if pathParams["known_host_uuid"] == "" {
 				return fmt.Errorf("--known-host-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":       workspace,
-				"repo_slug":       repoSlug,
-				"known_host_uuid": knownHostUuid,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -2985,32 +2663,24 @@ func newPipelinesDeleteRepositoryPipelineKnownHostCmd() *cobra.Command {
 		Short: `Delete a known host`,
 		Long:  `Delete a repository level known host.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":       workspace,
+				"repo_slug":       repoSlug,
+				"known_host_uuid": knownHostUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if knownHostUuid == "" {
+			if pathParams["known_host_uuid"] == "" {
 				return fmt.Errorf("--known-host-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":       workspace,
-				"repo_slug":       repoSlug,
-				"known_host_uuid": knownHostUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -3046,28 +2716,20 @@ func newPipelinesGetRepositoryPipelineVariablesCmd() *cobra.Command {
 		Short: `List variables for a repository`,
 		Long:  `Find repository level variables.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -3110,28 +2772,20 @@ func newPipelinesCreateRepositoryPipelineVariableCmd() *cobra.Command {
 		Short: `Create a variable for a repository`,
 		Long:  `Create a repository level variable.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -3187,32 +2841,24 @@ func newPipelinesGetRepositoryPipelineVariableCmd() *cobra.Command {
 		Short: `Get a variable for a repository`,
 		Long:  `Retrieve a repository level variable.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":     workspace,
+				"repo_slug":     repoSlug,
+				"variable_uuid": variableUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if variableUuid == "" {
+			if pathParams["variable_uuid"] == "" {
 				return fmt.Errorf("--variable-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":     workspace,
-				"repo_slug":     repoSlug,
-				"variable_uuid": variableUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -3251,32 +2897,24 @@ func newPipelinesUpdateRepositoryPipelineVariableCmd() *cobra.Command {
 		Short: `Update a variable for a repository`,
 		Long:  `Update a repository level variable.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":     workspace,
+				"repo_slug":     repoSlug,
+				"variable_uuid": variableUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if variableUuid == "" {
+			if pathParams["variable_uuid"] == "" {
 				return fmt.Errorf("--variable-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":     workspace,
-				"repo_slug":     repoSlug,
-				"variable_uuid": variableUuid,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -3333,32 +2971,24 @@ func newPipelinesDeleteRepositoryPipelineVariableCmd() *cobra.Command {
 		Short: `Delete a variable for a repository`,
 		Long:  `Delete a repository level variable.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"workspace":     workspace,
+				"repo_slug":     repoSlug,
+				"variable_uuid": variableUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if variableUuid == "" {
+			if pathParams["variable_uuid"] == "" {
 				return fmt.Errorf("--variable-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":     workspace,
-				"repo_slug":     repoSlug,
-				"variable_uuid": variableUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -3394,15 +3024,16 @@ func newPipelinesGetPipelineVariablesForTeamCmd() *cobra.Command {
 		Long: `Find account level variables.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if username == "" {
+			pathParams := map[string]string{
+				"username": username,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["username"] == "" {
 				return fmt.Errorf("--username is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"username": username,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -3440,15 +3071,16 @@ func newPipelinesCreatePipelineVariableForTeamCmd() *cobra.Command {
 		Long: `Create an account level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if username == "" {
+			pathParams := map[string]string{
+				"username": username,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["username"] == "" {
 				return fmt.Errorf("--username is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"username": username,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -3487,19 +3119,20 @@ func newPipelinesGetPipelineVariableForTeamCmd() *cobra.Command {
 		Long: `Retrieve a team level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if username == "" {
+			pathParams := map[string]string{
+				"username":      username,
+				"variable_uuid": variableUuid,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["username"] == "" {
 				return fmt.Errorf("--username is required")
 			}
-			if variableUuid == "" {
+			if pathParams["variable_uuid"] == "" {
 				return fmt.Errorf("--variable-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"username":      username,
-				"variable_uuid": variableUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -3533,19 +3166,20 @@ func newPipelinesUpdatePipelineVariableForTeamCmd() *cobra.Command {
 		Long: `Update a team level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if username == "" {
+			pathParams := map[string]string{
+				"username":      username,
+				"variable_uuid": variableUuid,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["username"] == "" {
 				return fmt.Errorf("--username is required")
 			}
-			if variableUuid == "" {
+			if pathParams["variable_uuid"] == "" {
 				return fmt.Errorf("--variable-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"username":      username,
-				"variable_uuid": variableUuid,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -3585,19 +3219,20 @@ func newPipelinesDeletePipelineVariableForTeamCmd() *cobra.Command {
 		Long: `Delete a team level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if username == "" {
+			pathParams := map[string]string{
+				"username":      username,
+				"variable_uuid": variableUuid,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["username"] == "" {
 				return fmt.Errorf("--username is required")
 			}
-			if variableUuid == "" {
+			if pathParams["variable_uuid"] == "" {
 				return fmt.Errorf("--variable-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"username":      username,
-				"variable_uuid": variableUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -3632,15 +3267,16 @@ func newPipelinesGetPipelineVariablesForUserCmd() *cobra.Command {
 		Long: `Find user level variables.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if selectedUser == "" {
+			pathParams := map[string]string{
+				"selected_user": selectedUser,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"selected_user": selectedUser,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -3678,15 +3314,16 @@ func newPipelinesCreatePipelineVariableForUserCmd() *cobra.Command {
 		Long: `Create a user level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if selectedUser == "" {
+			pathParams := map[string]string{
+				"selected_user": selectedUser,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"selected_user": selectedUser,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -3725,19 +3362,20 @@ func newPipelinesGetPipelineVariableForUserCmd() *cobra.Command {
 		Long: `Retrieve a user level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if selectedUser == "" {
+			pathParams := map[string]string{
+				"selected_user": selectedUser,
+				"variable_uuid": variableUuid,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
-			if variableUuid == "" {
+			if pathParams["variable_uuid"] == "" {
 				return fmt.Errorf("--variable-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"selected_user": selectedUser,
-				"variable_uuid": variableUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -3771,19 +3409,20 @@ func newPipelinesUpdatePipelineVariableForUserCmd() *cobra.Command {
 		Long: `Update a user level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if selectedUser == "" {
+			pathParams := map[string]string{
+				"selected_user": selectedUser,
+				"variable_uuid": variableUuid,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
-			if variableUuid == "" {
+			if pathParams["variable_uuid"] == "" {
 				return fmt.Errorf("--variable-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"selected_user": selectedUser,
-				"variable_uuid": variableUuid,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -3823,19 +3462,20 @@ func newPipelinesDeletePipelineVariableForUserCmd() *cobra.Command {
 		Long: `Delete an account level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if selectedUser == "" {
+			pathParams := map[string]string{
+				"selected_user": selectedUser,
+				"variable_uuid": variableUuid,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
-			if variableUuid == "" {
+			if pathParams["variable_uuid"] == "" {
 				return fmt.Errorf("--variable-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"selected_user": selectedUser,
-				"variable_uuid": variableUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -3866,18 +3506,16 @@ func newPipelinesGetOIDCConfigurationCmd() *cobra.Command {
 		Short: `Get OpenID configuration for OIDC in Pipelines`,
 		Long:  `This is part of OpenID Connect for Pipelines, see https://support.atlassian.com/bitbucket-cloud/docs/integrate-pipelines-with-resource-servers-using-oidc/`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -3907,18 +3545,16 @@ func newPipelinesGetOIDCKeysCmd() *cobra.Command {
 		Short: `Get keys for OIDC in Pipelines`,
 		Long:  `This is part of OpenID Connect for Pipelines, see https://support.atlassian.com/bitbucket-cloud/docs/integrate-pipelines-with-resource-servers-using-oidc/`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -3951,18 +3587,16 @@ func newPipelinesGetWorkspaceRunnersCmd() *cobra.Command {
 		Short: `Get workspace runners`,
 		Long:  `Retrieve workspace runners.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -3998,18 +3632,16 @@ func newPipelinesCreateWorkspaceRunnerCmd() *cobra.Command {
 		Short: `Create workspace runner`,
 		Long:  `Create workspace runner.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -4040,22 +3672,20 @@ func newPipelinesGetWorkspaceRunnerCmd() *cobra.Command {
 		Short: `Get workspace runner`,
 		Long:  `Get workspace runner by uuid.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace":   workspace,
+				"runner_uuid": runnerUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if runnerUuid == "" {
+			if pathParams["runner_uuid"] == "" {
 				return fmt.Errorf("--runner-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":   workspace,
-				"runner_uuid": runnerUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -4087,22 +3717,20 @@ func newPipelinesUpdateWorkspaceRunnerCmd() *cobra.Command {
 		Short: `Update workspace runner`,
 		Long:  `Update workspace runner.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace":   workspace,
+				"runner_uuid": runnerUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if runnerUuid == "" {
+			if pathParams["runner_uuid"] == "" {
 				return fmt.Errorf("--runner-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":   workspace,
-				"runner_uuid": runnerUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -4134,22 +3762,20 @@ func newPipelinesDeleteWorkspaceRunnerCmd() *cobra.Command {
 		Short: `Delete workspace runner`,
 		Long:  `Delete workspace runner by uuid.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace":   workspace,
+				"runner_uuid": runnerUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if runnerUuid == "" {
+			if pathParams["runner_uuid"] == "" {
 				return fmt.Errorf("--runner-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":   workspace,
-				"runner_uuid": runnerUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -4183,18 +3809,16 @@ func newPipelinesGetPipelineVariablesForWorkspaceCmd() *cobra.Command {
 		Short: `List variables for a workspace`,
 		Long:  `Find workspace level variables.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -4231,18 +3855,16 @@ func newPipelinesCreatePipelineVariableForWorkspaceCmd() *cobra.Command {
 		Short: `Create a variable for a workspace`,
 		Long:  `Create a workspace level variable.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -4280,22 +3902,20 @@ func newPipelinesGetPipelineVariableForWorkspaceCmd() *cobra.Command {
 		Short: `Get variable for a workspace`,
 		Long:  `Retrieve a workspace level variable.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace":     workspace,
+				"variable_uuid": variableUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if variableUuid == "" {
+			if pathParams["variable_uuid"] == "" {
 				return fmt.Errorf("--variable-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":     workspace,
-				"variable_uuid": variableUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -4328,22 +3948,20 @@ func newPipelinesUpdatePipelineVariableForWorkspaceCmd() *cobra.Command {
 		Short: `Update variable for a workspace`,
 		Long:  `Update a workspace level variable.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace":     workspace,
+				"variable_uuid": variableUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if variableUuid == "" {
+			if pathParams["variable_uuid"] == "" {
 				return fmt.Errorf("--variable-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":     workspace,
-				"variable_uuid": variableUuid,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -4382,22 +4000,20 @@ func newPipelinesDeletePipelineVariableForWorkspaceCmd() *cobra.Command {
 		Short: `Delete a variable for a workspace`,
 		Long:  `Delete a workspace level variable.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace":     workspace,
+				"variable_uuid": variableUuid,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
-			if variableUuid == "" {
+			if pathParams["variable_uuid"] == "" {
 				return fmt.Errorf("--variable-uuid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace":     workspace,
-				"variable_uuid": variableUuid,
 			}
 			queryParams := map[string]string{}
 			body := ""

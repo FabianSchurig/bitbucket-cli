@@ -66,11 +66,12 @@ func newUsersGetCurrentUserCmd() *cobra.Command {
 		Short: `Get current user`,
 		Long:  `Returns the currently logged in user.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			pathParams := map[string]string{}
+			handlers.InferRepoContext(pathParams)
 			c, err := client.NewClient()
 			if err != nil {
 				return err
 			}
-			pathParams := map[string]string{}
 			queryParams := map[string]string{}
 			body := ""
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
@@ -96,11 +97,12 @@ func newUsersListEmailAddressesForCurrentUserCmd() *cobra.Command {
 		Long: `Returns all the authenticated user's email addresses. Both
 confirmed and unconfirmed.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			pathParams := map[string]string{}
+			handlers.InferRepoContext(pathParams)
 			c, err := client.NewClient()
 			if err != nil {
 				return err
 			}
-			pathParams := map[string]string{}
 			queryParams := map[string]string{}
 			body := ""
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
@@ -132,15 +134,16 @@ email addresses.
 Details describe whether the address has been confirmed by the user and
 whether it is the user's primary address or not.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if email == "" {
+			pathParams := map[string]string{
+				"email": email,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["email"] == "" {
 				return fmt.Errorf("--email is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"email": email,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -170,15 +173,16 @@ func newUsersGetAUserCmd() *cobra.Command {
 		Short: `Get a user`,
 		Long:  "Gets the public information associated with a user account.\n\nIf the user's profile is private, `location`, `website` and\n`created_on` elements are omitted.\n\nNote that the user object returned by this operation is changing significantly, due to privacy changes.\nSee the [announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-changes-gdpr/#changes-to-bitbucket-user-objects) for details.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if selectedUser == "" {
+			pathParams := map[string]string{
+				"selected_user": selectedUser,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"selected_user": selectedUser,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -211,15 +215,16 @@ func newUsersListGpgKeysCmd() *cobra.Command {
 		Short: `List GPG keys`,
 		Long:  "Returns a paginated list of the user's GPG public keys.\nThe `key` and `subkeys` fields can also be requested from the endpoint.\nSee [Partial Responses](/cloud/bitbucket/rest/intro/#partial-response) for more details.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if selectedUser == "" {
+			pathParams := map[string]string{
+				"selected_user": selectedUser,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"selected_user": selectedUser,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -268,15 +273,16 @@ func newUsersAddANewGpgKeyCmd() *cobra.Command {
 		Short: `Add a new GPG key`,
 		Long:  "Adds a new GPG public key to the specified user account and returns the resulting key.\n\nExample:\n\n```\n$ curl -X POST -H \"Content-Type: application/json\" -d\n'{\"key\": \"<insert GPG Key>\"}'\nhttps://api.bitbucket.org/2.0/users/{d7dd0e2d-3994-4a50-a9ee-d260b6cefdab}/gpg-keys\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if selectedUser == "" {
+			pathParams := map[string]string{
+				"selected_user": selectedUser,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"selected_user": selectedUser,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -362,19 +368,20 @@ func newUsersGetAGpgKeyCmd() *cobra.Command {
 		Short: `Get a GPG key`,
 		Long:  "Returns a specific GPG public key belonging to a user.\nThe `key` and `subkeys` fields can also be requested from the endpoint.\nSee [Partial Responses](/cloud/bitbucket/rest/intro/#partial-response) for more details.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if fingerprint == "" {
+			pathParams := map[string]string{
+				"fingerprint":   fingerprint,
+				"selected_user": selectedUser,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["fingerprint"] == "" {
 				return fmt.Errorf("--fingerprint is required")
 			}
-			if selectedUser == "" {
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"fingerprint":   fingerprint,
-				"selected_user": selectedUser,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -406,19 +413,20 @@ func newUsersDeleteAGpgKeyCmd() *cobra.Command {
 		Short: `Delete a GPG key`,
 		Long:  `Deletes a specific GPG public key from a user's account.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if fingerprint == "" {
+			pathParams := map[string]string{
+				"fingerprint":   fingerprint,
+				"selected_user": selectedUser,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["fingerprint"] == "" {
 				return fmt.Errorf("--fingerprint is required")
 			}
-			if selectedUser == "" {
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"fingerprint":   fingerprint,
-				"selected_user": selectedUser,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -452,15 +460,16 @@ func newUsersListSshKeysCmd() *cobra.Command {
 		Short: `List SSH keys`,
 		Long:  `Returns a paginated list of the user's SSH public keys.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if selectedUser == "" {
+			pathParams := map[string]string{
+				"selected_user": selectedUser,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"selected_user": selectedUser,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -507,15 +516,16 @@ func newUsersAddANewSshKeyCmd() *cobra.Command {
 		Short: `Add a new SSH key`,
 		Long:  "Adds a new SSH public key to the specified user account and returns the resulting key.\n\nExample:\n\n```\n$ curl -X POST -H \"Content-Type: application/json\" -d '{\"key\": \"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKqP3Cr632C2dNhhgKVcon4ldUSAeKiku2yP9O9/bDtY user@myhost\"}' https://api.bitbucket.org/2.0/users/{ed08f5e1-605b-4f4a-aee4-6c97628a673e}/ssh-keys\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if selectedUser == "" {
+			pathParams := map[string]string{
+				"selected_user": selectedUser,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"selected_user": selectedUser,
 			}
 			queryParams := map[string]string{
 				"expires_on": expiresOn,
@@ -592,19 +602,20 @@ func newUsersGetASshKeyCmd() *cobra.Command {
 		Short: `Get a SSH key`,
 		Long:  `Returns a specific SSH public key belonging to a user.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if keyId == "" {
+			pathParams := map[string]string{
+				"key_id":        keyId,
+				"selected_user": selectedUser,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["key_id"] == "" {
 				return fmt.Errorf("--key-id is required")
 			}
-			if selectedUser == "" {
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"key_id":        keyId,
-				"selected_user": selectedUser,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -646,19 +657,20 @@ func newUsersUpdateASshKeyCmd() *cobra.Command {
 		Short: `Update a SSH key`,
 		Long:  "Updates a specific SSH public key on a user's account\n\nNote: Only the 'comment' field can be updated using this API. To modify the key or comment values, you must delete and add the key again.\n\nExample:\n\n```\n$ curl -X PUT -H \"Content-Type: application/json\" -d '{\"label\": \"Work key\"}' https://api.bitbucket.org/2.0/users/{ed08f5e1-605b-4f4a-aee4-6c97628a673e}/ssh-keys/{b15b6026-9c02-4626-b4ad-b905f99f763a}\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if keyId == "" {
+			pathParams := map[string]string{
+				"key_id":        keyId,
+				"selected_user": selectedUser,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["key_id"] == "" {
 				return fmt.Errorf("--key-id is required")
 			}
-			if selectedUser == "" {
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"key_id":        keyId,
-				"selected_user": selectedUser,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -733,19 +745,20 @@ func newUsersDeleteASshKeyCmd() *cobra.Command {
 		Short: `Delete a SSH key`,
 		Long:  `Deletes a specific SSH public key from a user's account.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if keyId == "" {
+			pathParams := map[string]string{
+				"key_id":        keyId,
+				"selected_user": selectedUser,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["key_id"] == "" {
 				return fmt.Errorf("--key-id is required")
 			}
-			if selectedUser == "" {
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"key_id":        keyId,
-				"selected_user": selectedUser,
 			}
 			queryParams := map[string]string{}
 			body := ""

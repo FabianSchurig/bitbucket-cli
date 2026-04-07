@@ -15,7 +15,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
-	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -27,7 +26,6 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
-	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -66,28 +64,20 @@ func newBranchingModelGetTheBranchingModelForARepositoryCmd() *cobra.Command {
 		Short: `Get the branching model for a repository`,
 		Long:  "Return the branching model as applied to the repository. This view is\nread-only. The branching model settings can be changed using the\n[settings](#api-repositories-workspace-repo-slug-branching-model-settings-get) API.\n\nThe returned object:\n\n1. Always has a `development` property. `development.branch` contains\n   the actual repository branch object that is considered to be the\n   `development` branch. `development.branch` will not be present\n   if it does not exist.\n2. Might have a `production` property. `production` will not\n   be present when `production` is disabled.\n   `production.branch` contains the actual branch object that is\n   considered to be the `production` branch. `production.branch` will\n   not be present if it does not exist.\n3. Always has a `branch_types` array which contains all enabled branch\n   types.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -119,28 +109,20 @@ func newBranchingModelGetTheBranchingModelConfigForARepositoryCmd() *cobra.Comma
 		Short: `Get the branching model config for a repository`,
 		Long:  "Return the branching model configuration for a repository. The returned\nobject:\n\n1. Always has a `development` property for the development branch.\n2. Always a `production` property for the production branch. The\n   production branch can be disabled.\n3. The `branch_types` contains all the branch types.\n4. `default_branch_deletion` indicates whether branches will be\n    deleted by default on merge.\n\nThis is the raw configuration for the branching model. A client\nwishing to see the branching model with its actual current branches may\nfind the [active model API](/cloud/bitbucket/rest/api-group-branching-model/#api-repositories-workspace-repo-slug-branching-model-get) more useful.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -172,28 +154,20 @@ func newBranchingModelUpdateTheBranchingModelConfigForARepositoryCmd() *cobra.Co
 		Short: `Update the branching model config for a repository`,
 		Long:  "Update the branching model configuration for a repository.\n\nThe `development` branch can be configured to a specific branch or to\ntrack the main branch. When set to a specific branch it must\ncurrently exist. Only the passed properties will be updated. The\nproperties not passed will be left unchanged. A request without a\n`development` property will leave the development branch unchanged.\n\nIt is possible for the `development` branch to be invalid. This\nhappens when it points at a specific branch that has been\ndeleted. This is indicated in the `is_valid` field for the branch. It is\nnot possible to update the settings for `development` if that\nwould leave the branch in an invalid state. Such a request will be\nrejected.\n\nThe `production` branch can be a specific branch, the main\nbranch or disabled. When set to a specific branch it must currently\nexist. The `enabled` property can be used to enable (`true`) or\ndisable (`false`) it. Only the passed properties will be updated. The\nproperties not passed will be left unchanged. A request without a\n`production` property will leave the production branch unchanged.\n\nIt is possible for the `production` branch to be invalid. This\nhappens when it points at a specific branch that has been\ndeleted. This is indicated in the `is_valid` field for the branch. A\nrequest that would leave `production` enabled and invalid will be\nrejected. It is possible to update `production` and make it invalid if\nit would also be left disabled.\n\nThe `branch_types` property contains the branch types to be updated.\nOnly the branch types passed will be updated. All updates will be\nrejected if it would leave the branching model in an invalid state.\nFor branch types this means that:\n\n1. The prefixes for all enabled branch types are valid. For example,\n   it is not possible to use '*' inside a Git prefix.\n2. A prefix of an enabled branch type must not be a prefix of another\n   enabled branch type. This is to ensure that a branch can be easily\n   classified by its prefix unambiguously.\n\nIt is possible to store an invalid prefix if that branch type would be\nleft disabled. Only the passed properties will be updated. The\nproperties not passed will be left unchanged. Each branch type must\nhave a `kind` property to identify it.\n\nThe `default_branch_deletion` property is a string. The value of `true`\nindicates to delete branches by default. The value of `false` indicates\nthat branches will not be deleted by default. A request without a\n`default_branch_deletion` property will leave it unchanged. Other values\nwould be ignored.\n\nThere is currently a side effect when using this API endpoint. If the\nrepository is inheriting branching model settings from its project,\nupdating the branching model for this repository will disable the\nproject setting inheritance.\n\n\nWe have deprecated this side effect and will remove it on 1 August 2022.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -225,28 +199,20 @@ func newBranchingModelGetTheEffectiveOrCurrentlyAppliedBranchingModelForAReposit
 		Short: `Get the effective, or currently applied, branching model for a repository`,
 		Long:  ``,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -278,22 +244,20 @@ func newBranchingModelGetTheBranchingModelForAProjectCmd() *cobra.Command {
 		Short: `Get the branching model for a project`,
 		Long:  "Return the branching model set at the project level. This view is\nread-only. The branching model settings can be changed using the\n[settings](#api-workspaces-workspace-projects-project-key-branching-model-settings-get)\nAPI.\n\nThe returned object:\n\n1. Always has a `development` property. `development.name` is\n   the user-specified branch that can be inherited by an individual repository's\n   branching model.\n2. Might have a `production` property. `production` will not\n   be present when `production` is disabled.\n   `production.name` is the user-specified branch that can be\n   inherited by an individual repository's branching model.\n3. Always has a `branch_types` array which contains all enabled branch\n   types.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -325,22 +289,20 @@ func newBranchingModelGetTheBranchingModelConfigForAProjectCmd() *cobra.Command 
 		Short: `Get the branching model config for a project`,
 		Long:  "Return the branching model configuration for a project. The returned\nobject:\n\n1. Always has a `development` property for the development branch.\n2. Always a `production` property for the production branch. The\n   production branch can be disabled.\n3. The `branch_types` contains all the branch types.\n4. `default_branch_deletion` indicates whether branches will be\n    deleted by default on merge.\n\n\nThis is the raw configuration for the branching model. A client\nwishing to see the branching model with its actual current branches may find the\n[active model API](#api-workspaces-workspace-projects-project-key-branching-model-get)\nmore useful.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -372,22 +334,20 @@ func newBranchingModelUpdateTheBranchingModelConfigForAProjectCmd() *cobra.Comma
 		Short: `Update the branching model config for a project`,
 		Long:  "Update the branching model configuration for a project.\n\nThe `development` branch can be configured to a specific branch or to\ntrack the main branch. Any branch name can be supplied, but will only\nsuccessfully be applied to a repository via inheritance if that branch\nexists for that repository. Only the passed properties will be updated. The\nproperties not passed will be left unchanged. A request without a\n`development` property will leave the development branch unchanged.\n\nThe `production` branch can be a specific branch, the main\nbranch or disabled. Any branch name can be supplied, but will only\nsuccessfully be applied to a repository via inheritance if that branch\nexists for that repository. The `enabled` property can be used to enable (`true`)\nor disable (`false`) it. Only the passed properties will be updated. The\nproperties not passed will be left unchanged. A request without a\n`production` property will leave the production branch unchanged.\n\nThe `branch_types` property contains the branch types to be updated.\nOnly the branch types passed will be updated. All updates will be\nrejected if it would leave the branching model in an invalid state.\nFor branch types this means that:\n\n1. The prefixes for all enabled branch types are valid. For example,\n   it is not possible to use '*' inside a Git prefix.\n2. A prefix of an enabled branch type must not be a prefix of another\n   enabled branch type. This is to ensure that a branch can be easily\n   classified by its prefix unambiguously.\n\nIt is possible to store an invalid prefix if that branch type would be\nleft disabled. Only the passed properties will be updated. The\nproperties not passed will be left unchanged. Each branch type must\nhave a `kind` property to identify it.\n\nThe `default_branch_deletion` property is a string. The value of `true`\nindicates to delete branches by default. The value of `false` indicates\nthat branches will not be deleted by default. A request without a\n`default_branch_deletion` property will leave it unchanged. Other values\nwould be ignored.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""

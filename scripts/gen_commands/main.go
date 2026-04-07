@@ -28,18 +28,16 @@ import (
 
 // CommandData holds the data for a single generated Cobra command.
 type CommandData struct {
-	OperationID      string
-	Use              string
-	Short            string
-	Long             string
-	Method           string
-	Path             string
-	Flags            []FlagData
-	BodyFields       []spec.BodyField
-	HasBody          bool
-	Paginated        bool
-	HasWorkspaceFlag bool // true when "workspace" is a path parameter
-	HasRepoSlugFlag  bool // true when "repo_slug" is a path parameter
+	OperationID string
+	Use         string
+	Short       string
+	Long        string
+	Method      string
+	Path        string
+	Flags       []FlagData
+	BodyFields  []spec.BodyField
+	HasBody     bool
+	Paginated   bool
 }
 
 // FlagData holds the data for a single CLI flag.
@@ -56,13 +54,12 @@ type FlagData struct {
 
 // FileData holds the complete template data for one generated file.
 type FileData struct {
-	SchemaPath      string
-	CommandName     string // e.g., "PR", "Hooks" — used in function name NewXxxCommand()
-	CommandUse      string // e.g., "pr", "hooks" — Cobra Use field
-	CommandShort    string // Cobra Short field
-	CommandLong     string // Cobra Long field
-	Commands        []CommandData
-	NeedsGitContext bool // true when any command needs workspace/repo-slug inference
+	SchemaPath   string
+	CommandName  string // e.g., "PR", "Hooks" — used in function name NewXxxCommand()
+	CommandUse   string // e.g., "pr", "hooks" — Cobra Use field
+	CommandShort string // Cobra Short field
+	CommandLong  string // Cobra Long field
+	Commands     []CommandData
 }
 
 // ─── Conversion: spec.OperationDef → CommandData ──────────────────────────────
@@ -83,17 +80,8 @@ func paramToFlag(p spec.ParamDef) FlagData {
 
 func operationToCommand(op spec.OperationDef) CommandData {
 	flags := make([]FlagData, 0, len(op.Params))
-	hasWorkspace := false
-	hasRepoSlug := false
 	for _, p := range op.Params {
-		f := paramToFlag(p)
-		if f.In == "path" && f.RawName == "workspace" {
-			hasWorkspace = true
-		}
-		if f.In == "path" && f.RawName == "repo_slug" {
-			hasRepoSlug = true
-		}
-		flags = append(flags, f)
+		flags = append(flags, paramToFlag(p))
 	}
 
 	bodyFields := spec.FlattenBodyFields(op.BodyFields)
@@ -113,18 +101,16 @@ func operationToCommand(op spec.OperationDef) CommandData {
 	}
 
 	return CommandData{
-		OperationID:      op.OperationID,
-		Use:              spec.ToKebab(op.OperationID),
-		Short:            op.Summary,
-		Long:             op.Description,
-		Method:           op.Method,
-		Path:             op.Path,
-		Flags:            flags,
-		BodyFields:       bodyFields,
-		HasBody:          op.HasBody,
-		Paginated:        op.Paginated,
-		HasWorkspaceFlag: hasWorkspace,
-		HasRepoSlugFlag:  hasRepoSlug,
+		OperationID: op.OperationID,
+		Use:         spec.ToKebab(op.OperationID),
+		Short:       op.Summary,
+		Long:        op.Description,
+		Method:      op.Method,
+		Path:        op.Path,
+		Flags:       flags,
+		BodyFields:  bodyFields,
+		HasBody:     op.HasBody,
+		Paginated:   op.Paginated,
 	}
 }
 
@@ -147,9 +133,6 @@ import (
 "github.com/spf13/cobra"
 
 "github.com/FabianSchurig/bitbucket-cli/internal/client"
-{{- if .NeedsGitContext}}
-"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
-{{- end}}
 "github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 "github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -161,9 +144,6 @@ _ = fmt.Errorf
 _ = json.Marshal
 _ = strconv.Itoa
 _ = client.NewClient
-{{- if .NeedsGitContext}}
-_ = gitcontext.InferDefaults
-{{- end}}
 _ = handlers.Dispatch
 _ = output.Format
 )
@@ -210,24 +190,25 @@ Use:   "{{.Use}}",
 Short: {{goStringLit .Short}},
 Long:  {{goStringLit .Long}},
 RunE: func(cmd *cobra.Command, args []string) error {
-{{- if and .HasWorkspaceFlag .HasRepoSlugFlag}}
-if workspace == "" || repoSlug == "" {
-inferredWs, inferredSlug := gitcontext.InferDefaults()
-if workspace == "" { workspace = inferredWs }
-if repoSlug == "" { repoSlug = inferredSlug }
-}
-{{- else if .HasWorkspaceFlag}}
-if workspace == "" {
-workspace, _ = gitcontext.InferDefaults()
-}
-{{- else if .HasRepoSlugFlag}}
-if repoSlug == "" {
-_, repoSlug = gitcontext.InferDefaults()
-}
+pathParams := map[string]string{
+{{- range .Flags}}
+{{- if eq .In "path"}}
+{{- if eq .GoType "int"}}
+"{{.RawName}}": strconv.Itoa({{.GoName}}),
+{{- else}}
+"{{.RawName}}": {{.GoName}},
 {{- end}}
+{{- end}}
+{{- end}}
+}
+handlers.InferRepoContext(pathParams)
 {{- range .Flags}}
 {{- if .Required}}
-{{- if eq .GoType "int"}}
+{{- if and (eq .In "path") (eq .GoType "string")}}
+if pathParams["{{.RawName}}"] == "" {
+return fmt.Errorf("--{{.Name}} is required")
+}
+{{- else if eq .GoType "int"}}
 if {{.GoName}} == 0 {
 return fmt.Errorf("--{{.Name}} is required")
 }
@@ -241,17 +222,6 @@ return fmt.Errorf("--{{.Name}} is required")
 c, err := client.NewClient()
 if err != nil {
 return err
-}
-pathParams := map[string]string{
-{{- range .Flags}}
-{{- if eq .In "path"}}
-{{- if eq .GoType "int"}}
-"{{.RawName}}": strconv.Itoa({{.GoName}}),
-{{- else}}
-"{{.RawName}}": {{.GoName}},
-{{- end}}
-{{- end}}
-{{- end}}
 }
 queryParams := map[string]string{
 {{- range .Flags}}
@@ -381,23 +351,17 @@ func main() {
 
 	operations := spec.BuildOperations(schema)
 	commands := make([]CommandData, 0, len(operations))
-	needsGitContext := false
 	for _, op := range operations {
-		cmd := operationToCommand(op)
-		if cmd.HasWorkspaceFlag || cmd.HasRepoSlugFlag {
-			needsGitContext = true
-		}
-		commands = append(commands, cmd)
+		commands = append(commands, operationToCommand(op))
 	}
 
 	data := FileData{
-		SchemaPath:      schemaPath,
-		CommandName:     cmdName,
-		CommandUse:      cmdUse,
-		CommandShort:    cmdShort,
-		CommandLong:     cmdLong,
-		Commands:        commands,
-		NeedsGitContext: needsGitContext,
+		SchemaPath:   schemaPath,
+		CommandName:  cmdName,
+		CommandUse:   cmdUse,
+		CommandShort: cmdShort,
+		CommandLong:  cmdLong,
+		Commands:     commands,
 	}
 
 	if err := generate(data, outputPath); err != nil {

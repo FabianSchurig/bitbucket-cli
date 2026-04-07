@@ -15,7 +15,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
-	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -27,7 +26,6 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
-	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -63,28 +61,20 @@ func newDownloadsListDownloadArtifactsCmd() *cobra.Command {
 		Short: `List download artifacts`,
 		Long:  `Returns a list of download links associated with the repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -116,28 +106,20 @@ func newDownloadsUploadADownloadArtifactCmd() *cobra.Command {
 		Short: `Upload a download artifact`,
 		Long:  "Upload new download artifacts.\n\nTo upload files, perform a `multipart/form-data` POST containing one\nor more `files` fields:\n\n    $ echo Hello World > hello.txt\n    $ curl -s -u evzijst -X POST https://api.bitbucket.org/2.0/repositories/evzijst/git-tests/downloads -F files=@hello.txt\n\nWhen a file is uploaded with the same name as an existing artifact,\nthen the existing file will be replaced.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -176,32 +158,24 @@ metadata.
     $ curl -s -L https://api.bitbucket.org/2.0/repositories/evzijst/git-tests/downloads/hello.txt
     Hello World`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"filename":  filename,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if filename == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["filename"] == "" {
 				return fmt.Errorf("--filename is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"filename":  filename,
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -235,32 +209,24 @@ func newDownloadsDeleteADownloadArtifactCmd() *cobra.Command {
 		Short: `Delete a download artifact`,
 		Long:  `Deletes the specified download artifact from the repository.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"filename":  filename,
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if filename == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["filename"] == "" {
 				return fmt.Errorf("--filename is required")
 			}
-			if repoSlug == "" {
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"filename":  filename,
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""

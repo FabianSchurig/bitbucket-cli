@@ -146,14 +146,22 @@ func parseGitConfigRemoteURL(configPath, remoteName string) string {
 //
 // Returns empty strings if the URL is not a recognised Bitbucket format.
 func ParseBitbucketURL(rawURL string) (workspace, repoSlug string) {
-	// SSH format: git@bitbucket.org:workspace/repo.git
-	// Also handle ssh://git@bitbucket.org/workspace/repo.git
-	if strings.Contains(rawURL, "bitbucket.org:") && !strings.Contains(rawURL, "://") {
-		idx := strings.Index(rawURL, "bitbucket.org:")
-		path := rawURL[idx+len("bitbucket.org:"):]
-		return extractFromPath(path)
+	// SCP-style SSH format: git@bitbucket.org:workspace/repo.git
+	if !strings.Contains(rawURL, "://") {
+		parts := strings.SplitN(rawURL, ":", 2)
+		if len(parts) == 2 {
+			host := parts[0]
+			if at := strings.LastIndex(host, "@"); at >= 0 {
+				host = host[at+1:]
+			}
+			if host == "bitbucket.org" {
+				return extractFromPath(parts[1])
+			}
+		}
+		return "", ""
 	}
 
+	// Also handle ssh://git@bitbucket.org/workspace/repo.git and HTTPS forms.
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		return "", ""

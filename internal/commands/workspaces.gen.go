@@ -15,7 +15,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
-	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -27,7 +26,6 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
-	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -84,11 +82,12 @@ func newWorkspacesListWorkspacesForTheCurrentUserCmd() *cobra.Command {
 		Short: `List workspaces for the current user`,
 		Long:  "**This endpoint is deprecated. Please use the supported alternatives:**\n* [List workspaces for user](/cloud/bitbucket/rest/api-group-workspaces/#api-user-workspaces-get)\n* [Get user permission on a workspace](/cloud/bitbucket/rest/api-group-workspaces/#api-user-workspaces-workspace-permission-get)\n\nReturns an object for each workspace the caller is a member of, and\ntheir effective role - the highest level of privilege the caller has.\nIf a user is a member of multiple groups with distinct roles, only the\nhighest level is returned.\n\nPermissions can be:\n\n* `owner`\n* `collaborator`\n* `member`\n\n**The `collaborator` role is being removed from the Bitbucket Cloud API. For more information,\nsee the [deprecation announcement](/cloud/bitbucket/deprecation-notice-collaborator-role/).**\n\n**When you move your administration from Bitbucket Cloud to admin.atlassian.com, the following fields on\n`workspace_membership` will no longer be present: `last_accessed` and `added_on`. See the\n[deprecation announcement](/cloud/bitbucket/announcement-breaking-change-workspace-membership/).**\n\nResults may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering) by\nworkspace or permission by adding the following query string parameters:\n\n* `q=workspace.slug=\"bbworkspace1\"` or `q=permission=\"owner\"`\n* `sort=workspace.slug`\n\nNote that the query parameter values need to be URL escaped so that `=`\nwould become `%3D`.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			pathParams := map[string]string{}
+			handlers.InferRepoContext(pathParams)
 			c, err := client.NewClient()
 			if err != nil {
 				return err
 			}
-			pathParams := map[string]string{}
 			queryParams := map[string]string{
 				"q":       q,
 				"sort":    sort,
@@ -130,11 +129,12 @@ func newWorkspacesGetUserWorkspacesCmd() *cobra.Command {
 		Short: `List workspaces for the current user`,
 		Long:  "Returns an object for each workspace accessible to the caller. This object\nalso contains details on whether the caller has admin permissions on the workspace\n(`\"administrator\" = true`) or not (`\"administrator\" = false`).\n\nQueries support filtering based on administrator permissions,\n[sorting](/cloud/bitbucket/rest/intro/#sorting-query-results) or\n[filtering](/cloud/bitbucket/rest/intro/#filtering) by `slug`. Results can\nbe [paginated](/cloud/bitbucket/rest/intro/#pagination).",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			pathParams := map[string]string{}
+			handlers.InferRepoContext(pathParams)
 			c, err := client.NewClient()
 			if err != nil {
 				return err
 			}
-			pathParams := map[string]string{}
 			queryParams := map[string]string{
 				"sort":          sort,
 				"administrator": strconv.FormatBool(administrator),
@@ -172,18 +172,16 @@ func newWorkspacesGetUserPermissionOnAWorkspaceCmd() *cobra.Command {
 		Short: `Get user permission on a workspace`,
 		Long:  "Returns the caller's effective role; as in, the highest level of privilege\nthe caller has for the workspace.\nIf the calling user is a member of multiple groups with distinct roles, only the\nhighest level is returned.\n\nPermissions can be:\n\n* `owner`\n* `create-project`\n* `collaborator` (deprecated; see this\n[deprecation announcement](/cloud/bitbucket/deprecation-notice-collaborator-role/) for more details)\n* `member`",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -218,11 +216,12 @@ func newWorkspacesListWorkspacesForUserCmd() *cobra.Command {
 		Short: `List workspaces for user`,
 		Long:  "**This endpoint is deprecated. Please use the\n[supported alternative](/cloud/bitbucket/rest/api-group-workspaces/#api-user-workspaces-get).**\n\nReturns a list of workspaces accessible by the authenticated user.\n\nResults may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering) by\nworkspace or permission by adding the following query string parameters:\n\n* `q=slug=\"bbworkspace1\"` or `q=is_private=true`\n* `sort=created_on`\n\nNote that the query parameter values need to be URL escaped so that `=`\nwould become `%3D`.\n\n**The `collaborator` role is being removed from the Bitbucket Cloud API. For more information,\nsee the [deprecation announcement](/cloud/bitbucket/deprecation-notice-collaborator-role/).**",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			pathParams := map[string]string{}
+			handlers.InferRepoContext(pathParams)
 			c, err := client.NewClient()
 			if err != nil {
 				return err
 			}
-			pathParams := map[string]string{}
 			queryParams := map[string]string{
 				"role":    role,
 				"q":       q,
@@ -262,18 +261,16 @@ func newWorkspacesGetAWorkspaceCmd() *cobra.Command {
 		Short: `Get a workspace`,
 		Long:  `Returns the requested workspace.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -306,18 +303,16 @@ func newWorkspacesListWebhooksForAWorkspaceCmd() *cobra.Command {
 		Short: `List webhooks for a workspace`,
 		Long:  `Returns a paginated list of webhooks installed on this workspace.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -359,18 +354,16 @@ func newWorkspacesCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 		Short: `Create a webhook for a workspace`,
 		Long:  "Creates a new webhook on the specified workspace.\n\nWorkspace webhooks are fired for events from all repositories contained\nby that workspace.\n\nExample:\n\n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n  https://api.bitbucket.org/2.0/workspaces/my-workspace/hooks\n  -d '\n    {\n      \"description\": \"Webhook Description\",\n      \"url\": \"https://example.com/\",\n      \"active\": true,\n      \"secret\": \"this is a really bad secret\",\n      \"events\": [\n        \"repo:push\",\n        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n```\n\nWhen the `secret` is provided it will be used as the key to generate a HMAC\ndigest value sent in the `X-Hub-Signature` header at delivery time. Passing\na `null` or empty `secret` or not passing a `secret` will leave the webhook's\nsecret unset. Bitbucket only generates the `X-Hub-Signature` when the webhook's\nsecret is set.\n\nThis call requires the webhook scope, as well as any scope\nthat applies to the events that the webhook subscribes to. In the\nexample above that means: `webhook`, `repository` and `issue`.\n\nThe `url` must properly resolve and cannot be an internal, non-routed address.\n\nOnly workspace owners can install webhooks on workspaces.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -429,22 +422,20 @@ func newWorkspacesGetAWebhookForAWorkspaceCmd() *cobra.Command {
 		Long: `Returns the webhook with the specified id installed on the given
 workspace.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"uid":       uid,
+				"workspace": workspace,
 			}
-			if uid == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["uid"] == "" {
 				return fmt.Errorf("--uid is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"uid":       uid,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -482,22 +473,20 @@ func newWorkspacesUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 		Short: `Update a webhook for a workspace`,
 		Long:  "Updates the specified webhook subscription.\n\nThe following properties can be mutated:\n\n* `description`\n* `url`\n* `secret`\n* `active`\n* `events`\n\nThe hook's secret is used as a key to generate the HMAC hex digest sent in the\n`X-Hub-Signature` header at delivery time. This signature is only generated\nwhen the hook has a secret.\n\nSet the hook's secret by passing the new value in the `secret` field. Passing a\n`null` value in the `secret` field will remove the secret from the hook. The\nhook's secret can be left unchanged by not passing the `secret` field in the\nrequest.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"uid":       uid,
+				"workspace": workspace,
 			}
-			if uid == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["uid"] == "" {
 				return fmt.Errorf("--uid is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"uid":       uid,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -556,22 +545,20 @@ func newWorkspacesDeleteAWebhookForAWorkspaceCmd() *cobra.Command {
 		Short: `Delete a webhook for a workspace`,
 		Long:  `Deletes the specified webhook subscription from the given workspace.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"uid":       uid,
+				"workspace": workspace,
 			}
-			if uid == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["uid"] == "" {
 				return fmt.Errorf("--uid is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"uid":       uid,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -605,18 +592,16 @@ func newWorkspacesListUsersInAWorkspaceCmd() *cobra.Command {
 		Short: `List users in a workspace`,
 		Long:  "Returns all members of the requested workspace.\n\nThis endpoint additionally supports [filtering](/cloud/bitbucket/rest/intro/#filtering) by\nemail address, if called by a workspace administrator, integration or workspace access\ntoken. This is done by adding the following query string parameter:\n\n* `q=user.email IN (\"user1@org.com\",\"user2@org.com\")`\n\nWhen filtering by email, you can query up to 90 addresses at a time.\nNote that the query parameter values need to be URL escaped, so the final query string\nshould be:\n\n* `q=user.email%20IN%20(%22user1@org.com%22,%22user2@org.com%22)`\n\nEmail addresses that you filter by (and only these email addresses) can be included in the\nresponse using the `fields` query parameter:\n\n* `&fields=+values.user.email` - add the `email` field to the default `user` response object\n* `&fields=values.user.email,values.user.account_id` - only return user email addresses and\naccount IDs\n\nOnce again, all query parameter values must be URL escaped.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -653,22 +638,20 @@ func newWorkspacesGetUserMembershipForAWorkspaceCmd() *cobra.Command {
 		Short: `Get user membership for a workspace`,
 		Long:  "Returns the workspace membership, which includes\na `User` object for the member and a `Workspace` object\nfor the requested workspace.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"member":    member,
+				"workspace": workspace,
 			}
-			if member == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["member"] == "" {
 				return fmt.Errorf("--member is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"member":    member,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -703,18 +686,16 @@ func newWorkspacesListUserPermissionsInAWorkspaceCmd() *cobra.Command {
 		Short: `List user permissions in a workspace`,
 		Long:  "Returns the list of members in a workspace\nand their permission levels.\nPermission can be:\n* `owner`\n* `collaborator`\n* `member`\n\n**The `collaborator` role is being removed from the Bitbucket Cloud API. For more information,\nsee the [deprecation announcement](/cloud/bitbucket/deprecation-notice-collaborator-role/).**\n\n**When you move your administration from Bitbucket Cloud to admin.atlassian.com, the following fields on\n`workspace_membership` will no longer be present: `last_accessed` and `added_on`. See the\n[deprecation announcement](/cloud/bitbucket/announcement-breaking-change-workspace-membership/).**\n\nResults may be further [filtered](/cloud/bitbucket/rest/intro/#filtering) by\npermission by adding the following query string parameters:\n\n* `q=permission=\"owner\"`",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{
 				"q":       q,
@@ -757,18 +738,16 @@ func newWorkspacesListAllRepositoryPermissionsForAWorkspaceCmd() *cobra.Command 
 		Short: `List all repository permissions for a workspace`,
 		Long:  "Returns an object for each repository permission for all of a\nworkspace's repositories.\n\nPermissions returned are effective permissions: the highest level of\npermission the user has. This does not distinguish between direct and\nindirect (group) privileges.\n\nOnly users with admin permission for the team may access this resource.\n\nPermissions can be:\n\n* `admin`\n* `write`\n* `read`\n\nResults may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering)\nby repository, user, or permission by adding the following query string\nparameters:\n\n* `q=repository.name=\"geordi\"` or `q=permission>\"read\"`\n* `sort=user.display_name`\n\nNote that the query parameter values need to be URL escaped so that `=`\nwould become `%3D`.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{
 				"q":       q,
@@ -814,28 +793,20 @@ func newWorkspacesListARepositoryPermissionsForAWorkspaceCmd() *cobra.Command {
 		Short: `List a repository permissions for a workspace`,
 		Long:  "Returns an object for the repository permission of each user in the\nrequested repository.\n\nPermissions returned are effective permissions: the highest level of\npermission the user has. This does not distinguish between direct and\nindirect (group) privileges.\n\nOnly users with admin permission for the repository may access this resource.\n\nPermissions can be:\n\n* `admin`\n* `write`\n* `read`\n\nResults may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering)\nby user, or permission by adding the following query string parameters:\n\n* `q=permission>\"read\"`\n* `sort=user.display_name`\n\nNote that the query parameter values need to be URL escaped so that `=`\nwould become `%3D`.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" || repoSlug == "" {
-				inferredWs, inferredSlug := gitcontext.InferDefaults()
-				if workspace == "" {
-					workspace = inferredWs
-				}
-				if repoSlug == "" {
-					repoSlug = inferredSlug
-				}
+			pathParams := map[string]string{
+				"repo_slug": repoSlug,
+				"workspace": workspace,
 			}
-			if repoSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"repo_slug": repoSlug,
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{
 				"q":       q,
@@ -879,18 +850,16 @@ func newWorkspacesListProjectsInAWorkspaceCmd() *cobra.Command {
 		Short: `List projects in a workspace`,
 		Long:  `Returns the list of projects in this workspace.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -927,18 +896,16 @@ func newWorkspacesCreateAProjectInAWorkspaceCmd() *cobra.Command {
 		Short: `Create a project in a workspace`,
 		Long:  "Creates a new project.\n\nNote that the avatar has to be embedded as either a data-url\nor a URL to an external image as shown in the examples below:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\": \"Mars Project\",\n    \"key\": \"MARS\",\n    \"description\": \"Software for colonizing mars.\",\n    \"links\": {\n        \"avatar\": {\n            \"href\": \"data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/...\"\n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type: application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n       https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq .\n{\n  // Serialized project document\n}\n```\n\nor even:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\": \"Mars Project\",\n    \"key\": \"MARS\",\n    \"description\": \"Software for colonizing mars.\",\n    \"links\": {\n        \"avatar\": {\n            \"href\": \"http://i.imgur.com/72tRx4w.gif\"\n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type: application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n       https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq .\n{\n  // Serialized project document\n}\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -976,22 +943,20 @@ func newWorkspacesGetAProjectForAWorkspaceCmd() *cobra.Command {
 		Short: `Get a project for a workspace`,
 		Long:  `Returns the requested project.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1024,22 +989,20 @@ func newWorkspacesUpdateAProjectForAWorkspaceCmd() *cobra.Command {
 		Short: `Update a project for a workspace`,
 		Long:  "Since this endpoint can be used to both update and to create a\nproject, the request body depends on the intent.\n\n#### Creation\n\nSee the POST documentation for the project collection for an\nexample of the request body.\n\nNote: The `key` should not be specified in the body of request\n(since it is already present in the URL). The `name` is required,\neverything else is optional.\n\n#### Update\n\nSee the POST documentation for the project collection for an\nexample of the request body.\n\nNote: The key is not required in the body (since it is already in\nthe URL). The key may be specified in the body, if the intent is\nto change the key itself. In such a scenario, the location of the\nproject is changed and is returned in the `Location` header of the\nresponse.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -1078,22 +1041,20 @@ func newWorkspacesDeleteAProjectForAWorkspaceCmd() *cobra.Command {
 		Short: `Delete a project for a workspace`,
 		Long:  "Deletes this project. This is an irreversible operation.\n\nYou cannot delete a project that still contains repositories.\nTo delete the project, [delete](/cloud/bitbucket/rest/api-group-repositories/#api-repositories-workspace-repo-slug-delete)\nor transfer the repositories first.\n\nExample:\n```\n$ curl -X DELETE https://api.bitbucket.org/2.0/workspaces/bbworkspace1/projects/PROJ\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -1129,22 +1090,20 @@ func newWorkspacesListWorkspacePullRequestsForAUserCmd() *cobra.Command {
 		Short: `List workspace pull requests for a user`,
 		Long:  "Returns all workspace pull requests authored by the specified user.\n\nBy default only open pull requests are returned. This can be controlled\nusing the `state` query parameter. To retrieve pull requests that are\nin one of multiple states, repeat the `state` parameter for each\nindividual state.\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"selected_user": selectedUser,
+				"workspace":     workspace,
 			}
-			if selectedUser == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"selected_user": selectedUser,
-				"workspace":     workspace,
 			}
 			queryParams := map[string]string{
 				"state":   state,
@@ -1184,18 +1143,16 @@ func newWorkspacesGetTheWorkspaceSystemGpgPublicKeysCmd() *cobra.Command {
 		Long: `Returns the system public GPG key(s). In most cases a single key is returned.
 During a key rotation period, two keys may be returned.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""

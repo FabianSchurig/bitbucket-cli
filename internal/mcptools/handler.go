@@ -16,7 +16,6 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
-	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -231,36 +230,31 @@ func buildRequestParams(args map[string]any, op OperationDef, opID string) (map[
 	pathParams := map[string]string{}
 	queryParams := map[string]string{}
 
-	// Infer workspace and repo_slug from git context if not provided.
-	needsWs, needsSlug := false, false
 	for _, p := range op.Params {
-		if p.In == "path" && p.Name == "workspace" && extractStringParam(args, "workspace", "string") == "" {
-			needsWs = true
+		val := extractStringParam(args, p.Name, p.Type)
+		if val != "" {
+			assignRequestParam(pathParams, queryParams, p, val)
+			continue
 		}
-		if p.In == "path" && p.Name == "repo_slug" && extractStringParam(args, "repo_slug", "string") == "" {
-			needsSlug = true
+		// Record empty path params so InferRepoContext can fill them.
+		if p.In == "path" {
+			pathParams[p.Name] = ""
+			continue
 		}
-	}
-	if needsWs || needsSlug {
-		inferredWs, inferredSlug := gitcontext.InferDefaults()
-		if needsWs && inferredWs != "" {
-			args["workspace"] = inferredWs
-		}
-		if needsSlug && inferredSlug != "" {
-			args["repo_slug"] = inferredSlug
+		if p.Required {
+			return nil, nil, errResult(fmt.Sprintf("missing required parameter: %s (for operation %s)", p.Name, opID))
 		}
 	}
 
+	handlers.InferRepoContext(pathParams)
+
+	// Validate required path params after inference.
 	for _, p := range op.Params {
-		val := extractStringParam(args, p.Name, p.Type)
-		if val == "" {
-			if p.Required {
-				return nil, nil, errResult(fmt.Sprintf("missing required parameter: %s (for operation %s)", p.Name, opID))
-			}
-			continue
+		if p.Required && p.In == "path" && pathParams[p.Name] == "" {
+			return nil, nil, errResult(fmt.Sprintf("missing required parameter: %s (for operation %s)", p.Name, opID))
 		}
-		assignRequestParam(pathParams, queryParams, p, val)
 	}
+
 	return pathParams, queryParams, nil
 }
 

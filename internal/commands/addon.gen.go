@@ -63,11 +63,12 @@ func newAddonUpdateAnInstalledAppCmd() *cobra.Command {
 		Short: `Update an installed app`,
 		Long:  "Updates the application installation for the user.\n\nThis endpoint is intended to be used by Bitbucket Connect apps\nand only supports JWT authentication -- that is how Bitbucket\nidentifies the particular installation of the app. Developers\nwith applications registered in the \"Develop Apps\" section\nof Bitbucket need not use this endpoint as updates for those\napplications can be sent out via the UI of that section.\n\nPassing an empty body will update the installation using the\nexisting descriptor URL.\n\n```\n$ curl -X PUT https://api.bitbucket.org/2.0/addon \\\n  -H \"Authorization: JWT <JWT Token>\" \\\n  --header \"Content-Type: application/json\" \\\n  --data '{}'\n```\n\nThe new `descriptor` for the installation can be also provided\nin the body directly.\n\n```\n$ curl -X PUT https://api.bitbucket.org/2.0/addon \\\n  -H \"Authorization: JWT <JWT Token>\" \\\n  --header \"Content-Type: application/json\" \\\n  --data '{\"descriptor\": $NEW_DESCRIPTOR}'\n```\n\nIn both these modes the URL of the descriptor cannot be changed. To\nchange the descriptor location and upgrade an installation\nthe request must be made exclusively with a `descriptor_url`.\n\n ```\n$ curl -X PUT https://api.bitbucket.org/2.0/addon \\\n  -H \"Authorization: JWT <JWT Token>\" \\\n  --header \"Content-Type: application/json\" \\\n  --data '{\"descriptor_url\": $NEW_URL}'\n```\n\nThe `descriptor_url` must exactly match the marketplace registration\nthat Atlassian has for the application. Contact your Atlassian\ndeveloper advocate to update this registration. Once the registration\nhas been updated you may call this resource for each installation.\n\nNote that the scopes of the application cannot be increased\nin the new descriptor nor reduced to none.",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			pathParams := map[string]string{}
+			handlers.InferRepoContext(pathParams)
 			c, err := client.NewClient()
 			if err != nil {
 				return err
 			}
-			pathParams := map[string]string{}
 			queryParams := map[string]string{}
 			body := ""
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
@@ -92,11 +93,12 @@ func newAddonDeleteAnAppCmd() *cobra.Command {
 		Short: `Delete an app`,
 		Long:  "Deletes the application for the user.\n\nThis endpoint is intended to be used by Bitbucket Connect apps\nand only supports JWT authentication -- that is how Bitbucket\nidentifies the particular installation of the app. Developers\nwith applications registered in the \"Develop Apps\" section\nof Bitbucket Marketplace need not use this endpoint as\nupdates for those applications can be sent out via the\nUI of that section.\n\n```\n$ curl -X DELETE https://api.bitbucket.org/2.0/addon \\\n  -H \"Authorization: JWT <JWT Token>\"\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			pathParams := map[string]string{}
+			handlers.InferRepoContext(pathParams)
 			c, err := client.NewClient()
 			if err != nil {
 				return err
 			}
-			pathParams := map[string]string{}
 			queryParams := map[string]string{}
 			body := ""
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
@@ -124,11 +126,12 @@ for the authenticated application.
 
 This endpoint is deprecated and will be removed by May 2026.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			pathParams := map[string]string{}
+			handlers.InferRepoContext(pathParams)
 			c, err := client.NewClient()
 			if err != nil {
 				return err
 			}
-			pathParams := map[string]string{}
 			queryParams := map[string]string{}
 			body := ""
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
@@ -156,15 +159,16 @@ func newAddonGetALinkerForAnAppCmd() *cobra.Command {
 		Short: `Get a linker for an app`,
 		Long:  "Gets a [linker](/cloud/bitbucket/modules/linker/) specified by `linker_key`\nfor the authenticated application.\n\nThis endpoint is deprecated and will be removed by May 2026.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if linkerKey == "" {
+			pathParams := map[string]string{
+				"linker_key": linkerKey,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["linker_key"] == "" {
 				return fmt.Errorf("--linker-key is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"linker_key": linkerKey,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -194,15 +198,16 @@ func newAddonListLinkerValuesForALinkerCmd() *cobra.Command {
 		Short: `List linker values for a linker`,
 		Long:  "Gets a list of all [linker](/cloud/bitbucket/modules/linker/) values for the\nspecified linker of the authenticated application.\n\nA linker value lets applications supply values to modify its regular expression.\n\nThe base regular expression must use a Bitbucket-specific match group `(?K)`\nwhich will be translated to `([\\w\\-]+)`. A value must match this pattern.\n\n[Read more about linker values](/cloud/bitbucket/modules/linker/#usingthebitbucketapitosupplyvalues)\n\nThis endpoint is deprecated and will be removed by May 2026.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if linkerKey == "" {
+			pathParams := map[string]string{
+				"linker_key": linkerKey,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["linker_key"] == "" {
 				return fmt.Errorf("--linker-key is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"linker_key": linkerKey,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -232,15 +237,16 @@ func newAddonCreateALinkerValueCmd() *cobra.Command {
 		Short: `Create a linker value`,
 		Long:  "Creates a [linker](/cloud/bitbucket/modules/linker/) value for the specified\nlinker of authenticated application.\n\nA linker value lets applications supply values to modify its regular expression.\n\nThe base regular expression must use a Bitbucket-specific match group `(?K)`\nwhich will be translated to `([\\w\\-]+)`. A value must match this pattern.\n\n[Read more about linker values](/cloud/bitbucket/modules/linker/#usingthebitbucketapitosupplyvalues)\n\nThis endpoint is deprecated and will be removed by May 2026.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if linkerKey == "" {
+			pathParams := map[string]string{
+				"linker_key": linkerKey,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["linker_key"] == "" {
 				return fmt.Errorf("--linker-key is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"linker_key": linkerKey,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -270,15 +276,16 @@ func newAddonUpdateALinkerValueCmd() *cobra.Command {
 		Short: `Update a linker value`,
 		Long:  "Bulk update [linker](/cloud/bitbucket/modules/linker/) values for the specified\nlinker of the authenticated application.\n\nA linker value lets applications supply values to modify its regular expression.\n\nThe base regular expression must use a Bitbucket-specific match group `(?K)`\nwhich will be translated to `([\\w\\-]+)`. A value must match this pattern.\n\n[Read more about linker values](/cloud/bitbucket/modules/linker/#usingthebitbucketapitosupplyvalues)\n\nThis endpoint is deprecated and will be removed by May 2026.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if linkerKey == "" {
+			pathParams := map[string]string{
+				"linker_key": linkerKey,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["linker_key"] == "" {
 				return fmt.Errorf("--linker-key is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"linker_key": linkerKey,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -311,15 +318,16 @@ specified linker of the authenticated application.
 
 This endpoint is deprecated and will be removed by May 2026.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if linkerKey == "" {
+			pathParams := map[string]string{
+				"linker_key": linkerKey,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["linker_key"] == "" {
 				return fmt.Errorf("--linker-key is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"linker_key": linkerKey,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -353,7 +361,12 @@ of the authenticated application.
 
 This endpoint is deprecated and will be removed by May 2026.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if linkerKey == "" {
+			pathParams := map[string]string{
+				"linker_key": linkerKey,
+				"value_id":   strconv.Itoa(valueId),
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["linker_key"] == "" {
 				return fmt.Errorf("--linker-key is required")
 			}
 			if valueId == 0 {
@@ -362,10 +375,6 @@ This endpoint is deprecated and will be removed by May 2026.`,
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"linker_key": linkerKey,
-				"value_id":   strconv.Itoa(valueId),
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -400,7 +409,12 @@ of the authenticated application.
 
 This endpoint is deprecated and will be removed by May 2026.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if linkerKey == "" {
+			pathParams := map[string]string{
+				"linker_key": linkerKey,
+				"value_id":   strconv.Itoa(valueId),
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["linker_key"] == "" {
 				return fmt.Errorf("--linker-key is required")
 			}
 			if valueId == 0 {
@@ -409,10 +423,6 @@ This endpoint is deprecated and will be removed by May 2026.`,
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"linker_key": linkerKey,
-				"value_id":   strconv.Itoa(valueId),
 			}
 			queryParams := map[string]string{}
 			body := ""

@@ -15,7 +15,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
-	"github.com/FabianSchurig/bitbucket-cli/internal/gitcontext"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
@@ -27,7 +26,6 @@ var (
 	_ = json.Marshal
 	_ = strconv.Itoa
 	_ = client.NewClient
-	_ = gitcontext.InferDefaults
 	_ = handlers.Dispatch
 	_ = output.Format
 )
@@ -78,18 +76,16 @@ func newProjectsListProjectsInAWorkspaceCmd() *cobra.Command {
 		Short: `List projects in a workspace`,
 		Long:  `Returns the list of projects in this workspace.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -126,18 +122,16 @@ func newProjectsCreateAProjectInAWorkspaceCmd() *cobra.Command {
 		Short: `Create a project in a workspace`,
 		Long:  "Creates a new project.\n\nNote that the avatar has to be embedded as either a data-url\nor a URL to an external image as shown in the examples below:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\": \"Mars Project\",\n    \"key\": \"MARS\",\n    \"description\": \"Software for colonizing mars.\",\n    \"links\": {\n        \"avatar\": {\n            \"href\": \"data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/...\"\n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type: application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n       https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq .\n{\n  // Serialized project document\n}\n```\n\nor even:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\": \"Mars Project\",\n    \"key\": \"MARS\",\n    \"description\": \"Software for colonizing mars.\",\n    \"links\": {\n        \"avatar\": {\n            \"href\": \"http://i.imgur.com/72tRx4w.gif\"\n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type: application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n       https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq .\n{\n  // Serialized project document\n}\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"workspace": workspace,
 			}
-			if workspace == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -175,22 +169,20 @@ func newProjectsGetAProjectForAWorkspaceCmd() *cobra.Command {
 		Short: `Get a project for a workspace`,
 		Long:  `Returns the requested project.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -223,22 +215,20 @@ func newProjectsUpdateAProjectForAWorkspaceCmd() *cobra.Command {
 		Short: `Update a project for a workspace`,
 		Long:  "Since this endpoint can be used to both update and to create a\nproject, the request body depends on the intent.\n\n#### Creation\n\nSee the POST documentation for the project collection for an\nexample of the request body.\n\nNote: The `key` should not be specified in the body of request\n(since it is already present in the URL). The `name` is required,\neverything else is optional.\n\n#### Update\n\nSee the POST documentation for the project collection for an\nexample of the request body.\n\nNote: The key is not required in the body (since it is already in\nthe URL). The key may be specified in the body, if the intent is\nto change the key itself. In such a scenario, the location of the\nproject is changed and is returned in the `Location` header of the\nresponse.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -277,22 +267,20 @@ func newProjectsDeleteAProjectForAWorkspaceCmd() *cobra.Command {
 		Short: `Delete a project for a workspace`,
 		Long:  "Deletes this project. This is an irreversible operation.\n\nYou cannot delete a project that still contains repositories.\nTo delete the project, [delete](/cloud/bitbucket/rest/api-group-repositories/#api-repositories-workspace-repo-slug-delete)\nor transfer the repositories first.\n\nExample:\n```\n$ curl -X DELETE https://api.bitbucket.org/2.0/workspaces/bbworkspace1/projects/PROJ\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -328,22 +316,20 @@ func newProjectsListTheDefaultReviewersInAProjectCmd() *cobra.Command {
 		Long: `Return a list of all default reviewers for a project. This is a list of users that will be added as default
 reviewers to pull requests for any repository within the project.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -382,26 +368,24 @@ func newProjectsGetWorkspacesProjectsDefaultReviewersCmd() *cobra.Command {
 		Short: `Get a default reviewer`,
 		Long:  `Returns the specified default reviewer.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key":   projectKey,
+				"selected_user": selectedUser,
+				"workspace":     workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if selectedUser == "" {
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key":   projectKey,
-				"selected_user": selectedUser,
-				"workspace":     workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -435,26 +419,24 @@ func newProjectsAddTheSpecificUserAsADefaultReviewerForTheProjectCmd() *cobra.Co
 		Short: `Add the specific user as a default reviewer for the project`,
 		Long:  "Adds the specified user to the project's list of default reviewers. The method is\nidempotent. Accepts an optional body containing the `uuid` of the user to be added.",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key":   projectKey,
+				"selected_user": selectedUser,
+				"workspace":     workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if selectedUser == "" {
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key":   projectKey,
-				"selected_user": selectedUser,
-				"workspace":     workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -488,26 +470,24 @@ func newProjectsRemoveTheSpecificUserFromTheProjectsDefaultReviewersCmd() *cobra
 		Short: `Remove the specific user from the project's default reviewers`,
 		Long:  "Removes a default reviewer from the project.\n\nExample:\n```\n$ curl https://api.bitbucket.org/2.0/.../default-reviewers/%7Bf0e0e8e9-66c1-4b85-a784-44a9eb9ef1a6%7D\n\nHTTP/1.1 204\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key":   projectKey,
+				"selected_user": selectedUser,
+				"workspace":     workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if selectedUser == "" {
+			if pathParams["selected_user"] == "" {
 				return fmt.Errorf("--selected-user is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key":   projectKey,
-				"selected_user": selectedUser,
-				"workspace":     workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -544,22 +524,20 @@ func newProjectsListExplicitGroupPermissionsForAProjectCmd() *cobra.Command {
 		Long: `Returns a paginated list of explicit group permissions for the given project.
 This endpoint does not support BBQL features.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -598,26 +576,24 @@ func newProjectsGetAnExplicitGroupPermissionForAProjectCmd() *cobra.Command {
 		Short: `Get an explicit group permission for a project`,
 		Long:  "Returns the group permission for a given group and project.\n\nOnly users with admin permission for the project may access this resource.\n\nPermissions can be:\n\n* `admin`\n* `create-repo`\n* `write`\n* `read`\n* `none`",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"group_slug":  groupSlug,
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if groupSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["group_slug"] == "" {
 				return fmt.Errorf("--group-slug is required")
 			}
-			if projectKey == "" {
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"group_slug":  groupSlug,
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -652,26 +628,24 @@ func newProjectsUpdateAnExplicitGroupPermissionForAProjectCmd() *cobra.Command {
 		Short: `Update an explicit group permission for a project`,
 		Long:  "Updates the group permission, or grants a new permission if one does not already exist.\n\nOnly users with admin permission for the project may access this resource.\n\nDue to security concerns, the JWT and OAuth authentication methods are unsupported.\nThis is to ensure integrations and add-ons are not allowed to change permissions.\n\nPermissions can be:\n\n* `admin`\n* `create-repo`\n* `write`\n* `read`",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"group_slug":  groupSlug,
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if groupSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["group_slug"] == "" {
 				return fmt.Errorf("--group-slug is required")
 			}
-			if projectKey == "" {
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"group_slug":  groupSlug,
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -714,26 +688,24 @@ func newProjectsDeleteAnExplicitGroupPermissionForAProjectCmd() *cobra.Command {
 
 Only users with admin permission for the project may access this resource.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"group_slug":  groupSlug,
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if groupSlug == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["group_slug"] == "" {
 				return fmt.Errorf("--group-slug is required")
 			}
-			if projectKey == "" {
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"group_slug":  groupSlug,
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -770,22 +742,20 @@ func newProjectsListExplicitUserPermissionsForAProjectCmd() *cobra.Command {
 		Long: `Returns a paginated list of explicit user permissions for the given project.
 This endpoint does not support BBQL features.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key": projectKey,
+				"workspace":   workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key": projectKey,
-				"workspace":   workspace,
 			}
 			queryParams := map[string]string{
 				"page":    strconv.Itoa(page),
@@ -824,26 +794,24 @@ func newProjectsGetAnExplicitUserPermissionForAProjectCmd() *cobra.Command {
 		Short: `Get an explicit user permission for a project`,
 		Long:  "Returns the explicit user permission for a given user and project.\n\nOnly users with admin permission for the project may access this resource.\n\nPermissions can be:\n\n* `admin`\n* `create-repo`\n* `write`\n* `read`\n* `none`",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key":      projectKey,
+				"selected_user_id": selectedUserId,
+				"workspace":        workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if selectedUserId == "" {
+			if pathParams["selected_user_id"] == "" {
 				return fmt.Errorf("--selected-user-id is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key":      projectKey,
-				"selected_user_id": selectedUserId,
-				"workspace":        workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
@@ -878,26 +846,24 @@ func newProjectsUpdateAnExplicitUserPermissionForAProjectCmd() *cobra.Command {
 		Short: `Update an explicit user permission for a project`,
 		Long:  "Updates the explicit user permission for a given user and project. The selected\nuser must be a member of the workspace, and cannot be the workspace owner.\n\nOnly users with admin permission for the project may access this resource.\n\nDue to security concerns, the JWT and OAuth authentication methods are unsupported.\nThis is to ensure integrations and add-ons are not allowed to change permissions.\n\nPermissions can be:\n\n* `admin`\n* `create-repo`\n* `write`\n* `read`",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key":      projectKey,
+				"selected_user_id": selectedUserId,
+				"workspace":        workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if selectedUserId == "" {
+			if pathParams["selected_user_id"] == "" {
 				return fmt.Errorf("--selected-user-id is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key":      projectKey,
-				"selected_user_id": selectedUserId,
-				"workspace":        workspace,
 			}
 			queryParams := map[string]string{}
 			if body == "" {
@@ -943,26 +909,24 @@ Only users with admin permission for the project may access this resource.
 Due to security concerns, the JWT and OAuth authentication methods are unsupported.
 This is to ensure integrations and add-ons are not allowed to change permissions.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if workspace == "" {
-				workspace, _ = gitcontext.InferDefaults()
+			pathParams := map[string]string{
+				"project_key":      projectKey,
+				"selected_user_id": selectedUserId,
+				"workspace":        workspace,
 			}
-			if projectKey == "" {
+			handlers.InferRepoContext(pathParams)
+			if pathParams["project_key"] == "" {
 				return fmt.Errorf("--project-key is required")
 			}
-			if selectedUserId == "" {
+			if pathParams["selected_user_id"] == "" {
 				return fmt.Errorf("--selected-user-id is required")
 			}
-			if workspace == "" {
+			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
 				return err
-			}
-			pathParams := map[string]string{
-				"project_key":      projectKey,
-				"selected_user_id": selectedUserId,
-				"workspace":        workspace,
 			}
 			queryParams := map[string]string{}
 			body := ""
