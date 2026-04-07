@@ -580,6 +580,13 @@ paths:
       x-atlassian-auth-types:
       - api-token
       operationId: createAWebhookForAWorkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/webhook_subscription'
+        description: The webhook subscription to create or update.
+        required: true
     parameters:
     - name: workspace
       in: path
@@ -734,6 +741,13 @@ paths:
       x-atlassian-auth-types:
       - api-token
       operationId: updateAWebhookForAWorkspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/webhook_subscription'
+        description: The webhook subscription to create or update.
+        required: true
     parameters:
     - name: uid
       in: path
@@ -3022,6 +3036,7 @@ components:
           uuid:
             type: string
             description: The webhook's id
+            readOnly: true
           url:
             type: string
             description: The URL events get delivered to.
@@ -3036,13 +3051,16 @@ components:
             enum:
             - repository
             - workspace
+            readOnly: true
           subject:
             $ref: '#/components/schemas/object'
+            readOnly: true
           active:
             type: boolean
           created_at:
             type: string
             format: date-time
+            readOnly: true
           events:
             type: array
             description: The events this webhook is subscribed to.
@@ -3085,6 +3103,7 @@ components:
             description: Indicates whether or not the hook has an associated secret.
               It is not possible to see the hook's secret. This field is ignored during
               updates.
+            readOnly: true
           secret:
             type: string
             description: The secret to associate with the hook. The secret is never

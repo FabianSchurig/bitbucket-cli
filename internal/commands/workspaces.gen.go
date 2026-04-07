@@ -334,7 +334,13 @@ func newWorkspacesListWebhooksForAWorkspaceCmd() *cobra.Command {
 // operationId: createAWebhookForAWorkspace
 func newWorkspacesCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 	var (
-		workspace string
+		workspace       string
+		bodyActive      bool
+		bodyDescription string
+		bodyEvents      string
+		bodySecret      string
+		bodyUrl         string
+		body            string
 	)
 
 	cmd := &cobra.Command{
@@ -353,7 +359,28 @@ func newWorkspacesCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
-			body := ""
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyActive {
+					handlers.SetNested(bodyObj, "active", bodyActive)
+				}
+				if bodyDescription != "" {
+					handlers.SetNested(bodyObj, "description", bodyDescription)
+				}
+				if bodyEvents != "" {
+					handlers.SetNested(bodyObj, "events", bodyEvents)
+				}
+				if bodySecret != "" {
+					handlers.SetNested(bodyObj, "secret", bodySecret)
+				}
+				if bodyUrl != "" {
+					handlers.SetNested(bodyObj, "url", bodyUrl)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
 				Method:      "POST",
 				URLTemplate: "/workspaces/{workspace}/hooks",
@@ -365,6 +392,12 @@ func newWorkspacesCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().BoolVar(&bodyActive, "active", false, `active`)
+	cmd.Flags().StringVar(&bodyDescription, "description", "", `A user-defined description of the webhook.`)
+	cmd.Flags().StringVar(&bodyEvents, "events", "", `The events this webhook is subscribed to. [issue:comment_created, issue:created, issue:updated, pipeline:span_created, project:updated, pullrequest:approved, pullrequest:changes_request_created, pullrequest:changes_request_removed, pullrequest:comment_created, pullrequest:comment_deleted, pullrequest:comment_reopened, pullrequest:comment_resolved, pullrequest:comment_updated, pullrequest:created, pullrequest:fulfilled, pullrequest:push, pullrequest:rejected, pullrequest:unapproved, pullrequest:updated, repo:commit_comment_created, repo:commit_status_created, repo:commit_status_updated, repo:created, repo:deleted, repo:fork, repo:imported, repo:push, repo:transfer, repo:updated]`)
+	cmd.Flags().StringVar(&bodySecret, "secret", "", "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.")
+	cmd.Flags().StringVar(&bodyUrl, "url", "", `The URL events get delivered to.`)
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
 
@@ -417,8 +450,14 @@ workspace.`,
 // operationId: updateAWebhookForAWorkspace
 func newWorkspacesUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 	var (
-		uid       string
-		workspace string
+		uid             string
+		workspace       string
+		bodyActive      bool
+		bodyDescription string
+		bodyEvents      string
+		bodySecret      string
+		bodyUrl         string
+		body            string
 	)
 
 	cmd := &cobra.Command{
@@ -441,7 +480,28 @@ func newWorkspacesUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 				"workspace": workspace,
 			}
 			queryParams := map[string]string{}
-			body := ""
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyActive {
+					handlers.SetNested(bodyObj, "active", bodyActive)
+				}
+				if bodyDescription != "" {
+					handlers.SetNested(bodyObj, "description", bodyDescription)
+				}
+				if bodyEvents != "" {
+					handlers.SetNested(bodyObj, "events", bodyEvents)
+				}
+				if bodySecret != "" {
+					handlers.SetNested(bodyObj, "secret", bodySecret)
+				}
+				if bodyUrl != "" {
+					handlers.SetNested(bodyObj, "url", bodyUrl)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
 				Method:      "PUT",
 				URLTemplate: "/workspaces/{workspace}/hooks/{uid}",
@@ -454,6 +514,12 @@ func newWorkspacesUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVar(&uid, "uid", "", "uid (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().BoolVar(&bodyActive, "active", false, `active`)
+	cmd.Flags().StringVar(&bodyDescription, "description", "", `A user-defined description of the webhook.`)
+	cmd.Flags().StringVar(&bodyEvents, "events", "", `The events this webhook is subscribed to. [issue:comment_created, issue:created, issue:updated, pipeline:span_created, project:updated, pullrequest:approved, pullrequest:changes_request_created, pullrequest:changes_request_removed, pullrequest:comment_created, pullrequest:comment_deleted, pullrequest:comment_reopened, pullrequest:comment_resolved, pullrequest:comment_updated, pullrequest:created, pullrequest:fulfilled, pullrequest:push, pullrequest:rejected, pullrequest:unapproved, pullrequest:updated, repo:commit_comment_created, repo:commit_status_created, repo:commit_status_updated, repo:created, repo:deleted, repo:fork, repo:imported, repo:push, repo:transfer, repo:updated]`)
+	cmd.Flags().StringVar(&bodySecret, "secret", "", "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.")
+	cmd.Flags().StringVar(&bodyUrl, "url", "", `The URL events get delivered to.`)
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
 
