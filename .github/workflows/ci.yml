@@ -54,8 +54,9 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  # Runs only on push to main so that the GITHUB_TOKEN write scope is never
+  # Runs only on push events so that the GITHUB_TOKEN write scope is never
   # issued to a pull-request runner (including fork PRs).
+  # Credentials are intentionally persisted so git-auto-commit-action can push.
   format:
     name: Format
     runs-on: ubuntu-latest
