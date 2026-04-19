@@ -254,7 +254,6 @@ func newUsersAddANewGpgKeyCmd() *cobra.Command {
 	var (
 		selectedUser          string
 		bodyAddedOn           string
-		bodyComment           string
 		bodyExpiresOn         string
 		bodyFingerprint       string
 		bodyKey               string
@@ -289,9 +288,6 @@ func newUsersAddANewGpgKeyCmd() *cobra.Command {
 				bodyObj := map[string]any{}
 				if bodyAddedOn != "" {
 					handlers.SetNested(bodyObj, "added_on", bodyAddedOn)
-				}
-				if bodyComment != "" {
-					handlers.SetNested(bodyObj, "comment", bodyComment)
 				}
 				if bodyExpiresOn != "" {
 					handlers.SetNested(bodyObj, "expires_on", bodyExpiresOn)
@@ -340,7 +336,6 @@ func newUsersAddANewGpgKeyCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVar(&selectedUser, "selected-user", "", "selected_user (path parameter)")
 	cmd.Flags().StringVar(&bodyAddedOn, "added-on", "", `added_on`)
-	cmd.Flags().StringVar(&bodyComment, "comment", "", `The comment parsed from the GPG key (if present)`)
 	cmd.Flags().StringVar(&bodyExpiresOn, "expires-on", "", `expires_on`)
 	cmd.Flags().StringVar(&bodyFingerprint, "fingerprint", "", `The GPG key fingerprint.`)
 	cmd.Flags().StringVar(&bodyKey, "key", "", `The GPG key value in X format.`)

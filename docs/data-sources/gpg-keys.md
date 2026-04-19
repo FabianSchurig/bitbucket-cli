@@ -49,7 +49,6 @@ output "gpg_keys_response" {
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
 - `added_on` (String) added_on
-- `comment` (String) The comment parsed from the GPG key (if present)
 - `expires_on` (String) expires_on
 - `key` (String) The GPG key value in X format.
 - `key_id` (String) The unique identifier for the GPG key

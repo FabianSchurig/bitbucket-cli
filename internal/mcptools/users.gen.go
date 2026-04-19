@@ -110,7 +110,6 @@ whether it is the user's primary address or not.`,
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `added_on`, Type: `string`, Desc: `added_on`},
-				{Path: `comment`, Type: `string`, Desc: `The comment parsed from the GPG key (if present)`},
 				{Path: `expires_on`, Type: `string`, Desc: `expires_on`},
 				{Path: `fingerprint`, Type: `string`, Desc: `The GPG key fingerprint.`},
 				{Path: `key`, Type: `string`, Desc: `The GPG key value in X format.`},

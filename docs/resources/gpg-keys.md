@@ -49,7 +49,6 @@ resource "bitbucket_gpg_keys" "example" {
 ### Optional
 - `fingerprint` (String) Path parameter (auto-populated from API response).
 - `added_on` (String) added_on (also computed from API response)
-- `comment` (String) The comment parsed from the GPG key (if present) (also computed from API response)
 - `expires_on` (String) expires_on (also computed from API response)
 - `key` (String) The GPG key value in X format. (also computed from API response)
 - `key_id` (String) The unique identifier for the GPG key (also computed from API response)

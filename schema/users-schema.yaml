@@ -875,9 +875,6 @@ components:
             type: string
             description: The fingerprint of the parent key. This value is null unless
               the current key is a subkey.
-          comment:
-            type: string
-            description: The comment parsed from the GPG key (if present)
           name:
             type: string
             description: The user-defined label for the GPG key
