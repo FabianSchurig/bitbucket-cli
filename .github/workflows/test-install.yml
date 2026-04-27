@@ -39,7 +39,8 @@ jobs:
       - name: Get latest release tag
         id: tag
         run: |
-          TAG=$(curl -s https://api.github.com/repos/FabianSchurig/bitbucket-cli/releases/latest | jq -r .tag_name)
+          TAG_URL=$(curl -fsSIL -o /dev/null -w '%{url_effective}' https://github.com/FabianSchurig/bitbucket-cli/releases/latest)
+          TAG=${TAG_URL##*/}
           VERSION=${TAG#v}
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
@@ -104,13 +105,13 @@ jobs:
       - name: Run install script (bb-cli)
         run: |
           chmod +x install.sh
-          sudo ./install.sh --binary bb-cli
+          ./install.sh --binary bb-cli
 
       - name: Verify bb-cli
         run: bb-cli --help
 
       - name: Run install script (bb-mcp)
-        run: sudo ./install.sh --binary bb-mcp
+        run: ./install.sh --binary bb-mcp
 
       - name: Verify bb-mcp
         run: bb-mcp --help

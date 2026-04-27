@@ -46,7 +46,9 @@ brew install bitbucket-cli
 Download the `.deb` package from the [latest release](https://github.com/FabianSchurig/bitbucket-cli/releases/latest) and install it. Supported architectures: `amd64`, `arm64`.
 
 ```bash
-VERSION=$(curl -s https://api.github.com/repos/FabianSchurig/bitbucket-cli/releases/latest | jq -r .tag_name | sed 's/^v//')
+TAG_URL=$(curl -fsSIL -o /dev/null -w '%{url_effective}' https://github.com/FabianSchurig/bitbucket-cli/releases/latest)
+VERSION=${TAG_URL##*/}
+VERSION=${VERSION#v}
 ARCH=$(dpkg --print-architecture)
 curl -LO "https://github.com/FabianSchurig/bitbucket-cli/releases/download/v${VERSION}/bb-cli_${VERSION}_${ARCH}.deb"
 sudo dpkg -i "bb-cli_${VERSION}_${ARCH}.deb"
@@ -59,7 +61,9 @@ Replace `bb-cli` with `bb-mcp` to install the MCP server instead.
 Download the `.rpm` package from the [latest release](https://github.com/FabianSchurig/bitbucket-cli/releases/latest) and install it. Supported architectures: `amd64`, `arm64`.
 
 ```bash
-VERSION=$(curl -s https://api.github.com/repos/FabianSchurig/bitbucket-cli/releases/latest | jq -r .tag_name | sed 's/^v//')
+TAG_URL=$(curl -fsSIL -o /dev/null -w '%{url_effective}' https://github.com/FabianSchurig/bitbucket-cli/releases/latest)
+VERSION=${TAG_URL##*/}
+VERSION=${VERSION#v}
 ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
 curl -LO "https://github.com/FabianSchurig/bitbucket-cli/releases/download/v${VERSION}/bb-cli_${VERSION}_${ARCH}.rpm"
 sudo rpm -i "bb-cli_${VERSION}_${ARCH}.rpm"

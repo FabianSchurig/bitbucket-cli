@@ -89,7 +89,35 @@ detect_arch() {
   esac
 }
 
-get_latest_version() {
+extract_tag_from_release_url() {
+  printf '%s\n' "$1" | sed -n 's#^.*/tag/\([^/?[:space:]]*\).*$#\1#p'
+}
+
+get_latest_version_from_redirect() {
+  latest_url="https://github.com/${REPO}/releases/latest"
+
+  if command -v curl >/dev/null 2>&1; then
+    final_url="$(curl -fsSIL -o /dev/null -w '%{url_effective}' "$latest_url" 2>/dev/null || true)"
+    version="$(extract_tag_from_release_url "$final_url")"
+    if [ -n "$version" ]; then
+      printf '%s\n' "$version"
+      return 0
+    fi
+  fi
+
+  if command -v wget >/dev/null 2>&1; then
+    redirect_url="$(wget -S --max-redirect=0 -O /dev/null "$latest_url" 2>&1 | sed -n 's/^[[:space:]]*Location: \(.*\)$/\1/p' | tail -n 1)"
+    version="$(extract_tag_from_release_url "$redirect_url")"
+    if [ -n "$version" ]; then
+      printf '%s\n' "$version"
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+get_latest_version_from_api() {
   if command -v curl >/dev/null 2>&1; then
     curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" | grep '"tag_name"' | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/'
   elif command -v wget >/dev/null 2>&1; then
@@ -98,6 +126,16 @@ get_latest_version() {
     echo "Error: curl or wget is required" >&2
     exit 1
   fi
+}
+
+get_latest_version() {
+  version="$(get_latest_version_from_redirect || true)"
+  if [ -n "$version" ]; then
+    printf '%s\n' "$version"
+    return 0
+  fi
+
+  get_latest_version_from_api
 }
 
 download() {
