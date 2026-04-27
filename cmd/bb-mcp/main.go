@@ -20,6 +20,12 @@
 //	OAuth2 access token:
 //	  export BITBUCKET_TOKEN=<token>
 //
+//	Bitbucket internal API (e.g. project-branch-restrictions):
+//	  export BITBUCKET_CSRF_TOKEN=<csrftoken cookie>
+//	  export BITBUCKET_CLOUD_SESSION_TOKEN=<cloud.session.token cookie>
+//	  Internal endpoints (https://bitbucket.org/!api/internal/...) reject
+//	  HTTP Basic Auth — both cookies above are required.
+//
 // Run:
 //
 //	bb-mcp                  # stdio transport (default, for MCP clients)

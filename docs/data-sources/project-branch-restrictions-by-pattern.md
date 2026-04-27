@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_project_branch_restrictions_by_pattern Data Source - bitbucket"
-subcategory: "Internal Project Branch Restrictions"
+subcategory: "Experimental"
 description: |-
   Reads Bitbucket project-branch-restrictions-by-pattern via the Bitbucket Cloud API.
 ---
@@ -8,6 +8,19 @@ description: |-
 # bitbucket_project_branch_restrictions_by_pattern (Data Source)
 
 Reads Bitbucket project-branch-restrictions-by-pattern via the Bitbucket Cloud API.
+
+~> **Experimental — internal API.** This data source targets Bitbucket's
+undocumented internal API at `https://bitbucket.org/!api/internal/`, which
+**does not accept HTTP Basic Auth**. You must configure the provider with
+`csrf_token` and `cloud_session_token` (or the `BITBUCKET_CSRF_TOKEN` /
+`BITBUCKET_CLOUD_SESSION_TOKEN` environment variables) — see the
+[provider documentation](../index.md#authenticating-against-the-internal-api)
+for details.
+
+Internal-API data sources are not auto-synced by the daily OpenAPI pipeline
+and the underlying endpoint may change without notice. The
+`cloud.session.token` cookie typically expires after ~1 month, so prefer
+running these manually with freshly-copied browser cookies.
 
 ## API Endpoints
 

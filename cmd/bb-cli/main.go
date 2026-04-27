@@ -55,7 +55,12 @@ Set authentication environment variables before running:
     BITBUCKET_TOKEN       your API token
 
   OAuth2 access token:
-    BITBUCKET_TOKEN       your OAuth2 access token`,
+    BITBUCKET_TOKEN       your OAuth2 access token
+
+  Internal API (e.g. project-branch-restrictions, /!api/internal/...):
+    BITBUCKET_CSRF_TOKEN           value of the csrftoken cookie
+    BITBUCKET_CLOUD_SESSION_TOKEN  value of the cloud.session.token cookie
+  Internal endpoints reject Basic Auth — both cookies above are required.`,
 	}
 
 	setColoredHelp(rootCmd)

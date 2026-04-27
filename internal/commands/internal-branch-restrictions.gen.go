@@ -45,9 +45,25 @@ https://bitbucket.org/!api/internal/. These commands wrap that endpoint
 so the same configuration can be managed from the CLI, MCP, or Terraform.
 
 Note: this is an undocumented internal API and is not covered by
-Atlassian's public stability guarantees. Authentication uses the same
-BITBUCKET_USERNAME / BITBUCKET_TOKEN environment variables as the
-public-API commands.
+Atlassian's public stability guarantees.
+
+AUTHENTICATION (IMPORTANT):
+The internal API does NOT accept HTTP Basic Auth (Atlassian API tokens,
+workspace access tokens, or app passwords will all return 401). It only
+accepts the same browser-style cookie auth the Bitbucket web UI sends.
+
+To use these commands, set BOTH of the following environment variables
+in addition to (or instead of) BITBUCKET_USERNAME / BITBUCKET_TOKEN:
+
+  BITBUCKET_CSRF_TOKEN           value of the "csrftoken" browser cookie
+  BITBUCKET_CLOUD_SESSION_TOKEN  value of the "cloud.session.token" cookie
+
+You can grab both values from your browser's developer tools while
+logged in to bitbucket.org (Application → Cookies → bitbucket.org).
+The CLI / MCP server / Terraform provider will automatically detect that
+the request URL contains "/!api/internal/" and switch from Basic Auth to
+cookie auth, also setting the X-CSRFToken, X-Requested-With, Referer and
+Sec-Fetch-* headers required by the endpoint.
 
 The API has only PUT and GET semantics — to "delete" all rules for a
 pattern or branch type, send a PUT with an empty values list:

@@ -78,6 +78,48 @@ output "repo_info" {
 - `username` (String) Bitbucket username (Atlassian account email for API tokens). Can also be set via `BITBUCKET_USERNAME` environment variable.
 - `token` (String, Sensitive) Bitbucket API token (Atlassian API token or workspace access token). Can also be set via `BITBUCKET_TOKEN` environment variable.
 - `base_url` (String) Base URL for the Bitbucket API. Defaults to `https://api.bitbucket.org/2.0`.
+- `csrf_token` (String, Sensitive) CSRF token (`csrftoken` browser cookie) used to authenticate against Bitbucket's internal API (`https://bitbucket.org/!api/internal/...`). Required for resources marked **Internal API**, which reject HTTP Basic Auth. Can also be set via `BITBUCKET_CSRF_TOKEN`. Must be paired with `cloud_session_token`.
+- `cloud_session_token` (String, Sensitive) Cloud session token (`cloud.session.token` browser cookie) used to authenticate against Bitbucket's internal API. Required for resources marked **Internal API**. Can also be set via `BITBUCKET_CLOUD_SESSION_TOKEN`. Must be paired with `csrf_token`.
+
+## Authenticating against the internal API
+
+A handful of resources (e.g. `bitbucket_project_branch_restrictions`) are
+backed by Bitbucket's undocumented internal API at
+`https://bitbucket.org/!api/internal/`. That endpoint **does not accept
+HTTP Basic Auth** — it only accepts the same browser cookies the Bitbucket
+web UI sends. Configure them like this:
+
+```hcl
+provider "bitbucket" {
+  # Public REST API (optional if you only use internal-API resources)
+  username = "your-email@example.com"
+  token    = "your-api-token"
+
+  # Internal API (required for resources marked "Internal API")
+  csrf_token          = "value of the csrftoken cookie"
+  cloud_session_token = "value of the cloud.session.token cookie"
+}
+```
+
+Or via environment variables:
+
+```bash
+export BITBUCKET_CSRF_TOKEN="..."
+export BITBUCKET_CLOUD_SESSION_TOKEN="..."
+```
+
+You can grab both values from your browser's developer tools while logged
+in to bitbucket.org (Application → Cookies → bitbucket.org). The provider
+inspects each request URL: requests to `/!api/internal/` automatically use
+cookie auth (and `X-CSRFToken`, `X-Requested-With`, `Referer`,
+`Sec-Fetch-*` headers); all other requests use Basic Auth.
+
+~> **The `cloud.session.token` cookie is short-lived** — typically about a
+month before Bitbucket invalidates it. Because of that, internal-API
+resources (grouped under **Experimental** below) are best used **manually
+and interactively**: copy a fresh cookie from your browser right before you
+run `terraform apply`. They are generally not suitable for unattended CI
+pipelines that may need to run weeks or months after the cookie was captured.
 
 ## Resources and Data Sources
 
@@ -144,7 +186,27 @@ operation groups. Each resource group maps to a set of CRUD operations.
 | `bitbucket_downloads` | `bitbucket_downloads` | CRDL |
 
 
-### Internal Project Branch Restrictions
+### Experimental
+
+Resources in this group wrap **undocumented internal Bitbucket endpoints**
+(`https://bitbucket.org/!api/internal/...`). They are not part of the public
+REST API and have several important caveats:
+
+- **Not auto-synced.** The rest of this provider is regenerated daily from
+  Atlassian's published OpenAPI spec; internal-API resources are hand-curated
+  and updated less frequently. Atlassian can change or remove these endpoints
+  without notice.
+- **Browser-cookie auth only.** They reject HTTP Basic Auth — you must
+  configure `csrf_token` and `cloud_session_token` (or the matching
+  `BITBUCKET_*` env vars). See
+  [Authenticating against the internal API](#authenticating-against-the-internal-api).
+- **Short-lived session token.** The `cloud.session.token` cookie typically
+  expires after about a month, after which Terraform runs that touch these
+  resources will start returning 401. Because of this, the practical
+  recommendation is to use experimental resources **manually / interactively**:
+  copy fresh values from your browser's developer tools (Application → Cookies
+  → bitbucket.org), run `terraform apply`, then unset the variables. They
+  are generally not suitable for unattended CI pipelines.
 
 | Resource | Data Source | CRUD |
 |----------|-------------|------|

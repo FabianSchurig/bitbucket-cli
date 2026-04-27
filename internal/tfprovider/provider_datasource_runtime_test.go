@@ -75,21 +75,25 @@ func TestProviderRuntime(t *testing.T) {
 
 	var schemaResp provider.SchemaResponse
 	p.Schema(context.Background(), provider.SchemaRequest{}, &schemaResp)
-	if len(schemaResp.Schema.Attributes) != 3 {
-		t.Fatalf("expected 3 provider attributes, got %d", len(schemaResp.Schema.Attributes))
+	if len(schemaResp.Schema.Attributes) != 5 {
+		t.Fatalf("expected 5 provider attributes, got %d", len(schemaResp.Schema.Attributes))
 	}
 
 	t.Setenv("BITBUCKET_USERNAME", "env-user")
 	t.Setenv("BITBUCKET_TOKEN", "env-token")
 	t.Setenv("BITBUCKET_BASE_URL", "https://env.example")
+	t.Setenv("BITBUCKET_CSRF_TOKEN", "env-csrf")
+	t.Setenv("BITBUCKET_CLOUD_SESSION_TOKEN", "env-session")
 
 	configType := providerObjectType(schemaResp.Schema.Attributes)
 	req := provider.ConfigureRequest{
 		Config: tfsdk.Config{
 			Raw: objectValue(configType, map[string]string{
-				"username": "cfg-user",
-				"token":    "cfg-token",
-				"base_url": "https://cfg.example",
+				"username":            "cfg-user",
+				"token":               "cfg-token",
+				"base_url":            "https://cfg.example",
+				"csrf_token":          "cfg-csrf",
+				"cloud_session_token": "cfg-session",
 			}),
 			Schema: schemaResp.Schema,
 		},
@@ -109,6 +113,8 @@ func TestProviderRuntime(t *testing.T) {
 	t.Setenv("BITBUCKET_USERNAME", "")
 	t.Setenv("BITBUCKET_TOKEN", "")
 	t.Setenv("BITBUCKET_BASE_URL", "")
+	t.Setenv("BITBUCKET_CSRF_TOKEN", "")
+	t.Setenv("BITBUCKET_CLOUD_SESSION_TOKEN", "")
 	var errResp provider.ConfigureResponse
 	p.Configure(context.Background(), provider.ConfigureRequest{
 		Config: tfsdk.Config{
