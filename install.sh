@@ -90,7 +90,7 @@ detect_arch() {
 }
 
 extract_tag_from_release_url() {
-  printf '%s\n' "$1" | sed -n 's#^.*/tag/\([^/?[:space:]]*\).*$#\1#p'
+  printf '%s\n' "$1" | sed -n 's#^.*/tag/\([^/#?[:space:]]*\).*$#\1#p'
 }
 
 get_latest_version_from_redirect() {
