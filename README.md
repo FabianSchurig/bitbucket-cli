@@ -108,6 +108,7 @@ This repository keeps Bitbucket Cloud tooling maintainable by generating most of
 - **Thin hand-written runtime**: auth, dispatch, output, and Terraform runtime stay generic instead of growing per-endpoint glue.
 - **Fast spec adoption**: new Bitbucket endpoints flow in through generation instead of large manual rewrites.
 - **Maintenance-first design**: the main development effort goes into the shared generators and runtime, not duplicated endpoint code.
+- **Internal/undocumented endpoints supported the same way**: schemas under `schema/` can be hand-authored for endpoints that are not in Bitbucket's public OpenAPI spec (for example the project-level branch-restrictions endpoint exposed only via `https://bitbucket.org/!api/internal/...`). The generators and runtime treat them identically — schema paths may use absolute URLs and the dispatcher passes them through unchanged.
 
 ## Architecture
 

@@ -69,6 +69,12 @@ var subResources = []subResource{
 	subResourceForGroup("hook-types", "Read subscribable webhook event types in Bitbucket", &HooksResourceGroup),
 	subResourceForGroup("workspace-permissions", "Read user permissions for a Bitbucket workspace", &WorkspacesResourceGroup),
 	subResourceForGroup("repo-settings", "Manage repository settings inheritance in Bitbucket", &ReposResourceGroup),
+	// Project-level branch restrictions (internal Bitbucket API) — exposed as
+	// two sub-resources so users can manage glob-pattern and branching-model
+	// rules independently. Both are powered by the same parent
+	// ProjectBranchRestrictionsResourceGroup; CRUD wiring is in CRUDConfig.
+	subResourceForGroup("project-branch-restrictions-by-pattern", "Manage project-level branch restrictions matched by glob pattern in Bitbucket (internal API)", &ProjectBranchRestrictionsResourceGroup),
+	subResourceForGroup("project-branch-restrictions-by-branch-type", "Manage project-level branch restrictions matched by branching-model branch type in Bitbucket (internal API)", &ProjectBranchRestrictionsResourceGroup),
 }
 
 func init() {

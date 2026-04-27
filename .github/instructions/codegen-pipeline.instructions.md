@@ -18,6 +18,7 @@ applyTo: ["scripts/**", "oapi-codegen.yaml"]
 - **Minimal hand-written code**: The generator should handle all boilerplate; only truly generic behavior belongs in hand-written code
 - **Schema scripts are Python 3.12**: Only dependency is `pyyaml`; keep scripts simple and dependency-light
 - **Go generator uses `yaml.v3`**: Parses the OpenAPI schema directly without third-party OpenAPI libraries
+- **Hand-authored schemas are first-class**: any `schema/*-schema.yaml` is consumed by the generators, not just files produced by `partition_spec.py`. Use this for endpoints that are not in Bitbucket's public OpenAPI spec (for example the internal project branch-restrictions endpoints in `schema/internal-branch-restrictions-schema.yaml`). Path keys may be **absolute URLs** (e.g. `https://bitbucket.org/!api/internal/...`); the dispatcher passes absolute URLs straight to resty so a different host works without runtime changes.
 
 ## Testing changes
 

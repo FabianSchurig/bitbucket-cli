@@ -102,6 +102,9 @@ Set authentication environment variables before running:
 	branchRestrictionsCmd := commands.NewBranchRestrictionsCommand()
 	commands.AddOutputFlag(branchRestrictionsCmd)
 
+	projectBranchRestrictionsCmd := commands.NewProjectBranchRestrictionsCommand()
+	commands.AddOutputFlag(projectBranchRestrictionsCmd)
+
 	branchingModelCmd := commands.NewBranchingModelCommand()
 	commands.AddOutputFlag(branchingModelCmd)
 
@@ -124,7 +127,8 @@ Set authentication environment variables before running:
 		prCmd, hooksCmd, searchCmd, refsCmd, commitsCmd, reportsCmd,
 		reposCmd, workspacesCmd, projectsCmd, pipelinesCmd,
 		issuesCmd, snippetsCmd, deploymentsCmd,
-		branchRestrictionsCmd, branchingModelCmd, commitStatusesCmd,
+		branchRestrictionsCmd, projectBranchRestrictionsCmd,
+		branchingModelCmd, commitStatusesCmd,
 		downloadsCmd, usersCmd, propertiesCmd, addonCmd,
 	)
 	return rootCmd
