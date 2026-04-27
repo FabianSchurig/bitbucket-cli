@@ -28,9 +28,11 @@ type BitbucketProvider struct {
 
 // BitbucketProviderModel describes the provider configuration.
 type BitbucketProviderModel struct {
-	Username types.String `tfsdk:"username"`
-	Token    types.String `tfsdk:"token"`
-	BaseURL  types.String `tfsdk:"base_url"`
+	Username          types.String `tfsdk:"username"`
+	Token             types.String `tfsdk:"token"`
+	BaseURL           types.String `tfsdk:"base_url"`
+	CSRFToken         types.String `tfsdk:"csrf_token"`
+	CloudSessionToken types.String `tfsdk:"cloud_session_token"`
 }
 
 // New creates a new BitbucketProvider instance.
@@ -64,6 +66,16 @@ func (p *BitbucketProvider) Schema(_ context.Context, _ provider.SchemaRequest, 
 				Description: "Base URL for the Bitbucket API. Defaults to https://api.bitbucket.org/2.0. Can also be set via BITBUCKET_BASE_URL.",
 				Optional:    true,
 			},
+			"csrf_token": schema.StringAttribute{
+				Description: "CSRF token (value of the `csrftoken` browser cookie) used to authenticate against Bitbucket's internal API (`https://bitbucket.org/!api/internal/...`). Required for any resource that targets an internal endpoint, because those endpoints reject HTTP Basic Auth. Can also be set via the BITBUCKET_CSRF_TOKEN environment variable. Must be supplied together with `cloud_session_token`.",
+				Optional:    true,
+				Sensitive:   true,
+			},
+			"cloud_session_token": schema.StringAttribute{
+				Description: "Cloud session token (value of the `cloud.session.token` browser cookie) used to authenticate against Bitbucket's internal API (`https://bitbucket.org/!api/internal/...`). Required for any resource that targets an internal endpoint. Can also be set via the BITBUCKET_CLOUD_SESSION_TOKEN environment variable. Must be supplied together with `csrf_token`.",
+				Optional:    true,
+				Sensitive:   true,
+			},
 		},
 	}
 }
@@ -89,12 +101,22 @@ func (p *BitbucketProvider) Configure(ctx context.Context, req provider.Configur
 	if !config.BaseURL.IsNull() {
 		baseURL = config.BaseURL.ValueString()
 	}
+	csrfToken := os.Getenv("BITBUCKET_CSRF_TOKEN")
+	if !config.CSRFToken.IsNull() {
+		csrfToken = config.CSRFToken.ValueString()
+	}
+	cloudSessionToken := os.Getenv("BITBUCKET_CLOUD_SESSION_TOKEN")
+	if !config.CloudSessionToken.IsNull() {
+		cloudSessionToken = config.CloudSessionToken.ValueString()
+	}
 
-	c, err := client.NewClientWithConfig(username, token, baseURL)
+	c, err := client.NewClientWithConfig(username, token, baseURL, csrfToken, cloudSessionToken)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to create Bitbucket client",
-			"Ensure BITBUCKET_TOKEN is set with a valid API token. Error: "+err.Error(),
+			"Set BITBUCKET_TOKEN with a valid API token for the public REST API, "+
+				"or set BITBUCKET_CSRF_TOKEN and BITBUCKET_CLOUD_SESSION_TOKEN to "+
+				"target Bitbucket's internal API. Error: "+err.Error(),
 		)
 		return
 	}

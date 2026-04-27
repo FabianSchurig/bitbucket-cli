@@ -1,6 +1,6 @@
 ---
 page_title: "bitbucket_project_branch_restrictions Resource - bitbucket"
-subcategory: "Internal Project Branch Restrictions"
+subcategory: "Experimental"
 description: |-
   Manages Bitbucket project-branch-restrictions via the Bitbucket Cloud API.
 ---
@@ -8,6 +8,22 @@ description: |-
 # bitbucket_project_branch_restrictions (Resource)
 
 Manages Bitbucket project-branch-restrictions via the Bitbucket Cloud API.
+
+~> **Experimental — internal API.** This resource targets Bitbucket's
+undocumented internal API at `https://bitbucket.org/!api/internal/`, which
+**does not accept HTTP Basic Auth**. You must configure the provider with
+`csrf_token` and `cloud_session_token` (or the `BITBUCKET_CSRF_TOKEN` /
+`BITBUCKET_CLOUD_SESSION_TOKEN` environment variables) — see the
+[provider documentation](../index.md#authenticating-against-the-internal-api)
+for details.
+
+Internal-API resources are **not** kept in sync by the daily OpenAPI sync that
+covers the rest of this provider — they are hand-curated and Atlassian may
+change or remove the underlying endpoint at any time. The
+`cloud.session.token` cookie also typically expires after about a month,
+so these resources are best used interactively (copy fresh cookie values from
+your browser's developer tools just before running `terraform apply`) rather
+than from unattended CI pipelines.
 
 ## CRUD Operations
 - **Read**: Supported

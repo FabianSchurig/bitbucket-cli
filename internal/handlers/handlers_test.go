@@ -204,8 +204,10 @@ func TestDispatch_AbsoluteURLTemplate(t *testing.T) {
 	defer srv.Close()
 
 	// Client points at a deliberately-wrong base URL; the absolute URLTemplate
-	// must override it.
+	// must override it. Internal-API URLs require csrf/session cookies.
 	c := newTestClient(t, "http://wrong-host.invalid")
+	c.CSRFToken = "csrf-test"
+	c.CloudSessionToken = "session-test"
 	err := handlers.Dispatch(context.Background(), c, handlers.Request{
 		Method:      "PUT",
 		URLTemplate: srv.URL + "/!api/internal/workspaces/{workspace}/projects/{project_key}/branch-restrictions/by-pattern/{pattern}",

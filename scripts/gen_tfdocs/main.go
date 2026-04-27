@@ -52,6 +52,7 @@ type GroupData struct {
 	ResponseFields     []FieldDoc   // computed response fields (Computed)
 	OverlapFields      []FieldDoc   // fields that are both writable and computed (Optional+Computed)
 	CRUDOps            []CRUDOpInfo // CRUD operation details (scopes, doc links)
+	IsInternalAPI      bool         // true if any operation targets bitbucket.org/!api/internal/...
 }
 
 // FieldDoc describes a Terraform attribute for documentation.
@@ -78,6 +79,16 @@ type CategoryGroup struct {
 	Category string
 	Groups   []GroupData
 }
+
+// experimentalSubcategory is used in Terraform docs for any resource group
+// backed by Bitbucket's undocumented internal API. Grouping these under
+// "Experimental" makes it visually obvious in the Terraform Registry sidebar
+// that they are not part of the public, auto-synced REST API surface and
+// may change without notice.
+const experimentalSubcategory = "Experimental"
+
+// internalAPIMarker matches URLs that target Bitbucket's internal API.
+const internalAPIMarker = "/!api/internal/"
 
 func exampleValue(param string) string {
 	switch param {
@@ -212,10 +223,26 @@ func buildGroups() []GroupData {
 		// Collect CRUD operation details (scopes, doc links).
 		crudOps := deriveCRUDOps(name, groupIndex)
 
+		// Detect internal-API resource (any op uses /!api/internal/...).
+		isInternal := false
+		for _, op := range crudOps {
+			if strings.Contains(op.Path, internalAPIMarker) {
+				isInternal = true
+				break
+			}
+		}
+
+		// Internal-API resources are grouped under "Experimental" in the
+		// Terraform Registry sidebar regardless of their schema title.
+		subcategory := groupIndex[name].Category
+		if isInternal {
+			subcategory = experimentalSubcategory
+		}
+
 		groups = append(groups, GroupData{
 			Name:               name,
 			TFName:             "bitbucket_" + strings.ReplaceAll(name, "-", "_"),
-			Subcategory:        groupIndex[name].Category,
+			Subcategory:        subcategory,
 			HasCreate:          crud.Create != "",
 			HasRead:            crud.Read != "",
 			HasUpdate:          crud.Update != "",
@@ -233,6 +260,7 @@ func buildGroups() []GroupData {
 			ResponseFields:     responseFields,
 			OverlapFields:      overlapFields,
 			CRUDOps:            crudOps,
+			IsInternalAPI:      isInternal,
 		})
 	}
 	sort.Slice(groups, func(i, j int) bool { return groups[i].Name < groups[j].Name })
@@ -706,6 +734,48 @@ output "repo_info" {
 - ` + "`username`" + ` (String) Bitbucket username (Atlassian account email for API tokens). Can also be set via ` + "`BITBUCKET_USERNAME`" + ` environment variable.
 - ` + "`token`" + ` (String, Sensitive) Bitbucket API token (Atlassian API token or workspace access token). Can also be set via ` + "`BITBUCKET_TOKEN`" + ` environment variable.
 - ` + "`base_url`" + ` (String) Base URL for the Bitbucket API. Defaults to ` + "`https://api.bitbucket.org/2.0`" + `.
+- ` + "`csrf_token`" + ` (String, Sensitive) CSRF token (` + "`csrftoken`" + ` browser cookie) used to authenticate against Bitbucket's internal API (` + "`https://bitbucket.org/!api/internal/...`" + `). Required for resources in the **Experimental** subcategory, which reject HTTP Basic Auth. Can also be set via ` + "`BITBUCKET_CSRF_TOKEN`" + `. Must be paired with ` + "`cloud_session_token`" + `.
+- ` + "`cloud_session_token`" + ` (String, Sensitive) Cloud session token (` + "`cloud.session.token`" + ` browser cookie) used to authenticate against Bitbucket's internal API. Required for resources in the **Experimental** subcategory. Can also be set via ` + "`BITBUCKET_CLOUD_SESSION_TOKEN`" + `. Must be paired with ` + "`csrf_token`" + `.
+
+## Authenticating against the internal API
+
+A handful of resources (e.g. ` + "`bitbucket_project_branch_restrictions`" + `) are
+backed by Bitbucket's undocumented internal API at
+` + "`https://bitbucket.org/!api/internal/`" + `. That endpoint **does not accept
+HTTP Basic Auth** — it only accepts the same browser cookies the Bitbucket
+web UI sends. Configure them like this:
+
+` + "```" + `hcl
+provider "bitbucket" {
+  # Public REST API (optional if you only use internal-API resources)
+  username = "your-email@example.com"
+  token    = "your-api-token"
+
+  # Experimental internal API (required for resources in the "Experimental" subcategory)
+  csrf_token          = "value of the csrftoken cookie"
+  cloud_session_token = "value of the cloud.session.token cookie"
+}
+` + "```" + `
+
+Or via environment variables:
+
+` + "```" + `bash
+export BITBUCKET_CSRF_TOKEN="..."
+export BITBUCKET_CLOUD_SESSION_TOKEN="..."
+` + "```" + `
+
+You can grab both values from your browser's developer tools while logged
+in to bitbucket.org (Application → Cookies → bitbucket.org). The provider
+inspects each request URL: requests to ` + "`/!api/internal/`" + ` automatically use
+cookie auth (and ` + "`X-CSRFToken`" + `, ` + "`X-Requested-With`" + `, ` + "`Referer`" + `,
+` + "`Sec-Fetch-*`" + ` headers); all other requests use Basic Auth.
+
+~> **The ` + "`cloud.session.token`" + ` cookie is short-lived** — typically about a
+month before Bitbucket invalidates it. Because of that, internal-API
+resources (grouped under **Experimental** below) are best used **manually
+and interactively**: copy a fresh cookie from your browser right before you
+run ` + "`terraform apply`" + `. They are generally not suitable for unattended CI
+pipelines that may need to run weeks or months after the cookie was captured.
 
 ## Resources and Data Sources
 
@@ -714,7 +784,27 @@ operation groups. Each resource group maps to a set of CRUD operations.
 {{range .CategoryGroups}}
 
 ### {{.Category}}
+{{if eq .Category "Experimental"}}
+Resources in this group wrap **undocumented internal Bitbucket endpoints**
+(` + "`https://bitbucket.org/!api/internal/...`" + `). They are not part of the public
+REST API and have several important caveats:
 
+- **Not auto-synced.** The rest of this provider is regenerated daily from
+  Atlassian's published OpenAPI spec; internal-API resources are hand-curated
+  and updated less frequently. Atlassian can change or remove these endpoints
+  without notice.
+- **Browser-cookie auth only.** They reject HTTP Basic Auth — you must
+  configure ` + "`csrf_token`" + ` and ` + "`cloud_session_token`" + ` (or the matching
+  ` + "`BITBUCKET_*`" + ` env vars). See
+  [Authenticating against the internal API](#authenticating-against-the-internal-api).
+- **Short-lived session token.** The ` + "`cloud.session.token`" + ` cookie typically
+  expires after about a month, after which Terraform runs that touch these
+  resources will start returning 401. Because of this, the practical
+  recommendation is to use experimental resources **manually / interactively**:
+  copy fresh values from your browser's developer tools (Application → Cookies
+  → bitbucket.org), run ` + "`terraform apply`" + `, then unset the variables. They
+  are generally not suitable for unattended CI pipelines.
+{{end}}
 | Resource | Data Source | CRUD |
 |----------|-------------|------|
 {{- range .Groups}}
@@ -740,7 +830,23 @@ description: |-
 
 # {{.TFName}} (Resource)
 
-Manages Bitbucket {{.Name}} via the Bitbucket Cloud API.
+Manages Bitbucket {{.Name}} via the Bitbucket Cloud API.{{if .IsInternalAPI}}
+
+~> **Experimental — internal API.** This resource targets Bitbucket's
+undocumented internal API at ` + "`https://bitbucket.org/!api/internal/`" + `, which
+**does not accept HTTP Basic Auth**. You must configure the provider with
+` + "`csrf_token`" + ` and ` + "`cloud_session_token`" + ` (or the ` + "`BITBUCKET_CSRF_TOKEN`" + ` /
+` + "`BITBUCKET_CLOUD_SESSION_TOKEN`" + ` environment variables) — see the
+[provider documentation](../index.md#authenticating-against-the-internal-api)
+for details.
+
+Internal-API resources are **not** kept in sync by the daily OpenAPI sync that
+covers the rest of this provider — they are hand-curated and Atlassian may
+change or remove the underlying endpoint at any time. The
+` + "`cloud.session.token`" + ` cookie also typically expires after about a month,
+so these resources are best used interactively (copy fresh cookie values from
+your browser's developer tools just before running ` + "`terraform apply`" + `) rather
+than from unattended CI pipelines.{{end}}
 
 ## CRUD Operations
 
@@ -838,7 +944,20 @@ description: |-
 
 # {{.TFName}} (Data Source)
 
-Reads Bitbucket {{.Name}} via the Bitbucket Cloud API.
+Reads Bitbucket {{.Name}} via the Bitbucket Cloud API.{{if .IsInternalAPI}}
+
+~> **Experimental — internal API.** This data source targets Bitbucket's
+undocumented internal API at ` + "`https://bitbucket.org/!api/internal/`" + `, which
+**does not accept HTTP Basic Auth**. You must configure the provider with
+` + "`csrf_token`" + ` and ` + "`cloud_session_token`" + ` (or the ` + "`BITBUCKET_CSRF_TOKEN`" + ` /
+` + "`BITBUCKET_CLOUD_SESSION_TOKEN`" + ` environment variables) — see the
+[provider documentation](../index.md#authenticating-against-the-internal-api)
+for details.
+
+Internal-API data sources are not auto-synced by the daily OpenAPI pipeline
+and the underlying endpoint may change without notice. The
+` + "`cloud.session.token`" + ` cookie typically expires after ~1 month, so prefer
+running these manually with freshly-copied browser cookies.{{end}}
 {{- if .CRUDOps}}
 
 ## API Endpoints

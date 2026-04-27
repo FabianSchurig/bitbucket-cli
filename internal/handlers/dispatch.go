@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/go-resty/resty/v2"
@@ -12,6 +13,18 @@ import (
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
 	"github.com/FabianSchurig/bitbucket-cli/internal/output"
 )
+
+// internalAPIMarker is the URL substring that identifies Bitbucket's
+// undocumented internal API (https://bitbucket.org/!api/internal/...).
+// Requests to these endpoints require csrftoken + cloud.session.token cookie
+// auth and the X-CSRFToken header — HTTP Basic Auth is rejected.
+const internalAPIMarker = "/!api/internal/"
+
+// isInternalAPI reports whether the given URL targets a Bitbucket internal
+// API endpoint that requires cookie-based authentication.
+func isInternalAPI(url string) bool {
+	return strings.Contains(url, internalAPIMarker)
+}
 
 // Request holds all parameters for a Dispatch call.
 type Request struct {
@@ -111,8 +124,30 @@ func buildURL(template string, pathParams map[string]string) string {
 
 // executeRequest builds and executes a single HTTP request.
 // Query params are only set on the first request; pagination URLs already contain them.
+//
+// Authentication is selected per request based on the URL:
+//   - /!api/internal/...  → cookie + X-CSRFToken auth (Basic Auth not sent)
+//   - everything else     → HTTP Basic Auth using the client's Username/Token
+//
+// Auth is applied per-request rather than client-level so that internal-API
+// requests do not inherit a stray Authorization header (the internal endpoint
+// returns 401 when both cookies and Basic Auth are present).
 func executeRequest(ctx context.Context, c *client.BBClient, r Request, fetchURL, baseURL string) (*resty.Response, error) {
 	req := c.R().SetContext(ctx)
+
+	if isInternalAPI(fetchURL) {
+		if c.CSRFToken == "" || c.CloudSessionToken == "" {
+			return nil, fmt.Errorf(
+				"internal Bitbucket API endpoint %s requires cookie auth: "+
+					"set BITBUCKET_CSRF_TOKEN and BITBUCKET_CLOUD_SESSION_TOKEN "+
+					"(HTTP Basic Auth is not supported by /!api/internal/ endpoints)",
+				fetchURL,
+			)
+		}
+		applyInternalAPIAuth(req, c)
+	} else {
+		applyBasicAuth(req, c)
+	}
 
 	if fetchURL == baseURL {
 		for k, v := range r.QueryParams {
@@ -127,6 +162,39 @@ func executeRequest(ctx context.Context, c *client.BBClient, r Request, fetchURL
 	}
 
 	return req.Execute(r.Method, fetchURL)
+}
+
+// applyBasicAuth sets HTTP Basic Auth on the request from the client's
+// Username/Token credentials. Falls back to the standard "x-token-auth"
+// pseudo-username when only a token is configured (workspace/repo access
+// tokens). Does nothing when no token is configured (the request will go out
+// unauthenticated and the server will return 401 — that's fine, we don't
+// want to silently invent credentials).
+func applyBasicAuth(req *resty.Request, c *client.BBClient) {
+	if c.Token == "" {
+		return
+	}
+	user := c.Username
+	if user == "" {
+		user = "x-token-auth"
+	}
+	req.SetBasicAuth(user, c.Token)
+}
+
+// applyInternalAPIAuth configures req with the cookies and headers required
+// by Bitbucket's internal API. No Authorization header is set, because the
+// internal endpoint returns 401 when an Authorization header is present
+// alongside the cookies.
+func applyInternalAPIAuth(req *resty.Request, c *client.BBClient) {
+	req.SetHeader("Accept", "application/json").
+		SetHeader("X-CSRFToken", c.CSRFToken).
+		SetHeader("X-Requested-With", "XMLHttpRequest").
+		SetHeader("Referer", "https://bitbucket.org/").
+		SetHeader("Sec-Fetch-Dest", "empty").
+		SetHeader("Sec-Fetch-Mode", "cors").
+		SetHeader("Sec-Fetch-Site", "same-origin").
+		SetCookie(&http.Cookie{Name: "csrftoken", Value: c.CSRFToken}).
+		SetCookie(&http.Cookie{Name: "cloud.session.token", Value: c.CloudSessionToken})
 }
 
 // parseResponseRaw handles empty and non-JSON responses.
