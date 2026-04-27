@@ -41,6 +41,8 @@ jobs:
         run: |
           TAG_URL=$(curl -fsSIL -o /dev/null -w '%{url_effective}' https://github.com/FabianSchurig/bitbucket-cli/releases/latest)
           TAG=${TAG_URL##*/}
+          TAG=${TAG%%\?*}
+          TAG=${TAG%%\#*}
           VERSION=${TAG#v}
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 

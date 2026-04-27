@@ -48,6 +48,8 @@ Download the `.deb` package from the [latest release](https://github.com/FabianS
 ```bash
 TAG_URL=$(curl -fsSIL -o /dev/null -w '%{url_effective}' https://github.com/FabianSchurig/bitbucket-cli/releases/latest)
 VERSION=${TAG_URL##*/}
+VERSION=${VERSION%%\?*}
+VERSION=${VERSION%%\#*}
 VERSION=${VERSION#v}
 ARCH=$(dpkg --print-architecture)
 curl -LO "https://github.com/FabianSchurig/bitbucket-cli/releases/download/v${VERSION}/bb-cli_${VERSION}_${ARCH}.deb"
@@ -63,6 +65,8 @@ Download the `.rpm` package from the [latest release](https://github.com/FabianS
 ```bash
 TAG_URL=$(curl -fsSIL -o /dev/null -w '%{url_effective}' https://github.com/FabianSchurig/bitbucket-cli/releases/latest)
 VERSION=${TAG_URL##*/}
+VERSION=${VERSION%%\?*}
+VERSION=${VERSION%%\#*}
 VERSION=${VERSION#v}
 ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
 curl -LO "https://github.com/FabianSchurig/bitbucket-cli/releases/download/v${VERSION}/bb-cli_${VERSION}_${ARCH}.rpm"
