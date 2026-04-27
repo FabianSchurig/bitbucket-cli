@@ -734,8 +734,8 @@ output "repo_info" {
 - ` + "`username`" + ` (String) Bitbucket username (Atlassian account email for API tokens). Can also be set via ` + "`BITBUCKET_USERNAME`" + ` environment variable.
 - ` + "`token`" + ` (String, Sensitive) Bitbucket API token (Atlassian API token or workspace access token). Can also be set via ` + "`BITBUCKET_TOKEN`" + ` environment variable.
 - ` + "`base_url`" + ` (String) Base URL for the Bitbucket API. Defaults to ` + "`https://api.bitbucket.org/2.0`" + `.
-- ` + "`csrf_token`" + ` (String, Sensitive) CSRF token (` + "`csrftoken`" + ` browser cookie) used to authenticate against Bitbucket's internal API (` + "`https://bitbucket.org/!api/internal/...`" + `). Required for resources marked **Internal API**, which reject HTTP Basic Auth. Can also be set via ` + "`BITBUCKET_CSRF_TOKEN`" + `. Must be paired with ` + "`cloud_session_token`" + `.
-- ` + "`cloud_session_token`" + ` (String, Sensitive) Cloud session token (` + "`cloud.session.token`" + ` browser cookie) used to authenticate against Bitbucket's internal API. Required for resources marked **Internal API**. Can also be set via ` + "`BITBUCKET_CLOUD_SESSION_TOKEN`" + `. Must be paired with ` + "`csrf_token`" + `.
+- ` + "`csrf_token`" + ` (String, Sensitive) CSRF token (` + "`csrftoken`" + ` browser cookie) used to authenticate against Bitbucket's internal API (` + "`https://bitbucket.org/!api/internal/...`" + `). Required for resources in the **Experimental** subcategory, which reject HTTP Basic Auth. Can also be set via ` + "`BITBUCKET_CSRF_TOKEN`" + `. Must be paired with ` + "`cloud_session_token`" + `.
+- ` + "`cloud_session_token`" + ` (String, Sensitive) Cloud session token (` + "`cloud.session.token`" + ` browser cookie) used to authenticate against Bitbucket's internal API. Required for resources in the **Experimental** subcategory. Can also be set via ` + "`BITBUCKET_CLOUD_SESSION_TOKEN`" + `. Must be paired with ` + "`csrf_token`" + `.
 
 ## Authenticating against the internal API
 
@@ -751,7 +751,7 @@ provider "bitbucket" {
   username = "your-email@example.com"
   token    = "your-api-token"
 
-  # Internal API (required for resources marked "Internal API")
+  # Experimental internal API (required for resources in the "Experimental" subcategory)
   csrf_token          = "value of the csrftoken cookie"
   cloud_session_token = "value of the cloud.session.token cookie"
 }

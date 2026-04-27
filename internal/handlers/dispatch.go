@@ -125,11 +125,13 @@ func buildURL(template string, pathParams map[string]string) string {
 // executeRequest builds and executes a single HTTP request.
 // Query params are only set on the first request; pagination URLs already contain them.
 //
-// Authentication is selected per request based on the URL: requests to
-// Bitbucket's internal API (/!api/internal/...) use cookie + X-CSRFToken auth
-// and explicitly suppress any client-level Basic Auth, since the internal
-// endpoint rejects requests that present an Authorization header. All other
-// requests inherit whatever Basic Auth the resty client was configured with.
+// Authentication is selected per request based on the URL:
+//   - /!api/internal/...  → cookie + X-CSRFToken auth (Basic Auth not sent)
+//   - everything else     → HTTP Basic Auth using the client's Username/Token
+//
+// Auth is applied per-request rather than client-level so that internal-API
+// requests do not inherit a stray Authorization header (the internal endpoint
+// returns 401 when both cookies and Basic Auth are present).
 func executeRequest(ctx context.Context, c *client.BBClient, r Request, fetchURL, baseURL string) (*resty.Response, error) {
 	req := c.R().SetContext(ctx)
 
@@ -143,6 +145,8 @@ func executeRequest(ctx context.Context, c *client.BBClient, r Request, fetchURL
 			)
 		}
 		applyInternalAPIAuth(req, c)
+	} else {
+		applyBasicAuth(req, c)
 	}
 
 	if fetchURL == baseURL {
@@ -160,18 +164,28 @@ func executeRequest(ctx context.Context, c *client.BBClient, r Request, fetchURL
 	return req.Execute(r.Method, fetchURL)
 }
 
-// applyInternalAPIAuth configures req with the cookies and headers required
-// by Bitbucket's internal API. It also clears any Basic Auth that might have
-// been set on the underlying resty client, because the internal endpoint
-// returns 401 when an Authorization header is present alongside the cookies.
-func applyInternalAPIAuth(req *resty.Request, c *client.BBClient) {
-	// Defeat the resty client-level Basic Auth middleware: pre-populating the
-	// Authorization header on the request makes resty skip its auth injection
-	// (it only adds the header when missing). We then drop the placeholder so
-	// no Authorization header is sent on the wire.
-	req.SetHeader("Authorization", "none")
-	req.Header.Del("Authorization")
+// applyBasicAuth sets HTTP Basic Auth on the request from the client's
+// Username/Token credentials. Falls back to the standard "x-token-auth"
+// pseudo-username when only a token is configured (workspace/repo access
+// tokens). Does nothing when no token is configured (the request will go out
+// unauthenticated and the server will return 401 — that's fine, we don't
+// want to silently invent credentials).
+func applyBasicAuth(req *resty.Request, c *client.BBClient) {
+	if c.Token == "" {
+		return
+	}
+	user := c.Username
+	if user == "" {
+		user = "x-token-auth"
+	}
+	req.SetBasicAuth(user, c.Token)
+}
 
+// applyInternalAPIAuth configures req with the cookies and headers required
+// by Bitbucket's internal API. No Authorization header is set, because the
+// internal endpoint returns 401 when an Authorization header is present
+// alongside the cookies.
+func applyInternalAPIAuth(req *resty.Request, c *client.BBClient) {
 	req.SetHeader("Accept", "application/json").
 		SetHeader("X-CSRFToken", c.CSRFToken).
 		SetHeader("X-Requested-With", "XMLHttpRequest").

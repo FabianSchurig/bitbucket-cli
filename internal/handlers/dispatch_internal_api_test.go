@@ -3,6 +3,7 @@ package handlers_test
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -36,9 +37,11 @@ func TestDispatch_InternalAPI_UsesCSRFAndSessionCookies(t *testing.T) {
 		capturedXReqWith = r.Header.Get("X-Requested-With")
 		capturedAccept = r.Header.Get("Accept")
 		capturedCookies = r.Cookies()
-		buf := make([]byte, r.ContentLength)
-		_, _ = r.Body.Read(buf)
-		capturedBody = string(buf)
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			t.Errorf("reading request body: %v", err)
+		}
+		capturedBody = string(body)
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(map[string]any{"values": []any{}})
 	}))
@@ -162,5 +165,63 @@ func TestDispatch_PublicAPI_UnaffectedByInternalAuth(t *testing.T) {
 		if c.Name == "csrftoken" || c.Name == "cloud.session.token" {
 			t.Errorf("internal-API cookie %q leaked onto public-API request", c.Name)
 		}
+	}
+}
+
+// TestDispatch_InternalAPI_SuppressesPreconfiguredBasicAuth verifies that
+// when the underlying resty client has Basic Auth configured, requests to
+// /!api/internal/ still go out with NO Authorization header. The internal
+// endpoint returns 401 if both cookies and Basic Auth are present, so
+// suppression must work even when Basic Auth was set up at client
+// construction time.
+//
+// This is the common production case: users set BITBUCKET_TOKEN (which would
+// historically trigger client-level SetBasicAuth) AND the internal-API
+// cookies, and call internal endpoints. The dispatcher applies Basic Auth
+// per-request and the client installs a defensive PreRequestHook, so neither
+// path can leak Authorization onto an internal request.
+func TestDispatch_InternalAPI_SuppressesPreconfiguredBasicAuth(t *testing.T) {
+	output.Format = "json"
+
+	var capturedAuth string
+	var capturedCookies []*http.Cookie
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		capturedAuth = r.Header.Get("Authorization")
+		capturedCookies = r.Cookies()
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]any{"values": []any{}})
+	}))
+	defer srv.Close()
+
+	// Build the client through the production constructor so the defensive
+	// PreRequestHook is installed, then ALSO call SetBasicAuth directly on
+	// the underlying resty client to simulate a worst-case where Basic Auth
+	// has been wired in at every level. The internal-API request must still
+	// go out without an Authorization header.
+	bb, err := client.NewClientWithConfig("u", "p", srv.URL, "csrf-abc", "session-xyz")
+	if err != nil {
+		t.Fatalf("NewClientWithConfig: %v", err)
+	}
+	bb.Client.SetBasicAuth("u", "p")
+
+	url := srv.URL + "/!api/internal/workspaces/myorg/projects/PROJ/branch-restrictions/group-by-branch/"
+	if err := handlers.Dispatch(context.Background(), bb, handlers.Request{
+		Method:      http.MethodGet,
+		URLTemplate: url,
+	}); err != nil {
+		t.Fatalf("Dispatch: %v", err)
+	}
+
+	if capturedAuth != "" {
+		t.Errorf("Authorization header should be suppressed for internal API even with Basic Auth pre-configured, got %q", capturedAuth)
+	}
+
+	cookieMap := map[string]string{}
+	for _, c := range capturedCookies {
+		cookieMap[c.Name] = c.Value
+	}
+	if cookieMap["csrftoken"] != "csrf-abc" || cookieMap["cloud.session.token"] != "session-xyz" {
+		t.Errorf("expected internal-API cookies to be sent, got %v", cookieMap)
 	}
 }

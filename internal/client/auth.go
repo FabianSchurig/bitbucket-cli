@@ -3,12 +3,22 @@ package client
 
 import (
 	"fmt"
+	"net/http"
 	"os"
+	"strings"
 
 	"github.com/go-resty/resty/v2"
 )
 
-const defaultBaseURL = "https://api.bitbucket.org/2.0"
+const (
+	defaultBaseURL = "https://api.bitbucket.org/2.0"
+
+	// internalAPIMarker is the URL substring that identifies Bitbucket's
+	// undocumented internal API. Kept here (and mirrored in the dispatcher)
+	// so the client-level pre-request hook can recognise internal URLs
+	// without depending on the handlers package.
+	internalAPIMarker = "/!api/internal/"
+)
 
 // BBClient wraps a resty.Client configured for the Bitbucket API.
 //
@@ -71,6 +81,19 @@ func NewClientWithConfig(username, token, baseURL, csrfToken, cloudSessionToken 
 	}
 	c := resty.New().SetBaseURL(base)
 
+	// Defence in depth: even though the dispatcher applies Basic Auth
+	// per-request (and not at the client level), this hook guarantees that
+	// no Authorization header ever reaches an internal-API endpoint, even
+	// if a future caller wires Basic Auth onto the underlying resty client
+	// directly. The internal endpoint returns 401 when both cookies and an
+	// Authorization header are present.
+	c.SetPreRequestHook(func(_ *resty.Client, r *http.Request) error {
+		if r != nil && r.URL != nil && strings.Contains(r.URL.Path, internalAPIMarker) {
+			r.Header.Del("Authorization")
+		}
+		return nil
+	})
+
 	hasBasic := token != ""
 	hasInternal := csrfToken != "" && cloudSessionToken != ""
 	if !hasBasic && !hasInternal {
@@ -81,16 +104,14 @@ func NewClientWithConfig(username, token, baseURL, csrfToken, cloudSessionToken 
 		)
 	}
 
-	// Pre-apply Basic Auth on the resty client so callers that bypass the
-	// dispatcher (e.g. ad-hoc tooling) still get authenticated for the public
-	// API. The dispatcher overrides this per-request for internal URLs.
-	if hasBasic {
-		authUser := username
-		if authUser == "" {
-			authUser = "x-token-auth"
-		}
-		c.SetBasicAuth(authUser, token)
-	}
+	// Authentication is selected per request by the dispatcher
+	// (handlers.executeRequest) based on the URL: public REST API → Basic
+	// Auth using Username/Token; internal API (/!api/internal/) → cookies
+	// + X-CSRFToken. We deliberately do NOT call resty's client-level
+	// SetBasicAuth: doing so would force the dispatcher into fragile
+	// header-deletion tricks to suppress Basic Auth on internal-API
+	// requests (resty re-injects the Authorization header from its
+	// client-level UserInfo during request execution).
 
 	return &BBClient{
 		Client:            c,
