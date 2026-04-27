@@ -35,6 +35,10 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Normalize repository owner
+        id: owner
+        run: echo "lowercase=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+
       - name: Determine image tag
         id: version
         env:
@@ -72,7 +76,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
+          images: ghcr.io/${{ steps.owner.outputs.lowercase }}/${{ matrix.image }}
           tags: |
             type=semver,pattern={{version}},value=${{ steps.version.outputs.tag }}
             type=semver,pattern={{major}}.{{minor}},value=${{ steps.version.outputs.tag }}
@@ -97,14 +101,14 @@ jobs:
       - name: Generate SBOM for ${{ matrix.image }}
         uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
         with:
-          image: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}@${{ steps.build.outputs.digest }}
+          image: ghcr.io/${{ steps.owner.outputs.lowercase }}/${{ matrix.image }}@${{ steps.build.outputs.digest }}
           artifact-name: sbom-${{ matrix.image }}.spdx.json
 
       - name: Scan ${{ matrix.image }} for CVEs
         uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2 # v7.4.0
         id: scan
         with:
-          image: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}@${{ steps.build.outputs.digest }}
+          image: ghcr.io/${{ steps.owner.outputs.lowercase }}/${{ matrix.image }}@${{ steps.build.outputs.digest }}
           fail-build: false
           severity-cutoff: critical
 
