@@ -203,7 +203,7 @@ func TestDispatch_InternalAPI_SuppressesPreconfiguredBasicAuth(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewClientWithConfig: %v", err)
 	}
-	bb.Client.SetBasicAuth("u", "p")
+	bb.SetBasicAuth("u", "p")
 
 	url := srv.URL + "/!api/internal/workspaces/myorg/projects/PROJ/branch-restrictions/group-by-branch/"
 	if err := handlers.Dispatch(context.Background(), bb, handlers.Request{
