@@ -1,6 +1,6 @@
 module github.com/FabianSchurig/bitbucket-cli
 
-go 1.25.8
+go 1.25.9
 
 require (
 	github.com/fatih/color v1.19.0
@@ -8,7 +8,7 @@ require (
 	github.com/hashicorp/terraform-plugin-framework v1.19.0
 	github.com/hashicorp/terraform-plugin-go v0.31.0
 	github.com/hashicorp/terraform-plugin-testing v1.15.0
-	github.com/modelcontextprotocol/go-sdk v1.4.1
+	github.com/modelcontextprotocol/go-sdk v1.5.0
 	github.com/spf13/cobra v1.10.2
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -39,35 +39,35 @@ require (
 	github.com/hashicorp/terraform-plugin-log v0.10.0 // indirect
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.40.0 // indirect
 	github.com/hashicorp/terraform-registry-address v0.4.0 // indirect
-	github.com/hashicorp/terraform-svchost v0.1.1 // indirect
+	github.com/hashicorp/terraform-svchost v0.2.1 // indirect
 	github.com/hashicorp/yamux v0.1.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
-	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
-	github.com/oklog/run v1.1.0 // indirect
-	github.com/segmentio/asm v1.1.3 // indirect
+	github.com/oklog/run v1.2.0 // indirect
+	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/segmentio/encoding v0.5.4 // indirect
-	github.com/spf13/pflag v1.0.9 // indirect
+	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	github.com/zclconf/go-cty v1.17.0 // indirect
-	golang.org/x/crypto v0.48.0 // indirect
-	golang.org/x/mod v0.33.0 // indirect
-	golang.org/x/net v0.49.0 // indirect
-	golang.org/x/oauth2 v0.34.0 // indirect
-	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.42.0 // indirect
-	golang.org/x/text v0.34.0 // indirect
-	golang.org/x/tools v0.41.0 // indirect
+	golang.org/x/crypto v0.50.0 // indirect
+	golang.org/x/mod v0.34.0 // indirect
+	golang.org/x/net v0.53.0 // indirect
+	golang.org/x/oauth2 v0.36.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sys v0.43.0 // indirect
+	golang.org/x/text v0.36.0 // indirect
+	golang.org/x/tools v0.43.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260120221211-b8f7ae30c516 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260420184626-e10c466a9529 // indirect
 	google.golang.org/grpc v1.80.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )

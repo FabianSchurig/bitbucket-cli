@@ -83,6 +83,32 @@ var CRUDConfig = map[string]CRUDMapping{
 		Delete: "deleteABranchRestrictionRule",
 		List:   "listBranchRestrictions",
 	},
+	// Project-level branch restrictions live on Bitbucket's *internal* API
+	// (https://bitbucket.org/!api/internal/...). The endpoint has only PUT and
+	// GET semantics: PUT replaces the full rule set for a pattern/branch type,
+	// and "delete" is achieved by sending an empty values list. To keep the
+	// generic CRUD machinery happy we map both Update and Delete to the same
+	// PUT operation; downstream Terraform/MCP code can treat the operation
+	// uniformly and pass {"values":[]} when the user removes the resource.
+	"project-branch-restrictions": {
+		Read:   "getProjectBranchRestrictionsGroupedByBranch",
+		Update: "replaceProjectBranchRestrictionsByPattern",
+		List:   "getProjectBranchRestrictionsGroupedByBranch",
+	},
+	"project-branch-restrictions-by-pattern": {
+		Read:   "getProjectBranchRestrictionsGroupedByBranch",
+		Create: "replaceProjectBranchRestrictionsByPattern",
+		Update: "replaceProjectBranchRestrictionsByPattern",
+		Delete: "replaceProjectBranchRestrictionsByPattern",
+		List:   "getProjectBranchRestrictionsGroupedByBranch",
+	},
+	"project-branch-restrictions-by-branch-type": {
+		Read:   "getProjectBranchRestrictionsGroupedByBranch",
+		Create: "replaceProjectBranchRestrictionsByBranchType",
+		Update: "replaceProjectBranchRestrictionsByBranchType",
+		Delete: "replaceProjectBranchRestrictionsByBranchType",
+		List:   "getProjectBranchRestrictionsGroupedByBranch",
+	},
 	"branching-model": {
 		Read:   "getTheBranchingModelForARepository",
 		Update: "updateTheBranchingModelConfigForARepository",

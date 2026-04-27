@@ -146,6 +146,18 @@ Manage Bitbucket webhooks
 
 ---
 
+## `bitbucket_project-branch-restrictions`
+
+Manage Bitbucket project-level branch restrictions (internal API)
+
+| Operation | Method | Description |
+|-----------|--------|-------------|
+| `replaceProjectBranchRestrictionsByBranchType` | `PUT` | Replaces the full set of project-level branch restriction rules that |
+| `replaceProjectBranchRestrictionsByPattern` | `PUT` | Replaces the full set of project-level branch restriction rules that |
+| `getProjectBranchRestrictionsGroupedByBranch` | `GET` | Returns the project-level branch restriction rules grouped by the |
+
+---
+
 ## `bitbucket_issues`
 
 Manage the issue tracker for a Bitbucket repository.

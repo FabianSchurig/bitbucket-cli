@@ -144,6 +144,15 @@ operation groups. Each resource group maps to a set of CRUD operations.
 | `bitbucket_downloads` | `bitbucket_downloads` | CRDL |
 
 
+### Internal Project Branch Restrictions
+
+| Resource | Data Source | CRUD |
+|----------|-------------|------|
+| `bitbucket_project_branch_restrictions` | `bitbucket_project_branch_restrictions` | RUL |
+| `bitbucket_project_branch_restrictions_by_branch_type` | `bitbucket_project_branch_restrictions_by_branch_type` | CRUDL |
+| `bitbucket_project_branch_restrictions_by_pattern` | `bitbucket_project_branch_restrictions_by_pattern` | CRUDL |
+
+
 ### Issues
 
 | Resource | Data Source | CRUD |

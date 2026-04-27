@@ -178,6 +178,53 @@ func TestDispatch_APIError(t *testing.T) {
 	}
 }
 
+// TestDispatch_AbsoluteURLTemplate verifies that an absolute URL in
+// URLTemplate is sent as-is, ignoring the client's BaseURL. This is required
+// for Bitbucket's internal endpoints which live on a different host
+// (https://bitbucket.org/!api/internal/...) than the public API base URL.
+func TestDispatch_AbsoluteURLTemplate(t *testing.T) {
+	output.Format = "json"
+
+	var gotPath string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
+		if r.Method != http.MethodPut {
+			t.Errorf("expected PUT, got %s", r.Method)
+		}
+		var body map[string]any
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Errorf("decoding body: %v", err)
+		}
+		if _, ok := body["values"]; !ok {
+			t.Errorf("expected body with 'values' key, got %v", body)
+		}
+		w.Header().Set(headerContentType, contentTypeJSON)
+		_ = json.NewEncoder(w).Encode(map[string]any{"ok": true})
+	}))
+	defer srv.Close()
+
+	// Client points at a deliberately-wrong base URL; the absolute URLTemplate
+	// must override it.
+	c := newTestClient(t, "http://wrong-host.invalid")
+	err := handlers.Dispatch(context.Background(), c, handlers.Request{
+		Method:      "PUT",
+		URLTemplate: srv.URL + "/!api/internal/workspaces/{workspace}/projects/{project_key}/branch-restrictions/by-pattern/{pattern}",
+		PathParams: map[string]string{
+			"workspace":   "myworkspace",
+			"project_key": "MYPROJ",
+			"pattern":     "main",
+		},
+		Body: `{"values":[{"pattern":"main","branch_match_kind":"glob","kind":"force"}]}`,
+	})
+	if err != nil {
+		t.Fatalf(dispatchErrFmt, err)
+	}
+	wantPath := "/!api/internal/workspaces/myworkspace/projects/MYPROJ/branch-restrictions/by-pattern/main"
+	if gotPath != wantPath {
+		t.Errorf("expected path %s, got %s", wantPath, gotPath)
+	}
+}
+
 func TestDispatch_DELETE_NoContent(t *testing.T) {
 	output.Format = "json"
 

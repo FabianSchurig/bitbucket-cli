@@ -28,8 +28,8 @@ func TestNewRootCmd(t *testing.T) {
 	if cmd.Version == "" {
 		t.Fatal("expected version on root command")
 	}
-	if len(cmd.Commands()) != 20 {
-		t.Fatalf("expected 20 subcommands, got %d", len(cmd.Commands()))
+	if len(cmd.Commands()) != 21 {
+		t.Fatalf("expected 21 subcommands, got %d", len(cmd.Commands()))
 	}
 
 	for _, sub := range cmd.Commands() {

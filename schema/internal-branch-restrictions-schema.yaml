@@ -1,0 +1,301 @@
+openapi: 3.0.0
+info:
+  title: Bitbucket Internal Project Branch Restrictions CLI
+  version: '1.0'
+  x-cli-command-name: ProjectBranchRestrictions
+  x-cli-command-use: project-branch-restrictions
+  x-cli-command-short: Manage Bitbucket project-level branch restrictions (internal API)
+  x-cli-command-long: |
+    Commands for listing and replacing branch restriction rules at the
+    *project* level via Bitbucket's internal API.
+
+    The Bitbucket public REST API (api.bitbucket.org/2.0) exposes branch
+    restrictions only at the *repository* level. Project-level restrictions
+    are configured in the web UI through an internal endpoint hosted at
+    https://bitbucket.org/!api/internal/. These commands wrap that endpoint
+    so the same configuration can be managed from the CLI, MCP, or Terraform.
+
+    Note: this is an undocumented internal API and is not covered by
+    Atlassian's public stability guarantees. Authentication uses the same
+    BITBUCKET_USERNAME / BITBUCKET_TOKEN environment variables as the
+    public-API commands.
+
+    The API has only PUT and GET semantics — to "delete" all rules for a
+    pattern or branch type, send a PUT with an empty values list:
+    --body '{"values":[]}'
+paths:
+  # Internal endpoints live on https://bitbucket.org/!api/internal/...
+  # The dispatcher passes absolute URLs through to resty unchanged, so the
+  # Bitbucket public-API base URL (api.bitbucket.org/2.0) does not apply here.
+  https://bitbucket.org/!api/internal/workspaces/{workspace}/projects/{project_key}/branch-restrictions/group-by-branch/:
+    parameters:
+      - name: workspace
+        in: path
+        description: Workspace ID (slug) or UUID surrounded by curly-braces.
+        required: true
+        schema:
+          type: string
+      - name: project_key
+        in: path
+        description: The project key (e.g. MYPROJ).
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Project branch restrictions (internal)
+      summary: List project branch restrictions grouped by branch
+      description: |
+        Returns the project-level branch restriction rules grouped by the
+        branch they apply to. Use this as the "Read" / "List" operation when
+        managing project-level branch restrictions.
+      operationId: getProjectBranchRestrictionsGroupedByBranch
+      responses:
+        '200':
+          description: Branch restrictions grouped by branch.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal_project_branch_restrictions_grouped'
+        '401':
+          description: If the request was not authenticated.
+        '403':
+          description: If the user does not have project admin access.
+        '404':
+          description: If the workspace or project does not exist.
+
+  https://bitbucket.org/!api/internal/workspaces/{workspace}/projects/{project_key}/branch-restrictions/by-pattern/{pattern}:
+    parameters:
+      - name: workspace
+        in: path
+        description: Workspace ID (slug) or UUID surrounded by curly-braces.
+        required: true
+        schema:
+          type: string
+      - name: project_key
+        in: path
+        description: The project key (e.g. MYPROJ).
+        required: true
+        schema:
+          type: string
+      - name: pattern
+        in: path
+        description: |
+          The branch glob pattern (e.g. "main", "release/*"). All rules for
+          this pattern are *replaced* by the supplied values list — pass an
+          empty list to delete all rules for the pattern.
+        required: true
+        schema:
+          type: string
+    put:
+      tags:
+        - Project branch restrictions (internal)
+      summary: Replace project branch restrictions matched by glob pattern
+      description: |
+        Replaces the full set of project-level branch restriction rules that
+        match the given branch glob pattern. The "branch_match_kind" of every
+        rule in the request body must be "glob".
+
+        This single endpoint covers Create, Update, and Delete:
+          * To create or update rules for a pattern, send the full desired
+            values list.
+          * To delete all rules for a pattern, send {"values": []}.
+      operationId: replaceProjectBranchRestrictionsByPattern
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/internal_project_branch_restrictions_request'
+      responses:
+        '200':
+          description: The updated set of branch restrictions for the pattern.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal_project_branch_restrictions_request'
+        '400':
+          description: If the request body is invalid.
+        '401':
+          description: If the request was not authenticated.
+        '403':
+          description: If the user does not have project admin access.
+
+  https://bitbucket.org/!api/internal/workspaces/{workspace}/projects/{project_key}/branch-restrictions/by-branch-type/{branch_type}:
+    parameters:
+      - name: workspace
+        in: path
+        description: Workspace ID (slug) or UUID surrounded by curly-braces.
+        required: true
+        schema:
+          type: string
+      - name: project_key
+        in: path
+        description: The project key (e.g. MYPROJ).
+        required: true
+        schema:
+          type: string
+      - name: branch_type
+        in: path
+        description: |
+          The branching-model branch type. All rules for this branch type
+          are *replaced* by the supplied values list — pass an empty list
+          to delete all rules for the branch type.
+        required: true
+        schema:
+          type: string
+          enum:
+            - production
+            - development
+            - bugfix
+            - release
+            - feature
+            - hotfix
+    put:
+      tags:
+        - Project branch restrictions (internal)
+      summary: Replace project branch restrictions matched by branching-model branch type
+      description: |
+        Replaces the full set of project-level branch restriction rules that
+        match the given branching-model branch type. The "branch_match_kind"
+        of every rule in the request body must be "branching_model".
+
+        This single endpoint covers Create, Update, and Delete:
+          * To create or update rules for a branch type, send the full
+            desired values list.
+          * To delete all rules for a branch type, send {"values": []}.
+      operationId: replaceProjectBranchRestrictionsByBranchType
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/internal_project_branch_restrictions_request'
+      responses:
+        '200':
+          description: The updated set of branch restrictions for the branch type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/internal_project_branch_restrictions_request'
+        '400':
+          description: If the request body is invalid.
+        '401':
+          description: If the request was not authenticated.
+        '403':
+          description: If the user does not have project admin access.
+
+components:
+  schemas:
+    internal_project_branch_restriction:
+      type: object
+      description: |
+        A single project-level branch restriction rule. Either `pattern`
+        (with `branch_match_kind: glob`) or `branch_type` (with
+        `branch_match_kind: branching_model`) must be set, matching the
+        endpoint used.
+      required:
+        - kind
+        - branch_match_kind
+      properties:
+        kind:
+          type: string
+          description: |
+            The kind of restriction.
+          enum:
+            - push
+            - force
+            - delete
+            - restrict_merges
+            - require_tasks_to_be_completed
+            - require_approvals_to_merge
+            - require_default_reviewer_approvals_to_merge
+            - require_no_changes_requested
+            - require_passing_builds_to_merge
+            - require_commits_behind
+            - reset_pullrequest_approvals_on_change
+            - smart_reset_pullrequest_approvals
+            - reset_pullrequest_changes_requested_on_change
+            - require_all_dependencies_merged
+            - enforce_merge_checks
+            - allow_auto_merge_when_builds_pass
+        branch_match_kind:
+          type: string
+          description: |
+            How the rule selects branches. Must be "glob" when used with
+            the by-pattern endpoint, or "branching_model" with by-branch-type.
+          enum:
+            - glob
+            - branching_model
+        pattern:
+          type: string
+          description: Branch glob pattern (when branch_match_kind=glob).
+        branch_type:
+          type: string
+          description: |
+            Branching-model branch type (when branch_match_kind=branching_model).
+          enum:
+            - production
+            - development
+            - bugfix
+            - release
+            - feature
+            - hotfix
+        value:
+          type: integer
+          description: |
+            Numeric threshold for kinds that require one (e.g.
+            require_approvals_to_merge, require_passing_builds_to_merge,
+            require_commits_behind).
+        users:
+          type: array
+          description: |
+            Users exempted from the restriction. Only applies to "push" and
+            "restrict_merges" kinds.
+          items:
+            type: object
+            properties:
+              uuid:
+                type: string
+                description: The user UUID, surrounded by curly-braces.
+        groups:
+          type: array
+          description: |
+            Groups exempted from the restriction. Only applies to "push" and
+            "restrict_merges" kinds.
+          items:
+            type: object
+            properties:
+              slug:
+                type: string
+                description: The group slug.
+              owner:
+                type: object
+                properties:
+                  username:
+                    type: string
+
+    internal_project_branch_restrictions_request:
+      type: object
+      description: |
+        The request body for replacing project branch restrictions. The
+        "values" list is the *complete* desired set of rules for the
+        pattern or branch type — use an empty list to remove all rules.
+      required:
+        - values
+      properties:
+        values:
+          type: array
+          description: The full desired list of rules.
+          items:
+            $ref: '#/components/schemas/internal_project_branch_restriction'
+
+    internal_project_branch_restrictions_grouped:
+      type: object
+      description: |
+        The response shape of the group-by-branch endpoint. Keys are branch
+        names (or branch-type identifiers); values are arrays of rules.
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/internal_project_branch_restriction'
