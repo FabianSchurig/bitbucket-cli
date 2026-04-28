@@ -205,9 +205,28 @@ func (r *GenericResource) Create(ctx context.Context, req resource.CreateRequest
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	if readOp := r.group.Ops.Read; readOp != nil && readOp.OperationID != op.OperationID {
-		r.refreshState(ctx, readOp, &resp.State, &resp.Diagnostics)
+	r.refreshAfterWrite(ctx, op, &resp.State, &resp.Diagnostics)
+}
+
+// refreshAfterWrite performs a post-write Read against the freshly-written
+// state when the Read operation differs from the write operation that just
+// ran. This is the generic mechanism by which any resource whose write
+// response shape diverges from the Read schema (e.g. the project
+// branch-restrictions endpoints, where the write PUT response is not the
+// shape the Read transformer expects) gets its state populated from the
+// canonical Read response. Without this follow-up, Terraform sees mismatches
+// between the planned state and the post-apply state and aborts with
+// "Provider produced inconsistent result after apply".
+//
+// Both Create and Update funnel through this helper so the refresh
+// behaviour stays symmetric: a write op that needs a follow-up Read after
+// Create needs the same follow-up after Update for the same reasons.
+func (r *GenericResource) refreshAfterWrite(ctx context.Context, writeOp *OperationDef, state stateAccessor, diags *diag.Diagnostics) {
+	readOp := r.group.Ops.Read
+	if readOp == nil || readOp.OperationID == writeOp.OperationID {
+		return
 	}
+	r.refreshState(ctx, readOp, state, diags)
 }
 
 // Read calls the read API operation and refreshes state. The resource `id` is
@@ -286,6 +305,15 @@ func restorePriorID(ctx context.Context, state stateAccessor, priorID string, di
 // rule returned by Create): such params appear as "(known after apply)" in the
 // plan even for in-place updates, so without the fallback the dispatch would
 // fail with "Missing Required Parameter".
+//
+// As with Create, when the Read operation differs from Update a follow-up
+// Read is performed against the freshly-written state so the canonical Read
+// response (and any Read-side response-shape transformer) populates state.
+// Without this, write responses whose shape diverges from the Read schema
+// (e.g. the project branch-restrictions PUT endpoints, whose response is not
+// in the flat `{"values": [...]}` form the schema declares) leave nested
+// Computed attributes mis-mapped, producing "Provider produced inconsistent
+// result after apply" errors on every modify.
 func (r *GenericResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	op := r.group.Ops.Update
 	if op == nil {
@@ -293,6 +321,10 @@ func (r *GenericResource) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 	r.dispatchWithParamFallback(ctx, op, &req.Plan, &req.State, &resp.State, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	r.refreshAfterWrite(ctx, op, &resp.State, &resp.Diagnostics)
 }
 
 // ImportState implements resource import. The import ID must be the slash-separated
