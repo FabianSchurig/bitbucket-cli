@@ -225,7 +225,10 @@ func (r *GenericResource) Read(ctx context.Context, req resource.ReadRequest, re
 		// If no read operation, preserve existing state.
 		return
 	}
-	priorID := readPriorID(ctx, &req.State)
+	priorID := readPriorID(ctx, &req.State, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 	r.dispatch(ctx, op, &req.State, &resp.State, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
@@ -238,7 +241,10 @@ func (r *GenericResource) Read(ctx context.Context, req resource.ReadRequest, re
 // after a successful Create so the post-create state matches the canonical
 // Read response.
 func (r *GenericResource) refreshState(ctx context.Context, readOp *OperationDef, state stateAccessor, diags *diag.Diagnostics) {
-	priorID := readPriorID(ctx, state)
+	priorID := readPriorID(ctx, state, diags)
+	if diags.HasError() {
+		return
+	}
 	r.dispatch(ctx, readOp, state, state, diags)
 	if diags.HasError() {
 		return
@@ -246,15 +252,18 @@ func (r *GenericResource) refreshState(ctx context.Context, readOp *OperationDef
 	restorePriorID(ctx, state, priorID, diags)
 }
 
-// readPriorID returns the existing `id` attribute from state. An empty string
-// is returned when the id has not been written yet (e.g., the Create dispatch
-// failed before storeDispatchResult ran), the attribute is null/unknown, or
-// the framework reports an error reading it. Callers treat the empty case as
-// "no id to preserve" and let the dispatch-written id stand.
-func readPriorID(ctx context.Context, state stateAccessor) string {
+// readPriorID returns the existing `id` attribute from state. Diagnostics
+// returned by the framework's GetAttribute call are appended to diags so
+// real state-handling problems (e.g. schema mismatches) surface to the user
+// instead of being silently swallowed; callers should bail out via
+// diags.HasError() when that happens. An empty string is returned when the
+// attribute is null or unknown — i.e. no id has been written yet (e.g. the
+// Create dispatch failed before storeDispatchResult ran). Callers treat the
+// empty case as "no id to preserve" and let the dispatch-written id stand.
+func readPriorID(ctx context.Context, state stateAccessor, diags *diag.Diagnostics) string {
 	var id types.String
-	d := state.GetAttribute(ctx, attrPath("id"), &id)
-	if d.HasError() || id.IsNull() || id.IsUnknown() {
+	diags.Append(state.GetAttribute(ctx, attrPath("id"), &id)...)
+	if diags.HasError() || id.IsNull() || id.IsUnknown() {
 		return ""
 	}
 	return id.ValueString()

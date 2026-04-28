@@ -19,10 +19,13 @@ func TestReadPriorIDAndRestore(t *testing.T) {
 
 	// Empty / null state → empty prior id, restore is a no-op.
 	empty := newMockState(nil)
-	if got := readPriorID(ctx, empty); got != "" {
+	var diags diag.Diagnostics
+	if got := readPriorID(ctx, empty, &diags); got != "" {
 		t.Fatalf("expected empty priorID for empty state, got %q", got)
 	}
-	var diags diag.Diagnostics
+	if diags.HasError() {
+		t.Fatalf("readPriorID on empty state should not error, got %#v", diags)
+	}
 	restorePriorID(ctx, empty, "", &diags)
 	if _, ok := empty.set["id"]; ok {
 		t.Fatalf("restorePriorID with empty id must not write state, set=%#v", empty.set)
@@ -32,7 +35,7 @@ func TestReadPriorIDAndRestore(t *testing.T) {
 	state := newMockState(map[string]attr.Value{
 		"id": types.StringValue("replaceProjectBranchRestrictionsByPattern/ws/PROJ/*"),
 	})
-	got := readPriorID(ctx, state)
+	got := readPriorID(ctx, state, &diags)
 	if got != "replaceProjectBranchRestrictionsByPattern/ws/PROJ/*" {
 		t.Fatalf("unexpected priorID: %q", got)
 	}
@@ -40,6 +43,24 @@ func TestReadPriorIDAndRestore(t *testing.T) {
 	restorePriorID(ctx, target, got, &diags)
 	if target.set["id"] != types.StringValue(got) {
 		t.Fatalf("expected restorePriorID to write id to target, got %#v", target.set["id"])
+	}
+}
+
+// TestReadPriorIDSurfacesDiagnostics confirms that GetAttribute diagnostics
+// are appended to the caller's diag bag rather than being silently dropped.
+func TestReadPriorIDSurfacesDiagnostics(t *testing.T) {
+	ctx := context.Background()
+	state := newMockState(nil)
+	state.diags = map[string]diag.Diagnostics{
+		"id": {diag.NewErrorDiagnostic("schema mismatch", "id attribute not declared")},
+	}
+
+	var diags diag.Diagnostics
+	if got := readPriorID(ctx, state, &diags); got != "" {
+		t.Fatalf("expected empty priorID on framework error, got %q", got)
+	}
+	if !diags.HasError() {
+		t.Fatal("expected GetAttribute diagnostics to be surfaced")
 	}
 }
 
