@@ -270,7 +270,7 @@ func TestResourceExtractParamsAndBody(t *testing.T) {
 	})
 	var diags diag.Diagnostics
 
-	pathParams, queryParams := r.extractParams(ctx, group.Ops.Create, source, &diags)
+	pathParams, queryParams := r.extractParams(ctx, group.Ops.Create, source, nil, &diags)
 	if !reflect.DeepEqual(pathParams, map[string]string{"workspace": "ws"}) {
 		t.Fatalf("unexpected path params: %#v", pathParams)
 	}
@@ -299,6 +299,68 @@ func TestResourceExtractParamsAndBody(t *testing.T) {
 	}
 }
 
+// TestResourceExtractParamsFallbackToState reproduces the bug reported in
+// "bitbucket_branch_restrictions Update fails with Missing Required Parameter id".
+// When an in-place Update is planned, the Computed-only path param (e.g. the
+// numeric "id"/"param_id") is "(known after apply)" in the plan. Without a
+// fallback to prior state, extractParams reports it as missing. With the
+// fallback, the value is sourced from state and the dispatch can proceed.
+func TestResourceExtractParamsFallbackToState(t *testing.T) {
+	group := testResourceGroup()
+	r := &GenericResource{group: group}
+	ctx := context.Background()
+
+	// Plan: workspace is known, param_id is unknown (typical for in-place Update
+	// of a resource whose id is Computed-only).
+	plan := newMockState(map[string]attr.Value{
+		"workspace": types.StringValue("ws"),
+		"param_id":  types.StringUnknown(),
+	})
+	state := newMockState(map[string]attr.Value{
+		"workspace": types.StringValue("ws"),
+		"param_id":  types.StringValue("75417602"),
+	})
+
+	// Without fallback, the missing/unknown id should produce a diagnostic.
+	var diagsNoFallback diag.Diagnostics
+	r.extractParams(ctx, group.Ops.Update, plan, nil, &diagsNoFallback)
+	if !diagsNoFallback.HasError() {
+		t.Fatal("expected Missing Required Parameter without state fallback")
+	}
+
+	// With state as fallback, the id is recovered and no error is reported.
+	var diagsWithFallback diag.Diagnostics
+	pathParams, _ := r.extractParams(ctx, group.Ops.Update, plan, state, &diagsWithFallback)
+	if diagsWithFallback.HasError() {
+		t.Fatalf("unexpected diagnostics with state fallback: %#v", diagsWithFallback)
+	}
+	if got := pathParams["id"]; got != "75417602" {
+		t.Fatalf("expected id %q from state fallback, got %q", "75417602", got)
+	}
+	if got := pathParams["workspace"]; got != "ws" {
+		t.Fatalf("expected workspace %q from plan, got %q", "ws", got)
+	}
+
+	// When both plan and state have a known value, the plan takes precedence
+	// (the fallback is only consulted when the plan value is null/unknown/empty).
+	planWithID := newMockState(map[string]attr.Value{
+		"workspace": types.StringValue("ws"),
+		"param_id":  types.StringValue("plan-id"),
+	})
+	stateWithID := newMockState(map[string]attr.Value{
+		"workspace": types.StringValue("ws"),
+		"param_id":  types.StringValue("state-id"),
+	})
+	var diagsPrecedence diag.Diagnostics
+	pathParams, _ = r.extractParams(ctx, group.Ops.Update, planWithID, stateWithID, &diagsPrecedence)
+	if diagsPrecedence.HasError() {
+		t.Fatalf("unexpected diagnostics: %#v", diagsPrecedence)
+	}
+	if got := pathParams["id"]; got != "plan-id" {
+		t.Fatalf("expected plan to take precedence over state fallback, got %q", got)
+	}
+}
+
 func TestResourceHelperSelectionAndCopyAttributes(t *testing.T) {
 	group := testResourceGroup()
 	r := &GenericResource{group: group}
@@ -316,7 +378,7 @@ func TestResourceHelperSelectionAndCopyAttributes(t *testing.T) {
 
 	missingSource := newMockState(map[string]attr.Value{})
 	diags = nil
-	r.extractParams(ctx, group.Ops.Read, missingSource, &diags)
+	r.extractParams(ctx, group.Ops.Read, missingSource, nil, &diags)
 	if !diags.HasError() {
 		t.Fatal("expected missing required parameter diagnostics")
 	}
