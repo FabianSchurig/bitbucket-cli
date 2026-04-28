@@ -94,7 +94,7 @@ func TestRefreshStatePreservesID(t *testing.T) {
 	})
 
 	var diags diag.Diagnostics
-	r.refreshState(ctx, group.Ops.Read, state, &diags)
+	r.refreshState(ctx, group.Ops.Read, state, nil, &diags)
 	if diags.HasError() {
 		t.Fatalf("unexpected refreshState diagnostics: %#v", diags)
 	}
@@ -124,7 +124,7 @@ func TestRefreshStateNoPriorIDDoesNotRestore(t *testing.T) {
 	})
 
 	var diags diag.Diagnostics
-	r.refreshState(ctx, group.Ops.Read, state, &diags)
+	r.refreshState(ctx, group.Ops.Read, state, nil, &diags)
 	if diags.HasError() {
 		t.Fatalf("unexpected refreshState diagnostics: %#v", diags)
 	}

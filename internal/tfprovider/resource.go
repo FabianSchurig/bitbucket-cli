@@ -205,7 +205,7 @@ func (r *GenericResource) Create(ctx context.Context, req resource.CreateRequest
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	r.refreshAfterWrite(ctx, op, &resp.State, &resp.Diagnostics)
+	r.refreshAfterWrite(ctx, op, &resp.State, nil, &resp.Diagnostics)
 }
 
 // refreshAfterWrite performs a post-write Read against the freshly-written
@@ -221,12 +221,20 @@ func (r *GenericResource) Create(ctx context.Context, req resource.CreateRequest
 // Both Create and Update funnel through this helper so the refresh
 // behaviour stays symmetric: a write op that needs a follow-up Read after
 // Create needs the same follow-up after Update for the same reasons.
-func (r *GenericResource) refreshAfterWrite(ctx context.Context, writeOp *OperationDef, state stateAccessor, diags *diag.Diagnostics) {
+//
+// paramFallback supplies an additional state to consult when a path/query
+// param required by the Read op is null/unknown/empty in the freshly-
+// written state. Update passes the prior state here so that Computed-only
+// required params (e.g. a numeric "id" that is "(known after apply)" in
+// the plan but present in prior state) can still satisfy the post-write
+// Read. Create passes nil — its written state always carries every Read
+// param either from the user-supplied plan or from populateComputedParams.
+func (r *GenericResource) refreshAfterWrite(ctx context.Context, writeOp *OperationDef, state, paramFallback stateAccessor, diags *diag.Diagnostics) {
 	readOp := r.group.Ops.Read
 	if readOp == nil || readOp.OperationID == writeOp.OperationID {
 		return
 	}
-	r.refreshState(ctx, readOp, state, diags)
+	r.refreshState(ctx, readOp, state, paramFallback, diags)
 }
 
 // Read calls the read API operation and refreshes state. The resource `id` is
@@ -255,16 +263,21 @@ func (r *GenericResource) Read(ctx context.Context, req resource.ReadRequest, re
 	restorePriorID(ctx, &resp.State, priorID, &resp.Diagnostics)
 }
 
-// refreshState performs a Read-style dispatch using the current resp.State as
+// refreshState performs a Read-style dispatch using the current state as
 // both source and target, after preserving the resource id. It is invoked
-// after a successful Create so the post-create state matches the canonical
+// after a successful write so the post-write state matches the canonical
 // Read response.
-func (r *GenericResource) refreshState(ctx context.Context, readOp *OperationDef, state stateAccessor, diags *diag.Diagnostics) {
+//
+// paramFallback, when non-nil, is consulted by the dispatcher when a
+// path/query param required by readOp is null/unknown/empty in state.
+// Update supplies the prior state here so that Computed-only required
+// params can still satisfy the Read; pass nil when no fallback applies.
+func (r *GenericResource) refreshState(ctx context.Context, readOp *OperationDef, state, paramFallback stateAccessor, diags *diag.Diagnostics) {
 	priorID := readPriorID(ctx, state, diags)
 	if diags.HasError() {
 		return
 	}
-	r.dispatch(ctx, readOp, state, state, diags)
+	r.dispatchWithParamFallback(ctx, readOp, state, paramFallback, state, diags)
 	if diags.HasError() {
 		return
 	}
@@ -324,7 +337,7 @@ func (r *GenericResource) Update(ctx context.Context, req resource.UpdateRequest
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	r.refreshAfterWrite(ctx, op, &resp.State, &resp.Diagnostics)
+	r.refreshAfterWrite(ctx, op, &resp.State, &req.State, &resp.Diagnostics)
 }
 
 // ImportState implements resource import. The import ID must be the slash-separated

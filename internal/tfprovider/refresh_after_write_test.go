@@ -48,7 +48,7 @@ func TestRefreshAfterWrite_ReadDiffersTriggersGET(t *testing.T) {
 			"id":        types.StringValue("priorID"),
 		})
 		var diags diag.Diagnostics
-		r.refreshAfterWrite(ctx, writeOp, state, &diags)
+		r.refreshAfterWrite(ctx, writeOp, state, nil, &diags)
 		if diags.HasError() {
 			t.Fatalf("%s: unexpected diagnostics: %#v", writeOp.OperationID, diags)
 		}
@@ -65,12 +65,10 @@ func TestRefreshAfterWrite_ReadDiffersTriggersGET(t *testing.T) {
 }
 
 // TestRefreshAfterWrite_SameOpSkipsRefresh asserts that when the write op
-// IS the Read op (i.e. they share an OperationID — as happens for the
-// project-branch-restrictions resource group, where Read and Update both
-// resolve to `getProjectBranchRestrictionsGroupedByBranch` /
-// `replaceProjectBranchRestrictionsByPattern` style aliasing), no
-// redundant follow-up Read is performed. This avoids re-issuing the same
-// call right after it just ran.
+// and the Read op share an OperationID (e.g. via CRUDConfig aliasing where
+// a single endpoint is wired up for both roles), no redundant follow-up
+// Read is performed. This avoids re-issuing the same call right after it
+// just ran.
 func TestRefreshAfterWrite_SameOpSkipsRefresh(t *testing.T) {
 	ctx := context.Background()
 
@@ -83,9 +81,8 @@ func TestRefreshAfterWrite_SameOpSkipsRefresh(t *testing.T) {
 	defer srv.Close()
 
 	group := testResourceGroup()
-	// Force Read and Update to share an OperationID — emulates the
-	// project-branch-restrictions configuration where Read/Update map to
-	// the same operation.
+	// Force Read and Update to share an OperationID to exercise the skip
+	// branch — a generic configuration the helper must handle.
 	group.Ops.Read.OperationID = group.Ops.Update.OperationID
 	r := &GenericResource{group: group, client: testBBClient(srv.URL)}
 
@@ -94,7 +91,7 @@ func TestRefreshAfterWrite_SameOpSkipsRefresh(t *testing.T) {
 		"param_id":  types.StringValue("5"),
 	})
 	var diags diag.Diagnostics
-	r.refreshAfterWrite(ctx, group.Ops.Update, state, &diags)
+	r.refreshAfterWrite(ctx, group.Ops.Update, state, nil, &diags)
 	if diags.HasError() {
 		t.Fatalf("unexpected diagnostics: %#v", diags)
 	}
@@ -118,8 +115,61 @@ func TestRefreshAfterWrite_NoReadOpIsNoOp(t *testing.T) {
 	r := &GenericResource{group: group, client: testBBClient(srv.URL)}
 
 	var diags diag.Diagnostics
-	r.refreshAfterWrite(ctx, group.Ops.Create, newMockState(nil), &diags)
+	r.refreshAfterWrite(ctx, group.Ops.Create, newMockState(nil), nil, &diags)
 	if diags.HasError() {
 		t.Fatalf("unexpected diagnostics: %#v", diags)
+	}
+}
+
+// TestRefreshAfterWrite_UsesParamFallback covers the Update case where a
+// required Read path param is Computed-only and therefore unknown in the
+// freshly-written state (e.g. a numeric "id" that was "(known after apply)"
+// in the plan and only surfaces in the prior state). Without the fallback
+// the post-write Read would fail with "Missing Required Parameter"; with
+// it, the dispatcher consults the prior state and the refresh succeeds.
+func TestRefreshAfterWrite_UsesParamFallback(t *testing.T) {
+	ctx := context.Background()
+
+	var gets int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet && r.URL.Path == "/items/ws/5" {
+			atomic.AddInt32(&gets, 1)
+			w.Header().Set("Content-Type", "application/json")
+			_ = json.NewEncoder(w).Encode(map[string]any{"title": "Hello"})
+			return
+		}
+		http.NotFound(w, r)
+	}))
+	defer srv.Close()
+
+	group := testResourceGroup()
+	r := &GenericResource{group: group, client: testBBClient(srv.URL)}
+
+	// Freshly-written Update state: workspace is known, param_id is unknown
+	// (Computed-only, was "(known after apply)" in the plan), id was set by
+	// the write op.
+	written := newMockState(map[string]attr.Value{
+		"workspace": types.StringValue("ws"),
+		"param_id":  types.StringUnknown(),
+		"id":        types.StringValue("priorID"),
+	})
+	// Prior state carries the previously-assigned param_id that the post-
+	// write Read needs in order to construct the GET URL.
+	prior := newMockState(map[string]attr.Value{
+		"workspace": types.StringValue("ws"),
+		"param_id":  types.StringValue("5"),
+		"id":        types.StringValue("priorID"),
+	})
+
+	var diags diag.Diagnostics
+	r.refreshAfterWrite(ctx, group.Ops.Update, written, prior, &diags)
+	if diags.HasError() {
+		t.Fatalf("unexpected diagnostics: %#v", diags)
+	}
+	if got := atomic.LoadInt32(&gets); got != 1 {
+		t.Fatalf("expected 1 follow-up GET when param_id comes from prior state, got %d", got)
+	}
+	if got := written.set["id"]; got != types.StringValue("priorID") {
+		t.Fatalf("refresh must preserve prior id when param_id is only available from prior state, got %#v", got)
 	}
 }
