@@ -335,6 +335,11 @@ func (r *GenericResource) dispatch(ctx context.Context, op *OperationDef, source
 		return
 	}
 
+	// Reshape responses whose on-the-wire shape differs from the schema the
+	// generic extractor expects (e.g. the project branch-restrictions
+	// `group-by-branch` GET).
+	result = transformProjectBranchRestrictionsRead(ctx, op, source, result, diags)
+
 	resultMap := r.storeDispatchResult(ctx, op, pathParams, target, diags, result)
 	if resultMap != nil {
 		r.populateComputedParams(ctx, resultMap, source, target, diags)
