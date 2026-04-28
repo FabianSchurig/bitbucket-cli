@@ -207,13 +207,20 @@ func (r *GenericResource) Read(ctx context.Context, req resource.ReadRequest, re
 }
 
 // Update calls the update API operation and updates state.
+//
+// Path and query parameters are read from the plan first and fall back to the
+// prior state. The fallback is required for resources whose identifying path
+// parameter is Computed-only (e.g., the numeric "id" of a branch restriction
+// rule returned by Create): such params appear as "(known after apply)" in the
+// plan even for in-place updates, so without the fallback the dispatch would
+// fail with "Missing Required Parameter".
 func (r *GenericResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	op := r.group.Ops.Update
 	if op == nil {
 		resp.Diagnostics.AddError("Update not supported", fmt.Sprintf("Resource %s does not support update", r.group.TypeName))
 		return
 	}
-	r.dispatch(ctx, op, &req.Plan, &resp.State, &resp.Diagnostics)
+	r.dispatchWithParamFallback(ctx, op, &req.Plan, &req.State, &resp.State, &resp.Diagnostics)
 }
 
 // ImportState implements resource import. The import ID must be the slash-separated
@@ -288,7 +295,7 @@ func (r *GenericResource) Delete(ctx context.Context, req resource.DeleteRequest
 	}
 
 	plan := &req.State
-	pathParams, queryParams := r.extractParams(ctx, op, plan, &resp.Diagnostics)
+	pathParams, queryParams := r.extractParams(ctx, op, plan, nil, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -312,7 +319,14 @@ func (r *GenericResource) Delete(ctx context.Context, req resource.DeleteRequest
 
 // dispatch executes an API operation, reading params from source and writing results to target.
 func (r *GenericResource) dispatch(ctx context.Context, op *OperationDef, source stateAccessor, target stateAccessor, diags *diag.Diagnostics) {
-	pathParams, queryParams := r.extractParams(ctx, op, source, diags)
+	r.dispatchWithParamFallback(ctx, op, source, nil, target, diags)
+}
+
+// dispatchWithParamFallback is like dispatch but consults paramFallback when a
+// path/query parameter is null/unknown/empty in the primary source. The body is
+// always built from the primary source.
+func (r *GenericResource) dispatchWithParamFallback(ctx context.Context, op *OperationDef, source, paramFallback stateAccessor, target stateAccessor, diags *diag.Diagnostics) {
+	pathParams, queryParams := r.extractParams(ctx, op, source, paramFallback, diags)
 	if diags.HasError() {
 		return
 	}
@@ -342,8 +356,12 @@ func (r *GenericResource) dispatch(ctx context.Context, op *OperationDef, source
 	r.copyAttributes(ctx, op, source, target, diags)
 }
 
-// extractParams reads path and query params from the source state/plan.
-func (r *GenericResource) extractParams(ctx context.Context, op *OperationDef, source stateAccessor, diags *diag.Diagnostics) (map[string]string, map[string]string) {
+// extractParams reads path and query params from the source state/plan. When a
+// value is null/unknown/empty in source and fallback is non-nil, the value is
+// looked up in fallback instead. This is used during Update where Computed-only
+// path params (e.g., a resource id returned by Create) are unknown in the plan
+// and must be read from prior state.
+func (r *GenericResource) extractParams(ctx context.Context, op *OperationDef, source, fallback stateAccessor, diags *diag.Diagnostics) (map[string]string, map[string]string) {
 	pathParams := map[string]string{}
 	queryParams := map[string]string{}
 
@@ -354,6 +372,15 @@ func (r *GenericResource) extractParams(ctx context.Context, op *OperationDef, s
 		diags.Append(d...)
 		if d.HasError() {
 			continue
+		}
+		if val.IsNull() || val.IsUnknown() || val.ValueString() == "" {
+			if fallback != nil {
+				var fb types.String
+				fd := fallback.GetAttribute(ctx, attrPath(attrName), &fb)
+				if !fd.HasError() && !fb.IsNull() && !fb.IsUnknown() && fb.ValueString() != "" {
+					val = fb
+				}
+			}
 		}
 		if val.IsNull() || val.IsUnknown() || val.ValueString() == "" {
 			if p.Required {
