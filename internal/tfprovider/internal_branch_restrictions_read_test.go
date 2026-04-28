@@ -16,6 +16,11 @@ var readOpGroupByBranch = &OperationDef{
 	OperationID: "getProjectBranchRestrictionsGroupedByBranch",
 }
 
+const (
+	tnByPattern    = "project-branch-restrictions-by-pattern"
+	tnByBranchType = "project-branch-restrictions-by-branch-type"
+)
+
 func sourceWithPattern(pattern string) *mockState {
 	return newMockState(map[string]attr.Value{
 		"pattern": types.StringValue(pattern),
@@ -32,7 +37,7 @@ func TestTransformProjectBranchRestrictionsRead_NotTargetOp(t *testing.T) {
 	in := []any{map[string]any{"foo": "bar"}}
 	out := transformProjectBranchRestrictionsRead(context.Background(),
 		&OperationDef{OperationID: "somethingElse"},
-		newMockState(nil), in, &diag.Diagnostics{})
+		tnByPattern, newMockState(nil), in, &diag.Diagnostics{})
 	if !reflect.DeepEqual(out, in) {
 		t.Fatalf("unexpected mutation for non-target op: got %#v", out)
 	}
@@ -40,7 +45,7 @@ func TestTransformProjectBranchRestrictionsRead_NotTargetOp(t *testing.T) {
 
 func TestTransformProjectBranchRestrictionsRead_NilResult(t *testing.T) {
 	out := transformProjectBranchRestrictionsRead(context.Background(),
-		readOpGroupByBranch, sourceWithPattern("*"), nil, &diag.Diagnostics{})
+		readOpGroupByBranch, tnByPattern, sourceWithPattern("*"), nil, &diag.Diagnostics{})
 	m, ok := out.(map[string]any)
 	if !ok {
 		t.Fatalf("expected map result, got %T", out)
@@ -80,7 +85,7 @@ func TestTransformProjectBranchRestrictionsRead_ArrayResponseByPattern(t *testin
 	}
 
 	out := transformProjectBranchRestrictionsRead(context.Background(),
-		readOpGroupByBranch, sourceWithPattern("*"), resp, &diag.Diagnostics{})
+		readOpGroupByBranch, tnByPattern, sourceWithPattern("*"), resp, &diag.Diagnostics{})
 
 	m := out.(map[string]any)
 	values := m["values"].([]any)
@@ -110,7 +115,7 @@ func TestTransformProjectBranchRestrictionsRead_ArrayResponseByPattern(t *testin
 	}
 }
 
-func TestTransformProjectBranchRestrictionsRead_MultipleKinds(t *testing.T) {
+func TestTransformProjectBranchRestrictionsRead_MultipleKindsSortedDeterministically(t *testing.T) {
 	resp := []any{
 		map[string]any{
 			"kind": map[string]any{
@@ -124,24 +129,28 @@ func TestTransformProjectBranchRestrictionsRead_MultipleKinds(t *testing.T) {
 		},
 	}
 
-	out := transformProjectBranchRestrictionsRead(context.Background(),
-		readOpGroupByBranch, sourceWithPattern("main"), resp, &diag.Diagnostics{})
+	// Run the transform many times so that any nondeterministic Go map
+	// iteration would surface as an out-of-order result on at least one run
+	// (Go intentionally randomises map iteration to discourage relying on it).
+	wantKinds := []string{"delete", "force", "push"}
+	for i := 0; i < 50; i++ {
+		out := transformProjectBranchRestrictionsRead(context.Background(),
+			readOpGroupByBranch, tnByPattern, sourceWithPattern("main"), resp, &diag.Diagnostics{})
 
-	values := out.(map[string]any)["values"].([]any)
-	if len(values) != 3 {
-		t.Fatalf("expected one row per kind, got %d", len(values))
-	}
-	gotKinds := map[string]bool{}
-	for _, v := range values {
-		row := v.(map[string]any)
-		gotKinds[row["kind"].(string)] = true
-		if row["pattern"] != "main" {
-			t.Errorf("pattern not propagated: %#v", row)
+		values := out.(map[string]any)["values"].([]any)
+		if len(values) != 3 {
+			t.Fatalf("iteration %d: expected one row per kind, got %d", i, len(values))
 		}
-	}
-	for _, want := range []string{"push", "delete", "force"} {
-		if !gotKinds[want] {
-			t.Errorf("missing expanded kind %q", want)
+		gotKinds := make([]string, 0, len(values))
+		for _, v := range values {
+			row := v.(map[string]any)
+			gotKinds = append(gotKinds, row["kind"].(string))
+			if row["pattern"] != "main" {
+				t.Errorf("iteration %d: pattern not propagated: %#v", i, row)
+			}
+		}
+		if !reflect.DeepEqual(gotKinds, wantKinds) {
+			t.Fatalf("iteration %d: expected deterministic sorted kind order %v, got %v", i, wantKinds, gotKinds)
 		}
 	}
 }
@@ -167,7 +176,7 @@ func TestTransformProjectBranchRestrictionsRead_ByBranchType(t *testing.T) {
 	}
 
 	out := transformProjectBranchRestrictionsRead(context.Background(),
-		readOpGroupByBranch, sourceWithBranchType("production"), resp, &diag.Diagnostics{})
+		readOpGroupByBranch, tnByBranchType, sourceWithBranchType("production"), resp, &diag.Diagnostics{})
 
 	values := out.(map[string]any)["values"].([]any)
 	if len(values) != 1 {
@@ -199,7 +208,7 @@ func TestTransformProjectBranchRestrictionsRead_BareNumericKindData(t *testing.T
 	}
 
 	out := transformProjectBranchRestrictionsRead(context.Background(),
-		readOpGroupByBranch, sourceWithPattern("*"), resp, &diag.Diagnostics{})
+		readOpGroupByBranch, tnByPattern, sourceWithPattern("*"), resp, &diag.Diagnostics{})
 
 	values := out.(map[string]any)["values"].([]any)
 	if len(values) != 1 {
@@ -211,9 +220,10 @@ func TestTransformProjectBranchRestrictionsRead_BareNumericKindData(t *testing.T
 	}
 }
 
-func TestTransformProjectBranchRestrictionsRead_ObjectShapedResponse(t *testing.T) {
+func TestTransformProjectBranchRestrictionsRead_ObjectShapedResponseSortedDeterministically(t *testing.T) {
 	// The schema declares the response as an object whose values are arrays of
-	// rules; ensure the transformer can handle that shape too.
+	// rules; ensure the transformer can handle that shape and that branch keys
+	// are visited in a stable order.
 	resp := map[string]any{
 		"main": []any{
 			map[string]any{
@@ -235,16 +245,34 @@ func TestTransformProjectBranchRestrictionsRead_ObjectShapedResponse(t *testing.
 		},
 	}
 
-	out := transformProjectBranchRestrictionsRead(context.Background(),
-		readOpGroupByBranch, sourceWithPattern("main"), resp, &diag.Diagnostics{})
+	// Filter to "main"; should always yield the same single row regardless of
+	// underlying map iteration order.
+	for i := 0; i < 25; i++ {
+		out := transformProjectBranchRestrictionsRead(context.Background(),
+			readOpGroupByBranch, tnByPattern, sourceWithPattern("main"), resp, &diag.Diagnostics{})
 
-	values := out.(map[string]any)["values"].([]any)
-	if len(values) != 1 {
-		t.Fatalf("expected 1 row filtered to main, got %d", len(values))
+		values := out.(map[string]any)["values"].([]any)
+		if len(values) != 1 {
+			t.Fatalf("iteration %d: expected 1 row filtered to main, got %d", i, len(values))
+		}
+		row := values[0].(map[string]any)
+		if row["pattern"] != "main" || row["kind"] != "push" {
+			t.Errorf("iteration %d: unexpected row: %#v", i, row)
+		}
 	}
-	row := values[0].(map[string]any)
-	if row["pattern"] != "main" || row["kind"] != "push" {
-		t.Errorf("unexpected row: %#v", row)
+
+	// And without a scope, both branch keys should be returned in sorted order.
+	out := transformProjectBranchRestrictionsRead(context.Background(),
+		readOpGroupByBranch, "unknown-typename", newMockState(nil), resp, &diag.Diagnostics{})
+	values := out.(map[string]any)["values"].([]any)
+	if len(values) != 2 {
+		t.Fatalf("expected 2 rows, got %d", len(values))
+	}
+	if values[0].(map[string]any)["pattern"] != "main" {
+		t.Errorf("expected first row to be 'main' (sorted), got %v", values[0])
+	}
+	if values[1].(map[string]any)["pattern"] != "release/*" {
+		t.Errorf("expected second row to be 'release/*' (sorted), got %v", values[1])
 	}
 }
 
@@ -261,10 +289,61 @@ func TestTransformProjectBranchRestrictionsRead_NoScopeMatchesAll(t *testing.T) 
 			"pattern":           "*",
 		},
 	}
+	// Use a typename that the gating logic does not recognise — both reads
+	// should be skipped, leaving pattern/branch_type empty and matching all.
 	out := transformProjectBranchRestrictionsRead(context.Background(),
-		readOpGroupByBranch, newMockState(nil), resp, &diag.Diagnostics{})
+		readOpGroupByBranch, "unknown-typename", newMockState(nil), resp, &diag.Diagnostics{})
 	values := out.(map[string]any)["values"].([]any)
 	if len(values) != 1 {
 		t.Fatalf("expected entry to be kept when no scope is set, got %d", len(values))
+	}
+}
+
+func TestTransformProjectBranchRestrictionsRead_TypeNameGatesAttributeReads(t *testing.T) {
+	// When the active sub-resource is by-pattern, the transform must not call
+	// GetAttribute on `branch_type` (which is not part of that sub-resource's
+	// schema and would yield a diagnostic in the real plugin framework).
+	// Mirror behaviour for by-branch-type and `pattern`.
+	captured := newMockState(map[string]attr.Value{
+		"pattern":     types.StringValue("main"),
+		"branch_type": types.StringValue("production"),
+	})
+
+	resp := []any{
+		map[string]any{
+			"kind": map[string]any{
+				"push": map[string]any{"users": []any{}, "groups": []any{}},
+			},
+			"branch_match_kind": "glob",
+			"pattern":           "main",
+			"branch_type":       "",
+		},
+	}
+
+	// by-pattern: should match when only pattern is read. If branch_type were
+	// also read it would be "production" and the entry (branch_type "") would
+	// be filtered out.
+	out := transformProjectBranchRestrictionsRead(context.Background(),
+		readOpGroupByBranch, tnByPattern, captured, resp, &diag.Diagnostics{})
+	if vs := out.(map[string]any)["values"].([]any); len(vs) != 1 {
+		t.Fatalf("by-pattern: expected entry to match, got %d (branch_type was read by mistake?)", len(vs))
+	}
+
+	// by-branch-type: response entry has branch_type "" which doesn't match
+	// "production"; verify pattern is NOT read (otherwise we'd still match).
+	respBT := []any{
+		map[string]any{
+			"kind": map[string]any{
+				"push": map[string]any{"users": []any{}, "groups": []any{}},
+			},
+			"branch_match_kind": "branching_model",
+			"pattern":           "",
+			"branch_type":       "production",
+		},
+	}
+	out = transformProjectBranchRestrictionsRead(context.Background(),
+		readOpGroupByBranch, tnByBranchType, captured, respBT, &diag.Diagnostics{})
+	if vs := out.(map[string]any)["values"].([]any); len(vs) != 1 {
+		t.Fatalf("by-branch-type: expected entry to match production, got %d (pattern was read by mistake?)", len(vs))
 	}
 }

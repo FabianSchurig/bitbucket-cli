@@ -2,6 +2,8 @@ package tfprovider
 
 import (
 	"context"
+	"sort"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
@@ -40,9 +42,14 @@ import (
 // The transform filters entries to those matching the resource's own
 // `pattern` (or `branch_type`) — read from the source state — and expands
 // each entry's nested `kind` object into one `values` row per kind name.
+// `typeName` is the resource group's TypeName (e.g.
+// `project-branch-restrictions-by-pattern`); it determines which scope
+// attribute to read so we never call `GetAttribute` on a root attribute
+// that the active sub-resource's schema does not declare.
 func transformProjectBranchRestrictionsRead(
 	ctx context.Context,
 	op *OperationDef,
+	typeName string,
 	source stateAccessor,
 	result any,
 	diags *diag.Diagnostics,
@@ -54,8 +61,7 @@ func transformProjectBranchRestrictionsRead(
 		return map[string]any{"values": []any{}}
 	}
 
-	pattern, _ := readBodyStringValue(ctx, source, "pattern", diags)
-	branchType, _ := readBodyStringValue(ctx, source, "branch_type", diags)
+	pattern, branchType := readBranchRestrictionScope(ctx, typeName, source, diags)
 
 	entries := flattenGroupByBranchEntries(result)
 	values := make([]any, 0, len(entries))
@@ -68,8 +74,27 @@ func transformProjectBranchRestrictionsRead(
 	return map[string]any{"values": values}
 }
 
+// readBranchRestrictionScope reads the scope attribute (`pattern` or
+// `branch_type`) declared by the active sub-resource. Reading an attribute
+// that the schema does not declare would surface as a diagnostic error
+// from the Terraform plugin framework, so we only call `GetAttribute` for
+// the attribute that actually exists on the running sub-resource.
+func readBranchRestrictionScope(ctx context.Context, typeName string, source stateAccessor, diags *diag.Diagnostics) (pattern, branchType string) {
+	switch {
+	case strings.HasSuffix(typeName, "by-pattern"):
+		pattern, _ = readBodyStringValue(ctx, source, "pattern", diags)
+	case strings.HasSuffix(typeName, "by-branch-type"):
+		branchType, _ = readBodyStringValue(ctx, source, "branch_type", diags)
+	}
+	return pattern, branchType
+}
+
 // flattenGroupByBranchEntries normalises the GET response shape (either
 // `[]any` or `map[string]any` with array values) into a flat `[]map[string]any`.
+// When the response is an object (the schema-declared shape), the keys are
+// visited in lexicographic order so the resulting `values` list is stable
+// across runs — Go map iteration would otherwise randomise it and produce
+// perpetual Terraform diffs on a ListNestedAttribute.
 func flattenGroupByBranchEntries(result any) []map[string]any {
 	var out []map[string]any
 	switch v := result.(type) {
@@ -80,8 +105,13 @@ func flattenGroupByBranchEntries(result any) []map[string]any {
 			}
 		}
 	case map[string]any:
-		for _, raw := range v {
-			arr, ok := raw.([]any)
+		keys := make([]string, 0, len(v))
+		for k := range v {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			arr, ok := v[k].([]any)
 			if !ok {
 				continue
 			}
@@ -121,21 +151,29 @@ func matchesBranchRestrictionScope(entry map[string]any, pattern, branchType str
 
 // expandKindEntries turns a single GET entry (whose `kind` field is an
 // object keyed by kind name) into one or more `values` rows whose `kind`
-// field is the flat string the PUT schema expects.
+// field is the flat string the PUT schema expects. Kind names are visited
+// in lexicographic order so the resulting `values` list is stable across
+// runs — Go map iteration would otherwise randomise it and produce
+// perpetual Terraform diffs on a ListNestedAttribute.
 func expandKindEntries(entry map[string]any) []any {
 	kindObj, ok := entry["kind"].(map[string]any)
 	if !ok {
 		return nil
 	}
-	var rows []any
-	for kindName, kindData := range kindObj {
+	kindNames := make([]string, 0, len(kindObj))
+	for k := range kindObj {
+		kindNames = append(kindNames, k)
+	}
+	sort.Strings(kindNames)
+	rows := make([]any, 0, len(kindNames))
+	for _, kindName := range kindNames {
 		row := map[string]any{
 			"kind":              kindName,
 			"branch_match_kind": entry["branch_match_kind"],
 			"pattern":           entry["pattern"],
 			"branch_type":       entry["branch_type"],
 		}
-		applyKindData(row, kindData)
+		applyKindData(row, kindObj[kindName])
 		rows = append(rows, row)
 	}
 	return rows
