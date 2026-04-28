@@ -186,7 +186,15 @@ func (r *GenericResource) Configure(_ context.Context, req resource.ConfigureReq
 	r.client = c
 }
 
-// Create calls the create API operation and stores the result in state.
+// Create calls the create API operation and stores the result in state. When
+// the resource also defines a Read operation that differs from Create, a
+// follow-up Read is performed against the freshly-written state so that
+// computed attributes are populated from the canonical Read response (and any
+// Read-side response-shape transformer, e.g. the project branch-restrictions
+// `group-by-branch` reshape, is applied). Without this follow-up, Create-only
+// responses whose shape diverges from the Read schema leave Computed
+// attributes unset, producing "Provider produced inconsistent result after
+// apply" errors on every fresh `terraform apply`.
 func (r *GenericResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	op := r.group.Ops.Create
 	if op == nil {
@@ -194,16 +202,71 @@ func (r *GenericResource) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 	r.dispatch(ctx, op, &req.Plan, &resp.State, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	if readOp := r.group.Ops.Read; readOp != nil && readOp.OperationID != op.OperationID {
+		r.refreshState(ctx, readOp, &resp.State, &resp.Diagnostics)
+	}
 }
 
-// Read calls the read API operation and refreshes state.
+// Read calls the read API operation and refreshes state. The resource `id` is
+// preserved from the prior state across Read: the id is established once at
+// Create time (from the Create operation and its path params) and must not
+// change across refreshes. Allowing Read to overwrite it would route
+// subsequent Update/Delete calls to the wrong operation/path — for example,
+// project branch-restrictions whose Read GET path lacks the `pattern`
+// segment, which after a refresh would produce a Delete against the
+// `group-by-branch` endpoint and a `400: values array must be specified`
+// from Bitbucket.
 func (r *GenericResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	op := r.group.Ops.Read
 	if op == nil {
 		// If no read operation, preserve existing state.
 		return
 	}
+	priorID := readPriorID(ctx, &req.State)
 	r.dispatch(ctx, op, &req.State, &resp.State, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	restorePriorID(ctx, &resp.State, priorID, &resp.Diagnostics)
+}
+
+// refreshState performs a Read-style dispatch using the current resp.State as
+// both source and target, after preserving the resource id. It is invoked
+// after a successful Create so the post-create state matches the canonical
+// Read response.
+func (r *GenericResource) refreshState(ctx context.Context, readOp *OperationDef, state stateAccessor, diags *diag.Diagnostics) {
+	priorID := readPriorID(ctx, state)
+	r.dispatch(ctx, readOp, state, state, diags)
+	if diags.HasError() {
+		return
+	}
+	restorePriorID(ctx, state, priorID, diags)
+}
+
+// readPriorID returns the existing `id` attribute from state. An empty string
+// is returned when the id has not been written yet (e.g., the Create dispatch
+// failed before storeDispatchResult ran), the attribute is null/unknown, or
+// the framework reports an error reading it. Callers treat the empty case as
+// "no id to preserve" and let the dispatch-written id stand.
+func readPriorID(ctx context.Context, state stateAccessor) string {
+	var id types.String
+	d := state.GetAttribute(ctx, attrPath("id"), &id)
+	if d.HasError() || id.IsNull() || id.IsUnknown() {
+		return ""
+	}
+	return id.ValueString()
+}
+
+// restorePriorID writes priorID back to state when non-empty. This undoes the
+// id (re)write performed by storeDispatchResult during a Read-style dispatch.
+func restorePriorID(ctx context.Context, state stateAccessor, priorID string, diags *diag.Diagnostics) {
+	if priorID == "" {
+		return
+	}
+	diags.Append(state.SetAttribute(ctx, attrPath("id"), types.StringValue(priorID))...)
 }
 
 // Update calls the update API operation and updates state.
