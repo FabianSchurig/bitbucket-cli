@@ -340,6 +340,25 @@ func TestResourceExtractParamsFallbackToState(t *testing.T) {
 	if got := pathParams["workspace"]; got != "ws" {
 		t.Fatalf("expected workspace %q from plan, got %q", "ws", got)
 	}
+
+	// When both plan and state have a known value, the plan takes precedence
+	// (the fallback is only consulted when the plan value is null/unknown/empty).
+	planWithID := newMockState(map[string]attr.Value{
+		"workspace": types.StringValue("ws"),
+		"param_id":  types.StringValue("plan-id"),
+	})
+	stateWithID := newMockState(map[string]attr.Value{
+		"workspace": types.StringValue("ws"),
+		"param_id":  types.StringValue("state-id"),
+	})
+	var diagsPrecedence diag.Diagnostics
+	pathParams, _ = r.extractParams(ctx, group.Ops.Update, planWithID, stateWithID, &diagsPrecedence)
+	if diagsPrecedence.HasError() {
+		t.Fatalf("unexpected diagnostics: %#v", diagsPrecedence)
+	}
+	if got := pathParams["id"]; got != "plan-id" {
+		t.Fatalf("expected plan to take precedence over state fallback, got %q", got)
+	}
 }
 
 func TestResourceHelperSelectionAndCopyAttributes(t *testing.T) {
