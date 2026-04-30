@@ -1319,9 +1319,10 @@ func stringifyComplexValue(val any) string {
 }
 
 // buildListFromResponse converts a JSON array from the API response into a
-// types.List value suitable for a ListNestedAttribute. Items are sorted by a
-// stable identity key (uuid > id > slug > full_slug > name > canonical JSON)
-// so two equivalent API responses (same elements in different order) produce
+// types.List value suitable for a ListNestedAttribute. Items are sorted by
+// a stable identity key using the precedence defined by
+// stableIdentityFieldOrder, with a canonical JSON tiebreaker, so two
+// equivalent API responses (same elements in different order) produce
 // byte-identical Terraform state — required for the post-apply consistency
 // check on order-sensitive ListNestedAttributes when the upstream Bitbucket
 // API returns collection elements in non-deterministic order. The matching

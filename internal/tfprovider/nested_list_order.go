@@ -32,15 +32,17 @@ var stableIdentityFieldOrder = []string{
 // stableItemSortKey returns a deterministic sort key for a nested-object
 // item (`map[string]any` shape, as decoded from a JSON API response). It
 // looks for the first non-empty value among the well-known identity fields
-// declared on the item; if none are present it falls back to the canonical
-// JSON encoding of the whole item. The fallback guarantees a total order
-// even for shapes the registry doesn't know about, so the resulting list is
-// always reproducible regardless of API ordering quirks.
+// declared on the item and **always** appends the canonical JSON encoding
+// of the whole item as a secondary tiebreaker. The tiebreaker guarantees a
+// total order even when two items happen to share the same identity value
+// (or none of the known identity fields are present), so the resulting list
+// is always reproducible regardless of API ordering quirks.
 func stableItemSortKey(m map[string]any, fields []BodyFieldDef) string {
 	declared := map[string]bool{}
 	for _, f := range fields {
 		declared[f.Path] = true
 	}
+	primary := ""
 	for _, candidate := range stableIdentityFieldOrder {
 		if !declared[candidate] && len(fields) > 0 {
 			// Only consider identity fields that exist in the item's schema
@@ -51,20 +53,34 @@ func stableItemSortKey(m map[string]any, fields []BodyFieldDef) string {
 		if v, ok := m[candidate]; ok && v != nil {
 			s := stringifyIdentityValue(v)
 			if s != "" {
-				return candidate + "=" + s
+				primary = candidate + "=" + s
+				break
 			}
 		}
 	}
-	if b, err := json.Marshal(canonicalize(m)); err == nil {
+	tiebreaker := canonicalJSONKey(m)
+	if primary == "" {
+		return tiebreaker
+	}
+	return primary + "|" + tiebreaker
+}
+
+// canonicalJSONKey returns a deterministic JSON-encoded form of v, used as
+// a total-order tiebreaker by stableItemSortKey. Falls back to %v when
+// json.Marshal returns an error (e.g. NaN / +Inf in numeric values).
+func canonicalJSONKey(v any) string {
+	if b, err := json.Marshal(canonicalize(v)); err == nil {
 		return "json=" + string(b)
 	}
-	return fmt.Sprintf("%v", m)
+	return fmt.Sprintf("raw=%v", v)
 }
 
 // stableObjectSortKey returns the same key for a `types.Object` element
 // already living in Terraform state / plan. It mirrors stableItemSortKey
 // over Terraform's attr.Value graph so plan-side sorting (the plan modifier)
-// and state-side sorting (the response builder) agree byte-for-byte.
+// and state-side sorting (the response builder) agree byte-for-byte —
+// including the secondary canonical-form tiebreaker that guarantees a
+// total order when two items share the same identity value.
 func stableObjectSortKey(obj types.Object, fields []BodyFieldDef) string {
 	attrs := obj.Attributes()
 	declared := map[string]bool{}
@@ -72,6 +88,7 @@ func stableObjectSortKey(obj types.Object, fields []BodyFieldDef) string {
 		// nested attrs are stored under snake_cased keys.
 		declared[bodyFieldKey(f)] = true
 	}
+	primary := ""
 	for _, candidate := range stableIdentityFieldOrder {
 		key := candidate
 		if len(fields) > 0 && !declared[key] {
@@ -82,12 +99,17 @@ func stableObjectSortKey(obj types.Object, fields []BodyFieldDef) string {
 			continue
 		}
 		if s, ok := stringifyAttrIdentity(v); ok && s != "" {
-			return candidate + "=" + s
+			primary = candidate + "=" + s
+			break
 		}
 	}
-	// Fallback: full string form (framework guarantees stable ordering of
-	// attribute names within String()).
-	return "obj=" + obj.String()
+	// Tiebreaker: the framework's stable String() form (attribute names are
+	// emitted in lexicographic order).
+	tiebreaker := "obj=" + obj.String()
+	if primary == "" {
+		return tiebreaker
+	}
+	return primary + "|" + tiebreaker
 }
 
 // bodyFieldKey returns the snake_cased attribute key for a BodyFieldDef.
@@ -139,12 +161,11 @@ func stringifyAttrIdentity(v attr.Value) (string, bool) {
 	return v.String(), true
 }
 
-// canonicalize rewrites nested maps so json.Marshal emits keys in
-// lexicographic order, giving a deterministic JSON tiebreaker. Go's
-// encoding/json already sorts map keys, so this is mostly defensive — it
-// also normalises float64 NaN-style oddities into stable strings via
-// %v. The fallback only fires when none of the well-known identity
-// fields are present.
+// canonicalize rewrites nested maps and slices so json.Marshal can be used
+// as a deterministic JSON tiebreaker. Go's encoding/json already sorts map
+// keys lexicographically, so this is mostly defensive recursion through
+// nested values. The fallback only fires when the primary identity-field
+// lookup yields no key.
 func canonicalize(v any) any {
 	switch x := v.(type) {
 	case map[string]any:
@@ -217,9 +238,27 @@ func newNestedListSortPlanModifier(itemFields []BodyFieldDef) nestedListSortPlan
 	return nestedListSortPlanModifier{itemFields: itemFields}
 }
 
+// stableIdentityPrecedenceDescription returns the human-readable form of
+// the identity-field precedence used by stableItemSortKey /
+// stableObjectSortKey (e.g. "uuid > id > slug > ... > canonical JSON"),
+// derived from stableIdentityFieldOrder so the docs can never drift.
+func stableIdentityPrecedenceDescription() string {
+	if len(stableIdentityFieldOrder) == 0 {
+		return "canonical JSON"
+	}
+	precedence := stableIdentityFieldOrder[0]
+	for _, field := range stableIdentityFieldOrder[1:] {
+		precedence += " > " + field
+	}
+	return precedence + " > canonical JSON"
+}
+
 // Description returns a human-readable description of the modifier.
 func (m nestedListSortPlanModifier) Description(_ context.Context) string {
-	return "Sorts the planned list elements by a stable identity key (uuid > id > slug > full_slug > name > canonical JSON) so the post-apply consistency check is order-insensitive."
+	return fmt.Sprintf(
+		"Sorts the planned list elements by a stable identity key (%s) so the post-apply consistency check is order-insensitive.",
+		stableIdentityPrecedenceDescription(),
+	)
 }
 
 // MarkdownDescription returns the Markdown form of Description.

@@ -32,7 +32,7 @@ func TestBuildListFromResponseSortsNestedObjectsByStableKey(t *testing.T) {
 	planOrder := buildListFromResponse([]any{userA, userB}, userFields)
 	apiOrder := buildListFromResponse([]any{userB, userA}, userFields)
 
-	if planOrder.String() != apiOrder.String() {
+	if !planOrder.Equal(apiOrder) {
 		t.Fatalf("nested-object list order must be deterministic regardless of input order:\n  plan-order = %s\n   api-order = %s", planOrder.String(), apiOrder.String())
 	}
 
@@ -40,6 +40,25 @@ func TestBuildListFromResponseSortsNestedObjectsByStableKey(t *testing.T) {
 	first := planOrder.Elements()[0].(types.Object).Attributes()["uuid"].(types.String).ValueString()
 	if first != "{aaaa-aaaa}" {
 		t.Fatalf("expected sorted-by-uuid first element to be {aaaa-aaaa}, got %s", first)
+	}
+}
+
+// TestBuildListFromResponseTiebreakerForDuplicateIdentity guards the total-
+// ordering guarantee: when two items share the same identity-field value,
+// the canonical JSON tiebreaker still produces a deterministic, reproducible
+// order regardless of the input order.
+func TestBuildListFromResponseTiebreakerForDuplicateIdentity(t *testing.T) {
+	fields := []BodyFieldDef{
+		{Path: "uuid", Type: "string"},
+		{Path: "display_name", Type: "string"},
+	}
+	dupA := map[string]any{"uuid": "{same}", "display_name": "Alice"}
+	dupB := map[string]any{"uuid": "{same}", "display_name": "Bob"}
+
+	planOrder := buildListFromResponse([]any{dupA, dupB}, fields)
+	apiOrder := buildListFromResponse([]any{dupB, dupA}, fields)
+	if !planOrder.Equal(apiOrder) {
+		t.Fatalf("duplicate-identity items must sort deterministically via tiebreaker:\n  plan-order = %s\n   api-order = %s", planOrder.String(), apiOrder.String())
 	}
 }
 
