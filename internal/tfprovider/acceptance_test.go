@@ -1639,6 +1639,162 @@ func TestAccRealAPI_DataSource_WorkspacePermissions(t *testing.T) {
 	})
 }
 
+// TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers exercises the
+// real Bitbucket API end-to-end against the regression class fixed by the
+// custom setLikeListType (multiset semantic equality + planned-order alignment
+// of the response array).
+//
+// Three concrete bugs this test guards against on the real API:
+//
+//  1. "Provider produced inconsistent result after apply" (pre-0.15.6) — the API
+//     echoes a fully-populated nested user object (display_name, created_on)
+//     whose computed inner fields were Unknown in the plan; without the
+//     planned-order alignment the post-apply state diverges from the plan.
+//  2. "Provider produced invalid plan" (v0.15.6) — the lexicographic-sort plan
+//     modifier reordered users at plan time, then refresh undid it.
+//  3. Perpetual diff on add/reorder — config order ≠ API response order makes
+//     every subsequent plan show a positional reshuffle.
+//
+// The mock-based TestAccBitbucketBranchRestrictionsUsersOrderInsensitive
+// covers the same logic against a controlled response, but only the real API
+// returns nested objects with all the computed inner fields present (and in
+// whatever order Bitbucket chooses), which is exactly the surface where the
+// regressions lived.
+//
+// Step 1 catches (1) on the single-user path (the user object's display_name /
+// created_on are computed). Step 2 catches (3) for the same case. When
+// BITBUCKET_TEST_USER_2 is also configured, steps 3-5 add full multi-element
+// coverage (reorder + remove) that catches (1)+(2)+(3) on the multiset path.
+//
+// Required env: BITBUCKET_TEST_WORKSPACE, BITBUCKET_TEST_REPO, BITBUCKET_TEST_USER
+// (UUID with surrounding braces, e.g. "{abcdef01-…}"). Optional:
+// BITBUCKET_TEST_USER_2 for full multi-element coverage.
+func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+	repoSlug := os.Getenv("BITBUCKET_TEST_REPO")
+	if repoSlug == "" {
+		t.Skip("BITBUCKET_TEST_REPO not set, skipping branch restrictions real API test")
+	}
+	user1 := os.Getenv("BITBUCKET_TEST_USER")
+	if user1 == "" {
+		t.Skip("BITBUCKET_TEST_USER not set, skipping branch restrictions real API test")
+	}
+	user2 := os.Getenv("BITBUCKET_TEST_USER_2") // optional second user UUID
+
+	pattern := "tf-acc-test-" + strings.ToLower(acctest.RandStringFromCharSet(8, acctest.CharSetAlphaNum))
+
+	cfg := func(uuids ...string) string {
+		var users strings.Builder
+		for _, u := range uuids {
+			fmt.Fprintf(&users, "    { uuid = %q },\n", u)
+		}
+		return fmt.Sprintf(`
+			provider "bitbucket" {}
+
+			resource "bitbucket_branch_restrictions" "test" {
+				workspace         = %q
+				repo_slug         = %q
+				kind              = "push"
+				branch_match_kind = "glob"
+				pattern           = %q
+
+				users = [
+%s				]
+			}
+		`, workspace, repoSlug, pattern, users.String())
+	}
+
+	steps := []resource.TestStep{
+		// (1) Create with one user. The API echoes display_name / created_on
+		// for that user; without setLikeListValue's planned-order alignment
+		// this step previously failed with "Provider produced inconsistent
+		// result after apply" because the computed inner fields are Unknown
+		// in the plan.
+		{
+			Config: cfg(user1),
+			Check: resource.ComposeTestCheckFunc(
+				resource.TestCheckResourceAttrSet("bitbucket_branch_restrictions.test", "id"),
+				resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test", "users.#", "1"),
+				resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test", "users.0.uuid", user1),
+				resource.TestCheckResourceAttrSet("bitbucket_branch_restrictions.test", "users.0.display_name"),
+			),
+		},
+		// (2) Re-plan with the same config — must be empty. Catches the
+		// perpetual-diff class.
+		{
+			Config:   cfg(user1),
+			PlanOnly: true,
+		},
+	}
+
+	if user2 != "" {
+		steps = append(steps,
+			// (3) Update to two users in {a, b} order. The API may echo
+			// {b, a}; this exercises the multi-element multiset apply path
+			// against the real response shape.
+			resource.TestStep{
+				Config: cfg(user1, user2),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test", "users.#", "2"),
+				),
+			},
+			// (4) Reorder to {b, a} — must be a no-op plan. Catches the
+			// v0.15.6 "Provider produced invalid plan" regression and the
+			// silent-reorder perpetual-diff bug.
+			resource.TestStep{
+				Config:   cfg(user2, user1),
+				PlanOnly: true,
+			},
+			// (5) Drop one user — must succeed and result in a clean
+			// one-element list. Catches the "remove an element" path
+			// through the multiset comparison.
+			resource.TestStep{
+				Config: cfg(user2),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test", "users.#", "1"),
+					resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test", "users.0.uuid", user2),
+				),
+			},
+		)
+	}
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		CheckDestroy:             testAccCheckBranchRestrictionDestroy(workspace, repoSlug, pattern),
+		Steps:                    steps,
+	})
+}
+
+// testAccCheckBranchRestrictionDestroy verifies no branch restriction matching
+// the test pattern (kind=push) remains in the workspace/repo after destroy.
+// The resource ID is generated by Bitbucket and not stable across runs, so we
+// query by the (kind, pattern) tuple that the test owns.
+func testAccCheckBranchRestrictionDestroy(workspace, repoSlug, pattern string) resource.TestCheckFunc {
+	return func(_ *terraform.State) error {
+		c, err := client.NewClient()
+		if err != nil {
+			return fmt.Errorf("failed to create client: %v", err)
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
+			Method:      "GET",
+			URLTemplate: "/repositories/{workspace}/{repo_slug}/branch-restrictions",
+			PathParams:  map[string]string{"workspace": workspace, "repo_slug": repoSlug},
+			QueryParams: map[string]string{"kind": "push", "pattern": pattern},
+			All:         true,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to list branch restrictions for destroy check: %v", err)
+		}
+		if items, ok := result.([]any); ok && len(items) > 0 {
+			return fmt.Errorf("branch restriction kind=push, pattern=%q still exists in %s/%s after destroy (%d found)",
+				pattern, workspace, repoSlug, len(items))
+		}
+		return nil
+	}
+}
+
 // TestAccRealAPI_DataSource_UserEmails reads a specific email address for the current user.
 // Uses BITBUCKET_USERNAME (the Atlassian account email) as the email parameter.
 func TestAccRealAPI_DataSource_UserEmails(t *testing.T) {
