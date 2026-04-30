@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
@@ -132,6 +133,7 @@ func buildNestedItemAttrs(itemFields []BodyFieldDef) map[string]schema.Attribute
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: buildNestedItemAttrs(f.ItemFields),
 				},
+				PlanModifiers: nestedListSortPlanModifiers(f.ItemFields),
 			}
 		} else if f.IsArray {
 			nested[key] = schema.ListAttribute{
@@ -834,6 +836,7 @@ func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
 			NestedObject: schema.NestedAttributeObject{
 				Attributes: buildNestedItemAttrs(bf.ItemFields),
 			},
+			PlanModifiers: nestedListSortPlanModifiers(bf.ItemFields),
 		}
 	}
 	if bf.IsArray {
@@ -909,6 +912,7 @@ func responseFieldAttr(rf BodyFieldDef) schema.Attribute {
 			NestedObject: schema.NestedAttributeObject{
 				Attributes: buildNestedItemAttrs(rf.ItemFields),
 			},
+			PlanModifiers: nestedListSortPlanModifiers(rf.ItemFields),
 		}
 	}
 	if rf.IsArray {
@@ -987,8 +991,24 @@ func mergeListNestedResponseAttr(attr schema.ListNestedAttribute, rf BodyFieldDe
 		attr.NestedObject = schema.NestedAttributeObject{
 			Attributes: buildNestedItemAttrs(rf.ItemFields),
 		}
+		if !hasNestedListSortModifier(attr.PlanModifiers) {
+			attr.PlanModifiers = append(attr.PlanModifiers, nestedListSortPlanModifiers(rf.ItemFields)...)
+		}
 	}
 	return attr
+}
+
+// hasNestedListSortModifier reports whether the given list plan modifiers
+// already contain the deterministic-order modifier — used during attribute
+// merges to avoid attaching it twice when a request body field is
+// promoted to also satisfy a Read response field.
+func hasNestedListSortModifier(mods []planmodifier.List) bool {
+	for _, m := range mods {
+		if _, ok := m.(nestedListSortPlanModifier); ok {
+			return true
+		}
+	}
+	return false
 }
 
 func mergeListResponseAttr(attr schema.ListAttribute, rf BodyFieldDef) schema.Attribute {
@@ -1299,7 +1319,13 @@ func stringifyComplexValue(val any) string {
 }
 
 // buildListFromResponse converts a JSON array from the API response into a
-// types.List value suitable for a ListNestedAttribute.
+// types.List value suitable for a ListNestedAttribute. Items are sorted by a
+// stable identity key (uuid > id > slug > full_slug > name > canonical JSON)
+// so two equivalent API responses (same elements in different order) produce
+// byte-identical Terraform state — required for the post-apply consistency
+// check on order-sensitive ListNestedAttributes when the upstream Bitbucket
+// API returns collection elements in non-deterministic order. The matching
+// plan-side sort lives in nestedListSortPlanModifier.
 func buildListFromResponse(arr []any, itemFields []BodyFieldDef) types.List {
 	attrTypes := itemAttrTypes(itemFields)
 	objType := types.ObjectType{AttrTypes: attrTypes}
@@ -1308,8 +1334,15 @@ func buildListFromResponse(arr []any, itemFields []BodyFieldDef) types.List {
 		return types.ListValueMust(objType, []attr.Value{})
 	}
 
-	elements := make([]attr.Value, 0, len(arr))
-	for _, item := range arr {
+	// Sort a working copy so we don't mutate the caller's slice (the same
+	// decoded response may be inspected by multiple callers, e.g. the
+	// computed-param populator).
+	sorted := make([]any, len(arr))
+	copy(sorted, arr)
+	sortResponseItems(sorted, itemFields)
+
+	elements := make([]attr.Value, 0, len(sorted))
+	for _, item := range sorted {
 		m, ok := item.(map[string]any)
 		if !ok {
 			continue
