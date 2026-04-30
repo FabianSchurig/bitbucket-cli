@@ -1700,6 +1700,7 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 
 				users = [
 %s				]
+				groups = []
 			}
 		`, workspace, repoSlug, pattern, users.String())
 	}
