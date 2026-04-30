@@ -1,13 +1,10 @@
 package tfprovider
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"sort"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -18,6 +15,12 @@ import (
 // groups/repositories, name for tags). Using a fixed precedence rather than
 // per-endpoint configuration keeps the codegen pipeline schema-driven and
 // avoids hand-maintained sort tables.
+//
+// The keys are now consumed exclusively by setLikeListValue.ListSemanticEquals
+// to decide whether two nested-object lists carry the same multiset of
+// elements regardless of order. The runtime no longer reorders user-supplied
+// or API-returned lists in place — order-insensitivity is expressed at the
+// value-type level via setLikeListType.
 var stableIdentityFieldOrder = []string{
 	"uuid",
 	"id",
@@ -76,9 +79,10 @@ func canonicalJSONKey(v any) string {
 }
 
 // stableObjectSortKey returns the same key for a `types.Object` element
-// already living in Terraform state / plan. It mirrors stableItemSortKey
-// over Terraform's attr.Value graph so plan-side sorting (the plan modifier)
-// and state-side sorting (the response builder) agree byte-for-byte —
+// already living in Terraform state / plan / config. It mirrors
+// stableItemSortKey over Terraform's attr.Value graph so the multiset
+// comparison performed by setLikeListValue.ListSemanticEquals lines up
+// byte-for-byte with the canonical key used for raw JSON responses —
 // including the secondary canonical-form tiebreaker that guarantees a
 // total order when two items share the same identity value.
 func stableObjectSortKey(obj types.Object, fields []BodyFieldDef) string {
@@ -183,130 +187,4 @@ func canonicalize(v any) any {
 	default:
 		return v
 	}
-}
-
-// sortResponseItems sorts a JSON-decoded array of nested-object items in
-// place by their stable identity key. It is the response-side half of the
-// fix: every nested-object array we materialise into Terraform state goes
-// through this so two equivalent API responses (same elements, different
-// order) produce byte-identical state.
-func sortResponseItems(arr []any, fields []BodyFieldDef) {
-	if len(arr) < 2 {
-		return
-	}
-	keys := make([]string, len(arr))
-	for i, item := range arr {
-		if m, ok := item.(map[string]any); ok {
-			keys[i] = stableItemSortKey(m, fields)
-		} else {
-			// Non-object entries (rare; defensive) sort by their JSON form.
-			if b, err := json.Marshal(item); err == nil {
-				keys[i] = "raw=" + string(b)
-			} else {
-				keys[i] = fmt.Sprintf("raw=%v", item)
-			}
-		}
-	}
-	idx := make([]int, len(arr))
-	for i := range idx {
-		idx[i] = i
-	}
-	sort.SliceStable(idx, func(i, j int) bool {
-		return keys[idx[i]] < keys[idx[j]]
-	})
-	sorted := make([]any, len(arr))
-	for i, k := range idx {
-		sorted[i] = arr[k]
-	}
-	copy(arr, sorted)
-}
-
-// nestedListSortPlanModifier is the plan-side half of the deterministic-
-// order fix. Attaching it to every ListNestedAttribute over an object item
-// ensures the planned value carries the same canonical order the response
-// builder will produce — without it Terraform's post-apply consistency
-// check would still fire whenever a user wrote elements in a different
-// order than the canonical sort.
-//
-// The modifier is a value type (no fields beyond the per-attribute item
-// schema) so equality / type-assertion in tests stays straightforward.
-type nestedListSortPlanModifier struct {
-	itemFields []BodyFieldDef
-}
-
-func newNestedListSortPlanModifier(itemFields []BodyFieldDef) nestedListSortPlanModifier {
-	return nestedListSortPlanModifier{itemFields: itemFields}
-}
-
-// stableIdentityPrecedenceDescription returns the human-readable form of
-// the identity-field precedence used by stableItemSortKey /
-// stableObjectSortKey (e.g. "uuid > id > slug > ... > canonical JSON"),
-// derived from stableIdentityFieldOrder so the docs can never drift.
-func stableIdentityPrecedenceDescription() string {
-	if len(stableIdentityFieldOrder) == 0 {
-		return "canonical JSON"
-	}
-	precedence := stableIdentityFieldOrder[0]
-	for _, field := range stableIdentityFieldOrder[1:] {
-		precedence += " > " + field
-	}
-	return precedence + " > canonical JSON"
-}
-
-// Description returns a human-readable description of the modifier.
-func (m nestedListSortPlanModifier) Description(_ context.Context) string {
-	return fmt.Sprintf(
-		"Sorts the planned list elements by a stable identity key (%s) so the post-apply consistency check is order-insensitive.",
-		stableIdentityPrecedenceDescription(),
-	)
-}
-
-// MarkdownDescription returns the Markdown form of Description.
-func (m nestedListSortPlanModifier) MarkdownDescription(ctx context.Context) string {
-	return m.Description(ctx)
-}
-
-// PlanModifyList sorts the planned list value in-place using the same
-// identity-field precedence the response builder uses.
-func (m nestedListSortPlanModifier) PlanModifyList(_ context.Context, req planmodifier.ListRequest, resp *planmodifier.ListResponse) {
-	if req.PlanValue.IsNull() || req.PlanValue.IsUnknown() {
-		return
-	}
-	elements := req.PlanValue.Elements()
-	if len(elements) < 2 {
-		return
-	}
-	keys := make([]string, len(elements))
-	for i, e := range elements {
-		obj, ok := e.(types.Object)
-		if !ok {
-			// Defensive: leave non-object element lists alone.
-			return
-		}
-		keys[i] = stableObjectSortKey(obj, m.itemFields)
-	}
-	idx := make([]int, len(elements))
-	for i := range idx {
-		idx[i] = i
-	}
-	sort.SliceStable(idx, func(i, j int) bool {
-		return keys[idx[i]] < keys[idx[j]]
-	})
-	sorted := make([]attr.Value, len(elements))
-	for i, k := range idx {
-		sorted[i] = elements[k]
-	}
-	sortedList, diags := types.ListValue(req.PlanValue.ElementType(context.Background()), sorted)
-	resp.Diagnostics.Append(diags...)
-	if diags.HasError() {
-		return
-	}
-	resp.PlanValue = sortedList
-}
-
-// nestedListSortPlanModifiers returns the standard plan-modifier slice for
-// a nested-object array attribute. It is a tiny helper so the schema
-// builders read consistently.
-func nestedListSortPlanModifiers(itemFields []BodyFieldDef) []planmodifier.List {
-	return []planmodifier.List{newNestedListSortPlanModifier(itemFields)}
 }

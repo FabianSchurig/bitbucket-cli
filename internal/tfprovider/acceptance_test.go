@@ -419,6 +419,39 @@ func startMockServer(t *testing.T) *httptest.Server {
 		_ = json.NewEncoder(w).Encode(map[string]any{"id": 1, "content": map[string]any{"raw": "new issue comment"}})
 	})
 
+	// ─── Branch restrictions endpoints ────────────────────────────────────────
+	// The GET / PUT handlers always return `users` in lexicographic UUID
+	// order regardless of the order the operator wrote them in HCL — this
+	// reproduces the exact upstream Bitbucket behaviour the order-
+	// insensitivity fix targets. Two distinct fixed UUIDs are used so the
+	// test can write them in reverse order and assert that the plan still
+	// matches and a follow-up plan is empty.
+	branchRestrictionResponse := map[string]any{
+		"id":                123,
+		"kind":              "push",
+		"branch_match_kind": "glob",
+		"pattern":           "develop",
+		"users": []any{
+			map[string]any{"uuid": "{aaaaaaaa-0000-0000-0000-000000000001}", "display_name": "Alice", "created_on": "2024-01-01T00:00:00Z"},
+			map[string]any{"uuid": "{bbbbbbbb-0000-0000-0000-000000000002}", "display_name": "Bob", "created_on": "2024-01-02T00:00:00Z"},
+		},
+		"groups": []any{},
+	}
+	mux.HandleFunc("/repositories/{workspace}/{repo_slug}/branch-restrictions/{id}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		switch r.Method {
+		case http.MethodGet, http.MethodPut:
+			_ = json.NewEncoder(w).Encode(branchRestrictionResponse)
+		case http.MethodDelete:
+			w.WriteHeader(http.StatusNoContent)
+		}
+	})
+	mux.HandleFunc("POST /repositories/{workspace}/{repo_slug}/branch-restrictions", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		_ = json.NewEncoder(w).Encode(branchRestrictionResponse)
+	})
+
 	// Catch-all for any other API calls during tests
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -1154,6 +1187,79 @@ func TestAccProvider_ConfigureWithToken(t *testing.T) {
 		},
 	})
 }
+
+// ─── Branch restrictions order-insensitivity acceptance test ─────────────────
+
+// TestAccBitbucketBranchRestrictionsUsersOrderInsensitive exercises the
+// fix for the bitbucket_branch_restrictions `users` ordering bug.
+//
+// The mock server returns `users` in lexicographic UUID order regardless
+// of submission order — i.e. the exact upstream Bitbucket Cloud behaviour
+// that triggers both the pre-0.15.6 "Provider produced inconsistent result
+// after apply" and the v0.15.6 "Provider produced invalid plan" failures.
+//
+// The HCL config below deliberately writes the two users in REVERSE
+// (bbbb before aaaa) so that:
+//
+//  1. plan + apply must succeed (no "invalid plan" diagnostic; the
+//     setLikeListType.ListSemanticEquals lets the framework treat the
+//     reordered API response as semantically equal to the config),
+//  2. a follow-up plan must be empty (no perpetual diff — the operator's
+//     order is preserved in state and the API order doesn't drift it),
+//  3. the resource's persisted users length matches the API response,
+//     proving state was actually saved (the pre-0.15.6 failure mode
+//     silently dropped state and re-created the resource on every plan).
+func TestAccBitbucketBranchRestrictionsUsersOrderInsensitive(t *testing.T) {
+	srv := startMockServer(t)
+	defer srv.Close()
+	setMockEnv(t, srv.URL)
+
+	config := fmt.Sprintf(`
+		provider "bitbucket" {
+			base_url = %q
+		}
+
+		resource "bitbucket_branch_restrictions" "example" {
+			workspace         = "testworkspace"
+			repo_slug         = "test-repo"
+			kind              = "push"
+			branch_match_kind = "glob"
+			pattern           = "develop"
+
+			users = [
+				{ uuid = "{bbbbbbbb-0000-0000-0000-000000000002}" },
+				{ uuid = "{aaaaaaaa-0000-0000-0000-000000000001}" },
+			]
+		}
+	`, srv.URL)
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		Steps: []resource.TestStep{
+			// Apply: must succeed even though the API will return users
+			// in the opposite order. Without the order-insensitive custom
+			// list type this step fails with either:
+			//   - "Provider produced invalid plan" (v0.15.6), or
+			//   - "Provider produced inconsistent result after apply" (pre-0.15.6).
+			{
+				Config: config,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_branch_restrictions.example", "id"),
+					resource.TestCheckResourceAttr("bitbucket_branch_restrictions.example", "users.#", "2"),
+				),
+			},
+			// Re-plan with the same config: must be a no-op. This is the
+			// "perpetual diff on add/reorder" guard — the framework only
+			// reports the plan as empty when ListSemanticEquals returns
+			// true for state vs. config.
+			{
+				Config:   config,
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
 
 // ─── Real API acceptance tests (run when TF_ACC=1 and credentials are set) ──
 

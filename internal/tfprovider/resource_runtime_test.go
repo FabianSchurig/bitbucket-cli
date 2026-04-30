@@ -434,8 +434,8 @@ func TestResourcePopulateComputedParamsAndExtractResponseFields(t *testing.T) {
 	if _, ok := responseTarget.set["settings"].(types.Object); !ok {
 		t.Fatalf("expected settings object value, got %T", responseTarget.set["settings"])
 	}
-	if _, ok := responseTarget.set["reviewers"].(types.List); !ok {
-		t.Fatalf("expected reviewers list value, got %T", responseTarget.set["reviewers"])
+	if _, ok := responseTarget.set["reviewers"].(setLikeListValue); !ok {
+		t.Fatalf("expected reviewers setLikeListValue, got %T", responseTarget.set["reviewers"])
 	}
 	if _, ok := responseTarget.set["tags"].(types.List); !ok {
 		t.Fatalf("expected tags list value, got %T", responseTarget.set["tags"])
@@ -494,8 +494,8 @@ func TestResourceResponseValueHelpers(t *testing.T) {
 	if _, ok := buildAttrValueFromResponse("bad", BodyFieldDef{Path: "settings", IsObject: true, ItemFields: itemFields}).(types.Object); !ok {
 		t.Fatal("expected null object attr value for invalid nested object")
 	}
-	if _, ok := buildAttrValueFromResponse("bad", BodyFieldDef{Path: "reviewers", IsArray: true, ItemFields: itemFields}).(types.List); !ok {
-		t.Fatal("expected null nested list attr value for invalid nested list")
+	if _, ok := buildAttrValueFromResponse("bad", BodyFieldDef{Path: "reviewers", IsArray: true, ItemFields: itemFields}).(setLikeListValue); !ok {
+		t.Fatal("expected null setLikeList attr value for invalid nested list")
 	}
 	if _, ok := buildAttrValueFromResponse("bad", BodyFieldDef{Path: "tags", IsArray: true}).(types.List); !ok {
 		t.Fatal("expected null simple list attr value for invalid list")
@@ -658,8 +658,8 @@ func TestResourceNestedSchemaHelpers(t *testing.T) {
 	if _, ok := attrTypes["settings"].(types.ObjectType); !ok {
 		t.Fatalf("expected object attr type, got %T", attrTypes["settings"])
 	}
-	if _, ok := attrTypes["reviewers"].(types.ListType); !ok {
-		t.Fatalf("expected list attr type, got %T", attrTypes["reviewers"])
+	if _, ok := attrTypes["reviewers"].(setLikeListType); !ok {
+		t.Fatalf("expected setLikeListType for nested-object array, got %T", attrTypes["reviewers"])
 	}
 }
 
