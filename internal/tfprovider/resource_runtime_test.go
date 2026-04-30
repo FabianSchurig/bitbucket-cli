@@ -3,6 +3,7 @@ package tfprovider
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -50,6 +51,8 @@ func (m *mockState) GetAttribute(_ context.Context, p path.Path, target interfac
 			*t = types.ListNull(types.StringType)
 		case *types.Object:
 			*t = types.ObjectNull(map[string]attr.Type{})
+		case *setLikeListValue:
+			*t = setLikeListValue{ListValue: types.ListNull(types.StringType)}
 		default:
 			panic("unsupported target type")
 		}
@@ -63,6 +66,19 @@ func (m *mockState) GetAttribute(_ context.Context, p path.Path, target interfac
 		*t = v.(types.List)
 	case *types.Object:
 		*t = v.(types.Object)
+	case *setLikeListValue:
+		// Accept either flavour from test fixtures: tests historically
+		// stored `types.List` for nested-object arrays; the schema now
+		// declares `setLikeListType`, so reading back into a
+		// `*setLikeListValue` must succeed for both shapes.
+		switch x := v.(type) {
+		case setLikeListValue:
+			*t = x
+		case types.List:
+			*t = setLikeListValue{ListValue: x}
+		default:
+			panic(fmt.Sprintf("unsupported value type for *setLikeListValue: %T", v))
+		}
 	default:
 		panic("unsupported target type")
 	}
@@ -427,7 +443,7 @@ func TestResourcePopulateComputedParamsAndExtractResponseFields(t *testing.T) {
 		},
 		"tags":     []any{"one", "two"},
 		"metadata": map[string]any{"mode": "full"},
-	}, responseTarget, &diags)
+	}, nil, responseTarget, &diags)
 	if got := responseTarget.set["title"]; got != types.StringValue("Hello") {
 		t.Fatalf("expected title response field, got %#v", got)
 	}
@@ -747,7 +763,7 @@ func TestResourceDispatchResultAndResponseHelpers(t *testing.T) {
 	target := newMockState(nil)
 	var diags diag.Diagnostics
 
-	if result := r.storeDispatchResult(ctx, &OperationDef{OperationID: "delete"}, nil, target, &diags, nil); result != nil {
+	if result := r.storeDispatchResult(ctx, &OperationDef{OperationID: "delete"}, nil, nil, target, &diags, nil); result != nil {
 		t.Fatalf("expected nil result map, got %#v", result)
 	}
 	if got := target.set["id"]; got != types.StringValue("delete") {
@@ -756,7 +772,7 @@ func TestResourceDispatchResultAndResponseHelpers(t *testing.T) {
 
 	target = newMockState(nil)
 	diags = nil
-	if result := r.storeDispatchResult(ctx, &OperationDef{OperationID: "bad"}, nil, target, &diags, map[string]any{"bad": make(chan int)}); result != nil || !diags.HasError() {
+	if result := r.storeDispatchResult(ctx, &OperationDef{OperationID: "bad"}, nil, nil, target, &diags, map[string]any{"bad": make(chan int)}); result != nil || !diags.HasError() {
 		t.Fatalf("expected marshal failure diagnostics, got result=%#v diags=%#v", result, diags)
 	}
 
@@ -765,7 +781,7 @@ func TestResourceDispatchResultAndResponseHelpers(t *testing.T) {
 	}
 
 	reservedTarget := newMockState(nil)
-	setResponseField(ctx, BodyFieldDef{Path: "id"}, map[string]any{"id": 1}, reservedTarget, &diags)
+	setResponseField(ctx, BodyFieldDef{Path: "id"}, map[string]any{"id": 1}, nil, reservedTarget, &diags)
 	if len(reservedTarget.set) != 0 {
 		t.Fatalf("expected reserved field to be skipped, got %#v", reservedTarget.set)
 	}

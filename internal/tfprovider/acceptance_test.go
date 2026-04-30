@@ -1260,7 +1260,6 @@ func TestAccBitbucketBranchRestrictionsUsersOrderInsensitive(t *testing.T) {
 	})
 }
 
-
 // ─── Real API acceptance tests (run when TF_ACC=1 and credentials are set) ──
 
 // skipIfNoRealAPI skips the test if real API credentials are not configured.

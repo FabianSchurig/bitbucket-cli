@@ -57,9 +57,12 @@ func setLikeListTypeFor(itemFields []BodyFieldDef) setLikeListType {
 }
 
 // Equal honours the ListType element-type comparison and additionally
-// distinguishes setLikeListType instances by their nested-object schema, so
-// two custom types that wrap structurally different element schemas don't
-// silently compare equal.
+// distinguishes setLikeListType instances by the *full shape* of their
+// nested-object schema. Two custom types whose paths happen to align but
+// whose Type/IsArray/IsObject/Required/ItemFields differ must NOT compare
+// equal — otherwise the framework's type-equality checks would let a value
+// shaped for one schema slip into a slot expecting another, producing
+// confusing downstream conversion errors.
 func (t setLikeListType) Equal(o attr.Type) bool {
 	other, ok := o.(setLikeListType)
 	if !ok {
@@ -68,11 +71,24 @@ func (t setLikeListType) Equal(o attr.Type) bool {
 	if !t.ListType.Equal(other.ListType) {
 		return false
 	}
-	if len(t.itemFields) != len(other.itemFields) {
+	return bodyFieldsEqual(t.itemFields, other.itemFields)
+}
+
+// bodyFieldsEqual returns true when two slices of BodyFieldDef describe the
+// same nested-object shape. Compared recursively over ItemFields so nested
+// arrays/objects are not collapsed to a path-only comparison.
+func bodyFieldsEqual(a, b []BodyFieldDef) bool {
+	if len(a) != len(b) {
 		return false
 	}
-	for i := range t.itemFields {
-		if t.itemFields[i].Path != other.itemFields[i].Path {
+	for i := range a {
+		x, y := a[i], b[i]
+		if x.Path != y.Path || x.Type != y.Type ||
+			x.IsArray != y.IsArray || x.IsObject != y.IsObject ||
+			x.Required != y.Required {
+			return false
+		}
+		if !bodyFieldsEqual(x.ItemFields, y.ItemFields) {
 			return false
 		}
 	}

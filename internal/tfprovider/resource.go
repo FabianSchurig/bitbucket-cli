@@ -476,7 +476,7 @@ func (r *GenericResource) dispatchWithParamFallback(ctx context.Context, op *Ope
 	// `group-by-branch` GET).
 	result = transformProjectBranchRestrictionsRead(ctx, op, r.group.TypeName, source, result, diags)
 
-	resultMap := r.storeDispatchResult(ctx, op, pathParams, target, diags, result)
+	resultMap := r.storeDispatchResult(ctx, op, pathParams, source, target, diags, result)
 	if resultMap != nil {
 		r.populateComputedParams(ctx, resultMap, source, target, diags)
 	}
@@ -542,14 +542,24 @@ func (r *GenericResource) buildBody(ctx context.Context, op *OperationDef, sourc
 // readListNested reads a ListNestedAttribute from state and returns it as a
 // []map[string]any suitable for JSON marshaling. Returns nil if the list is
 // null, unknown, or empty.
+//
+// The destination variable's Go type must match the schema attribute's
+// value type (`setLikeListValue` for nested-object arrays — see
+// `setLikeListTypeFor` in resource.go), otherwise the framework's
+// reflection-based conversion in `internal/reflect/interfaces.go`
+// rejects the read with `Cannot use attr.Value basetypes.ListValue, only
+// tfprovider.setLikeListValue is supported because tfprovider.setLikeListType
+// is the type in the schema`. Reading into the custom value type and then
+// unwrapping to the embedded `basetypes.ListValue` keeps every existing
+// downstream helper (which works in terms of `types.List`) untouched.
 func readListNested(ctx context.Context, source stateAccessor, attrName string, itemFields []BodyFieldDef, diags *diag.Diagnostics) []map[string]any {
-	var list types.List
+	var list setLikeListValue
 	d := source.GetAttribute(ctx, attrPath(attrName), &list)
 	diags.Append(d...)
 	if d.HasError() || list.IsNull() || list.IsUnknown() {
 		return nil
 	}
-	return readListNestedValue(list, itemFields)
+	return readListNestedValue(list.ListValue, itemFields)
 }
 
 func readListNestedValue(list types.List, itemFields []BodyFieldDef) []map[string]any {
@@ -726,9 +736,16 @@ func (r *GenericResource) responseFields() []BodyFieldDef {
 
 // extractResponseFields extracts individual field values from the API response
 // and sets them as computed attributes in the target state.
-func (r *GenericResource) extractResponseFields(ctx context.Context, m map[string]any, target stateAccessor, diags *diag.Diagnostics) {
+//
+// `source` is the planned (Create/Update) or prior (Read) state. It is
+// consulted to align nested-object response arrays with the operator's
+// existing element order via `reorderResponseArrayBySourceKeys`, which
+// satisfies Terraform Core's post-apply consistency check without silently
+// rewriting the operator's HCL at plan time. May be nil — when so, the
+// API response is persisted in its native order.
+func (r *GenericResource) extractResponseFields(ctx context.Context, m map[string]any, source, target stateAccessor, diags *diag.Diagnostics) {
 	for _, rf := range r.responseFields() {
-		setResponseField(ctx, rf, m, target, diags)
+		setResponseField(ctx, rf, m, source, target, diags)
 	}
 }
 
@@ -1031,7 +1048,7 @@ func addRequestBodyAttr(attrs map[string]schema.Attribute, hasBody bool) {
 	}
 }
 
-func (r *GenericResource) storeDispatchResult(ctx context.Context, op *OperationDef, pathParams map[string]string, target stateAccessor, diags *diag.Diagnostics, result any) map[string]any {
+func (r *GenericResource) storeDispatchResult(ctx context.Context, op *OperationDef, pathParams map[string]string, source, target stateAccessor, diags *diag.Diagnostics, result any) map[string]any {
 	if result == nil {
 		diags.Append(target.SetAttribute(ctx, attrPath("api_response"), types.StringValue(""))...)
 		diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(op.OperationID))...)
@@ -1047,7 +1064,7 @@ func (r *GenericResource) storeDispatchResult(ctx context.Context, op *Operation
 
 	resultMap, _ := result.(map[string]any)
 	if resultMap != nil {
-		r.extractResponseFields(ctx, resultMap, target, diags)
+		r.extractResponseFields(ctx, resultMap, source, target, diags)
 		if id := extractID(resultMap); id != "" {
 			diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(id))...)
 			return resultMap
@@ -1267,7 +1284,7 @@ func setComputedParam(ctx context.Context, m map[string]any, paramName, attrName
 	}
 }
 
-func setResponseField(ctx context.Context, rf BodyFieldDef, m map[string]any, target stateAccessor, diags *diag.Diagnostics) {
+func setResponseField(ctx context.Context, rf BodyFieldDef, m map[string]any, source, target stateAccessor, diags *diag.Diagnostics) {
 	key := toSnakeCase(strings.ReplaceAll(rf.Path, ".", "_"))
 	if isReservedResourceAttr(key) {
 		return
@@ -1276,11 +1293,58 @@ func setResponseField(ctx context.Context, rf BodyFieldDef, m map[string]any, ta
 	if !ok || val == nil {
 		return
 	}
+	// Nested-object arrays are aligned to the planned/prior order before
+	// being marshaled to a setLikeListValue, so the post-apply state is
+	// positionally identical to the planned state. Without this, Terraform
+	// Core's consistency check fails when the API returns elements in a
+	// different order than the operator wrote — see the godoc on
+	// `reorderResponseArrayBySourceKeys`.
+	if rf.IsArray && len(rf.ItemFields) > 0 && source != nil {
+		if arr, ok := val.([]any); ok {
+			sourceKeys := readNestedListPrimaryKeys(ctx, source, key, rf.ItemFields, diags)
+			val = reorderResponseArrayBySourceKeys(arr, rf.ItemFields, sourceKeys)
+		}
+	}
 	attrValue, ok := responseFieldValue(val, rf)
 	if !ok {
 		return
 	}
 	diags.Append(target.SetAttribute(ctx, attrPath(key), attrValue)...)
+}
+
+// readNestedListPrimaryKeys reads the planned/prior nested-object array at
+// `attrName` from `source` and returns the primary identity key of each
+// element in source order. Null/unknown lists yield nil; the reorderer
+// then leaves the API response in its native order.
+//
+// GetAttribute diagnostics are intentionally not appended to the dispatch
+// `diags` collection: the source may not declare this attribute (e.g. a
+// Read against a freshly-imported resource where the prior state is
+// empty), and the framework's "attribute not found" diagnostic in that
+// case is benign. Real read errors still surface through the other
+// GetAttribute call sites that consume the same source.
+func readNestedListPrimaryKeys(ctx context.Context, source stateAccessor, attrName string, itemFields []BodyFieldDef, _ *diag.Diagnostics) []string {
+	if source == nil {
+		return nil
+	}
+	var list setLikeListValue
+	d := source.GetAttribute(ctx, attrPath(attrName), &list)
+	if d.HasError() || list.IsNull() || list.IsUnknown() {
+		return nil
+	}
+	elems := list.Elements()
+	if len(elems) == 0 {
+		return nil
+	}
+	keys := make([]string, 0, len(elems))
+	for _, e := range elems {
+		obj, ok := e.(types.Object)
+		if !ok {
+			continue
+		}
+		keys = append(keys, stableObjectPrimaryKey(obj, itemFields))
+	}
+	return keys
 }
 
 func responseFieldValue(val any, rf BodyFieldDef) (any, bool) {
@@ -1376,24 +1440,16 @@ func buildListFromResponse(arr []any, itemFields []BodyFieldDef) setLikeListValu
 // keeps the call sites symmetrical with `attrNullValue` and makes future
 // changes to the wrapping protocol a single-edit affair.
 //
-// The conversion is total: setLikeListType.ValueFromList never returns
-// diagnostics and always yields a setLikeListValue (it just wraps the
-// input), so a panic here would indicate the custom type's contract was
-// broken — the explicit comma-ok assertion turns that into a typed error
-// message instead of a generic interface-conversion panic.
+// The wrapping is a pure struct construction (no diagnostics, no
+// reflection): setLikeListValue is a thin embedding of basetypes.ListValue,
+// so building it directly is equivalent to going through
+// `setLikeListType.ValueFromList` but cannot fail. This avoids panicking
+// in production provider code paths called from `buildListFromResponse`
+// and `attrNullValue` — the prior indirection through the framework
+// interface had two panic sites whose only purpose was to guard a
+// no-op conversion.
 func wrapSetLikeList(list types.List, itemFields []BodyFieldDef) setLikeListValue {
-	v, diags := setLikeListTypeFor(itemFields).ValueFromList(context.Background(), list)
-	if diags.HasError() {
-		// Defensive: setLikeListType.ValueFromList currently never errors,
-		// but if a future revision starts returning diagnostics we want a
-		// loud, debuggable failure rather than a silently-dropped value.
-		panic(fmt.Sprintf("wrapSetLikeList: ValueFromList returned diagnostics: %v", diags))
-	}
-	wrapped, ok := v.(setLikeListValue)
-	if !ok {
-		panic(fmt.Sprintf("wrapSetLikeList: ValueFromList returned %T, want setLikeListValue", v))
-	}
-	return wrapped
+	return setLikeListValue{ListValue: list, itemFields: itemFields}
 }
 
 // buildObjectFromResponse converts a JSON object from the API response into a

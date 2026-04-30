@@ -251,3 +251,78 @@ func mustListNested(t *testing.T, a resourceschema.Attribute) resourceschema.Lis
 	}
 	return listAttr
 }
+
+// TestSetLikeListTypeEqualDistinguishesShape asserts the strengthened type
+// equality contract: two setLikeListType values whose nested-object schemas
+// share their field paths but differ in any other attribute (Type,
+// IsArray, IsObject, Required, ItemFields) must NOT compare equal. A
+// path-only comparison (the prior behaviour, flagged in code review) would
+// allow a value built for one schema to silently slip into a slot expecting
+// the other and surface as a confusing downstream error.
+func TestSetLikeListTypeEqualDistinguishesShape(t *testing.T) {
+	base := []BodyFieldDef{
+		{Path: "uuid", Type: "string"},
+		{Path: "config", IsObject: true, ItemFields: []BodyFieldDef{{Path: "name", Type: "string"}}},
+	}
+
+	// Same paths, but the inner Type changes string→int. Must not be equal.
+	differentType := []BodyFieldDef{
+		{Path: "uuid", Type: "int"},
+		{Path: "config", IsObject: true, ItemFields: []BodyFieldDef{{Path: "name", Type: "string"}}},
+	}
+	if setLikeListTypeFor(base).Equal(setLikeListTypeFor(differentType)) {
+		t.Fatal("Equal must distinguish field Type changes")
+	}
+
+	// Same paths/Type, but Required differs. Must not be equal.
+	differentRequired := []BodyFieldDef{
+		{Path: "uuid", Type: "string", Required: true},
+		{Path: "config", IsObject: true, ItemFields: []BodyFieldDef{{Path: "name", Type: "string"}}},
+	}
+	if setLikeListTypeFor(base).Equal(setLikeListTypeFor(differentRequired)) {
+		t.Fatal("Equal must distinguish Required changes")
+	}
+
+	// Same paths everywhere, but a nested ItemFields entry has a different
+	// inner Type. Recursive comparison must catch it.
+	differentNestedInner := []BodyFieldDef{
+		{Path: "uuid", Type: "string"},
+		{Path: "config", IsObject: true, ItemFields: []BodyFieldDef{{Path: "name", Type: "int"}}},
+	}
+	if setLikeListTypeFor(base).Equal(setLikeListTypeFor(differentNestedInner)) {
+		t.Fatal("Equal must recurse into ItemFields")
+	}
+
+	// Sanity: identical shapes still compare equal.
+	if !setLikeListTypeFor(base).Equal(setLikeListTypeFor(base)) {
+		t.Fatal("identical shapes must still compare equal")
+	}
+}
+
+// TestWrapSetLikeListNeverPanics confirms the production helper performs a
+// pure struct construction and cannot panic on malformed framework
+// behaviour. Pre-fix the helper had two panic sites that would have
+// crashed Terraform; this test guards against their reintroduction.
+func TestWrapSetLikeListNeverPanics(t *testing.T) {
+	defer func() {
+		if r := recover(); r != nil {
+			t.Fatalf("wrapSetLikeList panicked: %v", r)
+		}
+	}()
+	// Cover the null, unknown, and known-empty list cases — these are the
+	// values the helper actually receives from buildListFromResponse and
+	// attrNullValue.
+	objType := types.ObjectType{AttrTypes: itemAttrTypes(userFields)}
+	got := wrapSetLikeList(types.ListNull(objType), userFields)
+	if !got.IsNull() {
+		t.Fatalf("expected null list, got %s", got.String())
+	}
+	got = wrapSetLikeList(types.ListUnknown(objType), userFields)
+	if !got.IsUnknown() {
+		t.Fatalf("expected unknown list, got %s", got.String())
+	}
+	got = wrapSetLikeList(types.ListValueMust(objType, []attr.Value{}), userFields)
+	if got.IsNull() || got.IsUnknown() || len(got.Elements()) != 0 {
+		t.Fatalf("expected known empty list, got %s", got.String())
+	}
+}

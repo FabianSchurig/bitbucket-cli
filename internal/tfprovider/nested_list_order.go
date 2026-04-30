@@ -165,6 +165,124 @@ func stringifyAttrIdentity(v attr.Value) (string, bool) {
 	return v.String(), true
 }
 
+// stableItemPrimaryKey returns ONLY the identity-field prefix of an item's
+// canonical sort key, omitting the canonical-JSON tiebreaker. It is the
+// matching key used by `reorderResponseArrayBySourceKeys` to pair an API
+// response item against its planned-state counterpart.
+//
+// The tiebreaker must be omitted because the planned-state side of that
+// comparison routinely has Unknown values for `Optional+Computed` inner
+// attributes (`display_name`, `created_on`, ...) that the API fills in,
+// while the API-response side has all of them resolved. Including those
+// fields in the matching key would make every pairing miss and the
+// reorderer would silently fall back to API order — defeating the post-
+// Create / post-Update consistency check.
+//
+// When no identity field is present (or none is declared on the schema),
+// the canonical-JSON form is still used so two genuinely-different items
+// don't collide; that's a degraded but defensible fallback for endpoints
+// without a stable primary key.
+func stableItemPrimaryKey(m map[string]any, fields []BodyFieldDef) string {
+	declared := map[string]bool{}
+	for _, f := range fields {
+		declared[f.Path] = true
+	}
+	for _, candidate := range stableIdentityFieldOrder {
+		if !declared[candidate] && len(fields) > 0 {
+			continue
+		}
+		if v, ok := m[candidate]; ok && v != nil {
+			s := stringifyIdentityValue(v)
+			if s != "" {
+				return candidate + "=" + s
+			}
+		}
+	}
+	// Fallback to the full canonical key when no identity field is present.
+	return canonicalJSONKey(m)
+}
+
+// stableObjectPrimaryKey is the `types.Object` companion to
+// `stableItemPrimaryKey`. It must produce byte-for-byte the same key for
+// the same logical item so cross-domain matching works — see the godoc on
+// `stableItemPrimaryKey` for why the tiebreaker is omitted.
+func stableObjectPrimaryKey(obj types.Object, fields []BodyFieldDef) string {
+	attrs := obj.Attributes()
+	declared := map[string]bool{}
+	for _, f := range fields {
+		declared[bodyFieldKey(f)] = true
+	}
+	for _, candidate := range stableIdentityFieldOrder {
+		key := candidate
+		if len(fields) > 0 && !declared[key] {
+			continue
+		}
+		v, ok := attrs[key]
+		if !ok {
+			continue
+		}
+		if s, ok := stringifyAttrIdentity(v); ok && s != "" {
+			return candidate + "=" + s
+		}
+	}
+	return "obj=" + obj.String()
+}
+
+// reorderResponseArrayBySourceKeys reshuffles `arr` so its elements appear
+// in the same order as `sourceKeys` (which is the sequence of primary
+// identity keys read from the planned/prior state). Items in the API
+// response whose primary key isn't in `sourceKeys` are appended at the end
+// in their original API order, so adding a new uuid to the HCL surfaces as
+// a single-element diff in the operator's chosen position.
+//
+// This is the central piece that satisfies Terraform Core's post-apply
+// consistency check: by reordering the API response to match what the
+// operator wrote, the post-apply state is positionally identical to the
+// planned state, eliminating the "Provider produced inconsistent result
+// after apply" error without silently rewriting the operator's HCL at plan
+// time.
+func reorderResponseArrayBySourceKeys(arr []any, fields []BodyFieldDef, sourceKeys []string) []any {
+	if len(sourceKeys) == 0 || len(arr) == 0 {
+		return arr
+	}
+	keyToItem := make(map[string]any, len(arr))
+	for _, it := range arr {
+		m, ok := it.(map[string]any)
+		if !ok {
+			continue
+		}
+		k := stableItemPrimaryKey(m, fields)
+		if _, exists := keyToItem[k]; !exists {
+			keyToItem[k] = it
+		}
+	}
+	out := make([]any, 0, len(arr))
+	emitted := make(map[string]bool, len(arr))
+	for _, k := range sourceKeys {
+		if emitted[k] {
+			continue
+		}
+		if it, ok := keyToItem[k]; ok {
+			out = append(out, it)
+			emitted[k] = true
+		}
+	}
+	for _, it := range arr {
+		m, ok := it.(map[string]any)
+		if !ok {
+			out = append(out, it)
+			continue
+		}
+		k := stableItemPrimaryKey(m, fields)
+		if emitted[k] {
+			continue
+		}
+		out = append(out, it)
+		emitted[k] = true
+	}
+	return out
+}
+
 // canonicalize rewrites nested maps and slices so json.Marshal can be used
 // as a deterministic JSON tiebreaker. Go's encoding/json already sorts map
 // keys lexicographically, so this is mostly defensive recursion through

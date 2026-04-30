@@ -201,3 +201,141 @@ func TestStableObjectSortKeyContextCompiles(t *testing.T) {
 	_ = stableItemSortKey(map[string]any{}, nil)
 	_ = stableObjectSortKey(types.ObjectNull(map[string]attr.Type{}), nil)
 }
+
+// ─── Identity-only key + response reordering ─────────────────────────────────
+//
+// The two helpers below are the load-bearing piece for the post-Create /
+// post-Update consistency check. Background: terraform-plugin-framework's
+// schema-level `ValueSemanticEquality` only runs on collection types whose
+// values implement `ListValuableWithSemanticEquals` AND whose `ListSemanticEquals`
+// returns `true`. For nested-object arrays carrying mixed user/computed
+// inner fields (`uuid` user-supplied, `display_name` / `created_on`
+// returned by the API), the planned-state value has Unknown for the
+// computed fields while the post-Create value has them filled in — so any
+// canonical-form comparison that includes those fields disagrees, the
+// framework falls back to positional element comparison, and TF Core then
+// errors `Provider produced inconsistent result after apply` when the API
+// returned the elements in a different order than the operator wrote.
+//
+// The fix that survives this is:
+//
+//   1. Match elements between planned and API-response sides on the
+//      *primary identity field only* (`uuid` > `id` > ... — not the full
+//      canonical JSON). Unknown computed fields don't participate.
+//   2. Reorder the API response array to match the operator's planned /
+//      prior order before persisting it to state, appending genuinely new
+//      elements at the end so adding a uuid surfaces as a single-element
+//      diff in the operator's chosen order.
+
+// TestStableItemPrimaryKeyReturnsIdentityOnly verifies the new helper that
+// extracts only the primary identity prefix (no canonical-JSON tiebreaker).
+// This is the key the response reorderer matches on.
+func TestStableItemPrimaryKeyReturnsIdentityOnly(t *testing.T) {
+	fields := []BodyFieldDef{{Path: "uuid"}, {Path: "display_name"}}
+	got := stableItemPrimaryKey(map[string]any{
+		"uuid":         "{abc}",
+		"display_name": "Alice",
+	}, fields)
+	if got != "uuid={abc}" {
+		t.Fatalf("primary key = %q, want %q (must include only the identity field, not display_name)", got, "uuid={abc}")
+	}
+}
+
+// TestStableItemPrimaryKeyMatchesObjectPrimaryKey ensures the JSON-side and
+// terraform-Object-side primary-key extractors agree byte-for-byte. Without
+// this invariant, the response reorderer would never find any matches
+// between the planned state (Object) and the API response (map[string]any).
+func TestStableItemPrimaryKeyMatchesObjectPrimaryKey(t *testing.T) {
+	fields := []BodyFieldDef{{Path: "uuid"}}
+
+	jsonKey := stableItemPrimaryKey(map[string]any{"uuid": "{abc}"}, fields)
+	objKey := stableObjectPrimaryKey(
+		types.ObjectValueMust(itemAttrTypes(fields), map[string]attr.Value{
+			"uuid": types.StringValue("{abc}"),
+		}),
+		fields,
+	)
+	if jsonKey != objKey {
+		t.Fatalf("primary key mismatch: jsonKey=%q objKey=%q", jsonKey, objKey)
+	}
+}
+
+// TestStableItemPrimaryKeyIgnoresUnknownComputedFields guards the post-Create
+// scenario: the planned object has Unknown for display_name / created_on,
+// the API response has them filled in. The primary key for both sides must
+// be the same so the reorderer can pair them.
+func TestStableItemPrimaryKeyIgnoresUnknownComputedFields(t *testing.T) {
+	fields := []BodyFieldDef{{Path: "uuid"}, {Path: "display_name"}}
+
+	planned := stableObjectPrimaryKey(
+		types.ObjectValueMust(itemAttrTypes(fields), map[string]attr.Value{
+			"uuid":         types.StringValue("{abc}"),
+			"display_name": types.StringUnknown(),
+		}),
+		fields,
+	)
+	apiSide := stableItemPrimaryKey(map[string]any{
+		"uuid":         "{abc}",
+		"display_name": "Alice",
+	}, fields)
+	if planned != apiSide {
+		t.Fatalf("planned-vs-api primary-key disagreement: planned=%q api=%q", planned, apiSide)
+	}
+}
+
+// TestReorderResponseArrayPreservesSourceOrder is the central guard for the
+// post-Create / post-Update consistency check. Given an API response in
+// `[A, B]` order and a planned source in `[B, A]` order (the operator's
+// HCL), the reorderer must hand back `[B, A]`. New items in the API
+// response that aren't in source are appended at the end.
+func TestReorderResponseArrayPreservesSourceOrder(t *testing.T) {
+	fields := []BodyFieldDef{{Path: "uuid"}}
+	api := []any{
+		map[string]any{"uuid": "{A}", "display_name": "Alice"},
+		map[string]any{"uuid": "{B}", "display_name": "Bob"},
+		map[string]any{"uuid": "{C}", "display_name": "Carol"}, // newly added by API
+	}
+	sourceOrder := []string{"uuid={B}", "uuid={A}"} // operator's HCL had B before A; C was added later
+
+	got := reorderResponseArrayBySourceKeys(api, fields, sourceOrder)
+	if len(got) != 3 {
+		t.Fatalf("len = %d, want 3", len(got))
+	}
+	wantUUIDs := []string{"{B}", "{A}", "{C}"}
+	for i, want := range wantUUIDs {
+		gotUUID, _ := got[i].(map[string]any)["uuid"].(string)
+		if gotUUID != want {
+			t.Fatalf("got[%d].uuid = %q, want %q", i, gotUUID, want)
+		}
+	}
+}
+
+// TestReorderResponseArrayReturnsAPIOrderWhenSourceEmpty handles the no-prior
+// case (Read on an unmanaged resource, Import, etc.): the reorderer must
+// not drop anything and must preserve the API's order verbatim.
+func TestReorderResponseArrayReturnsAPIOrderWhenSourceEmpty(t *testing.T) {
+	fields := []BodyFieldDef{{Path: "uuid"}}
+	api := []any{
+		map[string]any{"uuid": "{A}"},
+		map[string]any{"uuid": "{B}"},
+	}
+	got := reorderResponseArrayBySourceKeys(api, fields, nil)
+	if len(got) != 2 || got[0].(map[string]any)["uuid"] != "{A}" || got[1].(map[string]any)["uuid"] != "{B}" {
+		t.Fatalf("got = %#v, want [{A},{B}] verbatim", got)
+	}
+}
+
+// TestReorderResponseArrayDeduplicatesSourceKeys guards a defensive edge
+// case: duplicate keys in source order must not cause an item to be emitted
+// twice in the output.
+func TestReorderResponseArrayDeduplicatesSourceKeys(t *testing.T) {
+	fields := []BodyFieldDef{{Path: "uuid"}}
+	api := []any{
+		map[string]any{"uuid": "{A}"},
+		map[string]any{"uuid": "{B}"},
+	}
+	got := reorderResponseArrayBySourceKeys(api, fields, []string{"uuid={A}", "uuid={A}", "uuid={B}"})
+	if len(got) != 2 {
+		t.Fatalf("len = %d, want 2", len(got))
+	}
+}
