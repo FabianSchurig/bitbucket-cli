@@ -143,18 +143,15 @@ func TestBuildListFromResponsePreservesUpstreamOrder(t *testing.T) {
 }
 
 // TestBuildListFromResponseReturnsSetLikeListValue ensures the response
-// builder hands back a value whose runtime type matches the schema's
-// CustomType. Without this, state.SetAttribute would fail with a type
-// mismatch on every nested-object array attribute.
+// builder propagates the element schema into the returned value's
+// itemFields. The wrapping (setLikeListValue) is already enforced by the
+// function's static return type — this test guards the field propagation
+// that ListSemanticEquals depends on for its identity-key derivation.
 func TestBuildListFromResponseReturnsSetLikeListValue(t *testing.T) {
 	got := buildListFromResponse(
 		[]any{map[string]any{"uuid": "{x}"}},
 		[]BodyFieldDef{{Path: "uuid"}},
 	)
-	// The static return type is already setLikeListValue, but assert it
-	// dynamically too so a future refactor that broadens the signature is
-	// caught by tests rather than by a runtime panic during refresh.
-	var _ setLikeListValue = got
 	if got.itemFields == nil || got.itemFields[0].Path != "uuid" {
 		t.Fatalf("expected itemFields to be propagated; got %#v", got.itemFields)
 	}

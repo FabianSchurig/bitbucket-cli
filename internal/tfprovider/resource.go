@@ -1375,9 +1375,25 @@ func buildListFromResponse(arr []any, itemFields []BodyFieldDef) setLikeListValu
 // custom value type. Centralising the conversion (rather than inlining it)
 // keeps the call sites symmetrical with `attrNullValue` and makes future
 // changes to the wrapping protocol a single-edit affair.
+//
+// The conversion is total: setLikeListType.ValueFromList never returns
+// diagnostics and always yields a setLikeListValue (it just wraps the
+// input), so a panic here would indicate the custom type's contract was
+// broken — the explicit comma-ok assertion turns that into a typed error
+// message instead of a generic interface-conversion panic.
 func wrapSetLikeList(list types.List, itemFields []BodyFieldDef) setLikeListValue {
-	v, _ := setLikeListTypeFor(itemFields).ValueFromList(context.Background(), list)
-	return v.(setLikeListValue)
+	v, diags := setLikeListTypeFor(itemFields).ValueFromList(context.Background(), list)
+	if diags.HasError() {
+		// Defensive: setLikeListType.ValueFromList currently never errors,
+		// but if a future revision starts returning diagnostics we want a
+		// loud, debuggable failure rather than a silently-dropped value.
+		panic(fmt.Sprintf("wrapSetLikeList: ValueFromList returned diagnostics: %v", diags))
+	}
+	wrapped, ok := v.(setLikeListValue)
+	if !ok {
+		panic(fmt.Sprintf("wrapSetLikeList: ValueFromList returned %T, want setLikeListValue", v))
+	}
+	return wrapped
 }
 
 // buildObjectFromResponse converts a JSON object from the API response into a
