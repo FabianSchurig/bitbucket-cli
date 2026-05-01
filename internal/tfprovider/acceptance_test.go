@@ -1714,7 +1714,7 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 	}
 
 	const restrictionKind = "push"
-	const pattern = "tf-acc-order-insensitive-users"
+	pattern := "tf-acc-order-insensitive-users"
 	if err := testAccDeleteBranchRestrictionsByPattern(ctx, c, workspace, repoSlug, restrictionKind, pattern); err != nil {
 		t.Fatalf("failed to clean up existing branch restrictions before test: %v", err)
 	}
@@ -1893,7 +1893,7 @@ func testAccEnsureRepoUserWritePermission(ctx context.Context, c *client.BBClien
 				"selected_user_id": selectedUserID,
 			},
 		})
-		if err != nil && strings.Contains(err.Error(), "bitbucket API error 404") {
+		if testAccBitbucketAPIStatus(err, http.StatusNotFound) {
 			return nil
 		}
 		return err
@@ -1911,7 +1911,7 @@ func testAccRepoUserPermission(ctx context.Context, c *client.BBClient, workspac
 		},
 	})
 	if err != nil {
-		if strings.Contains(err.Error(), "bitbucket API error 404") {
+		if testAccBitbucketAPIStatus(err, http.StatusNotFound) {
 			return "", false, nil
 		}
 		return "", false, err
@@ -1928,7 +1928,11 @@ func testAccRepoUserPermission(ctx context.Context, c *client.BBClient, workspac
 }
 
 func testAccSetRepoUserPermission(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID, permission string) error {
-	_, err := handlers.DispatchRaw(ctx, c, handlers.Request{
+	body, err := json.Marshal(map[string]string{"permission": permission})
+	if err != nil {
+		return err
+	}
+	_, err = handlers.DispatchRaw(ctx, c, handlers.Request{
 		Method:      "PUT",
 		URLTemplate: "/repositories/{workspace}/{repo_slug}/permissions-config/users/{selected_user_id}",
 		PathParams: map[string]string{
@@ -1936,7 +1940,7 @@ func testAccSetRepoUserPermission(ctx context.Context, c *client.BBClient, works
 			"repo_slug":        repoSlug,
 			"selected_user_id": selectedUserID,
 		},
-		Body: fmt.Sprintf(`{"permission":%q}`, permission),
+		Body: string(body),
 	})
 	return err
 }
@@ -1977,11 +1981,15 @@ func testAccDeleteBranchRestrictionsByPattern(ctx context.Context, c *client.BBC
 				"id":        fmt.Sprint(id),
 			},
 		})
-		if err != nil && !strings.Contains(err.Error(), "bitbucket API error 404") {
+		if err != nil && !testAccBitbucketAPIStatus(err, http.StatusNotFound) {
 			return err
 		}
 	}
 	return nil
+}
+
+func testAccBitbucketAPIStatus(err error, status int) bool {
+	return err != nil && strings.Contains(err.Error(), fmt.Sprintf("bitbucket API error %d", status))
 }
 
 // TestAccRealAPI_DataSource_UserEmails reads a specific email address for the current user.
