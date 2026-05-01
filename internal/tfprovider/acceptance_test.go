@@ -1668,8 +1668,8 @@ func TestAccRealAPI_DataSource_WorkspacePermissions(t *testing.T) {
 // catches (1)+(2)+(3) on the multiset path.
 //
 // Required env: BITBUCKET_TEST_WORKSPACE, BITBUCKET_TEST_REPO. Optional:
-// BITBUCKET_TEST_USER or BITBUCKET_TEST_USER_2 for full multi-element coverage
-// (UUID with surrounding braces, e.g. "{abcdef01-…}").
+// BITBUCKET_TEST_USER, falling back to BITBUCKET_TEST_USER_2, for full
+// multi-element coverage (UUID with surrounding braces, e.g. "{abcdef01-…}").
 func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.T) {
 	workspace := skipIfNoRealAPI(t)
 	repoSlug := os.Getenv("BITBUCKET_TEST_REPO")
@@ -1690,7 +1690,7 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 	}
 
 	user2 := os.Getenv("BITBUCKET_TEST_USER")
-	if user2 == "" || user2 == user1 {
+	if user2 == "" {
 		user2 = os.Getenv("BITBUCKET_TEST_USER_2")
 	}
 	if user2 == user1 {
