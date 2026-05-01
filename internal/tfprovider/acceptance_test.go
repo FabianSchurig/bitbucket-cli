@@ -1688,6 +1688,11 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 		for _, u := range uuids {
 			fmt.Fprintf(&users, "    { uuid = %q },\n", u)
 		}
+		// `groups` is intentionally omitted: Bitbucket's
+		// /branch-restrictions POST returns 500 when an empty `groups`
+		// array is sent alongside a non-empty `users` (the matching
+		// mock-server test in TestAccBitbucketBranchRestrictionsUsersOrderInsensitive
+		// also omits it).
 		return fmt.Sprintf(`
 			provider "bitbucket" {}
 
@@ -1700,7 +1705,6 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 
 				users = [
 %s				]
-				groups = []
 			}
 		`, workspace, repoSlug, pattern, users.String())
 	}
