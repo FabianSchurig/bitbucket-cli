@@ -1662,42 +1662,81 @@ func TestAccRealAPI_DataSource_WorkspacePermissions(t *testing.T) {
 // regressions lived.
 //
 // Step 1 catches (1) on the single-user path (the user object's display_name /
-// created_on are computed). Step 2 catches (3) for the same case. When
-// BITBUCKET_TEST_USER_2 is also configured, steps 3-5 add full multi-element
-// coverage (reorder + remove) that catches (1)+(2)+(3) on the multiset path.
+// created_on are computed). Step 2 catches (3) for the same case. When an
+// additional test user is configured and can be granted repository write
+// permission, steps 3-5 add full multi-element coverage (reorder + remove) that
+// catches (1)+(2)+(3) on the multiset path.
 //
-// Required env: BITBUCKET_TEST_WORKSPACE, BITBUCKET_TEST_REPO, BITBUCKET_TEST_USER
-// (UUID with surrounding braces, e.g. "{abcdef01-…}"). Optional:
-// BITBUCKET_TEST_USER_2 for full multi-element coverage.
+// Required env: BITBUCKET_TEST_WORKSPACE, BITBUCKET_TEST_REPO. Optional:
+// BITBUCKET_TEST_USER or BITBUCKET_TEST_USER_2 for full multi-element coverage
+// (UUID with surrounding braces, e.g. "{abcdef01-…}").
 func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.T) {
 	workspace := skipIfNoRealAPI(t)
 	repoSlug := os.Getenv("BITBUCKET_TEST_REPO")
 	if repoSlug == "" {
 		t.Skip("BITBUCKET_TEST_REPO not set, skipping branch restrictions real API test")
 	}
-	user1 := os.Getenv("BITBUCKET_TEST_USER")
-	if user1 == "" {
-		t.Skip("BITBUCKET_TEST_USER not set, skipping branch restrictions real API test")
-	}
-	user2 := os.Getenv("BITBUCKET_TEST_USER_2") // optional second user UUID
 
-	pattern := "tf-acc-test-" + strings.ToLower(acctest.RandStringFromCharSet(8, acctest.CharSetAlphaNum))
+	c, err := client.NewClient()
+	if err != nil {
+		t.Fatalf("failed to create Bitbucket client: %v", err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	user1, err := testAccCurrentUserUUID(ctx, c)
+	if err != nil {
+		t.Fatalf("failed to read current user UUID: %v", err)
+	}
+
+	user2 := os.Getenv("BITBUCKET_TEST_USER")
+	if user2 == "" || user2 == user1 {
+		user2 = os.Getenv("BITBUCKET_TEST_USER_2")
+	}
+	if user2 == user1 {
+		user2 = ""
+	}
+
+	if user2 != "" {
+		restorePermission, err := testAccEnsureRepoUserWritePermission(ctx, c, workspace, repoSlug, user2)
+		if err != nil {
+			t.Logf("BITBUCKET_TEST_USER cannot be prepared with repository write permission; skipping multi-user branch restriction steps: %v", err)
+			user2 = ""
+		} else {
+			defer func() {
+				restoreCtx, restoreCancel := context.WithTimeout(context.Background(), 30*time.Second)
+				defer restoreCancel()
+				if err := restorePermission(restoreCtx); err != nil {
+					t.Logf("failed to restore repository permission for %s: %v", user2, err)
+				}
+			}()
+		}
+	}
+
+	const restrictionKind = "push"
+	const pattern = "tf-acc-order-insensitive-users"
+	if err := testAccDeleteBranchRestrictionsByPattern(ctx, c, workspace, repoSlug, restrictionKind, pattern); err != nil {
+		t.Fatalf("failed to clean up existing branch restrictions before test: %v", err)
+	}
+	defer func() {
+		cleanupCtx, cleanupCancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cleanupCancel()
+		if err := testAccDeleteBranchRestrictionsByPattern(cleanupCtx, c, workspace, repoSlug, restrictionKind, pattern); err != nil {
+			t.Logf("failed to clean up branch restrictions after test: %v", err)
+		}
+	}()
 
 	cfg := func(uuids ...string) string {
 		var users strings.Builder
 		for _, u := range uuids {
 			fmt.Fprintf(&users, "    { uuid = %q },\n", u)
 		}
-		// `kind = "delete"` is used (not "push") because Bitbucket Cloud's
-		// /branch-restrictions POST validates that every user listed in a
-		// `kind=push` restriction has repository write access, and returns
-		// `500 Something went wrong` (not 403) if any does not — a long-
-		// standing Bitbucket quirk that's orthogonal to what this test
-		// guards (multiset semantic equality + planned-order alignment of
-		// the response array). `kind=delete` accepts the same `users` array
-		// shape and exercises the exact same provider code paths, but does
-		// not perform the per-user permission validation, so it succeeds
-		// against any UUID the caller can read.
+		// `kind = "push"` is the branch-restriction kind that supports a
+		// user allow-list. Bitbucket validates that every listed user has
+		// repository write access before accepting the restriction, so this
+		// test uses the authenticated user for the required single-user path
+		// and explicitly grants write permission before exercising an
+		// optional second user.
 		//
 		// `groups` is intentionally omitted: Bitbucket's branch-restrictions
 		// POST returns 500 when an empty `groups` array is sent alongside a
@@ -1710,14 +1749,14 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 			resource "bitbucket_branch_restrictions" "test" {
 				workspace         = %q
 				repo_slug         = %q
-				kind              = "delete"
+				kind              = %q
 				branch_match_kind = "glob"
 				pattern           = %q
 
 				users = [
 %s				]
 			}
-		`, workspace, repoSlug, pattern, users.String())
+		`, workspace, repoSlug, restrictionKind, pattern, users.String())
 	}
 
 	steps := []resource.TestStep{
@@ -1776,16 +1815,16 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
-		CheckDestroy:             testAccCheckBranchRestrictionDestroy(workspace, repoSlug, pattern),
+		CheckDestroy:             testAccCheckBranchRestrictionDestroy(workspace, repoSlug, restrictionKind, pattern),
 		Steps:                    steps,
 	})
 }
 
 // testAccCheckBranchRestrictionDestroy verifies no branch restriction matching
-// the test pattern (kind=delete) remains in the workspace/repo after destroy.
+// the test pattern remains in the workspace/repo after destroy.
 // The resource ID is generated by Bitbucket and not stable across runs, so we
 // query by the (kind, pattern) tuple that the test owns.
-func testAccCheckBranchRestrictionDestroy(workspace, repoSlug, pattern string) resource.TestCheckFunc {
+func testAccCheckBranchRestrictionDestroy(workspace, repoSlug, kind, pattern string) resource.TestCheckFunc {
 	return func(_ *terraform.State) error {
 		c, err := client.NewClient()
 		if err != nil {
@@ -1797,18 +1836,152 @@ func testAccCheckBranchRestrictionDestroy(workspace, repoSlug, pattern string) r
 			Method:      "GET",
 			URLTemplate: "/repositories/{workspace}/{repo_slug}/branch-restrictions",
 			PathParams:  map[string]string{"workspace": workspace, "repo_slug": repoSlug},
-			QueryParams: map[string]string{"kind": "delete", "pattern": pattern},
+			QueryParams: map[string]string{"kind": kind, "pattern": pattern},
 			All:         true,
 		})
 		if err != nil {
 			return fmt.Errorf("failed to list branch restrictions for destroy check: %v", err)
 		}
 		if items, ok := result.([]any); ok && len(items) > 0 {
-			return fmt.Errorf("branch restriction kind=delete, pattern=%q still exists in %s/%s after destroy (%d found)",
-				pattern, workspace, repoSlug, len(items))
+			return fmt.Errorf("branch restriction kind=%s, pattern=%q still exists in %s/%s after destroy (%d found)",
+				kind, pattern, workspace, repoSlug, len(items))
 		}
 		return nil
 	}
+}
+
+func testAccCurrentUserUUID(ctx context.Context, c *client.BBClient) (string, error) {
+	result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
+		Method:      "GET",
+		URLTemplate: "/user",
+	})
+	if err != nil {
+		return "", err
+	}
+	user, ok := result.(map[string]any)
+	if !ok {
+		return "", fmt.Errorf("unexpected /user response type %T", result)
+	}
+	uuid, ok := user["uuid"].(string)
+	if !ok || uuid == "" {
+		return "", fmt.Errorf("current user response does not contain uuid")
+	}
+	return uuid, nil
+}
+
+func testAccEnsureRepoUserWritePermission(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID string) (func(context.Context) error, error) {
+	oldPermission, hadExplicitPermission, err := testAccRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID)
+	if err != nil {
+		return nil, err
+	}
+	if oldPermission == "write" || oldPermission == "admin" {
+		return func(context.Context) error { return nil }, nil
+	}
+	if err := testAccSetRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID, "write"); err != nil {
+		return nil, err
+	}
+	return func(ctx context.Context) error {
+		if hadExplicitPermission {
+			return testAccSetRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID, oldPermission)
+		}
+		_, err := handlers.DispatchRaw(ctx, c, handlers.Request{
+			Method:      "DELETE",
+			URLTemplate: "/repositories/{workspace}/{repo_slug}/permissions-config/users/{selected_user_id}",
+			PathParams: map[string]string{
+				"workspace":        workspace,
+				"repo_slug":        repoSlug,
+				"selected_user_id": selectedUserID,
+			},
+		})
+		if err != nil && strings.Contains(err.Error(), "bitbucket API error 404") {
+			return nil
+		}
+		return err
+	}, nil
+}
+
+func testAccRepoUserPermission(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID string) (permission string, explicit bool, err error) {
+	result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
+		Method:      "GET",
+		URLTemplate: "/repositories/{workspace}/{repo_slug}/permissions-config/users/{selected_user_id}",
+		PathParams: map[string]string{
+			"workspace":        workspace,
+			"repo_slug":        repoSlug,
+			"selected_user_id": selectedUserID,
+		},
+	})
+	if err != nil {
+		if strings.Contains(err.Error(), "bitbucket API error 404") {
+			return "", false, nil
+		}
+		return "", false, err
+	}
+	permissionResponse, ok := result.(map[string]any)
+	if !ok {
+		return "", false, fmt.Errorf("unexpected repo user permission response type %T", result)
+	}
+	permission, ok = permissionResponse["permission"].(string)
+	if !ok || permission == "" {
+		return "", true, fmt.Errorf("repo user permission response does not contain permission")
+	}
+	return permission, true, nil
+}
+
+func testAccSetRepoUserPermission(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID, permission string) error {
+	_, err := handlers.DispatchRaw(ctx, c, handlers.Request{
+		Method:      "PUT",
+		URLTemplate: "/repositories/{workspace}/{repo_slug}/permissions-config/users/{selected_user_id}",
+		PathParams: map[string]string{
+			"workspace":        workspace,
+			"repo_slug":        repoSlug,
+			"selected_user_id": selectedUserID,
+		},
+		Body: fmt.Sprintf(`{"permission":%q}`, permission),
+	})
+	return err
+}
+
+func testAccDeleteBranchRestrictionsByPattern(ctx context.Context, c *client.BBClient, workspace, repoSlug, kind, pattern string) error {
+	result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
+		Method:      "GET",
+		URLTemplate: "/repositories/{workspace}/{repo_slug}/branch-restrictions",
+		PathParams:  map[string]string{"workspace": workspace, "repo_slug": repoSlug},
+		QueryParams: map[string]string{"kind": kind, "pattern": pattern},
+		All:         true,
+	})
+	if err != nil {
+		return err
+	}
+	items, ok := result.([]any)
+	if !ok {
+		return fmt.Errorf("unexpected branch restriction list response type %T", result)
+	}
+	for _, raw := range items {
+		item, ok := raw.(map[string]any)
+		if !ok {
+			return fmt.Errorf("unexpected branch restriction item response type %T", raw)
+		}
+		if gotPattern, _ := item["pattern"].(string); gotPattern != pattern {
+			continue
+		}
+		id, ok := item["id"]
+		if !ok {
+			return fmt.Errorf("branch restriction response does not contain id")
+		}
+		_, err := handlers.DispatchRaw(ctx, c, handlers.Request{
+			Method:      "DELETE",
+			URLTemplate: "/repositories/{workspace}/{repo_slug}/branch-restrictions/{id}",
+			PathParams: map[string]string{
+				"workspace": workspace,
+				"repo_slug": repoSlug,
+				"id":        fmt.Sprint(id),
+			},
+		})
+		if err != nil && !strings.Contains(err.Error(), "bitbucket API error 404") {
+			return err
+		}
+	}
+	return nil
 }
 
 // TestAccRealAPI_DataSource_UserEmails reads a specific email address for the current user.
