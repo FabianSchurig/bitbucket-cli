@@ -22,6 +22,8 @@ import (
 	"github.com/FabianSchurig/bitbucket-cli/internal/tfprovider"
 )
 
+const testAccRealAPITimeout = 30 * time.Second
+
 // testAccProtoV6ProviderFactories creates provider factories for acceptance tests.
 func testAccProtoV6ProviderFactories() map[string]func() (tfprotov6.ProviderServer, error) {
 	return map[string]func() (tfprotov6.ProviderServer, error){
@@ -1411,7 +1413,7 @@ func testAccCheckProjectDestroy(workspace, projectKey string) resource.TestCheck
 		if err != nil {
 			return fmt.Errorf("failed to create client: %v", err)
 		}
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), testAccRealAPITimeout)
 		defer cancel()
 		_, err = handlers.DispatchRaw(ctx, c, handlers.Request{
 			Method:      "GET",
@@ -1681,7 +1683,7 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 	if err != nil {
 		t.Fatalf("failed to create Bitbucket client: %v", err)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), testAccRealAPITimeout)
 	defer cancel()
 
 	user1, err := testAccCurrentUserUUID(ctx, c)
@@ -1704,7 +1706,7 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 			user2 = ""
 		} else {
 			defer func() {
-				restoreCtx, restoreCancel := context.WithTimeout(context.Background(), 30*time.Second)
+				restoreCtx, restoreCancel := context.WithTimeout(context.Background(), testAccRealAPITimeout)
 				defer restoreCancel()
 				if err := restorePermission(restoreCtx); err != nil {
 					t.Logf("failed to restore repository permission for %s: %v", user2, err)
@@ -1714,12 +1716,16 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 	}
 
 	const restrictionKind = "push"
-	pattern := "tf-acc-order-insensitive-users"
+	patternUser := strings.Trim(user1, "{}")
+	if len(patternUser) > 8 {
+		patternUser = patternUser[:8]
+	}
+	pattern := "tf-acc-order-insensitive-users-" + strings.ToLower(patternUser)
 	if err := testAccDeleteBranchRestrictionsByPattern(ctx, c, workspace, repoSlug, restrictionKind, pattern); err != nil {
 		t.Fatalf("failed to clean up existing branch restrictions before test: %v", err)
 	}
 	defer func() {
-		cleanupCtx, cleanupCancel := context.WithTimeout(context.Background(), 30*time.Second)
+		cleanupCtx, cleanupCancel := context.WithTimeout(context.Background(), testAccRealAPITimeout)
 		defer cleanupCancel()
 		if err := testAccDeleteBranchRestrictionsByPattern(cleanupCtx, c, workspace, repoSlug, restrictionKind, pattern); err != nil {
 			t.Logf("failed to clean up branch restrictions after test: %v", err)
@@ -1830,7 +1836,7 @@ func testAccCheckBranchRestrictionDestroy(workspace, repoSlug, kind, pattern str
 		if err != nil {
 			return fmt.Errorf("failed to create client: %v", err)
 		}
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), testAccRealAPITimeout)
 		defer cancel()
 		result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
 			Method:      "GET",
