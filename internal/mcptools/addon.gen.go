@@ -26,6 +26,7 @@ Available operations:
 - deleteAllLinkerValues: Delete all linker values [DELETE]
 - getALinkerValue: Get a linker value [GET]
 - deleteALinkerValue: Delete a linker value [DELETE]
+- getTheClientKeyOfAConnectAddon: Get the client key of a Connect addon [GET]
 `,
 	Operations: []OperationDef{
 		{
@@ -161,6 +162,19 @@ This endpoint is deprecated and will be removed by May 2026.`,
 			Params: []ParamDef{
 				{Name: `linker_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `value_id`, In: `path`, Type: `integer`, Required: true},
+			},
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
+		},
+		{
+			OperationID: `getTheClientKeyOfAConnectAddon`,
+			Method:      `GET`,
+			Path:        `/addon/{addon_key}/client-key`,
+			Summary:     `Get the client key of a Connect addon`,
+			Description: "Get the client key of the Connect addon associated with a Forge app install via forgeAppId linkage.\n\nThis endpoint is part of the Connect -> Forge migration tooling. It is intended to be used by a Forge app\nusing `asApp().requestBitbucket()` only.\nPrerequisite: app developer needs to register the linkage between their Connect and Forge app by setting\n`forgeAppId` in the Connect addon descriptor to `app.id` from Forge app manifest, then update the installations.\nIf the request came from an installation of a registered Forge app, the client key of the linked Connect addon\ninstalled in the same workspace will be returned.\n\n```\napi.asApp().requestBitbucket(route`/2.0/addon/{addon-key}/client-key`)\n```",
+			Params: []ParamDef{
+				{Name: `addon_key`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,

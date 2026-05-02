@@ -12,8 +12,12 @@ paths:
     get:
       tags:
       - Search
+      deprecated: true
       summary: Search for code in a team's repositories
-      description: 'Search for code in the repositories of the specified team.
+      description: 'This API will be deprecated on November 1, 2026.
+
+
+        Search for code in the repositories of the specified team.
 
 
         Note that searches can match in the file''s text (`content_matches`),
@@ -168,8 +172,12 @@ paths:
     get:
       tags:
       - Search
+      deprecated: true
       summary: Search for code in a user's repositories
-      description: 'Search for code in the repositories of the specified user.
+      description: 'This API will be deprecated on November 1, 2026.
+
+
+        Search for code in the repositories of the specified user.
 
 
         Note that searches can match in the file''s text (`content_matches`),
@@ -321,8 +329,12 @@ paths:
     get:
       tags:
       - Search
+      deprecated: true
       summary: Search for code in a workspace
-      description: 'Search for code in the repositories of the specified workspace.
+      description: 'This API will be deprecated on November 1, 2026.
+
+
+        Search for code in the repositories of the specified workspace.
 
 
         Note that searches can match in the file''s text (`content_matches`),

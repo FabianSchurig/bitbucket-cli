@@ -49,6 +49,7 @@ func NewAddonCommand() *cobra.Command {
 		newAddonDeleteAllLinkerValuesCmd(),
 		newAddonGetALinkerValueCmd(),
 		newAddonDeleteALinkerValueCmd(),
+		newAddonGetTheClientKeyOfAConnectAddonCmd(),
 	)
 
 	return cmd
@@ -438,5 +439,44 @@ This endpoint is deprecated and will be removed by May 2026.`,
 	}
 	cmd.Flags().StringVar(&linkerKey, "linker-key", "", "linker_key (path parameter)")
 	cmd.Flags().IntVar(&valueId, "value-id", 0, "value_id (path parameter)")
+	return cmd
+}
+
+// newAddonGetTheClientKeyOfAConnectAddonCmd returns the "addon get-the-client-key-of-a-connect-addon" cobra command.
+// operationId: getTheClientKeyOfAConnectAddon
+func newAddonGetTheClientKeyOfAConnectAddonCmd() *cobra.Command {
+	var (
+		addonKey string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "get-the-client-key-of-a-connect-addon",
+		Short: `Get the client key of a Connect addon`,
+		Long:  "Get the client key of the Connect addon associated with a Forge app install via forgeAppId linkage.\n\nThis endpoint is part of the Connect -> Forge migration tooling. It is intended to be used by a Forge app\nusing `asApp().requestBitbucket()` only.\nPrerequisite: app developer needs to register the linkage between their Connect and Forge app by setting\n`forgeAppId` in the Connect addon descriptor to `app.id` from Forge app manifest, then update the installations.\nIf the request came from an installation of a registered Forge app, the client key of the linked Connect addon\ninstalled in the same workspace will be returned.\n\n```\napi.asApp().requestBitbucket(route`/2.0/addon/{addon-key}/client-key`)\n```",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			pathParams := map[string]string{
+				"addon_key": addonKey,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pathParams["addon_key"] == "" {
+				return fmt.Errorf("--addon-key is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/addon/{addon_key}/client-key",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().StringVar(&addonKey, "addon-key", "", "addon_key (path parameter)")
 	return cmd
 }
