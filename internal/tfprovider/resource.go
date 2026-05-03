@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
@@ -129,10 +130,10 @@ func buildNestedItemAttrs(itemFields []BodyFieldDef) map[string]schema.Attribute
 				Description: desc,
 				Optional:    true,
 				Computed:    true,
-				CustomType:  setLikeListTypeFor(f.ItemFields),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: buildNestedItemAttrs(f.ItemFields),
 				},
+				PlanModifiers: nestedListSortPlanModifiers(f.ItemFields),
 			}
 		} else if f.IsArray {
 			nested[key] = schema.ListAttribute{
@@ -153,11 +154,7 @@ func buildNestedItemAttrs(itemFields []BodyFieldDef) map[string]schema.Attribute
 }
 
 // itemAttrTypes returns the attr.Type map for nested attribute items.
-// Recursively handles nested objects and arrays. Nested-object arrays use
-// setLikeListType so the value-tree type matches the schema's CustomType
-// declaration in buildNestedItemAttrs — without this match the framework's
-// Equal() check would reject any ObjectValue carrying such a list during
-// state set/get.
+// Recursively handles nested objects and arrays.
 func itemAttrTypes(itemFields []BodyFieldDef) map[string]attr.Type {
 	attrTypes := map[string]attr.Type{}
 	for _, f := range itemFields {
@@ -165,7 +162,7 @@ func itemAttrTypes(itemFields []BodyFieldDef) map[string]attr.Type {
 		if f.IsObject && len(f.ItemFields) > 0 {
 			attrTypes[key] = types.ObjectType{AttrTypes: itemAttrTypes(f.ItemFields)}
 		} else if f.IsArray && len(f.ItemFields) > 0 {
-			attrTypes[key] = setLikeListTypeFor(f.ItemFields)
+			attrTypes[key] = types.ListType{ElemType: types.ObjectType{AttrTypes: itemAttrTypes(f.ItemFields)}}
 		} else if f.IsArray {
 			attrTypes[key] = types.ListType{ElemType: types.StringType}
 		} else {
@@ -476,7 +473,7 @@ func (r *GenericResource) dispatchWithParamFallback(ctx context.Context, op *Ope
 	// `group-by-branch` GET).
 	result = transformProjectBranchRestrictionsRead(ctx, op, r.group.TypeName, source, result, diags)
 
-	resultMap := r.storeDispatchResult(ctx, op, pathParams, source, target, diags, result)
+	resultMap := r.storeDispatchResult(ctx, op, pathParams, target, diags, result)
 	if resultMap != nil {
 		r.populateComputedParams(ctx, resultMap, source, target, diags)
 	}
@@ -542,24 +539,14 @@ func (r *GenericResource) buildBody(ctx context.Context, op *OperationDef, sourc
 // readListNested reads a ListNestedAttribute from state and returns it as a
 // []map[string]any suitable for JSON marshaling. Returns nil if the list is
 // null, unknown, or empty.
-//
-// The destination variable's Go type must match the schema attribute's
-// value type (`setLikeListValue` for nested-object arrays — see
-// `setLikeListTypeFor` in resource.go), otherwise the framework's
-// reflection-based conversion in `internal/reflect/interfaces.go`
-// rejects the read with `Cannot use attr.Value basetypes.ListValue, only
-// tfprovider.setLikeListValue is supported because tfprovider.setLikeListType
-// is the type in the schema`. Reading into the custom value type and then
-// unwrapping to the embedded `basetypes.ListValue` keeps every existing
-// downstream helper (which works in terms of `types.List`) untouched.
 func readListNested(ctx context.Context, source stateAccessor, attrName string, itemFields []BodyFieldDef, diags *diag.Diagnostics) []map[string]any {
-	var list setLikeListValue
+	var list types.List
 	d := source.GetAttribute(ctx, attrPath(attrName), &list)
 	diags.Append(d...)
 	if d.HasError() || list.IsNull() || list.IsUnknown() {
 		return nil
 	}
-	return readListNestedValue(list.ListValue, itemFields)
+	return readListNestedValue(list, itemFields)
 }
 
 func readListNestedValue(list types.List, itemFields []BodyFieldDef) []map[string]any {
@@ -736,16 +723,9 @@ func (r *GenericResource) responseFields() []BodyFieldDef {
 
 // extractResponseFields extracts individual field values from the API response
 // and sets them as computed attributes in the target state.
-//
-// `source` is the planned (Create/Update) or prior (Read) state. It is
-// consulted to align nested-object response arrays with the operator's
-// existing element order via `reorderResponseArrayBySourceKeys`, which
-// satisfies Terraform Core's post-apply consistency check without silently
-// rewriting the operator's HCL at plan time. May be nil — when so, the
-// API response is persisted in its native order.
-func (r *GenericResource) extractResponseFields(ctx context.Context, m map[string]any, source, target stateAccessor, diags *diag.Diagnostics) {
+func (r *GenericResource) extractResponseFields(ctx context.Context, m map[string]any, target stateAccessor, diags *diag.Diagnostics) {
 	for _, rf := range r.responseFields() {
-		setResponseField(ctx, rf, m, source, target, diags)
+		setResponseField(ctx, rf, m, target, diags)
 	}
 }
 
@@ -853,10 +833,10 @@ func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
 		return schema.ListNestedAttribute{
 			Description: desc,
 			Optional:    true,
-			CustomType:  setLikeListTypeFor(bf.ItemFields),
 			NestedObject: schema.NestedAttributeObject{
 				Attributes: buildNestedItemAttrs(bf.ItemFields),
 			},
+			PlanModifiers: nestedListSortPlanModifiers(bf.ItemFields),
 		}
 	}
 	if bf.IsArray {
@@ -929,10 +909,10 @@ func responseFieldAttr(rf BodyFieldDef) schema.Attribute {
 		return schema.ListNestedAttribute{
 			Description: desc,
 			Computed:    true,
-			CustomType:  setLikeListTypeFor(rf.ItemFields),
 			NestedObject: schema.NestedAttributeObject{
 				Attributes: buildNestedItemAttrs(rf.ItemFields),
 			},
+			PlanModifiers: nestedListSortPlanModifiers(rf.ItemFields),
 		}
 	}
 	if rf.IsArray {
@@ -1011,11 +991,24 @@ func mergeListNestedResponseAttr(attr schema.ListNestedAttribute, rf BodyFieldDe
 		attr.NestedObject = schema.NestedAttributeObject{
 			Attributes: buildNestedItemAttrs(rf.ItemFields),
 		}
-		if attr.CustomType == nil {
-			attr.CustomType = setLikeListTypeFor(rf.ItemFields)
+		if !hasNestedListSortModifier(attr.PlanModifiers) {
+			attr.PlanModifiers = append(attr.PlanModifiers, nestedListSortPlanModifiers(rf.ItemFields)...)
 		}
 	}
 	return attr
+}
+
+// hasNestedListSortModifier reports whether the given list plan modifiers
+// already contain the deterministic-order modifier — used during attribute
+// merges to avoid attaching it twice when a request body field is
+// promoted to also satisfy a Read response field.
+func hasNestedListSortModifier(mods []planmodifier.List) bool {
+	for _, m := range mods {
+		if _, ok := m.(nestedListSortPlanModifier); ok {
+			return true
+		}
+	}
+	return false
 }
 
 func mergeListResponseAttr(attr schema.ListAttribute, rf BodyFieldDef) schema.Attribute {
@@ -1048,7 +1041,7 @@ func addRequestBodyAttr(attrs map[string]schema.Attribute, hasBody bool) {
 	}
 }
 
-func (r *GenericResource) storeDispatchResult(ctx context.Context, op *OperationDef, pathParams map[string]string, source, target stateAccessor, diags *diag.Diagnostics, result any) map[string]any {
+func (r *GenericResource) storeDispatchResult(ctx context.Context, op *OperationDef, pathParams map[string]string, target stateAccessor, diags *diag.Diagnostics, result any) map[string]any {
 	if result == nil {
 		diags.Append(target.SetAttribute(ctx, attrPath("api_response"), types.StringValue(""))...)
 		diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(op.OperationID))...)
@@ -1064,7 +1057,7 @@ func (r *GenericResource) storeDispatchResult(ctx context.Context, op *Operation
 
 	resultMap, _ := result.(map[string]any)
 	if resultMap != nil {
-		r.extractResponseFields(ctx, resultMap, source, target, diags)
+		r.extractResponseFields(ctx, resultMap, target, diags)
 		if id := extractID(resultMap); id != "" {
 			diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(id))...)
 			return resultMap
@@ -1167,14 +1160,8 @@ func readObjectAttrValue(v attr.Value, itemFields []BodyFieldDef) (any, bool) {
 	return inner, true
 }
 
-// readNestedListAttrValue reads a nested-object array attr.Value into a
-// JSON-marshaling-friendly slice. It accepts both the plain
-// `basetypes.ListValue` (`types.List`) and the order-insensitive
-// `setLikeListValue` wrapper, since nested-object arrays attached to
-// either parent objects or top-level attributes now carry the custom
-// value type by default.
 func readNestedListAttrValue(v attr.Value, itemFields []BodyFieldDef) (any, bool) {
-	list, ok := asListValue(v)
+	list, ok := v.(types.List)
 	if !ok || list.IsNull() || list.IsUnknown() {
 		return nil, false
 	}
@@ -1183,21 +1170,6 @@ func readNestedListAttrValue(v attr.Value, itemFields []BodyFieldDef) (any, bool
 		return nil, false
 	}
 	return items, true
-}
-
-// asListValue extracts the underlying `basetypes.ListValue` from any value
-// that carries one — the framework's plain list type, or a custom list
-// type that wraps it (i.e. `setLikeListValue`). This indirection lets the
-// readers stay generic so a future custom list type doesn't require
-// touching every cast site again.
-func asListValue(v attr.Value) (types.List, bool) {
-	switch x := v.(type) {
-	case types.List:
-		return x, true
-	case setLikeListValue:
-		return x.ListValue, true
-	}
-	return types.List{}, false
 }
 
 func readSimpleListAttrValue(v attr.Value) (any, bool) {
@@ -1284,7 +1256,7 @@ func setComputedParam(ctx context.Context, m map[string]any, paramName, attrName
 	}
 }
 
-func setResponseField(ctx context.Context, rf BodyFieldDef, m map[string]any, source, target stateAccessor, diags *diag.Diagnostics) {
+func setResponseField(ctx context.Context, rf BodyFieldDef, m map[string]any, target stateAccessor, diags *diag.Diagnostics) {
 	key := toSnakeCase(strings.ReplaceAll(rf.Path, ".", "_"))
 	if isReservedResourceAttr(key) {
 		return
@@ -1293,58 +1265,11 @@ func setResponseField(ctx context.Context, rf BodyFieldDef, m map[string]any, so
 	if !ok || val == nil {
 		return
 	}
-	// Nested-object arrays are aligned to the planned/prior order before
-	// being marshaled to a setLikeListValue, so the post-apply state is
-	// positionally identical to the planned state. Without this, Terraform
-	// Core's consistency check fails when the API returns elements in a
-	// different order than the operator wrote — see the godoc on
-	// `reorderResponseArrayBySourceKeys`.
-	if rf.IsArray && len(rf.ItemFields) > 0 && source != nil {
-		if arr, ok := val.([]any); ok {
-			sourceKeys := readNestedListPrimaryKeys(ctx, source, key, rf.ItemFields, diags)
-			val = reorderResponseArrayBySourceKeys(arr, rf.ItemFields, sourceKeys)
-		}
-	}
 	attrValue, ok := responseFieldValue(val, rf)
 	if !ok {
 		return
 	}
 	diags.Append(target.SetAttribute(ctx, attrPath(key), attrValue)...)
-}
-
-// readNestedListPrimaryKeys reads the planned/prior nested-object array at
-// `attrName` from `source` and returns the primary identity key of each
-// element in source order. Null/unknown lists yield nil; the reorderer
-// then leaves the API response in its native order.
-//
-// GetAttribute diagnostics are intentionally not appended to the dispatch
-// `diags` collection: the source may not declare this attribute (e.g. a
-// Read against a freshly-imported resource where the prior state is
-// empty), and the framework's "attribute not found" diagnostic in that
-// case is benign. Real read errors still surface through the other
-// GetAttribute call sites that consume the same source.
-func readNestedListPrimaryKeys(ctx context.Context, source stateAccessor, attrName string, itemFields []BodyFieldDef, _ *diag.Diagnostics) []string {
-	if source == nil {
-		return nil
-	}
-	var list setLikeListValue
-	d := source.GetAttribute(ctx, attrPath(attrName), &list)
-	if d.HasError() || list.IsNull() || list.IsUnknown() {
-		return nil
-	}
-	elems := list.Elements()
-	if len(elems) == 0 {
-		return nil
-	}
-	keys := make([]string, 0, len(elems))
-	for _, e := range elems {
-		obj, ok := e.(types.Object)
-		if !ok {
-			continue
-		}
-		keys = append(keys, stableObjectPrimaryKey(obj, itemFields))
-	}
-	return keys
 }
 
 func responseFieldValue(val any, rf BodyFieldDef) (any, bool) {
@@ -1394,28 +1319,31 @@ func stringifyComplexValue(val any) string {
 }
 
 // buildListFromResponse converts a JSON array from the API response into a
-// list value suitable for a ListNestedAttribute. The returned value is
-// wrapped in setLikeListValue so its runtime type matches the schema's
-// CustomType — without that, state.SetAttribute would reject the value
-// for the nested-object array attributes (users, groups, reviewers, ...)
-// that opt into the order-insensitive custom list type.
-//
-// The order of items in `arr` is preserved verbatim. Order-insensitivity
-// is now expressed via setLikeListValue.ListSemanticEquals at the type
-// level, so the response builder no longer reorders elements — this keeps
-// upstream-API ordering visible when it is genuinely meaningful (e.g. the
-// natural order in which a paginated GET returned them) while still
-// suppressing spurious diffs against config order.
-func buildListFromResponse(arr []any, itemFields []BodyFieldDef) setLikeListValue {
+// types.List value suitable for a ListNestedAttribute. Items are sorted by
+// a stable identity key using the precedence defined by
+// stableIdentityFieldOrder, with a canonical JSON tiebreaker, so two
+// equivalent API responses (same elements in different order) produce
+// byte-identical Terraform state — required for the post-apply consistency
+// check on order-sensitive ListNestedAttributes when the upstream Bitbucket
+// API returns collection elements in non-deterministic order. The matching
+// plan-side sort lives in nestedListSortPlanModifier.
+func buildListFromResponse(arr []any, itemFields []BodyFieldDef) types.List {
 	attrTypes := itemAttrTypes(itemFields)
 	objType := types.ObjectType{AttrTypes: attrTypes}
 
 	if len(arr) == 0 {
-		return wrapSetLikeList(types.ListValueMust(objType, []attr.Value{}), itemFields)
+		return types.ListValueMust(objType, []attr.Value{})
 	}
 
-	elements := make([]attr.Value, 0, len(arr))
-	for _, item := range arr {
+	// Sort a working copy so we don't mutate the caller's slice (the same
+	// decoded response may be inspected by multiple callers, e.g. the
+	// computed-param populator).
+	sorted := make([]any, len(arr))
+	copy(sorted, arr)
+	sortResponseItems(sorted, itemFields)
+
+	elements := make([]attr.Value, 0, len(sorted))
+	for _, item := range sorted {
 		m, ok := item.(map[string]any)
 		if !ok {
 			continue
@@ -1432,24 +1360,7 @@ func buildListFromResponse(arr []any, itemFields []BodyFieldDef) setLikeListValu
 		}
 		elements = append(elements, types.ObjectValueMust(attrTypes, objAttrs))
 	}
-	return wrapSetLikeList(types.ListValueMust(objType, elements), itemFields)
-}
-
-// wrapSetLikeList lifts a plain types.List into the order-insensitive
-// custom value type. Centralising the conversion (rather than inlining it)
-// keeps the call sites symmetrical with `attrNullValue` and makes future
-// changes to the wrapping protocol a single-edit affair.
-//
-// The wrapping is a pure struct construction (no diagnostics, no
-// reflection): setLikeListValue is a thin embedding of basetypes.ListValue,
-// so building it directly is equivalent to going through
-// `setLikeListType.ValueFromList` but cannot fail. This avoids panicking
-// in production provider code paths called from `buildListFromResponse`
-// and `attrNullValue` — the prior indirection through the framework
-// interface had two panic sites whose only purpose was to guard a
-// no-op conversion.
-func wrapSetLikeList(list types.List, itemFields []BodyFieldDef) setLikeListValue {
-	return setLikeListValue{ListValue: list, itemFields: itemFields}
+	return types.ListValueMust(objType, elements)
 }
 
 // buildObjectFromResponse converts a JSON object from the API response into a
@@ -1495,15 +1406,12 @@ func buildAttrValueFromResponse(v any, f BodyFieldDef) attr.Value {
 }
 
 // attrNullValue returns the appropriate null value for a field's type.
-// Nested-object arrays are wrapped in setLikeListValue so the null value's
-// runtime type matches the schema's CustomType — required by the
-// framework's value-type round-trip checks at refresh time.
 func attrNullValue(f BodyFieldDef) attr.Value {
 	if f.IsObject && len(f.ItemFields) > 0 {
 		return types.ObjectNull(itemAttrTypes(f.ItemFields))
 	}
 	if f.IsArray && len(f.ItemFields) > 0 {
-		return wrapSetLikeList(types.ListNull(types.ObjectType{AttrTypes: itemAttrTypes(f.ItemFields)}), f.ItemFields)
+		return types.ListNull(types.ObjectType{AttrTypes: itemAttrTypes(f.ItemFields)})
 	}
 	if f.IsArray {
 		return types.ListNull(types.StringType)

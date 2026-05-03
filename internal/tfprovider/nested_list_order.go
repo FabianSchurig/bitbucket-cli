@@ -1,17 +1,14 @@
 package tfprovider
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-)
-
-const (
-	fallbackObjectKeyPrefix = "obj="
-	fallbackJSONKeyPrefix   = "json="
-	fallbackRawKeyPrefix    = "raw="
 )
 
 // stableIdentityFieldOrder is the precedence used to derive a stable per-item
@@ -21,12 +18,6 @@ const (
 // groups/repositories, name for tags). Using a fixed precedence rather than
 // per-endpoint configuration keeps the codegen pipeline schema-driven and
 // avoids hand-maintained sort tables.
-//
-// The keys are now consumed exclusively by setLikeListValue.ListSemanticEquals
-// to decide whether two nested-object lists carry the same multiset of
-// elements regardless of order. The runtime no longer reorders user-supplied
-// or API-returned lists in place — order-insensitivity is expressed at the
-// value-type level via setLikeListType.
 var stableIdentityFieldOrder = []string{
 	"uuid",
 	"id",
@@ -79,16 +70,15 @@ func stableItemSortKey(m map[string]any, fields []BodyFieldDef) string {
 // json.Marshal returns an error (e.g. NaN / +Inf in numeric values).
 func canonicalJSONKey(v any) string {
 	if b, err := json.Marshal(canonicalize(v)); err == nil {
-		return fallbackJSONKeyPrefix + string(b)
+		return "json=" + string(b)
 	}
-	return fmt.Sprintf("%s%v", fallbackRawKeyPrefix, v)
+	return fmt.Sprintf("raw=%v", v)
 }
 
 // stableObjectSortKey returns the same key for a `types.Object` element
-// already living in Terraform state / plan / config. It mirrors
-// stableItemSortKey over Terraform's attr.Value graph so the multiset
-// comparison performed by setLikeListValue.ListSemanticEquals lines up
-// byte-for-byte with the canonical key used for raw JSON responses —
+// already living in Terraform state / plan. It mirrors stableItemSortKey
+// over Terraform's attr.Value graph so plan-side sorting (the plan modifier)
+// and state-side sorting (the response builder) agree byte-for-byte —
 // including the secondary canonical-form tiebreaker that guarantees a
 // total order when two items share the same identity value.
 func stableObjectSortKey(obj types.Object, fields []BodyFieldDef) string {
@@ -115,7 +105,7 @@ func stableObjectSortKey(obj types.Object, fields []BodyFieldDef) string {
 	}
 	// Tiebreaker: the framework's stable String() form (attribute names are
 	// emitted in lexicographic order).
-	tiebreaker := fallbackObjectKeyPrefix + obj.String()
+	tiebreaker := "obj=" + obj.String()
 	if primary == "" {
 		return tiebreaker
 	}
@@ -171,124 +161,6 @@ func stringifyAttrIdentity(v attr.Value) (string, bool) {
 	return v.String(), true
 }
 
-// stableItemPrimaryKey returns ONLY the identity-field prefix of an item's
-// canonical sort key, omitting the canonical-JSON tiebreaker. It is the
-// matching key used by `reorderResponseArrayBySourceKeys` to pair an API
-// response item against its planned-state counterpart.
-//
-// The tiebreaker must be omitted because the planned-state side of that
-// comparison routinely has Unknown values for `Optional+Computed` inner
-// attributes (`display_name`, `created_on`, ...) that the API fills in,
-// while the API-response side has all of them resolved. Including those
-// fields in the matching key would make every pairing miss and the
-// reorderer would silently fall back to API order — defeating the post-
-// Create / post-Update consistency check.
-//
-// When no identity field is present (or none is declared on the schema),
-// the canonical-JSON form is still used so two genuinely-different items
-// don't collide; that's a degraded but defensible fallback for endpoints
-// without a stable primary key.
-func stableItemPrimaryKey(m map[string]any, fields []BodyFieldDef) string {
-	declared := map[string]bool{}
-	for _, f := range fields {
-		declared[f.Path] = true
-	}
-	for _, candidate := range stableIdentityFieldOrder {
-		if !declared[candidate] && len(fields) > 0 {
-			continue
-		}
-		if v, ok := m[candidate]; ok && v != nil {
-			s := stringifyIdentityValue(v)
-			if s != "" {
-				return candidate + "=" + s
-			}
-		}
-	}
-	// Fallback to the full canonical key when no identity field is present.
-	return canonicalJSONKey(m)
-}
-
-// stableObjectPrimaryKey is the `types.Object` companion to
-// `stableItemPrimaryKey`. It must produce byte-for-byte the same key for
-// the same logical item so cross-domain matching works — see the godoc on
-// `stableItemPrimaryKey` for why the tiebreaker is omitted.
-func stableObjectPrimaryKey(obj types.Object, fields []BodyFieldDef) string {
-	attrs := obj.Attributes()
-	declared := map[string]bool{}
-	for _, f := range fields {
-		declared[bodyFieldKey(f)] = true
-	}
-	for _, candidate := range stableIdentityFieldOrder {
-		key := candidate
-		if len(fields) > 0 && !declared[key] {
-			continue
-		}
-		v, ok := attrs[key]
-		if !ok {
-			continue
-		}
-		if s, ok := stringifyAttrIdentity(v); ok && s != "" {
-			return candidate + "=" + s
-		}
-	}
-	return fallbackObjectKeyPrefix + obj.String()
-}
-
-// reorderResponseArrayBySourceKeys reshuffles `arr` so its elements appear
-// in the same order as `sourceKeys` (which is the sequence of primary
-// identity keys read from the planned/prior state). Items in the API
-// response whose primary key isn't in `sourceKeys` are appended at the end
-// in their original API order, so adding a new uuid to the HCL surfaces as
-// a single-element diff in the operator's chosen position.
-//
-// This is the central piece that satisfies Terraform Core's post-apply
-// consistency check: by reordering the API response to match what the
-// operator wrote, the post-apply state is positionally identical to the
-// planned state, eliminating the "Provider produced inconsistent result
-// after apply" error without silently rewriting the operator's HCL at plan
-// time.
-func reorderResponseArrayBySourceKeys(arr []any, fields []BodyFieldDef, sourceKeys []string) []any {
-	if len(sourceKeys) == 0 || len(arr) == 0 {
-		return arr
-	}
-	keyToItem := make(map[string]any, len(arr))
-	for _, it := range arr {
-		m, ok := it.(map[string]any)
-		if !ok {
-			continue
-		}
-		k := stableItemPrimaryKey(m, fields)
-		if _, exists := keyToItem[k]; !exists {
-			keyToItem[k] = it
-		}
-	}
-	out := make([]any, 0, len(arr))
-	emitted := make(map[string]bool, len(arr))
-	for _, k := range sourceKeys {
-		if emitted[k] {
-			continue
-		}
-		if it, ok := keyToItem[k]; ok {
-			out = append(out, it)
-			emitted[k] = true
-		}
-	}
-	for _, it := range arr {
-		m, ok := it.(map[string]any)
-		if !ok {
-			out = append(out, it)
-			continue
-		}
-		k := stableItemPrimaryKey(m, fields)
-		if emitted[k] {
-			continue
-		}
-		out = append(out, it)
-		emitted[k] = true
-	}
-	return out
-}
-
 // canonicalize rewrites nested maps and slices so json.Marshal can be used
 // as a deterministic JSON tiebreaker. Go's encoding/json already sorts map
 // keys lexicographically, so this is mostly defensive recursion through
@@ -311,4 +183,130 @@ func canonicalize(v any) any {
 	default:
 		return v
 	}
+}
+
+// sortResponseItems sorts a JSON-decoded array of nested-object items in
+// place by their stable identity key. It is the response-side half of the
+// fix: every nested-object array we materialise into Terraform state goes
+// through this so two equivalent API responses (same elements, different
+// order) produce byte-identical state.
+func sortResponseItems(arr []any, fields []BodyFieldDef) {
+	if len(arr) < 2 {
+		return
+	}
+	keys := make([]string, len(arr))
+	for i, item := range arr {
+		if m, ok := item.(map[string]any); ok {
+			keys[i] = stableItemSortKey(m, fields)
+		} else {
+			// Non-object entries (rare; defensive) sort by their JSON form.
+			if b, err := json.Marshal(item); err == nil {
+				keys[i] = "raw=" + string(b)
+			} else {
+				keys[i] = fmt.Sprintf("raw=%v", item)
+			}
+		}
+	}
+	idx := make([]int, len(arr))
+	for i := range idx {
+		idx[i] = i
+	}
+	sort.SliceStable(idx, func(i, j int) bool {
+		return keys[idx[i]] < keys[idx[j]]
+	})
+	sorted := make([]any, len(arr))
+	for i, k := range idx {
+		sorted[i] = arr[k]
+	}
+	copy(arr, sorted)
+}
+
+// nestedListSortPlanModifier is the plan-side half of the deterministic-
+// order fix. Attaching it to every ListNestedAttribute over an object item
+// ensures the planned value carries the same canonical order the response
+// builder will produce — without it Terraform's post-apply consistency
+// check would still fire whenever a user wrote elements in a different
+// order than the canonical sort.
+//
+// The modifier is a value type (no fields beyond the per-attribute item
+// schema) so equality / type-assertion in tests stays straightforward.
+type nestedListSortPlanModifier struct {
+	itemFields []BodyFieldDef
+}
+
+func newNestedListSortPlanModifier(itemFields []BodyFieldDef) nestedListSortPlanModifier {
+	return nestedListSortPlanModifier{itemFields: itemFields}
+}
+
+// stableIdentityPrecedenceDescription returns the human-readable form of
+// the identity-field precedence used by stableItemSortKey /
+// stableObjectSortKey (e.g. "uuid > id > slug > ... > canonical JSON"),
+// derived from stableIdentityFieldOrder so the docs can never drift.
+func stableIdentityPrecedenceDescription() string {
+	if len(stableIdentityFieldOrder) == 0 {
+		return "canonical JSON"
+	}
+	precedence := stableIdentityFieldOrder[0]
+	for _, field := range stableIdentityFieldOrder[1:] {
+		precedence += " > " + field
+	}
+	return precedence + " > canonical JSON"
+}
+
+// Description returns a human-readable description of the modifier.
+func (m nestedListSortPlanModifier) Description(_ context.Context) string {
+	return fmt.Sprintf(
+		"Sorts the planned list elements by a stable identity key (%s) so the post-apply consistency check is order-insensitive.",
+		stableIdentityPrecedenceDescription(),
+	)
+}
+
+// MarkdownDescription returns the Markdown form of Description.
+func (m nestedListSortPlanModifier) MarkdownDescription(ctx context.Context) string {
+	return m.Description(ctx)
+}
+
+// PlanModifyList sorts the planned list value in-place using the same
+// identity-field precedence the response builder uses.
+func (m nestedListSortPlanModifier) PlanModifyList(_ context.Context, req planmodifier.ListRequest, resp *planmodifier.ListResponse) {
+	if req.PlanValue.IsNull() || req.PlanValue.IsUnknown() {
+		return
+	}
+	elements := req.PlanValue.Elements()
+	if len(elements) < 2 {
+		return
+	}
+	keys := make([]string, len(elements))
+	for i, e := range elements {
+		obj, ok := e.(types.Object)
+		if !ok {
+			// Defensive: leave non-object element lists alone.
+			return
+		}
+		keys[i] = stableObjectSortKey(obj, m.itemFields)
+	}
+	idx := make([]int, len(elements))
+	for i := range idx {
+		idx[i] = i
+	}
+	sort.SliceStable(idx, func(i, j int) bool {
+		return keys[idx[i]] < keys[idx[j]]
+	})
+	sorted := make([]attr.Value, len(elements))
+	for i, k := range idx {
+		sorted[i] = elements[k]
+	}
+	sortedList, diags := types.ListValue(req.PlanValue.ElementType(context.Background()), sorted)
+	resp.Diagnostics.Append(diags...)
+	if diags.HasError() {
+		return
+	}
+	resp.PlanValue = sortedList
+}
+
+// nestedListSortPlanModifiers returns the standard plan-modifier slice for
+// a nested-object array attribute. It is a tiny helper so the schema
+// builders read consistently.
+func nestedListSortPlanModifiers(itemFields []BodyFieldDef) []planmodifier.List {
+	return []planmodifier.List{newNestedListSortPlanModifier(itemFields)}
 }
