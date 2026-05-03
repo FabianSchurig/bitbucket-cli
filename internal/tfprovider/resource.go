@@ -129,6 +129,7 @@ func buildNestedItemAttrs(itemFields []BodyFieldDef) map[string]schema.Attribute
 				Description: desc,
 				Optional:    true,
 				Computed:    true,
+				CustomType:  setLikeListTypeFor(f.ItemFields),
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: buildNestedItemAttrs(f.ItemFields),
 				},
@@ -160,7 +161,7 @@ func itemAttrTypes(itemFields []BodyFieldDef) map[string]attr.Type {
 		if f.IsObject && len(f.ItemFields) > 0 {
 			attrTypes[key] = types.ObjectType{AttrTypes: itemAttrTypes(f.ItemFields)}
 		} else if f.IsArray && len(f.ItemFields) > 0 {
-			attrTypes[key] = types.ListType{ElemType: types.ObjectType{AttrTypes: itemAttrTypes(f.ItemFields)}}
+			attrTypes[key] = setLikeListTypeFor(f.ItemFields)
 		} else if f.IsArray {
 			attrTypes[key] = types.ListType{ElemType: types.StringType}
 		} else {
@@ -835,6 +836,7 @@ func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
 		return schema.ListNestedAttribute{
 			Description: desc,
 			Optional:    true,
+			CustomType:  setLikeListTypeFor(bf.ItemFields),
 			NestedObject: schema.NestedAttributeObject{
 				Attributes: buildNestedItemAttrs(bf.ItemFields),
 			},
@@ -910,6 +912,7 @@ func responseFieldAttr(rf BodyFieldDef) schema.Attribute {
 		return schema.ListNestedAttribute{
 			Description: desc,
 			Computed:    true,
+			CustomType:  setLikeListTypeFor(rf.ItemFields),
 			NestedObject: schema.NestedAttributeObject{
 				Attributes: buildNestedItemAttrs(rf.ItemFields),
 			},
@@ -988,6 +991,7 @@ func mergeListNestedResponseAttr(attr schema.ListNestedAttribute, rf BodyFieldDe
 	attr.Computed = true
 	attr.Description = fieldDescription(rf)
 	if rf.IsArray && len(rf.ItemFields) > 0 {
+		attr.CustomType = setLikeListTypeFor(rf.ItemFields)
 		attr.NestedObject = schema.NestedAttributeObject{
 			Attributes: buildNestedItemAttrs(rf.ItemFields),
 		}
@@ -1314,20 +1318,26 @@ func stringifyComplexValue(val any) string {
 }
 
 // buildListFromResponse converts a JSON array from the API response into a
-// types.List value suitable for a ListNestedAttribute. When `priorList` is
-// a non-null/non-unknown reference list (e.g. the planned/prior state
-// value), response items are reordered to match that reference order via
-// stable identity keys — this is what makes nested-object lists
-// order-insensitive without ever mutating the plan. When no reference
-// exists (initial Read with no prior state, or data source reads), items
-// are sorted by a stable identity key with a canonical JSON tiebreaker so
-// two equivalent API responses still produce byte-identical state.
-func buildListFromResponse(arr []any, itemFields []BodyFieldDef, priorList types.List) types.List {
+// setLikeListValue suitable for a ListNestedAttribute that uses
+// setLikeListType as its CustomType. When `priorList` is a non-null/non-unknown
+// reference list (e.g. the planned/prior state value), response items are
+// reordered to match that reference order via stable identity keys — this
+// keeps state byte-stable across refreshes when nothing changed. Plan-time
+// reordering between config and prior state is handled separately by
+// setLikeListValue.ListSemanticEquals (the framework substitutes the prior
+// value when the lists are set-equivalent), which is what makes plan, apply
+// and arbitrary re-runs idempotent under reordering — including the case
+// where the operator reorders the config between runs.
+func buildListFromResponse(arr []any, itemFields []BodyFieldDef, priorList types.List) setLikeListValue {
 	attrTypes := itemAttrTypes(itemFields)
 	objType := types.ObjectType{AttrTypes: attrTypes}
 
+	wrap := func(lv types.List) setLikeListValue {
+		return setLikeListValue{ListValue: lv, itemFields: itemFields}
+	}
+
 	if len(arr) == 0 {
-		return types.ListValueMust(objType, []attr.Value{})
+		return wrap(types.ListValueMust(objType, []attr.Value{}))
 	}
 
 	// Work on a copy so we never mutate the caller's slice.
