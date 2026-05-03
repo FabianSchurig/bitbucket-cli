@@ -302,9 +302,13 @@ func asymmetricObjectEqual(left, right types.Object) bool {
 	}
 	leftAttrs := left.Attributes()
 	rightAttrs := right.Attributes()
-	if len(leftAttrs) != len(rightAttrs) {
-		return false
-	}
+	// Asymmetric comparison: left can have fewer attributes than right.
+	// This handles the case where config-derived plan objects contain only
+	// user-provided attributes (e.g. just {uuid}) while state contains
+	// additional Computed attributes (display_name, created_on, links, etc.).
+	// We verify that every attribute in left matches the corresponding
+	// attribute in right (with Unknown on left wildcarding any value on right),
+	// but right can have extra attributes that left doesn't have.
 	for k, lv := range leftAttrs {
 		rv, ok := rightAttrs[k]
 		if !ok {
