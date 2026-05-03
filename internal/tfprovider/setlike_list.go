@@ -56,13 +56,13 @@ func (t setLikeListType) Equal(o attr.Type) bool {
 
 // String returns a human-readable type name for diagnostics.
 func (t setLikeListType) String() string {
-	return "setLikeListType[" + t.ListType.ElemType.String() + "]"
+	return "setLikeListType[" + t.ElemType.String() + "]"
 }
 
 // ValueType returns a zero-value of the matching value type so the framework
 // knows what to instantiate.
 func (t setLikeListType) ValueType(ctx context.Context) attr.Value {
-	return setLikeListValue{ListValue: basetypes.NewListNull(t.ListType.ElemType), itemFields: t.itemFields}
+	return setLikeListValue{ListValue: basetypes.NewListNull(t.ElemType), itemFields: t.itemFields}
 }
 
 // ValueFromList wraps a base ListValue in a setLikeListValue carrying the
@@ -96,7 +96,7 @@ type setLikeListValue struct {
 // Type returns the matching setLikeListType so framework operations pick
 // the custom semantic-equality logic.
 func (v setLikeListValue) Type(ctx context.Context) attr.Type {
-	return setLikeListType{ListType: basetypes.ListType{ElemType: v.ListValue.ElementType(ctx)}, itemFields: v.itemFields}
+	return setLikeListType{ListType: basetypes.ListType{ElemType: v.ElementType(ctx)}, itemFields: v.itemFields}
 }
 
 // Equal returns positional equality, matching basetypes.ListValue. Semantic

@@ -73,43 +73,6 @@ func canonicalJSONKey(v any) string {
 	return fmt.Sprintf("raw=%v", v)
 }
 
-// stableObjectSortKey returns the same key for a `types.Object` element
-// already living in Terraform state / plan. It mirrors stableItemSortKey
-// over Terraform's attr.Value graph so plan-side sorting (the plan modifier)
-// and state-side sorting (the response builder) agree byte-for-byte —
-// including the secondary canonical-form tiebreaker that guarantees a
-// total order when two items share the same identity value.
-func stableObjectSortKey(obj types.Object, fields []BodyFieldDef) string {
-	attrs := obj.Attributes()
-	declared := map[string]bool{}
-	for _, f := range fields {
-		// nested attrs are stored under snake_cased keys.
-		declared[bodyFieldKey(f)] = true
-	}
-	primary := ""
-	for _, candidate := range stableIdentityFieldOrder {
-		key := candidate
-		if len(fields) > 0 && !declared[key] {
-			continue
-		}
-		v, ok := attrs[key]
-		if !ok {
-			continue
-		}
-		if s, ok := stringifyAttrIdentity(v); ok && s != "" {
-			primary = candidate + "=" + s
-			break
-		}
-	}
-	// Tiebreaker: the framework's stable String() form (attribute names are
-	// emitted in lexicographic order).
-	tiebreaker := "obj=" + obj.String()
-	if primary == "" {
-		return tiebreaker
-	}
-	return primary + "|" + tiebreaker
-}
-
 // bodyFieldKey returns the snake_cased attribute key for a BodyFieldDef.
 // It mirrors the key derivation used by buildNestedItemAttrs / itemAttrTypes
 // so identity-field lookups on Terraform objects line up with the schema.

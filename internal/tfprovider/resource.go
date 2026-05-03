@@ -539,13 +539,16 @@ func (r *GenericResource) buildBody(ctx context.Context, op *OperationDef, sourc
 // []map[string]any suitable for JSON marshaling. Returns nil if the list is
 // null, unknown, or empty.
 func readListNested(ctx context.Context, source stateAccessor, attrName string, itemFields []BodyFieldDef, diags *diag.Diagnostics) []map[string]any {
-	var list types.List
+	// Nested-object lists use setLikeListType as the schema CustomType, so
+	// the read target must be the matching setLikeListValue. The embedded
+	// basetypes.ListValue is then used for element extraction.
+	var list setLikeListValue
 	d := source.GetAttribute(ctx, attrPath(attrName), &list)
 	diags.Append(d...)
 	if d.HasError() || list.IsNull() || list.IsUnknown() {
 		return nil
 	}
-	return readListNestedValue(list, itemFields)
+	return readListNestedValue(list.ListValue, itemFields)
 }
 
 func readListNestedValue(list types.List, itemFields []BodyFieldDef) []map[string]any {
@@ -1264,12 +1267,14 @@ func setResponseField(ctx context.Context, rf BodyFieldDef, m map[string]any, so
 	// For nested-object lists, read the prior/planned value from `source`
 	// so the API response can be reordered to match it (preserves the
 	// operator's order without mutating the plan). Errors reading the prior
-	// value are non-fatal: we fall back to deterministic sorting.
+	// value are non-fatal: we fall back to deterministic sorting. Read into
+	// setLikeListValue (the schema's CustomType value type) and forward the
+	// embedded basetypes.ListValue downstream.
 	var priorList types.List
 	if source != nil && rf.IsArray && len(rf.ItemFields) > 0 {
-		var probe types.List
+		var probe setLikeListValue
 		if d := source.GetAttribute(ctx, attrPath(key), &probe); !d.HasError() {
-			priorList = probe
+			priorList = probe.ListValue
 		}
 	}
 	attrValue, ok := responseFieldValue(val, rf, priorList)

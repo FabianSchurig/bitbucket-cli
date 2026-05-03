@@ -50,6 +50,8 @@ func (m *mockState) GetAttribute(_ context.Context, p path.Path, target interfac
 			*t = types.ListNull(types.StringType)
 		case *types.Object:
 			*t = types.ObjectNull(map[string]attr.Type{})
+		case *setLikeListValue:
+			*t = setLikeListNull(nil)
 		default:
 			panic("unsupported target type")
 		}
@@ -63,6 +65,15 @@ func (m *mockState) GetAttribute(_ context.Context, p path.Path, target interfac
 		*t = v.(types.List)
 	case *types.Object:
 		*t = v.(types.Object)
+	case *setLikeListValue:
+		switch raw := v.(type) {
+		case setLikeListValue:
+			*t = raw
+		case types.List:
+			*t = setLikeListValue{ListValue: raw}
+		default:
+			panic("unsupported value type for setLikeListValue target")
+		}
 	default:
 		panic("unsupported target type")
 	}
