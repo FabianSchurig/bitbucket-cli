@@ -113,13 +113,19 @@ func (v setLikeListValue) Equal(o attr.Value) bool {
 
 // ListSemanticEquals reports whether two nested-object lists contain the
 // same elements regardless of order. Items are matched by their stable
-// identity key (uuid > id > slug > full_slug > name); two items match when
-// their primary keys are equal AND every declared item field is positionally
-// equal between them. Items whose identity key is empty fall back to deep
-// per-field equality.
+// identity key (uuid > id > slug > full_slug > name). Once paired by
+// primary key, attributes are compared per-field with one important
+// relaxation: if either side reports IsUnknown() for an attribute, that
+// attribute is treated as a wildcard match. This is what makes plan +
+// apply idempotent both under reordering AND in the presence of
+// server-computed nested fields (e.g. created_on, display_name) whose
+// planned value is "(known after apply)" while prior state holds a
+// concrete value.
 //
-// This is what makes plan + apply idempotent under reordering: the
-// framework substitutes prior state when SemanticEquals returns true,
+// Items whose identity key is empty fall back to deep per-field equality
+// (the framework's strict Equal) since we have no other way to pair them.
+//
+// The framework substitutes prior state when SemanticEquals returns true,
 // producing an empty diff for any permutation.
 func (v setLikeListValue) ListSemanticEquals(ctx context.Context, other basetypes.ListValuable) (bool, diag.Diagnostics) {
 	var diags diag.Diagnostics
@@ -193,7 +199,17 @@ func (v setLikeListValue) ListSemanticEquals(ctx context.Context, other basetype
 					if usedRight[idx] {
 						continue
 					}
-					if l.Equal(right[idx]) {
+					rObj, rok := right[idx].(types.Object)
+					if !rok {
+						continue
+					}
+					// Pair-by-key: treat unknown attrs on either
+					// side as a wildcard. This is the relaxation
+					// that lets computed nested fields (unknown in
+					// plan, known in state) compare equal so the
+					// framework substitutes prior state and emits
+					// no diff.
+					if objectsEqualIgnoringUnknowns(lObj, rObj) {
 						usedRight[idx] = true
 						matched = true
 						break
@@ -224,9 +240,81 @@ func (v setLikeListValue) ListSemanticEquals(ctx context.Context, other basetype
 	return true, diags
 }
 
+// objectsEqualIgnoringUnknowns reports per-attribute equality between two
+// types.Object values, treating an IsUnknown attribute on either side as a
+// wildcard match. Null is NOT a wildcard — a known value differs from a
+// null value, since null is a concrete state.
+//
+// This is the relaxation that makes ListSemanticEquals tolerate
+// server-computed nested fields whose planned value is "(known after
+// apply)" while the prior state holds a real value: pairing happens on a
+// stable primary key (uuid/id/slug/...), and the per-field check below
+// accepts unknown vs known on the relaxed attributes.
+//
+// We compare on the union of attribute names from both objects so a missing
+// attribute on one side (shouldn't happen — the schema pins both — but
+// defensive) is correctly treated as a mismatch unless the other side is
+// also missing or unknown.
+func objectsEqualIgnoringUnknowns(a, b types.Object) bool {
+	if a.IsNull() != b.IsNull() {
+		return false
+	}
+	if a.IsNull() {
+		return true
+	}
+	// If either object as a whole is unknown, it's a wildcard.
+	if a.IsUnknown() || b.IsUnknown() {
+		return true
+	}
+	aAttrs := a.Attributes()
+	bAttrs := b.Attributes()
+	// Union of attribute names.
+	names := make(map[string]struct{}, len(aAttrs)+len(bAttrs))
+	for n := range aAttrs {
+		names[n] = struct{}{}
+	}
+	for n := range bAttrs {
+		names[n] = struct{}{}
+	}
+	for n := range names {
+		av, aok := aAttrs[n]
+		bv, bok := bAttrs[n]
+		if !aok || !bok {
+			// One side is missing this attribute. Tolerate if the
+			// other side is unknown; otherwise it's a mismatch.
+			if (aok && av.IsUnknown()) || (bok && bv.IsUnknown()) {
+				continue
+			}
+			return false
+		}
+		if av.IsUnknown() || bv.IsUnknown() {
+			continue
+		}
+		if !av.Equal(bv) {
+			return false
+		}
+	}
+	return true
+}
+
+// setLikeListNull returns a null setLikeListValue typed for the given item
+// fields, used when a nested-object array attribute is absent from a
+// response or input.
+func setLikeListNull(itemFields []BodyFieldDef) setLikeListValue {
+	objType := types.ObjectType{AttrTypes: itemAttrTypes(itemFields)}
+	return setLikeListValue{ListValue: basetypes.NewListNull(objType), itemFields: itemFields}
+}
+
+// setLikeListValueMust wraps types.ListValueMust into a setLikeListValue so
+// the value's concrete type matches the schema's CustomType.
+func setLikeListValueMust(itemFields []BodyFieldDef, elements []attr.Value) setLikeListValue {
+	objType := types.ObjectType{AttrTypes: itemAttrTypes(itemFields)}
+	return setLikeListValue{ListValue: types.ListValueMust(objType, elements), itemFields: itemFields}
+}
+
 // Compile-time assertions: the value implements semantic-equality and the
 // type implements ListTypable.
 var (
-	_ basetypes.ListTypable                  = setLikeListType{}
+	_ basetypes.ListTypable                    = setLikeListType{}
 	_ basetypes.ListValuableWithSemanticEquals = setLikeListValue{}
 )

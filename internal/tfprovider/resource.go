@@ -1149,8 +1149,16 @@ func readObjectAttrValue(v attr.Value, itemFields []BodyFieldDef) (any, bool) {
 }
 
 func readNestedListAttrValue(v attr.Value, itemFields []BodyFieldDef) (any, bool) {
-	list, ok := v.(types.List)
-	if !ok || list.IsNull() || list.IsUnknown() {
+	var list types.List
+	switch x := v.(type) {
+	case types.List:
+		list = x
+	case setLikeListValue:
+		list = x.ListValue
+	default:
+		return nil, false
+	}
+	if list.IsNull() || list.IsUnknown() {
 		return nil, false
 	}
 	items := readListNestedValue(list, itemFields)
@@ -1383,7 +1391,7 @@ func buildListFromResponse(arr []any, itemFields []BodyFieldDef, priorList types
 		}
 		elements = append(elements, types.ObjectValueMust(attrTypes, objAttrs))
 	}
-	return types.ListValueMust(objType, elements)
+	return wrap(types.ListValueMust(objType, elements))
 }
 
 // buildObjectFromResponse converts a JSON object from the API response into a
@@ -1420,7 +1428,7 @@ func buildAttrValueFromResponse(v any, f BodyFieldDef) attr.Value {
 		// available here; fall back to deterministic sort. The Required
 		// attrs constraint that motivated alignment only applies to
 		// top-level lists which are reached via setResponseField.
-		return buildListFromResponse(arr, f.ItemFields, types.ListNull(types.ObjectType{AttrTypes: itemAttrTypes(f.ItemFields)}))
+		return buildListFromResponse(arr, f.ItemFields, setLikeListNull(f.ItemFields).ListValue)
 	}
 	if f.IsArray {
 		arr, ok := v.([]any)
@@ -1438,7 +1446,7 @@ func attrNullValue(f BodyFieldDef) attr.Value {
 		return types.ObjectNull(itemAttrTypes(f.ItemFields))
 	}
 	if f.IsArray && len(f.ItemFields) > 0 {
-		return types.ListNull(types.ObjectType{AttrTypes: itemAttrTypes(f.ItemFields)})
+		return setLikeListNull(f.ItemFields)
 	}
 	if f.IsArray {
 		return types.ListNull(types.StringType)

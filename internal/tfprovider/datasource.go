@@ -377,7 +377,7 @@ func dataSourceResponseValue(val any, rf BodyFieldDef) any {
 		if arr, ok := val.([]any); ok {
 			// Data sources have no prior plan/state to align against; fall
 			// back to deterministic identity-key sorting for stability.
-			return buildListFromResponse(arr, rf.ItemFields, types.ListNull(types.ObjectType{AttrTypes: itemAttrTypes(rf.ItemFields)}))
+			return buildListFromResponse(arr, rf.ItemFields, setLikeListNull(rf.ItemFields).ListValue)
 		}
 		return nil
 	}
