@@ -21,3 +21,19 @@ run "read_repo_user_permissions" {
     error_message = "Expected non-empty id for data source bitbucket_repo_user_permissions"
   }
 }
+
+run "create_repo_user_permissions" {
+  command = apply
+
+  variables {
+    repo_slug = "my-repo"
+    selected_user_id = "{user-uuid}"
+    workspace = "my-workspace"
+  }
+
+  # Resource create should succeed with mock provider
+  assert {
+    condition     = bitbucket_repo_user_permissions.test.id != ""
+    error_message = "Expected non-empty id for resource bitbucket_repo_user_permissions"
+  }
+}

@@ -375,7 +375,9 @@ func setDataSourceResponseField(ctx context.Context, resp *datasource.ReadRespon
 func dataSourceResponseValue(val any, rf BodyFieldDef) any {
 	if rf.IsArray && len(rf.ItemFields) > 0 {
 		if arr, ok := val.([]any); ok {
-			return buildListFromResponse(arr, rf.ItemFields)
+			// Data sources have no prior plan/state to align against; fall
+			// back to deterministic identity-key sorting for stability.
+			return buildListFromResponse(arr, rf.ItemFields, setLikeListNull(rf.ItemFields).ListValue)
 		}
 		return nil
 	}

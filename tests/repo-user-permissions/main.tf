@@ -31,3 +31,9 @@ data "bitbucket_repo_user_permissions" "test" {
   workspace = var.workspace
   selected_user_id = var.selected_user_id
 }
+
+resource "bitbucket_repo_user_permissions" "test" {
+  repo_slug = var.repo_slug
+  selected_user_id = var.selected_user_id
+  workspace = var.workspace
+}

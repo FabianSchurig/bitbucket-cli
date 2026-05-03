@@ -50,6 +50,8 @@ func (m *mockState) GetAttribute(_ context.Context, p path.Path, target interfac
 			*t = types.ListNull(types.StringType)
 		case *types.Object:
 			*t = types.ObjectNull(map[string]attr.Type{})
+		case *setLikeListValue:
+			*t = setLikeListNull(nil)
 		default:
 			panic("unsupported target type")
 		}
@@ -63,6 +65,15 @@ func (m *mockState) GetAttribute(_ context.Context, p path.Path, target interfac
 		*t = v.(types.List)
 	case *types.Object:
 		*t = v.(types.Object)
+	case *setLikeListValue:
+		switch raw := v.(type) {
+		case setLikeListValue:
+			*t = raw
+		case types.List:
+			*t = setLikeListValue{ListValue: raw}
+		default:
+			panic("unsupported value type for setLikeListValue target")
+		}
 	default:
 		panic("unsupported target type")
 	}
@@ -427,15 +438,15 @@ func TestResourcePopulateComputedParamsAndExtractResponseFields(t *testing.T) {
 		},
 		"tags":     []any{"one", "two"},
 		"metadata": map[string]any{"mode": "full"},
-	}, responseTarget, &diags)
+	}, nil, responseTarget, &diags)
 	if got := responseTarget.set["title"]; got != types.StringValue("Hello") {
 		t.Fatalf("expected title response field, got %#v", got)
 	}
 	if _, ok := responseTarget.set["settings"].(types.Object); !ok {
 		t.Fatalf("expected settings object value, got %T", responseTarget.set["settings"])
 	}
-	if _, ok := responseTarget.set["reviewers"].(types.List); !ok {
-		t.Fatalf("expected reviewers list value, got %T", responseTarget.set["reviewers"])
+	if _, ok := responseTarget.set["reviewers"].(setLikeListValue); !ok {
+		t.Fatalf("expected reviewers setLikeListValue, got %T", responseTarget.set["reviewers"])
 	}
 	if _, ok := responseTarget.set["tags"].(types.List); !ok {
 		t.Fatalf("expected tags list value, got %T", responseTarget.set["tags"])
@@ -494,8 +505,8 @@ func TestResourceResponseValueHelpers(t *testing.T) {
 	if _, ok := buildAttrValueFromResponse("bad", BodyFieldDef{Path: "settings", IsObject: true, ItemFields: itemFields}).(types.Object); !ok {
 		t.Fatal("expected null object attr value for invalid nested object")
 	}
-	if _, ok := buildAttrValueFromResponse("bad", BodyFieldDef{Path: "reviewers", IsArray: true, ItemFields: itemFields}).(types.List); !ok {
-		t.Fatal("expected null nested list attr value for invalid nested list")
+	if _, ok := buildAttrValueFromResponse("bad", BodyFieldDef{Path: "reviewers", IsArray: true, ItemFields: itemFields}).(setLikeListValue); !ok {
+		t.Fatal("expected null nested setLikeListValue for invalid nested list")
 	}
 	if _, ok := buildAttrValueFromResponse("bad", BodyFieldDef{Path: "tags", IsArray: true}).(types.List); !ok {
 		t.Fatal("expected null simple list attr value for invalid list")
@@ -658,8 +669,8 @@ func TestResourceNestedSchemaHelpers(t *testing.T) {
 	if _, ok := attrTypes["settings"].(types.ObjectType); !ok {
 		t.Fatalf("expected object attr type, got %T", attrTypes["settings"])
 	}
-	if _, ok := attrTypes["reviewers"].(types.ListType); !ok {
-		t.Fatalf("expected list attr type, got %T", attrTypes["reviewers"])
+	if _, ok := attrTypes["reviewers"].(setLikeListType); !ok {
+		t.Fatalf("expected setLikeListType for nested-object reviewers, got %T", attrTypes["reviewers"])
 	}
 }
 
@@ -747,7 +758,7 @@ func TestResourceDispatchResultAndResponseHelpers(t *testing.T) {
 	target := newMockState(nil)
 	var diags diag.Diagnostics
 
-	if result := r.storeDispatchResult(ctx, &OperationDef{OperationID: "delete"}, nil, target, &diags, nil); result != nil {
+	if result := r.storeDispatchResult(ctx, &OperationDef{OperationID: "delete"}, nil, nil, target, &diags, nil); result != nil {
 		t.Fatalf("expected nil result map, got %#v", result)
 	}
 	if got := target.set["id"]; got != types.StringValue("delete") {
@@ -756,7 +767,7 @@ func TestResourceDispatchResultAndResponseHelpers(t *testing.T) {
 
 	target = newMockState(nil)
 	diags = nil
-	if result := r.storeDispatchResult(ctx, &OperationDef{OperationID: "bad"}, nil, target, &diags, map[string]any{"bad": make(chan int)}); result != nil || !diags.HasError() {
+	if result := r.storeDispatchResult(ctx, &OperationDef{OperationID: "bad"}, nil, nil, target, &diags, map[string]any{"bad": make(chan int)}); result != nil || !diags.HasError() {
 		t.Fatalf("expected marshal failure diagnostics, got result=%#v diags=%#v", result, diags)
 	}
 
@@ -765,18 +776,18 @@ func TestResourceDispatchResultAndResponseHelpers(t *testing.T) {
 	}
 
 	reservedTarget := newMockState(nil)
-	setResponseField(ctx, BodyFieldDef{Path: "id"}, map[string]any{"id": 1}, reservedTarget, &diags)
+	setResponseField(ctx, BodyFieldDef{Path: "id"}, map[string]any{"id": 1}, nil, reservedTarget, &diags)
 	if len(reservedTarget.set) != 0 {
 		t.Fatalf("expected reserved field to be skipped, got %#v", reservedTarget.set)
 	}
 
-	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "settings", IsObject: true, ItemFields: []BodyFieldDef{{Path: "name"}}}); ok || val != nil {
+	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "settings", IsObject: true, ItemFields: []BodyFieldDef{{Path: "name"}}}, types.ListNull(types.ObjectType{})); ok || val != nil {
 		t.Fatalf("expected invalid object response field to be skipped, got %#v ok=%v", val, ok)
 	}
-	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "reviewers", IsArray: true, ItemFields: []BodyFieldDef{{Path: "name"}}}); ok || val != nil {
+	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "reviewers", IsArray: true, ItemFields: []BodyFieldDef{{Path: "name"}}}, types.ListNull(types.ObjectType{})); ok || val != nil {
 		t.Fatalf("expected invalid nested list response field to be skipped, got %#v ok=%v", val, ok)
 	}
-	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "tags", IsArray: true}); ok || val != nil {
+	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "tags", IsArray: true}, types.ListNull(types.ObjectType{})); ok || val != nil {
 		t.Fatalf("expected invalid list response field to be skipped, got %#v ok=%v", val, ok)
 	}
 }

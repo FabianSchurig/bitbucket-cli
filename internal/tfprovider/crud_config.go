@@ -197,6 +197,7 @@ var CRUDConfig = map[string]CRUDMapping{
 		List:   "listExplicitGroupPermissionsForARepository",
 	},
 	"repo-user-permissions": {
+		Create: "updateAnExplicitUserPermissionForARepository",
 		Read:   "getAnExplicitUserPermissionForARepository",
 		Update: "updateAnExplicitUserPermissionForARepository",
 		Delete: "deleteAnExplicitUserPermissionForARepository",

@@ -33,7 +33,7 @@ func TestReadObjectAttrsPreservesNestedArrays(t *testing.T) {
 			types.StringValue("one"),
 			types.StringValue("two"),
 		}),
-		"reviewers": types.ListValueMust(reviewerObjType, []attr.Value{
+		"reviewers": setLikeListValueMust(reviewerFields, []attr.Value{
 			types.ObjectValueMust(reviewerObjType.AttrTypes, map[string]attr.Value{
 				"name": types.StringValue("alice"),
 			}),
@@ -42,7 +42,7 @@ func TestReadObjectAttrsPreservesNestedArrays(t *testing.T) {
 			"labels": types.ListValueMust(types.StringType, []attr.Value{
 				types.StringValue("x"),
 			}),
-			"owners": types.ListValueMust(ownerObjType, []attr.Value{
+			"owners": setLikeListValueMust(ownerFields, []attr.Value{
 				types.ObjectValueMust(ownerObjType.AttrTypes, map[string]attr.Value{
 					"name": types.StringValue("bob"),
 				}),
@@ -85,7 +85,7 @@ func TestBuildListFromResponsePreservesNestedArrays(t *testing.T) {
 				map[string]any{"name": "alice"},
 			},
 		},
-	}, fields)
+	}, fields, types.ListNull(types.ObjectType{AttrTypes: itemAttrTypes(fields)}))
 
 	elements := list.Elements()
 	if len(elements) != 1 {
@@ -101,9 +101,9 @@ func TestBuildListFromResponsePreservesNestedArrays(t *testing.T) {
 		t.Fatalf("tags value = %#v, want list with 2 elements", obj.Attributes()["tags"])
 	}
 
-	reviewersVal, ok := obj.Attributes()["reviewers"].(types.List)
+	reviewersVal, ok := obj.Attributes()["reviewers"].(setLikeListValue)
 	if !ok || len(reviewersVal.Elements()) != 1 {
-		t.Fatalf("reviewers value = %#v, want list with 1 element", obj.Attributes()["reviewers"])
+		t.Fatalf("reviewers value = %#v, want setLikeListValue with 1 element", obj.Attributes()["reviewers"])
 	}
 	reviewerObj, ok := reviewersVal.Elements()[0].(types.Object)
 	if !ok {
