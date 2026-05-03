@@ -122,27 +122,37 @@ func TestBuildListFromResponseTiebreakerForDuplicateIdentity(t *testing.T) {
 	}
 }
 
-// TestNestedObjectArraySchemasNoLongerAttachPlanModifier guards that the
-// schema builders no longer attach a sort plan modifier — sorting at plan
-// time mutated Required attributes and was rejected by Terraform's
-// framework. Order-insensitivity is now enforced at state-save time via
-// alignResponseItemsToReference.
-func TestNestedObjectArraySchemasNoLongerAttachPlanModifier(t *testing.T) {
+// TestNestedObjectArraySchemasAttachSetLikeListPlanModifier guards that the
+// schema builders attach the setLikeListUseStateIfSetEqual plan modifier on
+// nested-object array attributes. The framework only invokes
+// ListSemanticEquals during Create/Update/Read — not during
+// PlanResourceChange — so without this plan modifier a `terraform plan`
+// against a reordered configuration would show a perpetual diff. The plan
+// modifier closes that gap by substituting the prior state when the
+// planned and prior lists contain the same items (compared by stable
+// identity key).
+func TestNestedObjectArraySchemasAttachSetLikeListPlanModifier(t *testing.T) {
 	itemFields := []BodyFieldDef{{Path: "uuid", Type: "string"}}
 
 	bodyAttr, ok := bodyFieldAttr(BodyFieldDef{Path: "users", IsArray: true, ItemFields: itemFields}).(resourceschema.ListNestedAttribute)
 	if !ok {
 		t.Fatalf("bodyFieldAttr returned non-ListNestedAttribute")
 	}
-	if len(bodyAttr.PlanModifiers) != 0 {
-		t.Fatalf("bodyFieldAttr must not attach plan modifiers anymore; got %#v", bodyAttr.PlanModifiers)
+	if len(bodyAttr.PlanModifiers) != 1 {
+		t.Fatalf("bodyFieldAttr must attach exactly one plan modifier; got %#v", bodyAttr.PlanModifiers)
+	}
+	if _, ok := bodyAttr.PlanModifiers[0].(setLikeListUseStateModifier); !ok {
+		t.Fatalf("bodyFieldAttr plan modifier must be setLikeListUseStateModifier; got %T", bodyAttr.PlanModifiers[0])
 	}
 
 	respAttr, ok := responseFieldAttr(BodyFieldDef{Path: "users", IsArray: true, ItemFields: itemFields}).(resourceschema.ListNestedAttribute)
 	if !ok {
 		t.Fatalf("responseFieldAttr returned non-ListNestedAttribute")
 	}
-	if len(respAttr.PlanModifiers) != 0 {
-		t.Fatalf("responseFieldAttr must not attach plan modifiers anymore; got %#v", respAttr.PlanModifiers)
+	if len(respAttr.PlanModifiers) != 1 {
+		t.Fatalf("responseFieldAttr must attach exactly one plan modifier; got %#v", respAttr.PlanModifiers)
+	}
+	if _, ok := respAttr.PlanModifiers[0].(setLikeListUseStateModifier); !ok {
+		t.Fatalf("responseFieldAttr plan modifier must be setLikeListUseStateModifier; got %T", respAttr.PlanModifiers[0])
 	}
 }

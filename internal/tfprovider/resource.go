@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
@@ -844,6 +845,9 @@ func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
 			NestedObject: schema.NestedAttributeObject{
 				Attributes: buildNestedItemAttrs(bf.ItemFields),
 			},
+			PlanModifiers: []planmodifier.List{
+				setLikeListUseStateIfSetEqual(bf.ItemFields),
+			},
 		}
 	}
 	if bf.IsArray {
@@ -919,6 +923,9 @@ func responseFieldAttr(rf BodyFieldDef) schema.Attribute {
 			CustomType:  setLikeListTypeFor(rf.ItemFields),
 			NestedObject: schema.NestedAttributeObject{
 				Attributes: buildNestedItemAttrs(rf.ItemFields),
+			},
+			PlanModifiers: []planmodifier.List{
+				setLikeListUseStateIfSetEqual(rf.ItemFields),
 			},
 		}
 	}
@@ -998,6 +1005,9 @@ func mergeListNestedResponseAttr(attr schema.ListNestedAttribute, rf BodyFieldDe
 		attr.CustomType = setLikeListTypeFor(rf.ItemFields)
 		attr.NestedObject = schema.NestedAttributeObject{
 			Attributes: buildNestedItemAttrs(rf.ItemFields),
+		}
+		attr.PlanModifiers = []planmodifier.List{
+			setLikeListUseStateIfSetEqual(rf.ItemFields),
 		}
 	}
 	return attr
