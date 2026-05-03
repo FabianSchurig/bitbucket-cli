@@ -195,7 +195,7 @@ func stableItemPrimaryKey(m map[string]any, fields []BodyFieldDef) string {
 		declared[f.Path] = true
 	}
 	for _, candidate := range stableIdentityFieldOrder {
-		if !declared[candidate] && len(fields) > 0 {
+		if len(fields) > 0 && !declared[candidate] {
 			continue
 		}
 		if v, ok := m[candidate]; ok && v != nil {
