@@ -25,6 +25,8 @@ import (
 
 const testAccRealAPITimeout = 30 * time.Second
 
+var testAccRepoUserPermissionOps = tfprovider.MapCRUDOps("repo-user-permissions", tfprovider.ReposResourceGroup.AllOps)
+
 // testAccProtoV6ProviderFactories creates provider factories for acceptance tests.
 func testAccProtoV6ProviderFactories() map[string]func() (tfprotov6.ProviderServer, error) {
 	return map[string]func() (tfprotov6.ProviderServer, error){
@@ -1894,9 +1896,13 @@ func testAccPrepareSecondBranchRestrictionUser(ctx context.Context, c *client.BB
 // excludeUUID is skipped. When multiple candidates exist, the UUIDs are sorted
 // so the test consistently selects the same secondary user across runs.
 func testAccFindAnotherRepoWriterUUID(ctx context.Context, c *client.BBClient, workspace, repoSlug, excludeUUID string) (string, error) {
+	listOp, err := testAccRequireRepoUserPermissionOp(testAccRepoUserPermissionOps.List, "list")
+	if err != nil {
+		return "", err
+	}
 	result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
-		Method:      "GET",
-		URLTemplate: "/repositories/{workspace}/{repo_slug}/permissions-config/users",
+		Method:      listOp.Method,
+		URLTemplate: listOp.Path,
 		PathParams:  map[string]string{"workspace": workspace, "repo_slug": repoSlug},
 		All:         true,
 	})
@@ -1985,6 +1991,10 @@ func testAccFindAnotherWorkspaceMemberUUID(ctx context.Context, c *client.BBClie
 // has repository write/admin access for the duration of the test and returns a
 // callback that restores the previous explicit permission state afterwards.
 func testAccEnsureRepoUserWritePermission(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID string) (func(context.Context) error, error) {
+	deleteOp, err := testAccRequireRepoUserPermissionOp(testAccRepoUserPermissionOps.Delete, "delete")
+	if err != nil {
+		return nil, err
+	}
 	oldPermission, hadExplicitPermission, err := testAccRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID)
 	if err != nil {
 		return nil, err
@@ -2000,8 +2010,8 @@ func testAccEnsureRepoUserWritePermission(ctx context.Context, c *client.BBClien
 			return testAccSetRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID, oldPermission)
 		}
 		_, err := handlers.DispatchRaw(ctx, c, handlers.Request{
-			Method:      "DELETE",
-			URLTemplate: "/repositories/{workspace}/{repo_slug}/permissions-config/users/{selected_user_id}",
+			Method:      deleteOp.Method,
+			URLTemplate: deleteOp.Path,
 			PathParams: map[string]string{
 				"workspace":        workspace,
 				"repo_slug":        repoSlug,
@@ -2018,9 +2028,13 @@ func testAccEnsureRepoUserWritePermission(ctx context.Context, c *client.BBClien
 // testAccRepoUserPermission returns the explicit repository permission, if any,
 // for the selected user.
 func testAccRepoUserPermission(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID string) (permission string, explicit bool, err error) {
+	readOp, err := testAccRequireRepoUserPermissionOp(testAccRepoUserPermissionOps.Read, "read")
+	if err != nil {
+		return "", false, err
+	}
 	result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
-		Method:      "GET",
-		URLTemplate: "/repositories/{workspace}/{repo_slug}/permissions-config/users/{selected_user_id}",
+		Method:      readOp.Method,
+		URLTemplate: readOp.Path,
 		PathParams: map[string]string{
 			"workspace":        workspace,
 			"repo_slug":        repoSlug,
@@ -2047,13 +2061,17 @@ func testAccRepoUserPermission(ctx context.Context, c *client.BBClient, workspac
 // testAccSetRepoUserPermission sets an explicit repository permission for the
 // selected user.
 func testAccSetRepoUserPermission(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID, permission string) error {
+	updateOp, err := testAccRequireRepoUserPermissionOp(testAccRepoUserPermissionOps.Update, "update")
+	if err != nil {
+		return err
+	}
 	body, err := json.Marshal(map[string]string{"permission": permission})
 	if err != nil {
 		return err
 	}
 	_, err = handlers.DispatchRaw(ctx, c, handlers.Request{
-		Method:      "PUT",
-		URLTemplate: "/repositories/{workspace}/{repo_slug}/permissions-config/users/{selected_user_id}",
+		Method:      updateOp.Method,
+		URLTemplate: updateOp.Path,
 		PathParams: map[string]string{
 			"workspace":        workspace,
 			"repo_slug":        repoSlug,
@@ -2062,6 +2080,13 @@ func testAccSetRepoUserPermission(ctx context.Context, c *client.BBClient, works
 		Body: string(body),
 	})
 	return err
+}
+
+func testAccRequireRepoUserPermissionOp(op *tfprovider.OperationDef, action string) (*tfprovider.OperationDef, error) {
+	if op == nil {
+		return nil, fmt.Errorf("repo-user-permissions %s operation is not configured", action)
+	}
+	return op, nil
 }
 
 // testAccDeleteBranchRestrictionsByPattern deletes every repository branch
