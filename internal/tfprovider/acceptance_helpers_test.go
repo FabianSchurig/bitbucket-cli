@@ -10,7 +10,7 @@ import (
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
 )
 
-func TestAccEnsureRepoUserWritePermissionRestoresPriorState(t *testing.T) {
+func TestAccRepoUserPermissionRestoreFuncRestoresPriorState(t *testing.T) {
 	for _, tc := range []struct {
 		name          string
 		oldPermission string
@@ -20,13 +20,13 @@ func TestAccEnsureRepoUserWritePermissionRestoresPriorState(t *testing.T) {
 		{
 			name:          "none is restored by delete",
 			oldPermission: "none",
-			wantPuts:      []string{"write"},
+			wantPuts:      nil,
 			wantDeletes:   1,
 		},
 		{
 			name:          "read is restored by put",
 			oldPermission: "read",
-			wantPuts:      []string{"write", "read"},
+			wantPuts:      []string{"read"},
 			wantDeletes:   0,
 		},
 	} {
@@ -61,12 +61,9 @@ func TestAccEnsureRepoUserWritePermissionRestoresPriorState(t *testing.T) {
 			if err != nil {
 				t.Fatalf("NewClientWithConfig: %v", err)
 			}
-			restore, err := testAccEnsureRepoUserWritePermission(context.Background(), c, "ws", "repo", "{user}")
+			restore, err := testAccRepoUserPermissionRestoreFunc(context.Background(), c, "ws", "repo", "{user}")
 			if err != nil {
-				t.Fatalf("testAccEnsureRepoUserWritePermission: %v", err)
-			}
-			if len(putPermissions) != 1 || putPermissions[0] != "write" {
-				t.Fatalf("initial PUT permissions = %#v, want [write]", putPermissions)
+				t.Fatalf("testAccRepoUserPermissionRestoreFunc: %v", err)
 			}
 			if err := restore(context.Background()); err != nil {
 				t.Fatalf("restore: %v", err)

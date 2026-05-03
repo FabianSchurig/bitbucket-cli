@@ -1645,35 +1645,10 @@ func TestAccRealAPI_DataSource_WorkspacePermissions(t *testing.T) {
 }
 
 // TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers exercises the
-// real Bitbucket API end-to-end against the regression class fixed by the
-// custom setLikeListType (multiset semantic equality + planned-order alignment
-// of the response array).
-//
-// Three concrete bugs this test guards against on the real API:
-//
-//  1. "Provider produced inconsistent result after apply" (pre-0.15.6) — the API
-//     echoes a fully-populated nested user object (display_name, created_on)
-//     whose computed inner fields were Unknown in the plan; without the
-//     planned-order alignment the post-apply state diverges from the plan.
-//  2. "Provider produced invalid plan" (v0.15.6) — the lexicographic-sort plan
-//     modifier reordered users at plan time, then refresh undid it.
-//  3. Perpetual diff on add/reorder — config order ≠ API response order makes
-//     every subsequent plan show a positional reshuffle.
-//
-// The mock-based TestAccBitbucketBranchRestrictionsUsersOrderInsensitive
-// covers the same logic against a controlled response, but only the real API
-// returns nested objects with all the computed inner fields present (and in
-// whatever order Bitbucket chooses), which is exactly the surface where the
-// regressions lived.
-//
-// Step 1 catches (1) on the single-user path (the user object's display_name /
-// created_on are computed). Step 2 catches (3) for the same case. Steps 3-4
-// model the real-world Terraform graph: a bitbucket_repo_user_permissions
-// resource grants the second workspace member repository write access first,
-// the branch restriction depends on it, and Terraform destroy tears the branch
-// restriction down before removing the temporary permission.
-//
-// Required env: BITBUCKET_TEST_WORKSPACE, BITBUCKET_TEST_REPO.
+// real Bitbucket API for the order-insensitive users regression. The multi-user
+// steps intentionally model a normal Terraform graph: grant repository access
+// with bitbucket_repo_user_permissions first, then create the branch restriction
+// that references that user, and let Terraform destroy in reverse order.
 func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.T) {
 	workspace := skipIfNoRealAPI(t)
 	repoSlug := os.Getenv("BITBUCKET_TEST_REPO")
@@ -1881,11 +1856,8 @@ func testAccCurrentUserUUID(ctx context.Context, c *client.BBClient) (string, er
 }
 
 // testAccPrepareSecondBranchRestrictionUser returns a second non-owner
-// workspace member UUID for the real branch-restrictions acceptance test and a
-// restore callback for the repository permission resource managed by Terraform
-// during the test. The test itself grants write access via
-// bitbucket_repo_user_permissions so Terraform exercises the real dependency
-// order: permission first, branch restriction second, reverse on destroy.
+// workspace member UUID and a restore callback for its original repository
+// permission. Terraform grants temporary write access during the test.
 func testAccPrepareSecondBranchRestrictionUser(ctx context.Context, c *client.BBClient, workspace, repoSlug, excludeUUID string) (string, func(context.Context) error, error) {
 	userUUID, err := testAccFindAnotherWorkspaceMemberUUID(ctx, c, workspace, excludeUUID)
 	if err != nil {
@@ -1900,56 +1872,6 @@ func testAccPrepareSecondBranchRestrictionUser(ctx context.Context, c *client.BB
 		return "", nil, err
 	}
 	return userUUID, restore, nil
-}
-
-// testAccFindAnotherRepoWriterUUID lists explicit repository user permissions
-// and returns a different user UUID with write/admin access. The UUID in
-// excludeUUID is skipped. When multiple candidates exist, the UUIDs are sorted
-// so the test consistently selects the same secondary user across runs.
-func testAccFindAnotherRepoWriterUUID(ctx context.Context, c *client.BBClient, workspace, repoSlug, excludeUUID string) (string, error) {
-	listOp, err := testAccRequireRepoUserPermissionOp(testAccRepoUserPermissionOps.List, "list")
-	if err != nil {
-		return "", err
-	}
-	result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
-		Method:      listOp.Method,
-		URLTemplate: listOp.Path,
-		PathParams:  map[string]string{"workspace": workspace, "repo_slug": repoSlug},
-		All:         true,
-	})
-	if err != nil {
-		return "", err
-	}
-	items, ok := result.([]any)
-	if !ok {
-		return "", fmt.Errorf("unexpected repo user permissions response type %T", result)
-	}
-
-	var candidates []string
-	for _, raw := range items {
-		item, ok := raw.(map[string]any)
-		if !ok {
-			return "", fmt.Errorf("unexpected repo user permission item response type %T", raw)
-		}
-		permission, _ := item["permission"].(string)
-		if permission != "write" && permission != "admin" {
-			continue
-		}
-		user, ok := item["user"].(map[string]any)
-		if !ok {
-			continue
-		}
-		uuid, _ := user["uuid"].(string)
-		if uuid == "" || uuid == excludeUUID {
-			continue
-		}
-		candidates = append(candidates, uuid)
-	}
-	sort.Strings(candidates)
-	if len(candidates) == 0 {
-		return "", nil
-	}
-	return candidates[0], nil
 }
 
 // testAccFindAnotherWorkspaceMemberUUID returns a deterministic non-owner
@@ -1996,27 +1918,6 @@ func testAccFindAnotherWorkspaceMemberUUID(ctx context.Context, c *client.BBClie
 		return "", nil
 	}
 	return candidates[0], nil
-}
-
-// testAccEnsureRepoUserWritePermission makes sure the selected workspace user
-// has repository write/admin access for the duration of the test and returns a
-// callback that restores the previous explicit permission state afterwards.
-func testAccEnsureRepoUserWritePermission(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID string) (func(context.Context) error, error) {
-	restore, err := testAccRepoUserPermissionRestoreFunc(ctx, c, workspace, repoSlug, selectedUserID)
-	if err != nil {
-		return nil, err
-	}
-	oldPermission, _, err := testAccRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID)
-	if err != nil {
-		return nil, err
-	}
-	if oldPermission == "write" || oldPermission == "admin" {
-		return func(context.Context) error { return nil }, nil
-	}
-	if err := testAccSetRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID, "write"); err != nil {
-		return nil, err
-	}
-	return restore, nil
 }
 
 func testAccRepoUserPermissionRestoreFunc(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID string) (func(context.Context) error, error) {

@@ -292,7 +292,7 @@ REST API and have several important caveats:
 | `bitbucket_forked_repository` | `bitbucket_forked_repository` | CL |
 | `bitbucket_repo_group_permissions` | `bitbucket_repo_group_permissions` | RUDL |
 | `bitbucket_repo_settings` | `bitbucket_repo_settings` | RU |
-| `bitbucket_repo_user_permissions` | `bitbucket_repo_user_permissions` | RUDL |
+| `bitbucket_repo_user_permissions` | `bitbucket_repo_user_permissions` | CRUDL |
 | `bitbucket_repos` | `bitbucket_repos` | CRUDL |
 
 

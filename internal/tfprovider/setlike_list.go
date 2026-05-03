@@ -240,7 +240,10 @@ func elementPrimaryKeys(elements []attr.Value, itemFields []BodyFieldDef) ([]str
 			return nil, false
 		}
 		key := stableObjectPrimaryKey(obj, itemFields)
-		if isFallbackPrimaryKey(key) || seen[key] {
+		if isFallbackPrimaryKey(key) {
+			return nil, false
+		}
+		if seen[key] {
 			return nil, false
 		}
 		keys[i] = key
