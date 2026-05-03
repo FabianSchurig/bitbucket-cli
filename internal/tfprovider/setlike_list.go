@@ -114,10 +114,10 @@ func (v setLikeListValue) Equal(o attr.Value) bool {
 // ListSemanticEquals reports whether two nested-object lists contain the
 // same elements regardless of order. Items are paired by their stable
 // identity key (uuid > id > slug > full_slug > name) and then compared
-// per-attribute with the framework's strict Equal — meaning paired
-// objects must agree on every attribute, including known-vs-unknown.
+// per-attribute with asymmetric Unknown tolerance: Unknown in the receiver
+// (proposedNew) wildcards any value in the argument (prior).
 //
-// IMPORTANT — receiver/argument mapping and why we MUST stay strict:
+// IMPORTANT — receiver/argument mapping and why asymmetric tolerance is safe:
 //
 // terraform-plugin-framework calls semantic equality with the receiver
 // being ProposedNewValue and the argument being PriorValue (see
@@ -126,16 +126,23 @@ func (v setLikeListValue) Equal(o attr.Value) bool {
 // When this method returns true, the framework REPLACES the new state
 // with the prior value.
 //
-//  1. Create / Update apply consistency: receiver `v` = resp.NewState
-//     (concrete API response), argument `other` = req.PlannedState
-//     (with Unknowns for every Computed/Optional+Computed nested field
-//     such as users[*].created_on, display_name). If we tolerated
-//     Unknown attributes on `other` as wildcards we would return true,
-//     the framework would overwrite the concrete API response with the
-//     plan's Unknowns, and Terraform Core would reject the apply with
-//     "Provider returned invalid result object after apply".
+//  1. ModifyPlan (config reorder on Required nested-object lists with
+//     Computed inner fields): receiver `v` = planned value from config
+//     (with Unknown for every Computed nested field like
+//     users[*].display_name), argument `other` = prior state (concrete
+//     from last refresh). Unknown on left wildcards any concrete value
+//     on right, so reordering the config produces an empty diff when
+//     the set of identity keys is unchanged.
 //
-//  2. Read refresh: receiver `v` = resp.NewState (refresh response,
+//  2. Create / Update apply consistency: receiver `v` = resp.NewState
+//     (concrete API response), argument `other` = req.PlannedState
+//     (with Unknowns for every Computed/Optional+Computed nested field).
+//     The receiver is fully concrete (no Unknowns on left), so the
+//     asymmetric wildcard never fires and we perform strict per-attribute
+//     equality — correctly rejecting {display_name: "Foo"} ≠ {display_name: Unknown}
+//     to avoid overwriting the API response with plan Unknowns.
+//
+//  3. Read refresh: receiver `v` = resp.NewState (refresh response,
 //     concrete after alignResponseItemsToReference reorders it to
 //     match prior state order), argument `other` = req.CurrentState
 //     (concrete prior state). Both are concrete — strict equality
@@ -149,8 +156,9 @@ func (v setLikeListValue) Equal(o attr.Value) bool {
 // (e.g. prior list null/empty, or two fully-known lists that differ
 // only in order).
 //
-// Items whose identity key is empty fall back to a positional Equal
-// search since we have no other way to pair them.
+// Items whose identity key is empty fall back to a positional search
+// (still using asymmetric Unknown tolerance) since we have no other way
+// to pair them.
 func (v setLikeListValue) ListSemanticEquals(ctx context.Context, other basetypes.ListValuable) (bool, diag.Diagnostics) {
 	var diags diag.Diagnostics
 	otherTyped, ok := other.(setLikeListValue)
@@ -227,11 +235,18 @@ func (v setLikeListValue) ListSemanticEquals(ctx context.Context, other basetype
 					if !rok {
 						continue
 					}
-					// Pair-by-key + strict Equal (no Unknown
-					// wildcards): apply consistency forbids
-					// returning true when the plan side carries
-					// Unknown computed attributes; see method doc.
-					if lObj.Equal(rObj) {
+					// Asymmetric Unknown tolerance: Unknown on the left
+					// (proposedNew, the receiver) wildcards any value on
+					// the right (prior, the argument). This enables
+					// ModifyPlan for Required nested-object lists:
+					// config-reordered lists with Computed inner fields
+					// (e.g. users[*].display_name) are Unknown in the
+					// plan, but we still want to recognize the set is
+					// unchanged. In Create/Update apply the receiver is
+					// the concrete API response and the argument is the
+					// plan — no Unknowns on the left there. In Read
+					// refresh both sides are concrete — still fine.
+					if asymmetricObjectEqual(lObj, rObj) {
 						usedRight[idx] = true
 						matched = true
 						break
@@ -244,13 +259,16 @@ func (v setLikeListValue) ListSemanticEquals(ctx context.Context, other basetype
 		}
 		// Fall back to a linear search over still-unused right items so
 		// items without a primary key still get a chance to pair up.
-		// Strict per-element Equal — see method doc for why we cannot
-		// tolerate Unknown wildcards.
+		// Use the same asymmetric Unknown tolerance as above.
 		for _, idx := range rightFallback {
 			if usedRight[idx] {
 				continue
 			}
-			if l.Equal(right[idx]) {
+			rObj, rok := right[idx].(types.Object)
+			if !rok {
+				continue
+			}
+			if asymmetricObjectEqual(lObj, rObj) {
 				usedRight[idx] = true
 				matched = true
 				break
@@ -261,6 +279,48 @@ func (v setLikeListValue) ListSemanticEquals(ctx context.Context, other basetype
 		}
 	}
 	return true, diags
+}
+
+// asymmetricObjectEqual compares two types.Object values with asymmetric
+// Unknown tolerance: Unknown in `left` (the proposedNew/receiver side)
+// wildcards any value in `right` (the prior/argument side). This enables
+// ModifyPlan to recognize set-equivalence even when Required nested-object
+// lists carry Computed inner attributes (e.g. users[*].display_name): the
+// planned value has Unknown for those fields but the state has concrete
+// API-returned values, and we still want to substitute the prior state
+// value to produce an empty diff.
+//
+// Apply-time consistency is maintained because in Create/Update the receiver
+// is the concrete API response (no Unknowns on left) and the argument is
+// the plan (Unknowns on right), so the wildcard never fires there.
+func asymmetricObjectEqual(left, right types.Object) bool {
+	if left.IsNull() != right.IsNull() || left.IsUnknown() != right.IsUnknown() {
+		return false
+	}
+	if left.IsNull() || left.IsUnknown() {
+		return true
+	}
+	leftAttrs := left.Attributes()
+	rightAttrs := right.Attributes()
+	if len(leftAttrs) != len(rightAttrs) {
+		return false
+	}
+	for k, lv := range leftAttrs {
+		rv, ok := rightAttrs[k]
+		if !ok {
+			return false
+		}
+		// Asymmetric tolerance: Unknown on left wildcards anything on right.
+		if lv.IsUnknown() {
+			continue
+		}
+		// Strict equality otherwise (including when right is Unknown, which
+		// shouldn't happen in practice since state is always concrete).
+		if !lv.Equal(rv) {
+			return false
+		}
+	}
+	return true
 }
 
 // setLikeListNull returns a null setLikeListValue typed for the given item
