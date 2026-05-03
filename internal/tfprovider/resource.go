@@ -839,6 +839,7 @@ func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
 		return schema.ListNestedAttribute{
 			Description: desc,
 			Optional:    true,
+			Computed:    true,
 			CustomType:  setLikeListTypeFor(bf.ItemFields),
 			NestedObject: schema.NestedAttributeObject{
 				Attributes: buildNestedItemAttrs(bf.ItemFields),
