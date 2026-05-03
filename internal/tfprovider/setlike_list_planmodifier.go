@@ -44,11 +44,28 @@ func (m setLikeListUseStateModifier) MarkdownDescription(ctx context.Context) st
 }
 
 func (m setLikeListUseStateModifier) PlanModifyList(ctx context.Context, req planmodifier.ListRequest, resp *planmodifier.ListResponse) {
-	// Nothing to do if either side is missing.
+	// Nothing to do if prior state is missing — the resource is being
+	// created and there is no value to fall back to.
 	if req.StateValue.IsNull() || req.StateValue.IsUnknown() {
 		return
 	}
-	if req.PlanValue.IsNull() || req.PlanValue.IsUnknown() {
+
+	// MarkComputedNilsAsUnknown runs BEFORE plan modifiers and marks any
+	// Optional+Computed attribute whose configuration is null (e.g.
+	// `groups` when the operator only configures `users`) as Unknown
+	// whenever the raw proposed plan differs from prior state — for
+	// instance because another set-like list was reordered. In that case
+	// the only sensible plan value is the prior state itself; otherwise
+	// the plan would flip a known concrete value to "(known after apply)"
+	// and produce a perpetual diff.
+	if req.PlanValue.IsUnknown() {
+		resp.PlanValue = req.StateValue
+		return
+	}
+
+	// Null planned values represent an explicit "not set" — leave them
+	// alone so the framework can reconcile against prior state on its own.
+	if req.PlanValue.IsNull() {
 		return
 	}
 
