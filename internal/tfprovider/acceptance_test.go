@@ -1841,6 +1841,8 @@ func testAccCheckBranchRestrictionDestroy(workspace, repoSlug, kind string, patt
 	}
 }
 
+// testAccCurrentUserUUID returns the UUID of the currently authenticated user
+// from the Bitbucket `/user` endpoint.
 func testAccCurrentUserUUID(ctx context.Context, c *client.BBClient) (string, error) {
 	result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
 		Method:      "GET",
@@ -1860,6 +1862,10 @@ func testAccCurrentUserUUID(ctx context.Context, c *client.BBClient) (string, er
 	return uuid, nil
 }
 
+// testAccFindAnotherRepoWriterUUID lists explicit repository user permissions
+// and returns a different user UUID with write/admin access. The UUID in
+// excludeUUID is skipped. When multiple candidates exist, the UUIDs are sorted
+// so the test consistently selects the same secondary user across runs.
 func testAccFindAnotherRepoWriterUUID(ctx context.Context, c *client.BBClient, workspace, repoSlug, excludeUUID string) (string, error) {
 	result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
 		Method:      "GET",
@@ -1902,6 +1908,9 @@ func testAccFindAnotherRepoWriterUUID(ctx context.Context, c *client.BBClient, w
 	return candidates[0], nil
 }
 
+// testAccDeleteBranchRestrictionsByPattern deletes every repository branch
+// restriction matching the provided kind/pattern pairs. It is used to make the
+// real-API acceptance test idempotent before and after execution.
 func testAccDeleteBranchRestrictionsByPattern(ctx context.Context, c *client.BBClient, workspace, repoSlug, kind string, patterns ...string) error {
 	for _, pattern := range patterns {
 		if pattern == "" {
