@@ -112,44 +112,47 @@ func (v setLikeListValue) Equal(o attr.Value) bool {
 }
 
 // ListSemanticEquals reports whether two nested-object lists contain the
-// same elements regardless of order. Items are matched by their stable
+// same elements regardless of order. Items are paired by their stable
 // identity key (uuid > id > slug > full_slug > name) and then compared
-// with the framework's strict Equal — meaning two paired objects must
-// agree on every attribute, including known-vs-unknown.
+// with an *asymmetric* equality that treats Unknown attributes on the
+// `other` (proposed-new) side as wildcards matching any concrete value
+// on the `v` (prior) side — but NOT vice-versa.
 //
-// IMPORTANT — why we do NOT relax unknown-vs-known here:
+// Why the asymmetry — and why both directions matter:
 //
-// terraform-plugin-framework calls SchemaSemanticEquality after
-// Create/Update/Read with PriorData = plan (Create/Update) or current
-// state (Read), and ProposedNewData = the freshly written resp.NewState.
-// When ListSemanticEquals returns true the framework REPLACES the new
-// state with the prior value (see
-// internal/fwschemadata/value_semantic_equality_list.go). After Create
-// the plan still carries Unknown for every Optional+Computed nested
-// field (e.g. users[*].created_on / display_name), so wildcarding
-// unknowns would cause the framework to overwrite our concrete API
-// response with the plan's unknowns and Terraform Core would reject
-// the apply with "Provider returned invalid result object after apply".
+// terraform-plugin-framework calls SchemaSemanticEquality from two very
+// different code paths, both passing PriorData as the receiver `v` and
+// ProposedNewData as `other`, and in both, returning true causes the
+// framework to REPLACE NewState with PriorData (see
+// internal/fwschemadata/value_semantic_equality_list.go).
 //
-// Order-insensitivity is therefore implemented in two places:
+//  1. Plan / Read: PriorData = current state (concrete), ProposedNewData
+//     = config-merged plan or API refresh response. The plan side often
+//     carries Unknown for every Optional+Computed nested field (e.g.
+//     users[*].created_on, display_name) — and the user may have
+//     reordered the list in config. We WANT SemanticEqual=true here so
+//     the framework substitutes the concrete prior state and produces
+//     an empty diff. → tolerate Unknown on `other`.
 //
-//  1. Refresh-time alignment: buildListFromResponse aligns the API
-//     response order to the prior list (plan or current state) by
-//     primary key before SetAttribute, so the new state is always in
-//     prior-state order. SchemaSemanticEquality then sees byte-equal
-//     prior/new lists and there is no diff.
+//  2. Create / Update apply consistency: PriorData = req.PlannedState
+//     (with Unknowns for computed fields), ProposedNewData = resp.NewState
+//     (concrete API response). We MUST return false here, otherwise the
+//     framework overwrites our concrete API response with the plan's
+//     Unknowns and Terraform Core rejects the apply with "Provider
+//     returned invalid result object after apply". → do NOT tolerate
+//     Unknown on `v`.
 //
-//  2. ListSemanticEquals (this method): pairs items by primary key so
-//     two fully-known lists that differ only in order still compare
-//     equal — needed when alignment cannot fully recover prior order
-//     (e.g. the prior list was empty/null) but both lists contain the
-//     same set of items.
+// The asymmetric rule "Unknown on `other` is a wildcard, Unknown on `v`
+// is a hard mismatch" satisfies both cases with one implementation.
 //
-// Items whose identity key is empty fall back to a positional Equal
+// Order-insensitivity is also reinforced by refresh-time alignment in
+// buildListFromResponse → alignResponseItemsToReference, which reorders
+// the API response to match the prior list's primary-key order before
+// SetAttribute. SemanticEquals here is the safety net for cases the
+// alignment cannot cover (prior list null/empty, fresh import, etc.).
+//
+// Items whose identity key is empty fall back to a positional asymmetric
 // search since we have no other way to pair them.
-//
-// The framework substitutes prior state when SemanticEquals returns true,
-// producing an empty diff for any permutation of fully-known elements.
 func (v setLikeListValue) ListSemanticEquals(ctx context.Context, other basetypes.ListValuable) (bool, diag.Diagnostics) {
 	var diags diag.Diagnostics
 	otherTyped, ok := other.(setLikeListValue)
@@ -226,11 +229,12 @@ func (v setLikeListValue) ListSemanticEquals(ctx context.Context, other basetype
 					if !rok {
 						continue
 					}
-					// Pair-by-key + strict Equal: knowns must match
-					// knowns. We deliberately do NOT treat unknown
-					// as a wildcard — see the method comment for
-					// the apply-consistency reasoning.
-					if lObj.Equal(rObj) {
+					// Pair-by-key + asymmetric Equal: Unknown on the
+					// `right` (proposed-new) side is a wildcard for
+					// any concrete left value; Unknown on the left
+					// (prior) side is NOT — see the method comment
+					// for the apply-consistency reasoning.
+					if asymmetricObjectEqual(lObj, rObj) {
 						usedRight[idx] = true
 						matched = true
 						break
@@ -243,12 +247,26 @@ func (v setLikeListValue) ListSemanticEquals(ctx context.Context, other basetype
 		}
 		// Fall back to a linear search over still-unused right items so
 		// items without a primary key (or with an unknown nested attr that
-		// blocks Equal) still get a chance to pair up.
+		// blocks Equal) still get a chance to pair up. Same asymmetric
+		// rule applies (Unknown on right side is wildcard).
 		for _, idx := range rightFallback {
 			if usedRight[idx] {
 				continue
 			}
-			if l.Equal(right[idx]) {
+			rObj, rok := right[idx].(types.Object)
+			if !rok {
+				if l.Equal(right[idx]) {
+					usedRight[idx] = true
+					matched = true
+					break
+				}
+				continue
+			}
+			lObjFB, lok := l.(types.Object)
+			if !lok {
+				continue
+			}
+			if asymmetricObjectEqual(lObjFB, rObj) {
 				usedRight[idx] = true
 				matched = true
 				break
@@ -261,7 +279,71 @@ func (v setLikeListValue) ListSemanticEquals(ctx context.Context, other basetype
 	return true, diags
 }
 
-// setLikeListNull returns a null setLikeListValue typed for the given item
+// asymmetricObjectEqual reports whether two nested-object values are
+// equivalent under the asymmetric rule used by ListSemanticEquals:
+// Unknown attributes on the `proposed` side match any concrete value on
+// the `prior` side, but Unknown attributes on the `prior` side do NOT
+// match concrete values on the `proposed` side.
+//
+// See ListSemanticEquals for the full rationale (Plan vs. apply
+// consistency). This helper does the recursive walk: when an attribute
+// is itself an Object it recurses, so deeply-nested computed fields
+// (e.g. links.avatar.href) are handled correctly. Lists/Maps/Sets fall
+// back to strict Equal — they are not the targeted shape here, and
+// nested ListNestedAttributes carry their own semantic-equality.
+func asymmetricObjectEqual(prior, proposed types.Object) bool {
+	if prior.IsNull() != proposed.IsNull() {
+		return false
+	}
+	if prior.IsNull() {
+		return true
+	}
+	// Whole-object Unknown on proposed is a wildcard for anything on
+	// prior (including a concrete or also-Unknown prior). The reverse
+	// case — Unknown on prior, concrete on proposed — is rejected just
+	// below.
+	if proposed.IsUnknown() {
+		return true
+	}
+	if prior.IsUnknown() {
+		return false
+	}
+	pAttrs := prior.Attributes()
+	nAttrs := proposed.Attributes()
+	if len(pAttrs) != len(nAttrs) {
+		return false
+	}
+	for name, pv := range pAttrs {
+		nv, ok := nAttrs[name]
+		if !ok {
+			return false
+		}
+		// Unknown on proposed side → wildcard match.
+		if nv.IsUnknown() {
+			continue
+		}
+		// Unknown on prior side but proposed is concrete → mismatch.
+		if pv.IsUnknown() {
+			return false
+		}
+		// Recurse into nested Objects so deeper computed fields enjoy
+		// the same asymmetric tolerance.
+		if pObj, ok := pv.(types.Object); ok {
+			if nObj, ok := nv.(types.Object); ok {
+				if !asymmetricObjectEqual(pObj, nObj) {
+					return false
+				}
+				continue
+			}
+			return false
+		}
+		if !pv.Equal(nv) {
+			return false
+		}
+	}
+	return true
+}
+
 // fields, used when a nested-object array attribute is absent from a
 // response or input.
 func setLikeListNull(itemFields []BodyFieldDef) setLikeListValue {
