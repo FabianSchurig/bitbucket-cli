@@ -10,7 +10,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
@@ -133,7 +132,6 @@ func buildNestedItemAttrs(itemFields []BodyFieldDef) map[string]schema.Attribute
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: buildNestedItemAttrs(f.ItemFields),
 				},
-				PlanModifiers: nestedListSortPlanModifiers(f.ItemFields),
 			}
 		} else if f.IsArray {
 			nested[key] = schema.ListAttribute{
@@ -473,7 +471,7 @@ func (r *GenericResource) dispatchWithParamFallback(ctx context.Context, op *Ope
 	// `group-by-branch` GET).
 	result = transformProjectBranchRestrictionsRead(ctx, op, r.group.TypeName, source, result, diags)
 
-	resultMap := r.storeDispatchResult(ctx, op, pathParams, target, diags, result)
+	resultMap := r.storeDispatchResult(ctx, op, pathParams, source, target, diags, result)
 	if resultMap != nil {
 		r.populateComputedParams(ctx, resultMap, source, target, diags)
 	}
@@ -722,10 +720,14 @@ func (r *GenericResource) responseFields() []BodyFieldDef {
 }
 
 // extractResponseFields extracts individual field values from the API response
-// and sets them as computed attributes in the target state.
-func (r *GenericResource) extractResponseFields(ctx context.Context, m map[string]any, target stateAccessor, diags *diag.Diagnostics) {
+// and sets them as computed attributes in the target state. The optional
+// `source` accessor (typically the plan or prior state used to dispatch the
+// API call) is consulted to align response-side nested-object lists with
+// the configured/planned order, preserving order-insensitivity without
+// mutating the planned value.
+func (r *GenericResource) extractResponseFields(ctx context.Context, m map[string]any, source, target stateAccessor, diags *diag.Diagnostics) {
 	for _, rf := range r.responseFields() {
-		setResponseField(ctx, rf, m, target, diags)
+		setResponseField(ctx, rf, m, source, target, diags)
 	}
 }
 
@@ -836,7 +838,6 @@ func bodyFieldAttr(bf BodyFieldDef) schema.Attribute {
 			NestedObject: schema.NestedAttributeObject{
 				Attributes: buildNestedItemAttrs(bf.ItemFields),
 			},
-			PlanModifiers: nestedListSortPlanModifiers(bf.ItemFields),
 		}
 	}
 	if bf.IsArray {
@@ -912,7 +913,6 @@ func responseFieldAttr(rf BodyFieldDef) schema.Attribute {
 			NestedObject: schema.NestedAttributeObject{
 				Attributes: buildNestedItemAttrs(rf.ItemFields),
 			},
-			PlanModifiers: nestedListSortPlanModifiers(rf.ItemFields),
 		}
 	}
 	if rf.IsArray {
@@ -991,24 +991,8 @@ func mergeListNestedResponseAttr(attr schema.ListNestedAttribute, rf BodyFieldDe
 		attr.NestedObject = schema.NestedAttributeObject{
 			Attributes: buildNestedItemAttrs(rf.ItemFields),
 		}
-		if !hasNestedListSortModifier(attr.PlanModifiers) {
-			attr.PlanModifiers = append(attr.PlanModifiers, nestedListSortPlanModifiers(rf.ItemFields)...)
-		}
 	}
 	return attr
-}
-
-// hasNestedListSortModifier reports whether the given list plan modifiers
-// already contain the deterministic-order modifier — used during attribute
-// merges to avoid attaching it twice when a request body field is
-// promoted to also satisfy a Read response field.
-func hasNestedListSortModifier(mods []planmodifier.List) bool {
-	for _, m := range mods {
-		if _, ok := m.(nestedListSortPlanModifier); ok {
-			return true
-		}
-	}
-	return false
 }
 
 func mergeListResponseAttr(attr schema.ListAttribute, rf BodyFieldDef) schema.Attribute {
@@ -1041,7 +1025,7 @@ func addRequestBodyAttr(attrs map[string]schema.Attribute, hasBody bool) {
 	}
 }
 
-func (r *GenericResource) storeDispatchResult(ctx context.Context, op *OperationDef, pathParams map[string]string, target stateAccessor, diags *diag.Diagnostics, result any) map[string]any {
+func (r *GenericResource) storeDispatchResult(ctx context.Context, op *OperationDef, pathParams map[string]string, source, target stateAccessor, diags *diag.Diagnostics, result any) map[string]any {
 	if result == nil {
 		diags.Append(target.SetAttribute(ctx, attrPath("api_response"), types.StringValue(""))...)
 		diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(op.OperationID))...)
@@ -1057,7 +1041,7 @@ func (r *GenericResource) storeDispatchResult(ctx context.Context, op *Operation
 
 	resultMap, _ := result.(map[string]any)
 	if resultMap != nil {
-		r.extractResponseFields(ctx, resultMap, target, diags)
+		r.extractResponseFields(ctx, resultMap, source, target, diags)
 		if id := extractID(resultMap); id != "" {
 			diags.Append(target.SetAttribute(ctx, attrPath("id"), types.StringValue(id))...)
 			return resultMap
@@ -1256,7 +1240,7 @@ func setComputedParam(ctx context.Context, m map[string]any, paramName, attrName
 	}
 }
 
-func setResponseField(ctx context.Context, rf BodyFieldDef, m map[string]any, target stateAccessor, diags *diag.Diagnostics) {
+func setResponseField(ctx context.Context, rf BodyFieldDef, m map[string]any, source, target stateAccessor, diags *diag.Diagnostics) {
 	key := toSnakeCase(strings.ReplaceAll(rf.Path, ".", "_"))
 	if isReservedResourceAttr(key) {
 		return
@@ -1265,14 +1249,25 @@ func setResponseField(ctx context.Context, rf BodyFieldDef, m map[string]any, ta
 	if !ok || val == nil {
 		return
 	}
-	attrValue, ok := responseFieldValue(val, rf)
+	// For nested-object lists, read the prior/planned value from `source`
+	// so the API response can be reordered to match it (preserves the
+	// operator's order without mutating the plan). Errors reading the prior
+	// value are non-fatal: we fall back to deterministic sorting.
+	var priorList types.List
+	if source != nil && rf.IsArray && len(rf.ItemFields) > 0 {
+		var probe types.List
+		if d := source.GetAttribute(ctx, attrPath(key), &probe); !d.HasError() {
+			priorList = probe
+		}
+	}
+	attrValue, ok := responseFieldValue(val, rf, priorList)
 	if !ok {
 		return
 	}
 	diags.Append(target.SetAttribute(ctx, attrPath(key), attrValue)...)
 }
 
-func responseFieldValue(val any, rf BodyFieldDef) (any, bool) {
+func responseFieldValue(val any, rf BodyFieldDef, priorList types.List) (any, bool) {
 	if rf.IsObject && len(rf.ItemFields) > 0 {
 		obj, ok := val.(map[string]any)
 		if !ok {
@@ -1285,7 +1280,7 @@ func responseFieldValue(val any, rf BodyFieldDef) (any, bool) {
 		if !ok {
 			return nil, false
 		}
-		return buildListFromResponse(arr, rf.ItemFields), true
+		return buildListFromResponse(arr, rf.ItemFields, priorList), true
 	}
 	if rf.IsArray {
 		arr, ok := val.([]any)
@@ -1319,15 +1314,15 @@ func stringifyComplexValue(val any) string {
 }
 
 // buildListFromResponse converts a JSON array from the API response into a
-// types.List value suitable for a ListNestedAttribute. Items are sorted by
-// a stable identity key using the precedence defined by
-// stableIdentityFieldOrder, with a canonical JSON tiebreaker, so two
-// equivalent API responses (same elements in different order) produce
-// byte-identical Terraform state — required for the post-apply consistency
-// check on order-sensitive ListNestedAttributes when the upstream Bitbucket
-// API returns collection elements in non-deterministic order. The matching
-// plan-side sort lives in nestedListSortPlanModifier.
-func buildListFromResponse(arr []any, itemFields []BodyFieldDef) types.List {
+// types.List value suitable for a ListNestedAttribute. When `priorList` is
+// a non-null/non-unknown reference list (e.g. the planned/prior state
+// value), response items are reordered to match that reference order via
+// stable identity keys — this is what makes nested-object lists
+// order-insensitive without ever mutating the plan. When no reference
+// exists (initial Read with no prior state, or data source reads), items
+// are sorted by a stable identity key with a canonical JSON tiebreaker so
+// two equivalent API responses still produce byte-identical state.
+func buildListFromResponse(arr []any, itemFields []BodyFieldDef, priorList types.List) types.List {
 	attrTypes := itemAttrTypes(itemFields)
 	objType := types.ObjectType{AttrTypes: attrTypes}
 
@@ -1335,15 +1330,33 @@ func buildListFromResponse(arr []any, itemFields []BodyFieldDef) types.List {
 		return types.ListValueMust(objType, []attr.Value{})
 	}
 
-	// Sort a working copy so we don't mutate the caller's slice (the same
-	// decoded response may be inspected by multiple callers, e.g. the
-	// computed-param populator).
-	sorted := make([]any, len(arr))
-	copy(sorted, arr)
-	sortResponseItems(sorted, itemFields)
+	// Work on a copy so we never mutate the caller's slice.
+	ordered := make([]any, len(arr))
+	copy(ordered, arr)
 
-	elements := make([]attr.Value, 0, len(sorted))
-	for _, item := range sorted {
+	aligned := false
+	if !priorList.IsNull() && !priorList.IsUnknown() {
+		refs := make([]types.Object, 0, len(priorList.Elements()))
+		for _, e := range priorList.Elements() {
+			if obj, ok := e.(types.Object); ok && !obj.IsNull() && !obj.IsUnknown() {
+				refs = append(refs, obj)
+			}
+		}
+		if len(refs) > 0 {
+			aligned = alignResponseItemsToReference(ordered, refs, itemFields)
+		}
+	}
+	if !aligned {
+		// Fall back (or stabilise leftovers after partial alignment) with
+		// the deterministic identity-key sort so equivalent API responses
+		// still produce byte-identical state.
+		if priorList.IsNull() || priorList.IsUnknown() || len(priorList.Elements()) == 0 {
+			sortResponseItems(ordered, itemFields)
+		}
+	}
+
+	elements := make([]attr.Value, 0, len(ordered))
+	for _, item := range ordered {
 		m, ok := item.(map[string]any)
 		if !ok {
 			continue
@@ -1393,7 +1406,11 @@ func buildAttrValueFromResponse(v any, f BodyFieldDef) attr.Value {
 		if !ok {
 			return attrNullValue(f)
 		}
-		return buildListFromResponse(arr, f.ItemFields)
+		// Nested-inside-object arrays don't have a per-item prior list
+		// available here; fall back to deterministic sort. The Required
+		// attrs constraint that motivated alignment only applies to
+		// top-level lists which are reached via setResponseField.
+		return buildListFromResponse(arr, f.ItemFields, types.ListNull(types.ObjectType{AttrTypes: itemAttrTypes(f.ItemFields)}))
 	}
 	if f.IsArray {
 		arr, ok := v.([]any)

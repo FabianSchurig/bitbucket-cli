@@ -85,7 +85,7 @@ func TestBuildListFromResponsePreservesNestedArrays(t *testing.T) {
 				map[string]any{"name": "alice"},
 			},
 		},
-	}, fields)
+	}, fields, types.ListNull(types.ObjectType{AttrTypes: itemAttrTypes(fields)}))
 
 	elements := list.Elements()
 	if len(elements) != 1 {

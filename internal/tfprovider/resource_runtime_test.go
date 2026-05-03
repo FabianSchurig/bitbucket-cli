@@ -427,7 +427,7 @@ func TestResourcePopulateComputedParamsAndExtractResponseFields(t *testing.T) {
 		},
 		"tags":     []any{"one", "two"},
 		"metadata": map[string]any{"mode": "full"},
-	}, responseTarget, &diags)
+	}, nil, responseTarget, &diags)
 	if got := responseTarget.set["title"]; got != types.StringValue("Hello") {
 		t.Fatalf("expected title response field, got %#v", got)
 	}
@@ -747,7 +747,7 @@ func TestResourceDispatchResultAndResponseHelpers(t *testing.T) {
 	target := newMockState(nil)
 	var diags diag.Diagnostics
 
-	if result := r.storeDispatchResult(ctx, &OperationDef{OperationID: "delete"}, nil, target, &diags, nil); result != nil {
+	if result := r.storeDispatchResult(ctx, &OperationDef{OperationID: "delete"}, nil, nil, target, &diags, nil); result != nil {
 		t.Fatalf("expected nil result map, got %#v", result)
 	}
 	if got := target.set["id"]; got != types.StringValue("delete") {
@@ -756,7 +756,7 @@ func TestResourceDispatchResultAndResponseHelpers(t *testing.T) {
 
 	target = newMockState(nil)
 	diags = nil
-	if result := r.storeDispatchResult(ctx, &OperationDef{OperationID: "bad"}, nil, target, &diags, map[string]any{"bad": make(chan int)}); result != nil || !diags.HasError() {
+	if result := r.storeDispatchResult(ctx, &OperationDef{OperationID: "bad"}, nil, nil, target, &diags, map[string]any{"bad": make(chan int)}); result != nil || !diags.HasError() {
 		t.Fatalf("expected marshal failure diagnostics, got result=%#v diags=%#v", result, diags)
 	}
 
@@ -765,18 +765,18 @@ func TestResourceDispatchResultAndResponseHelpers(t *testing.T) {
 	}
 
 	reservedTarget := newMockState(nil)
-	setResponseField(ctx, BodyFieldDef{Path: "id"}, map[string]any{"id": 1}, reservedTarget, &diags)
+	setResponseField(ctx, BodyFieldDef{Path: "id"}, map[string]any{"id": 1}, nil, reservedTarget, &diags)
 	if len(reservedTarget.set) != 0 {
 		t.Fatalf("expected reserved field to be skipped, got %#v", reservedTarget.set)
 	}
 
-	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "settings", IsObject: true, ItemFields: []BodyFieldDef{{Path: "name"}}}); ok || val != nil {
+	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "settings", IsObject: true, ItemFields: []BodyFieldDef{{Path: "name"}}}, types.ListNull(types.ObjectType{})); ok || val != nil {
 		t.Fatalf("expected invalid object response field to be skipped, got %#v ok=%v", val, ok)
 	}
-	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "reviewers", IsArray: true, ItemFields: []BodyFieldDef{{Path: "name"}}}); ok || val != nil {
+	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "reviewers", IsArray: true, ItemFields: []BodyFieldDef{{Path: "name"}}}, types.ListNull(types.ObjectType{})); ok || val != nil {
 		t.Fatalf("expected invalid nested list response field to be skipped, got %#v ok=%v", val, ok)
 	}
-	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "tags", IsArray: true}); ok || val != nil {
+	if val, ok := responseFieldValue("bad", BodyFieldDef{Path: "tags", IsArray: true}, types.ListNull(types.ObjectType{})); ok || val != nil {
 		t.Fatalf("expected invalid list response field to be skipped, got %#v ok=%v", val, ok)
 	}
 }
