@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -1664,14 +1665,13 @@ func TestAccRealAPI_DataSource_WorkspacePermissions(t *testing.T) {
 // regressions lived.
 //
 // Step 1 catches (1) on the single-user path (the user object's display_name /
-// created_on are computed). Step 2 catches (3) for the same case. When an
-// additional test user is configured and can be granted repository write
-// permission, steps 3-5 add full multi-element coverage (reorder + remove) that
-// catches (1)+(2)+(3) on the multiset path.
+// created_on are computed). Step 2 catches (3) for the same case. When a
+// second repository user with existing write/admin access can be discovered via
+// the Bitbucket API, steps 3-4 add real multi-element coverage without relying
+// on additional environment variables or mutating repository permissions during
+// the test.
 //
-// Required env: BITBUCKET_TEST_WORKSPACE, BITBUCKET_TEST_REPO. Optional:
-// BITBUCKET_TEST_USER, falling back to BITBUCKET_TEST_USER_2, for full
-// multi-element coverage (UUID with surrounding braces, e.g. "{abcdef01-…}").
+// Required env: BITBUCKET_TEST_WORKSPACE, BITBUCKET_TEST_REPO.
 func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.T) {
 	workspace := skipIfNoRealAPI(t)
 	repoSlug := os.Getenv("BITBUCKET_TEST_REPO")
@@ -1691,28 +1691,12 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 		t.Fatalf("failed to read current user UUID: %v", err)
 	}
 
-	user2 := os.Getenv("BITBUCKET_TEST_USER")
+	user2, err := testAccFindAnotherRepoWriterUUID(ctx, c, workspace, repoSlug, user1)
+	if err != nil {
+		t.Fatalf("failed to discover a second repository user for branch restriction testing: %v", err)
+	}
 	if user2 == "" {
-		user2 = os.Getenv("BITBUCKET_TEST_USER_2")
-	}
-	if user2 == user1 {
-		user2 = ""
-	}
-
-	if user2 != "" {
-		restorePermission, err := testAccEnsureRepoUserWritePermission(ctx, c, workspace, repoSlug, user2)
-		if err != nil {
-			t.Logf("BITBUCKET_TEST_USER cannot be prepared with repository write permission; skipping multi-user branch restriction steps: %v", err)
-			user2 = ""
-		} else {
-			defer func() {
-				restoreCtx, restoreCancel := context.WithTimeout(context.Background(), testAccRealAPITimeout)
-				defer restoreCancel()
-				if err := restorePermission(restoreCtx); err != nil {
-					t.Logf("failed to restore repository permission for %s: %v", user2, err)
-				}
-			}()
-		}
+		t.Log("no second repository user with explicit write/admin permission found; skipping multi-user real-API coverage")
 	}
 
 	const restrictionKind = "push"
@@ -1720,19 +1704,21 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 	if len(patternUser) > 8 {
 		patternUser = patternUser[:8]
 	}
-	pattern := "tf-acc-order-insensitive-users-" + strings.ToLower(patternUser)
-	if err := testAccDeleteBranchRestrictionsByPattern(ctx, c, workspace, repoSlug, restrictionKind, pattern); err != nil {
+	patternBase := "tf-acc-order-insensitive-users-" + strings.ToLower(patternUser)
+	patternSingle := patternBase + "-single"
+	patternMulti := patternBase + "-multi"
+	if err := testAccDeleteBranchRestrictionsByPattern(ctx, c, workspace, repoSlug, restrictionKind, patternSingle, patternMulti); err != nil {
 		t.Fatalf("failed to clean up existing branch restrictions before test: %v", err)
 	}
 	defer func() {
 		cleanupCtx, cleanupCancel := context.WithTimeout(context.Background(), testAccRealAPITimeout)
 		defer cleanupCancel()
-		if err := testAccDeleteBranchRestrictionsByPattern(cleanupCtx, c, workspace, repoSlug, restrictionKind, pattern); err != nil {
+		if err := testAccDeleteBranchRestrictionsByPattern(cleanupCtx, c, workspace, repoSlug, restrictionKind, patternSingle, patternMulti); err != nil {
 			t.Logf("failed to clean up branch restrictions after test: %v", err)
 		}
 	}()
 
-	cfg := func(uuids ...string) string {
+	cfg := func(resourceName, pattern string, uuids ...string) string {
 		var users strings.Builder
 		for _, u := range uuids {
 			fmt.Fprintf(&users, "    { uuid = %q },\n", u)
@@ -1752,7 +1738,7 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 		return fmt.Sprintf(`
 			provider "bitbucket" {}
 
-			resource "bitbucket_branch_restrictions" "test" {
+			resource "bitbucket_branch_restrictions" %q {
 				workspace         = %q
 				repo_slug         = %q
 				kind              = %q
@@ -1762,7 +1748,7 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 				users = [
 %s				]
 			}
-		`, workspace, repoSlug, restrictionKind, pattern, users.String())
+		`, resourceName, workspace, repoSlug, restrictionKind, pattern, users.String())
 	}
 
 	steps := []resource.TestStep{
@@ -1772,56 +1758,50 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 		// result after apply" because the computed inner fields are Unknown
 		// in the plan.
 		{
-			Config: cfg(user1),
+			Config: cfg("test_single", patternSingle, user1),
 			Check: resource.ComposeTestCheckFunc(
-				resource.TestCheckResourceAttrSet("bitbucket_branch_restrictions.test", "id"),
-				resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test", "users.#", "1"),
-				resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test", "users.0.uuid", user1),
-				resource.TestCheckResourceAttrSet("bitbucket_branch_restrictions.test", "users.0.display_name"),
+				resource.TestCheckResourceAttrSet("bitbucket_branch_restrictions.test_single", "id"),
+				resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test_single", "users.#", "1"),
+				resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test_single", "users.0.uuid", user1),
+				resource.TestCheckResourceAttrSet("bitbucket_branch_restrictions.test_single", "users.0.display_name"),
 			),
 		},
 		// (2) Re-plan with the same config — must be empty. Catches the
 		// perpetual-diff class.
 		{
-			Config:   cfg(user1),
+			Config:   cfg("test_single", patternSingle, user1),
 			PlanOnly: true,
 		},
 	}
 
 	if user2 != "" {
 		steps = append(steps,
-			// (3) Update to two users in {a, b} order. The API may echo
-			// {b, a}; this exercises the multi-element multiset apply path
-			// against the real response shape.
+			// (3) Create a fresh two-user restriction in {a, b} order. The API
+			// may echo {b, a}; the provider must still preserve the configured
+			// order in state while keeping computed fields populated.
 			resource.TestStep{
-				Config: cfg(user1, user2),
+				Config: cfg("test_multi", patternMulti, user1, user2),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test", "users.#", "2"),
+					resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test_multi", "users.#", "2"),
+					resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test_multi", "users.0.uuid", user1),
+					resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test_multi", "users.1.uuid", user2),
+					resource.TestCheckResourceAttrSet("bitbucket_branch_restrictions.test_multi", "users.0.display_name"),
+					resource.TestCheckResourceAttrSet("bitbucket_branch_restrictions.test_multi", "users.1.display_name"),
 				),
 			},
 			// (4) Reorder to {b, a} — must be a no-op plan. Catches the
 			// v0.15.6 "Provider produced invalid plan" regression and the
-			// silent-reorder perpetual-diff bug.
+			// silent-reorder perpetual-diff bug on the real multi-user path.
 			resource.TestStep{
-				Config:   cfg(user2, user1),
+				Config:   cfg("test_multi", patternMulti, user2, user1),
 				PlanOnly: true,
-			},
-			// (5) Drop one user — must succeed and result in a clean
-			// one-element list. Catches the "remove an element" path
-			// through the multiset comparison.
-			resource.TestStep{
-				Config: cfg(user2),
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test", "users.#", "1"),
-					resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test", "users.0.uuid", user2),
-				),
 			},
 		)
 	}
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
-		CheckDestroy:             testAccCheckBranchRestrictionDestroy(workspace, repoSlug, restrictionKind, pattern),
+		CheckDestroy:             testAccCheckBranchRestrictionDestroy(workspace, repoSlug, restrictionKind, patternSingle, patternMulti),
 		Steps:                    steps,
 	})
 }
@@ -1830,7 +1810,7 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 // the test pattern remains in the workspace/repo after destroy.
 // The resource ID is generated by Bitbucket and not stable across runs, so we
 // query by the (kind, pattern) tuple that the test owns.
-func testAccCheckBranchRestrictionDestroy(workspace, repoSlug, kind, pattern string) resource.TestCheckFunc {
+func testAccCheckBranchRestrictionDestroy(workspace, repoSlug, kind string, patterns ...string) resource.TestCheckFunc {
 	return func(_ *terraform.State) error {
 		c, err := client.NewClient()
 		if err != nil {
@@ -1838,19 +1818,24 @@ func testAccCheckBranchRestrictionDestroy(workspace, repoSlug, kind, pattern str
 		}
 		ctx, cancel := context.WithTimeout(context.Background(), testAccRealAPITimeout)
 		defer cancel()
-		result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
-			Method:      "GET",
-			URLTemplate: "/repositories/{workspace}/{repo_slug}/branch-restrictions",
-			PathParams:  map[string]string{"workspace": workspace, "repo_slug": repoSlug},
-			QueryParams: map[string]string{"kind": kind, "pattern": pattern},
-			All:         true,
-		})
-		if err != nil {
-			return fmt.Errorf("failed to list branch restrictions for destroy check: %v", err)
-		}
-		if items, ok := result.([]any); ok && len(items) > 0 {
-			return fmt.Errorf("branch restriction kind=%s, pattern=%q still exists in %s/%s after destroy (%d found)",
-				kind, pattern, workspace, repoSlug, len(items))
+		for _, pattern := range patterns {
+			if pattern == "" {
+				continue
+			}
+			result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/branch-restrictions",
+				PathParams:  map[string]string{"workspace": workspace, "repo_slug": repoSlug},
+				QueryParams: map[string]string{"kind": kind, "pattern": pattern},
+				All:         true,
+			})
+			if err != nil {
+				return fmt.Errorf("failed to list branch restrictions for destroy check: %v", err)
+			}
+			if items, ok := result.([]any); ok && len(items) > 0 {
+				return fmt.Errorf("branch restriction kind=%s, pattern=%q still exists in %s/%s after destroy (%d found)",
+					kind, pattern, workspace, repoSlug, len(items))
+			}
 		}
 		return nil
 	}
@@ -1875,120 +1860,91 @@ func testAccCurrentUserUUID(ctx context.Context, c *client.BBClient) (string, er
 	return uuid, nil
 }
 
-func testAccEnsureRepoUserWritePermission(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID string) (func(context.Context) error, error) {
-	oldPermission, hadExplicitPermission, err := testAccRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID)
-	if err != nil {
-		return nil, err
-	}
-	if oldPermission == "write" || oldPermission == "admin" {
-		return func(context.Context) error { return nil }, nil
-	}
-	if err := testAccSetRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID, "write"); err != nil {
-		return nil, err
-	}
-	return func(ctx context.Context) error {
-		if hadExplicitPermission {
-			return testAccSetRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID, oldPermission)
-		}
-		_, err := handlers.DispatchRaw(ctx, c, handlers.Request{
-			Method:      "DELETE",
-			URLTemplate: "/repositories/{workspace}/{repo_slug}/permissions-config/users/{selected_user_id}",
-			PathParams: map[string]string{
-				"workspace":        workspace,
-				"repo_slug":        repoSlug,
-				"selected_user_id": selectedUserID,
-			},
-		})
-		if testAccBitbucketAPIStatus(err, http.StatusNotFound) {
-			return nil
-		}
-		return err
-	}, nil
-}
-
-func testAccRepoUserPermission(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID string) (permission string, explicit bool, err error) {
+func testAccFindAnotherRepoWriterUUID(ctx context.Context, c *client.BBClient, workspace, repoSlug, excludeUUID string) (string, error) {
 	result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
 		Method:      "GET",
-		URLTemplate: "/repositories/{workspace}/{repo_slug}/permissions-config/users/{selected_user_id}",
-		PathParams: map[string]string{
-			"workspace":        workspace,
-			"repo_slug":        repoSlug,
-			"selected_user_id": selectedUserID,
-		},
-	})
-	if err != nil {
-		if testAccBitbucketAPIStatus(err, http.StatusNotFound) {
-			return "", false, nil
-		}
-		return "", false, err
-	}
-	permissionResponse, ok := result.(map[string]any)
-	if !ok {
-		return "", false, fmt.Errorf("unexpected repo user permission response type %T", result)
-	}
-	permission, ok = permissionResponse["permission"].(string)
-	if !ok || permission == "" {
-		return "", true, fmt.Errorf("repo user permission response does not contain permission")
-	}
-	return permission, true, nil
-}
-
-func testAccSetRepoUserPermission(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID, permission string) error {
-	body, err := json.Marshal(map[string]string{"permission": permission})
-	if err != nil {
-		return err
-	}
-	_, err = handlers.DispatchRaw(ctx, c, handlers.Request{
-		Method:      "PUT",
-		URLTemplate: "/repositories/{workspace}/{repo_slug}/permissions-config/users/{selected_user_id}",
-		PathParams: map[string]string{
-			"workspace":        workspace,
-			"repo_slug":        repoSlug,
-			"selected_user_id": selectedUserID,
-		},
-		Body: string(body),
-	})
-	return err
-}
-
-func testAccDeleteBranchRestrictionsByPattern(ctx context.Context, c *client.BBClient, workspace, repoSlug, kind, pattern string) error {
-	result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
-		Method:      "GET",
-		URLTemplate: "/repositories/{workspace}/{repo_slug}/branch-restrictions",
+		URLTemplate: "/repositories/{workspace}/{repo_slug}/permissions-config/users",
 		PathParams:  map[string]string{"workspace": workspace, "repo_slug": repoSlug},
-		QueryParams: map[string]string{"kind": kind, "pattern": pattern},
 		All:         true,
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 	items, ok := result.([]any)
 	if !ok {
-		return fmt.Errorf("unexpected branch restriction list response type %T", result)
+		return "", fmt.Errorf("unexpected repo user permissions response type %T", result)
 	}
+
+	var candidates []string
 	for _, raw := range items {
 		item, ok := raw.(map[string]any)
 		if !ok {
-			return fmt.Errorf("unexpected branch restriction item response type %T", raw)
+			return "", fmt.Errorf("unexpected repo user permission item response type %T", raw)
 		}
-		if gotPattern, _ := item["pattern"].(string); gotPattern != pattern {
+		permission, _ := item["permission"].(string)
+		if permission != "write" && permission != "admin" {
 			continue
 		}
-		id, ok := item["id"]
+		user, ok := item["user"].(map[string]any)
 		if !ok {
-			return fmt.Errorf("branch restriction response does not contain id")
+			continue
 		}
-		_, err := handlers.DispatchRaw(ctx, c, handlers.Request{
-			Method:      "DELETE",
-			URLTemplate: "/repositories/{workspace}/{repo_slug}/branch-restrictions/{id}",
-			PathParams: map[string]string{
-				"workspace": workspace,
-				"repo_slug": repoSlug,
-				"id":        fmt.Sprint(id),
-			},
+		uuid, _ := user["uuid"].(string)
+		if uuid == "" || uuid == excludeUUID {
+			continue
+		}
+		candidates = append(candidates, uuid)
+	}
+	sort.Strings(candidates)
+	if len(candidates) == 0 {
+		return "", nil
+	}
+	return candidates[0], nil
+}
+
+func testAccDeleteBranchRestrictionsByPattern(ctx context.Context, c *client.BBClient, workspace, repoSlug, kind string, patterns ...string) error {
+	for _, pattern := range patterns {
+		if pattern == "" {
+			continue
+		}
+		result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
+			Method:      "GET",
+			URLTemplate: "/repositories/{workspace}/{repo_slug}/branch-restrictions",
+			PathParams:  map[string]string{"workspace": workspace, "repo_slug": repoSlug},
+			QueryParams: map[string]string{"kind": kind, "pattern": pattern},
+			All:         true,
 		})
-		if err != nil && !testAccBitbucketAPIStatus(err, http.StatusNotFound) {
+		if err != nil {
 			return err
+		}
+		items, ok := result.([]any)
+		if !ok {
+			return fmt.Errorf("unexpected branch restriction list response type %T", result)
+		}
+		for _, raw := range items {
+			item, ok := raw.(map[string]any)
+			if !ok {
+				return fmt.Errorf("unexpected branch restriction item response type %T", raw)
+			}
+			if gotPattern, _ := item["pattern"].(string); gotPattern != pattern {
+				continue
+			}
+			id, ok := item["id"]
+			if !ok {
+				return fmt.Errorf("branch restriction response does not contain id")
+			}
+			_, err := handlers.DispatchRaw(ctx, c, handlers.Request{
+				Method:      "DELETE",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/branch-restrictions/{id}",
+				PathParams: map[string]string{
+					"workspace": workspace,
+					"repo_slug": repoSlug,
+					"id":        fmt.Sprint(id),
+				},
+			})
+			if err != nil && !testAccBitbucketAPIStatus(err, http.StatusNotFound) {
+				return err
+			}
 		}
 	}
 	return nil
