@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -178,12 +179,12 @@ func (v setLikeListValue) ToListValue(_ context.Context) (basetypes.ListValue, d
 // values participate in this comparison (per the framework contract on
 // ListValuableWithSemanticEquals).
 //
-// The comparison key for each element is the same canonical sort key the
-// rest of the runtime uses (`stableObjectSortKey` — identity field with
-// canonical-JSON tiebreaker). This guarantees a total order so duplicate
-// identity values are still distinguished by their other attributes,
-// preventing silent equivalence between genuinely different element
-// payloads.
+// For ordinary API objects with unique identity fields (uuid, id, slug, ...),
+// equality is based on those identity keys only. This intentionally ignores
+// API-computed fields that are Unknown in config/plan but populated in state.
+// Ambiguous lists (missing identity keys or duplicate identities) fall back to
+// the full canonical sort key so genuinely different duplicate payloads are
+// still distinguished.
 func (v setLikeListValue) ListSemanticEquals(_ context.Context, other basetypes.ListValuable) (bool, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -207,8 +208,12 @@ func (v setLikeListValue) ListSemanticEquals(_ context.Context, other basetypes.
 		return false, diags
 	}
 
-	leftKeys := elementSortKeys(left, v.itemFields)
-	rightKeys := elementSortKeys(right, o.itemFields)
+	leftKeys, leftPrimary := elementPrimaryKeys(left, v.itemFields)
+	rightKeys, rightPrimary := elementPrimaryKeys(right, o.itemFields)
+	if !leftPrimary || !rightPrimary {
+		leftKeys = elementSortKeys(left, v.itemFields)
+		rightKeys = elementSortKeys(right, o.itemFields)
+	}
 	sort.Strings(leftKeys)
 	sort.Strings(rightKeys)
 	for i := range leftKeys {
@@ -217,6 +222,37 @@ func (v setLikeListValue) ListSemanticEquals(_ context.Context, other basetypes.
 		}
 	}
 	return true, diags
+}
+
+// elementPrimaryKeys returns the identity-only key sequence for object
+// elements when every element has a unique stable identity field (uuid, id,
+// slug, ...). Computed fields such as display_name are intentionally excluded:
+// config/plan often has them Unknown while Read refresh has them populated.
+// If any element lacks a primary identity or a duplicate identity appears, the
+// caller falls back to full canonical element keys so genuinely ambiguous
+// lists are not collapsed.
+func elementPrimaryKeys(elements []attr.Value, itemFields []BodyFieldDef) ([]string, bool) {
+	keys := make([]string, len(elements))
+	seen := make(map[string]bool, len(elements))
+	for i, e := range elements {
+		obj, ok := e.(types.Object)
+		if !ok {
+			return nil, false
+		}
+		key := stableObjectPrimaryKey(obj, itemFields)
+		if isFallbackPrimaryKey(key) || seen[key] {
+			return nil, false
+		}
+		keys[i] = key
+		seen[key] = true
+	}
+	return keys, true
+}
+
+func isFallbackPrimaryKey(key string) bool {
+	return strings.HasPrefix(key, "obj=") ||
+		strings.HasPrefix(key, "json=") ||
+		strings.HasPrefix(key, "raw=")
 }
 
 // elementSortKeys produces the canonical per-element key sequence used by

@@ -1991,10 +1991,6 @@ func testAccFindAnotherWorkspaceMemberUUID(ctx context.Context, c *client.BBClie
 // has repository write/admin access for the duration of the test and returns a
 // callback that restores the previous explicit permission state afterwards.
 func testAccEnsureRepoUserWritePermission(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID string) (func(context.Context) error, error) {
-	deleteOp, err := testAccRequireRepoUserPermissionOp(testAccRepoUserPermissionOps.Delete, "delete")
-	if err != nil {
-		return nil, err
-	}
 	oldPermission, hadExplicitPermission, err := testAccRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID)
 	if err != nil {
 		return nil, err
@@ -2006,22 +2002,10 @@ func testAccEnsureRepoUserWritePermission(ctx context.Context, c *client.BBClien
 		return nil, err
 	}
 	return func(ctx context.Context) error {
-		if hadExplicitPermission {
+		if hadExplicitPermission && oldPermission != "none" {
 			return testAccSetRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID, oldPermission)
 		}
-		_, err := handlers.DispatchRaw(ctx, c, handlers.Request{
-			Method:      deleteOp.Method,
-			URLTemplate: deleteOp.Path,
-			PathParams: map[string]string{
-				"workspace":        workspace,
-				"repo_slug":        repoSlug,
-				"selected_user_id": selectedUserID,
-			},
-		})
-		if testAccBitbucketAPIStatus(err, http.StatusNotFound) {
-			return nil
-		}
-		return err
+		return testAccDeleteRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID)
 	}, nil
 }
 
@@ -2056,6 +2040,26 @@ func testAccRepoUserPermission(ctx context.Context, c *client.BBClient, workspac
 		return "", true, fmt.Errorf("repo user permission response does not contain permission")
 	}
 	return permission, true, nil
+}
+
+func testAccDeleteRepoUserPermission(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID string) error {
+	deleteOp, err := testAccRequireRepoUserPermissionOp(testAccRepoUserPermissionOps.Delete, "delete")
+	if err != nil {
+		return err
+	}
+	_, err = handlers.DispatchRaw(ctx, c, handlers.Request{
+		Method:      deleteOp.Method,
+		URLTemplate: deleteOp.Path,
+		PathParams: map[string]string{
+			"workspace":        workspace,
+			"repo_slug":        repoSlug,
+			"selected_user_id": selectedUserID,
+		},
+	})
+	if testAccBitbucketAPIStatus(err, http.StatusNotFound) {
+		return nil
+	}
+	return err
 }
 
 // testAccSetRepoUserPermission sets an explicit repository permission for the

@@ -92,6 +92,39 @@ func TestSetLikeListSemanticEqualsDistinguishesAddRemove(t *testing.T) {
 	}
 }
 
+// TestSetLikeListSemanticEqualsIgnoresComputedFieldDriftWithStableIdentity
+// covers the real Terraform plan shape for branch-restriction users: HCL only
+// declares uuid, while Read refresh persists API-computed fields such as
+// display_name. Reordering two users must therefore compare by uuid identity,
+// not by the whole object payload.
+func TestSetLikeListSemanticEqualsIgnoresComputedFieldDriftWithStableIdentity(t *testing.T) {
+	attrTypes := itemAttrTypes(userFields)
+	objType := types.ObjectType{AttrTypes: attrTypes}
+
+	planned := wrapSetLikeList(types.ListValueMust(objType, []attr.Value{
+		types.ObjectValueMust(attrTypes, map[string]attr.Value{
+			"uuid":         types.StringValue("{bbbb}"),
+			"display_name": types.StringUnknown(),
+		}),
+		types.ObjectValueMust(attrTypes, map[string]attr.Value{
+			"uuid":         types.StringValue("{aaaa}"),
+			"display_name": types.StringUnknown(),
+		}),
+	}), userFields)
+	refreshed := mkUserList(t,
+		[2]string{"{aaaa}", "Alice"},
+		[2]string{"{bbbb}", "Bob"},
+	)
+
+	eq, diags := planned.ListSemanticEquals(context.Background(), refreshed)
+	if diags.HasError() {
+		t.Fatalf("unexpected diagnostics: %#v", diags)
+	}
+	if !eq {
+		t.Fatalf("same uuid set with computed-field drift must be semantically equal:\n  planned   = %s\n  refreshed = %s", planned.String(), refreshed.String())
+	}
+}
+
 // TestSetLikeListSemanticEqualsHandlesDuplicateIdentities verifies that two
 // items sharing the same identity value (e.g. uuid) but differing in
 // another attribute are still distinguished — i.e. semantic equality uses
