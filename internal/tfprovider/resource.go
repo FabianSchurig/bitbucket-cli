@@ -10,10 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
@@ -88,6 +85,11 @@ type ResourceGroup struct {
 type GenericResource struct {
 	group  ResourceGroup
 	client *client.BBClient
+	// schemaAttrs is captured during Schema() so ModifyPlan can introspect
+	// the live attribute set without depending on terraform-plugin-framework
+	// internal packages (req.Plan.Schema is fwschema.Schema, which is in an
+	// internal package).
+	schemaAttrs map[string]schema.Attribute
 }
 
 // Metadata returns the resource type name.
@@ -109,6 +111,7 @@ func (r *GenericResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 		Description: r.group.Description,
 		Attributes:  attrs,
 	}
+	r.schemaAttrs = attrs
 }
 
 // buildNestedItemAttrs creates schema attributes for nested fields (array items
@@ -744,16 +747,10 @@ func resourceBaseAttrs() map[string]schema.Attribute {
 		"id": schema.StringAttribute{
 			Description: "Resource identifier.",
 			Computed:    true,
-			PlanModifiers: []planmodifier.String{
-				stringplanmodifier.UseStateForUnknown(),
-			},
 		},
 		"api_response": schema.StringAttribute{
 			Description: "The raw JSON response from the Bitbucket API.",
 			Computed:    true,
-			PlanModifiers: []planmodifier.String{
-				stringplanmodifier.UseStateForUnknown(),
-			},
 		},
 	}
 }
@@ -811,16 +808,6 @@ func resourceParamAttr(p ParamDef, isRequired bool) schema.StringAttribute {
 	}
 	attr.Optional = true
 	attr.Computed = p.In == "path"
-	if attr.Computed {
-		// Optional+Computed path params (e.g. the API "id" exposed as
-		// "param_id") must keep their prior state value when the framework
-		// marks them Unknown via MarkComputedNilsAsUnknown — otherwise
-		// reorder-only changes on a sibling set-like list would flip the
-		// param to "(known after apply)" and produce a perpetual diff.
-		attr.PlanModifiers = []planmodifier.String{
-			stringplanmodifier.UseStateForUnknown(),
-		}
-	}
 	return attr
 }
 
@@ -953,26 +940,17 @@ func responseFieldAttr(rf BodyFieldDef) schema.Attribute {
 			Description: desc,
 			Computed:    true,
 			ElementType: types.StringType,
-			PlanModifiers: []planmodifier.List{
-				listplanmodifier.UseStateForUnknown(),
-			},
 		}
 	}
 	if rf.Type == "int" {
 		return schema.Int64Attribute{
 			Description: desc,
 			Computed:    true,
-			PlanModifiers: []planmodifier.Int64{
-				int64planmodifier.UseStateForUnknown(),
-			},
 		}
 	}
 	return schema.StringAttribute{
 		Description: desc,
 		Computed:    true,
-		PlanModifiers: []planmodifier.String{
-			stringplanmodifier.UseStateForUnknown(),
-		},
 	}
 }
 
@@ -999,7 +977,6 @@ func mergeStringResponseAttr(attr schema.StringAttribute, rf BodyFieldDef) schem
 	}
 	attr.Computed = true
 	attr.Description = fieldDescription(rf)
-	attr.PlanModifiers = appendUseStateForUnknownString(attr.PlanModifiers)
 	return attr
 }
 
@@ -1009,7 +986,6 @@ func mergeInt64ResponseAttr(attr schema.Int64Attribute, rf BodyFieldDef) schema.
 	}
 	attr.Computed = true
 	attr.Description = fieldDescription(rf)
-	attr.PlanModifiers = appendUseStateForUnknownInt64(attr.PlanModifiers)
 	return attr
 }
 
@@ -1049,49 +1025,12 @@ func mergeListResponseAttr(attr schema.ListAttribute, rf BodyFieldDef) schema.At
 	}
 	attr.Computed = true
 	attr.Description = fieldDescription(rf)
-	attr.PlanModifiers = appendUseStateForUnknownList(attr.PlanModifiers)
 	return attr
 }
 
 func canMergeComputedAttr(computed, required bool) bool {
 	return !computed && !required
 }
-
-// appendUseStateForUnknownString appends a UseStateForUnknown plan modifier
-// only if one isn't already present (matched by description string so we
-// don't depend on the upstream package's unexported types).
-func appendUseStateForUnknownString(mods []planmodifier.String) []planmodifier.String {
-	for _, m := range mods {
-		if m != nil && m.Description(context.Background()) == useStateForUnknownDescription {
-			return mods
-		}
-	}
-	return append(mods, stringplanmodifier.UseStateForUnknown())
-}
-
-func appendUseStateForUnknownInt64(mods []planmodifier.Int64) []planmodifier.Int64 {
-	for _, m := range mods {
-		if m != nil && m.Description(context.Background()) == useStateForUnknownDescription {
-			return mods
-		}
-	}
-	return append(mods, int64planmodifier.UseStateForUnknown())
-}
-
-func appendUseStateForUnknownList(mods []planmodifier.List) []planmodifier.List {
-	for _, m := range mods {
-		if m != nil && m.Description(context.Background()) == useStateForUnknownDescription {
-			return mods
-		}
-	}
-	return append(mods, listplanmodifier.UseStateForUnknown())
-}
-
-// useStateForUnknownDescription matches the upstream string for
-// stringplanmodifier.UseStateForUnknown / int64planmodifier.UseStateForUnknown
-// / listplanmodifier.UseStateForUnknown so we can detect existing modifiers
-// without depending on their unexported struct types.
-const useStateForUnknownDescription = "Once set, the value of this attribute in state will not change."
 
 func fieldDescription(field BodyFieldDef) string {
 	if field.Desc != "" {
