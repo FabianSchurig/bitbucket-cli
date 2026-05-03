@@ -44,7 +44,9 @@ var _ resource.ResourceWithModifyPlan = &GenericResource{}
 // the generator: it inspects the current resource's schema and body
 // definitions rather than special-casing any particular resource.
 func (r *GenericResource) ModifyPlan(ctx context.Context, req resource.ModifyPlanRequest, resp *resource.ModifyPlanResponse) {
-	// Skip create (no prior state) and destroy (plan is null).
+	// Skip create (no prior state) and destroy (plan is null). State.Raw
+	// is concrete for any existing resource; the IsKnown guard handles
+	// pathological framework states defensively.
 	if req.State.Raw.IsNull() || !req.State.Raw.IsKnown() {
 		return
 	}
