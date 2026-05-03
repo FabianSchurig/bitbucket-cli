@@ -8,6 +8,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
+const (
+	fallbackObjectKeyPrefix = "obj="
+	fallbackJSONKeyPrefix   = "json="
+	fallbackRawKeyPrefix    = "raw="
+)
+
 // stableIdentityFieldOrder is the precedence used to derive a stable per-item
 // sort key for nested-object arrays. Bitbucket's REST API consistently
 // exposes one of these as the natural primary key on collection items
@@ -73,9 +79,9 @@ func stableItemSortKey(m map[string]any, fields []BodyFieldDef) string {
 // json.Marshal returns an error (e.g. NaN / +Inf in numeric values).
 func canonicalJSONKey(v any) string {
 	if b, err := json.Marshal(canonicalize(v)); err == nil {
-		return "json=" + string(b)
+		return fallbackJSONKeyPrefix + string(b)
 	}
-	return fmt.Sprintf("raw=%v", v)
+	return fmt.Sprintf("%s%v", fallbackRawKeyPrefix, v)
 }
 
 // stableObjectSortKey returns the same key for a `types.Object` element
@@ -109,7 +115,7 @@ func stableObjectSortKey(obj types.Object, fields []BodyFieldDef) string {
 	}
 	// Tiebreaker: the framework's stable String() form (attribute names are
 	// emitted in lexicographic order).
-	tiebreaker := "obj=" + obj.String()
+	tiebreaker := fallbackObjectKeyPrefix + obj.String()
 	if primary == "" {
 		return tiebreaker
 	}
@@ -225,7 +231,7 @@ func stableObjectPrimaryKey(obj types.Object, fields []BodyFieldDef) string {
 			return candidate + "=" + s
 		}
 	}
-	return "obj=" + obj.String()
+	return fallbackObjectKeyPrefix + obj.String()
 }
 
 // reorderResponseArrayBySourceKeys reshuffles `arr` so its elements appear

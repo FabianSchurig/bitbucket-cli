@@ -250,9 +250,9 @@ func elementPrimaryKeys(elements []attr.Value, itemFields []BodyFieldDef) ([]str
 }
 
 func isFallbackPrimaryKey(key string) bool {
-	return strings.HasPrefix(key, "obj=") ||
-		strings.HasPrefix(key, "json=") ||
-		strings.HasPrefix(key, "raw=")
+	return strings.HasPrefix(key, fallbackObjectKeyPrefix) ||
+		strings.HasPrefix(key, fallbackJSONKeyPrefix) ||
+		strings.HasPrefix(key, fallbackRawKeyPrefix)
 }
 
 // elementSortKeys produces the canonical per-element key sequence used by

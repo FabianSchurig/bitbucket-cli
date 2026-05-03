@@ -2028,6 +2028,10 @@ func testAccRepoUserPermissionRestoreFunc(ctx context.Context, c *client.BBClien
 		if hadExplicitPermission && oldPermission != "none" {
 			return testAccSetRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID, oldPermission)
 		}
+		// Bitbucket may report "none" for a user without an effective
+		// explicit repository grant, but the PUT endpoint rejects
+		// permission=none. Deleting the permission is the API's restore path
+		// for both "none" and absent original state.
 		return testAccDeleteRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID)
 	}, nil
 }
