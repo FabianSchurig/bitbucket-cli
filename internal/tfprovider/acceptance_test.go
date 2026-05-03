@@ -1724,14 +1724,14 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 		}
 	}()
 
-	cfg := func(resourceName, pattern string, grantUser2Permission bool, uuids ...string) string {
+	cfg := func(resourceName, pattern string, createUser2PermissionResource bool, uuids ...string) string {
 		var users strings.Builder
 		for _, u := range uuids {
 			fmt.Fprintf(&users, "    { uuid = %q },\n", u)
 		}
 		permissionResource := ""
 		dependsOn := ""
-		if grantUser2Permission {
+		if createUser2PermissionResource {
 			permissionResource = fmt.Sprintf(`
 			resource "bitbucket_repo_user_permissions" "branch_restriction_user2" {
 				workspace        = %[1]q
@@ -2025,6 +2025,9 @@ func testAccRepoUserPermissionRestoreFunc(ctx context.Context, c *client.BBClien
 		return nil, err
 	}
 	return func(ctx context.Context) error {
+		// "none" is equivalent to no explicit repository permission in this
+		// restore path, so it must use DELETE just like an absent original
+		// permission.
 		if hadExplicitPermission && oldPermission != "none" {
 			return testAccSetRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID, oldPermission)
 		}

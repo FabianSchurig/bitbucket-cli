@@ -249,6 +249,10 @@ func elementPrimaryKeys(elements []attr.Value, itemFields []BodyFieldDef) ([]str
 	return keys, true
 }
 
+// isFallbackPrimaryKey reports whether stableObjectPrimaryKey had to fall
+// back because no stable identity field (uuid, id, slug, ...) was available.
+// Callers use this signal to avoid identity-only comparison and instead fall
+// back to full canonical element comparison for ambiguous lists.
 func isFallbackPrimaryKey(key string) bool {
 	return strings.HasPrefix(key, fallbackObjectKeyPrefix) ||
 		strings.HasPrefix(key, fallbackJSONKeyPrefix) ||
