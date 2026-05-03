@@ -65,6 +65,9 @@ func TestAccEnsureRepoUserWritePermissionRestoresPriorState(t *testing.T) {
 			if err != nil {
 				t.Fatalf("testAccEnsureRepoUserWritePermission: %v", err)
 			}
+			if len(putPermissions) != 1 || putPermissions[0] != "write" {
+				t.Fatalf("initial PUT permissions = %#v, want [write]", putPermissions)
+			}
 			if err := restore(context.Background()); err != nil {
 				t.Fatalf("restore: %v", err)
 			}

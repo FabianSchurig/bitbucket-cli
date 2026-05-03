@@ -294,8 +294,9 @@ func TestSubResourceGroups_Registered(t *testing.T) {
 			wantList: "listExplicitGroupPermissionsForARepository",
 		},
 		"repo-user-permissions": {
-			wantRead: "getAnExplicitUserPermissionForARepository",
-			wantList: "listExplicitUserPermissionsForARepository",
+			wantCreate: "updateAnExplicitUserPermissionForARepository",
+			wantRead:   "getAnExplicitUserPermissionForARepository",
+			wantList:   "listExplicitUserPermissionsForARepository",
 		},
 		"project-group-permissions": {
 			wantRead: "getAnExplicitGroupPermissionForAProject",

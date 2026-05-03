@@ -1668,9 +1668,10 @@ func TestAccRealAPI_DataSource_WorkspacePermissions(t *testing.T) {
 //
 // Step 1 catches (1) on the single-user path (the user object's display_name /
 // created_on are computed). Step 2 catches (3) for the same case. Steps 3-4
-// use a second workspace member, granting temporary repository write access
-// when needed so the real multi-user path is exercised without manual repo
-// setup.
+// model the real-world Terraform graph: a bitbucket_repo_user_permissions
+// resource grants the second workspace member repository write access first,
+// the branch restriction depends on it, and Terraform destroy tears the branch
+// restriction down before removing the temporary permission.
 //
 // Required env: BITBUCKET_TEST_WORKSPACE, BITBUCKET_TEST_REPO.
 func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.T) {
@@ -1723,17 +1724,32 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 		}
 	}()
 
-	cfg := func(resourceName, pattern string, uuids ...string) string {
+	cfg := func(resourceName, pattern string, grantUser2Permission bool, uuids ...string) string {
 		var users strings.Builder
 		for _, u := range uuids {
 			fmt.Fprintf(&users, "    { uuid = %q },\n", u)
 		}
+		permissionResource := ""
+		dependsOn := ""
+		if grantUser2Permission {
+			permissionResource = fmt.Sprintf(`
+			resource "bitbucket_repo_user_permissions" "branch_restriction_user2" {
+				workspace        = %[1]q
+				repo_slug        = %[2]q
+				selected_user_id = %[3]q
+				request_body     = jsonencode({ permission = "write" })
+			}
+`, workspace, repoSlug, user2)
+			dependsOn = `
+				depends_on = [bitbucket_repo_user_permissions.branch_restriction_user2]
+`
+		}
 		// `kind = "push"` is the branch-restriction kind that supports a
 		// user allow-list. Bitbucket validates that every listed user has
-		// repository write access before accepting the restriction, so this
-		// test uses the authenticated user for the required single-user path
-		// and explicitly grants write permission before exercising an
-		// optional second user.
+		// repository write access before accepting the restriction. The
+		// multi-user steps grant the second user's repository permission with
+		// the Terraform resource exposed by this provider, matching the
+		// real-world dependency graph users should write.
 		//
 		// `groups` is intentionally omitted: Bitbucket's branch-restrictions
 		// POST returns 500 when an empty `groups` array is sent alongside a
@@ -1742,6 +1758,7 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 		// it).
 		return fmt.Sprintf(`
 			provider "bitbucket" {}
+%s
 
 			resource "bitbucket_branch_restrictions" %q {
 				workspace         = %q
@@ -1752,8 +1769,9 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 
 				users = [
 %s				]
+%s
 			}
-		`, resourceName, workspace, repoSlug, restrictionKind, pattern, users.String())
+		`, permissionResource, resourceName, workspace, repoSlug, restrictionKind, pattern, users.String(), dependsOn)
 	}
 
 	steps := []resource.TestStep{
@@ -1763,7 +1781,7 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 		// result after apply" because the computed inner fields are Unknown
 		// in the plan.
 		{
-			Config: cfg("test_single", patternSingle, user1),
+			Config: cfg("test_single", patternSingle, false, user1),
 			Check: resource.ComposeTestCheckFunc(
 				resource.TestCheckResourceAttrSet("bitbucket_branch_restrictions.test_single", "id"),
 				resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test_single", "users.#", "1"),
@@ -1774,14 +1792,14 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 		// (2) Re-plan with the same config — must be empty. Catches the
 		// perpetual-diff class.
 		{
-			Config:   cfg("test_single", patternSingle, user1),
+			Config:   cfg("test_single", patternSingle, false, user1),
 			PlanOnly: true,
 		},
 		// (3) Create a fresh two-user restriction in {a, b} order. The API
 		// may echo {b, a}; the provider must still preserve the configured
 		// order in state while keeping computed fields populated.
 		{
-			Config: cfg("test_multi", patternMulti, user1, user2),
+			Config: cfg("test_multi", patternMulti, true, user1, user2),
 			Check: resource.ComposeTestCheckFunc(
 				resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test_multi", "users.#", "2"),
 				resource.TestCheckResourceAttr("bitbucket_branch_restrictions.test_multi", "users.0.uuid", user1),
@@ -1794,7 +1812,7 @@ func TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers(t *testing.
 		// v0.15.6 "Provider produced invalid plan" regression and the
 		// silent-reorder perpetual-diff bug on the real multi-user path.
 		{
-			Config:   cfg("test_multi", patternMulti, user2, user1),
+			Config:   cfg("test_multi", patternMulti, true, user2, user1),
 			PlanOnly: true,
 		},
 	}
@@ -1862,21 +1880,14 @@ func testAccCurrentUserUUID(ctx context.Context, c *client.BBClient) (string, er
 	return uuid, nil
 }
 
-// testAccPrepareSecondBranchRestrictionUser returns a second user UUID for the
-// real branch-restrictions acceptance test and a restore callback for any
-// repository permission mutation it performs. It prefers an existing repo
-// writer/admin, otherwise it selects another non-owner workspace member and
-// grants temporary repository write access.
+// testAccPrepareSecondBranchRestrictionUser returns a second non-owner
+// workspace member UUID for the real branch-restrictions acceptance test and a
+// restore callback for the repository permission resource managed by Terraform
+// during the test. The test itself grants write access via
+// bitbucket_repo_user_permissions so Terraform exercises the real dependency
+// order: permission first, branch restriction second, reverse on destroy.
 func testAccPrepareSecondBranchRestrictionUser(ctx context.Context, c *client.BBClient, workspace, repoSlug, excludeUUID string) (string, func(context.Context) error, error) {
-	userUUID, err := testAccFindAnotherRepoWriterUUID(ctx, c, workspace, repoSlug, excludeUUID)
-	if err != nil {
-		return "", nil, err
-	}
-	if userUUID != "" {
-		return userUUID, func(context.Context) error { return nil }, nil
-	}
-
-	userUUID, err = testAccFindAnotherWorkspaceMemberUUID(ctx, c, workspace, excludeUUID)
+	userUUID, err := testAccFindAnotherWorkspaceMemberUUID(ctx, c, workspace, excludeUUID)
 	if err != nil {
 		return "", nil, err
 	}
@@ -1884,7 +1895,7 @@ func testAccPrepareSecondBranchRestrictionUser(ctx context.Context, c *client.BB
 		return "", nil, fmt.Errorf("no second non-owner workspace member found for workspace %q", workspace)
 	}
 
-	restore, err := testAccEnsureRepoUserWritePermission(ctx, c, workspace, repoSlug, userUUID)
+	restore, err := testAccRepoUserPermissionRestoreFunc(ctx, c, workspace, repoSlug, userUUID)
 	if err != nil {
 		return "", nil, err
 	}
@@ -1991,7 +2002,11 @@ func testAccFindAnotherWorkspaceMemberUUID(ctx context.Context, c *client.BBClie
 // has repository write/admin access for the duration of the test and returns a
 // callback that restores the previous explicit permission state afterwards.
 func testAccEnsureRepoUserWritePermission(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID string) (func(context.Context) error, error) {
-	oldPermission, hadExplicitPermission, err := testAccRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID)
+	restore, err := testAccRepoUserPermissionRestoreFunc(ctx, c, workspace, repoSlug, selectedUserID)
+	if err != nil {
+		return nil, err
+	}
+	oldPermission, _, err := testAccRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID)
 	if err != nil {
 		return nil, err
 	}
@@ -1999,6 +2014,14 @@ func testAccEnsureRepoUserWritePermission(ctx context.Context, c *client.BBClien
 		return func(context.Context) error { return nil }, nil
 	}
 	if err := testAccSetRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID, "write"); err != nil {
+		return nil, err
+	}
+	return restore, nil
+}
+
+func testAccRepoUserPermissionRestoreFunc(ctx context.Context, c *client.BBClient, workspace, repoSlug, selectedUserID string) (func(context.Context) error, error) {
+	oldPermission, hadExplicitPermission, err := testAccRepoUserPermission(ctx, c, workspace, repoSlug, selectedUserID)
+	if err != nil {
 		return nil, err
 	}
 	return func(ctx context.Context) error {
