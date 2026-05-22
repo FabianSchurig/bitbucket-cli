@@ -80,6 +80,7 @@ func NewClientWithConfig(username, token, baseURL, csrfToken, cloudSessionToken 
 		base = defaultBaseURL
 	}
 	c := resty.New().SetBaseURL(base)
+	ConfigureRetry(c)
 
 	// Defence in depth: even though the dispatcher applies Basic Auth
 	// per-request (and not at the client level), this hook guarantees that
