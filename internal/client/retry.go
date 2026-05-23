@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -60,7 +61,7 @@ func ConfigureRetry(c *resty.Client) {
 func retryCondition(resp *resty.Response, err error) bool {
 	// Never retry context cancellation or deadline exceeded errors.
 	if err != nil {
-		if err == context.Canceled || err == context.DeadlineExceeded {
+		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 			return false
 		}
 	}
