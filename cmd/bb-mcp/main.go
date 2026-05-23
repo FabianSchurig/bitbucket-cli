@@ -87,14 +87,7 @@ func main() {
 			log.Fatalf("MCP server error: %v", err)
 		}
 	case "sse":
-		handler := mcp.NewStreamableHTTPHandler(func(_ *http.Request) *mcp.Server {
-			return server
-		}, nil)
-		// Wrap with cross-origin protection to guard against CSRF/DNS rebinding
-		// attacks. This is required since go-sdk v1.6.0 no longer enables origin
-		// verification by default when CrossOriginProtection is nil.
-		protection := http.NewCrossOriginProtection()
-		protectedHandler := protection.Handler(handler)
+		protectedHandler := newSSEHandler(server)
 		fmt.Fprintf(os.Stderr, "MCP SSE server listening on %s\n", *addr)
 		if err := http.ListenAndServe(*addr, protectedHandler); err != nil {
 			log.Fatalf("HTTP server error: %v", err)
@@ -102,6 +95,19 @@ func main() {
 	default:
 		log.Fatalf("unknown transport: %s (valid: stdio, sse)", *transport)
 	}
+}
+
+// newSSEHandler creates the HTTP handler for the SSE transport with
+// cross-origin protection enabled.
+func newSSEHandler(server *mcp.Server) http.Handler {
+	handler := mcp.NewStreamableHTTPHandler(func(_ *http.Request) *mcp.Server {
+		return server
+	}, nil)
+	// Wrap with cross-origin protection to guard against CSRF/DNS rebinding
+	// attacks. This is required since go-sdk v1.6.0 no longer enables origin
+	// verification by default when CrossOriginProtection is nil.
+	protection := http.NewCrossOriginProtection()
+	return protection.Handler(handler)
 }
 
 func registerAllTools(server *mcp.Server, cfg *config.Config) {
