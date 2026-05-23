@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
@@ -12,6 +14,55 @@ import (
 	"github.com/FabianSchurig/bitbucket-cli/internal/config"
 	"github.com/FabianSchurig/bitbucket-cli/internal/mcptools"
 )
+
+func TestNewSSEHandler_CrossOriginProtection(t *testing.T) {
+	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0.0.1"}, nil)
+	handler := newSSEHandler(server)
+
+	tests := []struct {
+		name        string
+		method      string
+		origin      string
+		host        string
+		wantBlocked bool
+	}{
+		{
+			name:        "same-origin POST allowed",
+			method:      http.MethodPost,
+			origin:      "http://localhost:8080",
+			host:        "localhost:8080",
+			wantBlocked: false,
+		},
+		{
+			name:        "cross-origin POST blocked",
+			method:      http.MethodPost,
+			origin:      "http://evil.example.com",
+			host:        "localhost:8080",
+			wantBlocked: true,
+		},
+		{
+			name:        "safe GET allowed regardless of origin",
+			method:      http.MethodGet,
+			origin:      "http://evil.example.com",
+			host:        "localhost:8080",
+			wantBlocked: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(tt.method, "http://"+tt.host+"/mcp", nil)
+			req.Header.Set("Origin", tt.origin)
+			req.Host = tt.host
+			rr := httptest.NewRecorder()
+			handler.ServeHTTP(rr, req)
+			blocked := rr.Code == http.StatusForbidden
+			if blocked != tt.wantBlocked {
+				t.Errorf("got status %d, wantBlocked=%v", rr.Code, tt.wantBlocked)
+			}
+		})
+	}
+}
 
 func TestRegisterAllTools(t *testing.T) {
 	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0.0.1"}, nil)
