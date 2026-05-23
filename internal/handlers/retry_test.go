@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/go-resty/resty/v2"
 
@@ -15,10 +16,12 @@ import (
 )
 
 // newRetryTestClient creates a BBClient with retry configured, pointing at the test server.
+// Retry wait times are overridden to very small durations so tests run fast.
 func newRetryTestClient(t *testing.T, serverURL string) *client.BBClient {
 	t.Helper()
 	r := resty.New().SetBaseURL(serverURL)
 	client.ConfigureRetry(r)
+	r.SetRetryWaitTime(1 * time.Millisecond).SetRetryMaxWaitTime(5 * time.Millisecond)
 	return &client.BBClient{Client: r, Token: "test-token"}
 }
 

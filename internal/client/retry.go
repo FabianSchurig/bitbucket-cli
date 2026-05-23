@@ -1,6 +1,8 @@
 package client
 
 import (
+	"context"
+	"net/http"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -30,19 +32,53 @@ var retryableStatusCodes = map[int]bool{
 	504: true,
 }
 
+// idempotentMethods defines HTTP methods that are safe to retry without
+// risking duplicate side effects.
+var idempotentMethods = map[string]bool{
+	http.MethodGet:     true,
+	http.MethodHead:    true,
+	http.MethodPut:     true,
+	http.MethodDelete:  true,
+	http.MethodOptions: true,
+}
+
 // ConfigureRetry sets up resty's built-in retry mechanism on the given client.
-// It uses exponential backoff and retries only on transient HTTP errors.
+// It uses exponential backoff and retries only on transient HTTP errors for
+// idempotent methods (GET, HEAD, PUT, DELETE, OPTIONS). Non-idempotent methods
+// like POST and PATCH are never retried to avoid duplicate side effects.
+// Context cancellation and deadline errors are also not retried.
 // This is safe to call on any resty.Client and benefits all consumers
 // (CLI, MCP server, Terraform provider) uniformly.
 func ConfigureRetry(c *resty.Client) {
 	c.SetRetryCount(retryMaxAttempts).
 		SetRetryWaitTime(retryInitialWait).
 		SetRetryMaxWaitTime(retryMaxWait).
-		AddRetryCondition(func(resp *resty.Response, err error) bool {
-			if err != nil {
-				// Network-level errors (timeouts, connection refused) are retryable.
-				return true
-			}
-			return retryableStatusCodes[resp.StatusCode()]
-		})
+		AddRetryCondition(retryCondition)
+}
+
+// retryCondition determines whether a failed request should be retried.
+func retryCondition(resp *resty.Response, err error) bool {
+	// Never retry context cancellation or deadline exceeded errors.
+	if err != nil {
+		if err == context.Canceled || err == context.DeadlineExceeded {
+			return false
+		}
+	}
+
+	// Determine the HTTP method from the response or request.
+	method := ""
+	if resp != nil && resp.Request != nil && resp.Request.RawRequest != nil {
+		method = resp.Request.RawRequest.Method
+	}
+
+	// Only retry idempotent methods to avoid duplicate side effects.
+	if !idempotentMethods[method] {
+		return false
+	}
+
+	if err != nil {
+		// Network-level errors (timeouts, connection refused) are retryable.
+		return true
+	}
+	return retryableStatusCodes[resp.StatusCode()]
 }
