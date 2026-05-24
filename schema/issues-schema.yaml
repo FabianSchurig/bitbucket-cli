@@ -297,9 +297,9 @@ paths:
             schema:
               $ref: '#/components/schemas/export_options'
         description: The options to apply to the export. Available options include
-          `project_key` and `project_name` which, if specified, are used as the project
-          key and name in the exported Jira json format. Option `send_email` specifies
-          whether an email should be sent upon export result. Option `include_attachments`
+          `project_key` and `project_name` which, if specified, are used as the Jira
+          space key and name in the exported Jira json format. Option `send_email`
+          specifies whether an email should be sent upon export result. Option `include_attachments`
           specifies whether attachments are included in the export.
       security:
       - oauth2:

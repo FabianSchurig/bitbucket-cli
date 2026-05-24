@@ -2668,6 +2668,10 @@ components:
           queued:
             type: boolean
             description: A boolean flag indicating whether the pull request is queued
+          mergeable:
+            type: boolean
+            description: A boolean flag indicating whether the pull request passes
+              all merge checks
           description:
             type: string
             description: Explains what the pull request does.

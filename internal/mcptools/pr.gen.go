@@ -38,6 +38,7 @@ Available operations:
 - resolveACommentThread: Resolve a comment thread [POST]
 - reopenACommentThread: Reopen a comment thread [DELETE]
 - listCommitsOnAPullRequest: List commits on a pull request [GET]
+- getFileConflictsForAPullRequest: Get file conflicts for a pull request [GET]
 - declineAPullRequest: Decline a pull request [POST]
 - listChangesInAPullRequest: List changes in a pull request [GET]
 - getTheDiffStatForAPullRequest: Get the diff stat for a pull request [GET]
@@ -197,6 +198,7 @@ new pull request that is created.`,
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL."},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `hash`},
@@ -255,6 +257,7 @@ Only open pull requests can be mutated.`,
 				{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `destination.commit.hash`, Type: `string`, Desc: `hash`},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL."},
 				{Path: `source.commit.hash`, Type: `string`, Desc: `hash`},
@@ -353,6 +356,7 @@ Returns the newly created pull request comment.`,
 				{Path: `pullrequest.close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 				{Path: `pullrequest.description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `pullrequest.draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+				{Path: `pullrequest.mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `pullrequest.reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `pullrequest.reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL."},
 				{Path: `pullrequest.state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -404,6 +408,7 @@ Returns the newly created pull request comment.`,
 				{Path: `pullrequest.close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 				{Path: `pullrequest.description`, Type: `string`, Desc: `Explains what the pull request does.`},
 				{Path: `pullrequest.draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+				{Path: `pullrequest.mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `pullrequest.reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `pullrequest.reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL."},
 				{Path: `pullrequest.state`, Type: `string`, Desc: `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`},
@@ -471,6 +476,22 @@ Returns the newly created pull request comment.`,
 
 These are the commits that are being merged into the destination
 branch when the pull requests gets accepted.`,
+			Params: []ParamDef{
+				{Name: `pull_request_id`, In: `path`, Type: `integer`, Required: true},
+				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
+				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
+			},
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
+		},
+		{
+			OperationID: `getFileConflictsForAPullRequest`,
+			Method:      `GET`,
+			Path:        `/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/conflicts`,
+			Summary:     `Get file conflicts for a pull request`,
+			Description: `Redirects to the [repository file conflicts](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-file-conflicts-spec-get)
+with the revspec that corresponds to the pull request.`,
 			Params: []ParamDef{
 				{Name: `pull_request_id`, In: `path`, Type: `integer`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},

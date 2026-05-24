@@ -61,6 +61,7 @@ func NewPRCommand() *cobra.Command {
 		newPRResolveACommentThreadCmd(),
 		newPRReopenACommentThreadCmd(),
 		newPRListCommitsOnAPullRequestCmd(),
+		newPRGetFileConflictsForAPullRequestCmd(),
 		newPRDeclineAPullRequestCmd(),
 		newPRListChangesInAPullRequestCmd(),
 		newPRGetTheDiffStatForAPullRequestCmd(),
@@ -485,6 +486,7 @@ func newPRCreateAPullRequestCmd() *cobra.Command {
 		bodyDescription           string
 		bodyDestinationCommitHash string
 		bodyDraft                 bool
+		bodyMergeable             bool
 		bodyReason                string
 		bodyReviewers             string
 		bodySourceCommitHash      string
@@ -528,6 +530,9 @@ func newPRCreateAPullRequestCmd() *cobra.Command {
 				if bodyDraft {
 					handlers.SetNested(bodyObj, "draft", bodyDraft)
 				}
+				if bodyMergeable {
+					handlers.SetNested(bodyObj, "mergeable", bodyMergeable)
+				}
 				if bodyReason != "" {
 					handlers.SetNested(bodyObj, "reason", bodyReason)
 				}
@@ -564,6 +569,7 @@ func newPRCreateAPullRequestCmd() *cobra.Command {
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `Explains what the pull request does.`)
 	cmd.Flags().StringVar(&bodyDestinationCommitHash, "destination-commit-hash", "", `hash`)
 	cmd.Flags().BoolVar(&bodyDraft, "draft", false, `A boolean flag indicating whether the pull request is a draft.`)
+	cmd.Flags().BoolVar(&bodyMergeable, "mergeable", false, `A boolean flag indicating whether the pull request passes all merge checks`)
 	cmd.Flags().StringVar(&bodyReason, "reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
 	cmd.Flags().StringVar(&bodyReviewers, "reviewers", "", "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.")
 	cmd.Flags().StringVar(&bodySourceCommitHash, "source-commit-hash", "", `hash`)
@@ -680,6 +686,7 @@ func newPRUpdateAPullRequestCmd() *cobra.Command {
 		bodyDescription           string
 		bodyDestinationCommitHash string
 		bodyDraft                 bool
+		bodyMergeable             bool
 		bodyReason                string
 		bodyReviewers             string
 		bodySourceCommitHash      string
@@ -731,6 +738,9 @@ Only open pull requests can be mutated.`,
 				if bodyDraft {
 					handlers.SetNested(bodyObj, "draft", bodyDraft)
 				}
+				if bodyMergeable {
+					handlers.SetNested(bodyObj, "mergeable", bodyMergeable)
+				}
 				if bodyReason != "" {
 					handlers.SetNested(bodyObj, "reason", bodyReason)
 				}
@@ -768,6 +778,7 @@ Only open pull requests can be mutated.`,
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `Explains what the pull request does.`)
 	cmd.Flags().StringVar(&bodyDestinationCommitHash, "destination-commit-hash", "", `hash`)
 	cmd.Flags().BoolVar(&bodyDraft, "draft", false, `A boolean flag indicating whether the pull request is a draft.`)
+	cmd.Flags().BoolVar(&bodyMergeable, "mergeable", false, `A boolean flag indicating whether the pull request passes all merge checks`)
 	cmd.Flags().StringVar(&bodyReason, "reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
 	cmd.Flags().StringVar(&bodyReviewers, "reviewers", "", "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.")
 	cmd.Flags().StringVar(&bodySourceCommitHash, "source-commit-hash", "", `hash`)
@@ -1010,6 +1021,7 @@ func newPRCreateACommentOnAPullRequestCmd() *cobra.Command {
 		bodyPullrequestCloseSourceBranch bool
 		bodyPullrequestDescription       string
 		bodyPullrequestDraft             bool
+		bodyPullrequestMergeable         bool
 		bodyPullrequestReason            string
 		bodyPullrequestReviewers         string
 		bodyPullrequestState             string
@@ -1084,6 +1096,9 @@ Returns the newly created pull request comment.`,
 				if bodyPullrequestDraft {
 					handlers.SetNested(bodyObj, "pullrequest.draft", bodyPullrequestDraft)
 				}
+				if bodyPullrequestMergeable {
+					handlers.SetNested(bodyObj, "pullrequest.mergeable", bodyPullrequestMergeable)
+				}
 				if bodyPullrequestReason != "" {
 					handlers.SetNested(bodyObj, "pullrequest.reason", bodyPullrequestReason)
 				}
@@ -1132,6 +1147,7 @@ Returns the newly created pull request comment.`,
 	cmd.Flags().BoolVar(&bodyPullrequestCloseSourceBranch, "pullrequest-close-source-branch", false, `A boolean flag indicating if merging the pull request closes the source branch.`)
 	cmd.Flags().StringVar(&bodyPullrequestDescription, "pullrequest-description", "", `Explains what the pull request does.`)
 	cmd.Flags().BoolVar(&bodyPullrequestDraft, "pullrequest-draft", false, `A boolean flag indicating whether the pull request is a draft.`)
+	cmd.Flags().BoolVar(&bodyPullrequestMergeable, "pullrequest-mergeable", false, `A boolean flag indicating whether the pull request passes all merge checks`)
 	cmd.Flags().StringVar(&bodyPullrequestReason, "pullrequest-reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
 	cmd.Flags().StringVar(&bodyPullrequestReviewers, "pullrequest-reviewers", "", "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.")
 	cmd.Flags().StringVar(&bodyPullrequestState, "pullrequest-state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)
@@ -1219,6 +1235,7 @@ func newPRUpdateACommentOnAPullRequestCmd() *cobra.Command {
 		bodyPullrequestCloseSourceBranch bool
 		bodyPullrequestDescription       string
 		bodyPullrequestDraft             bool
+		bodyPullrequestMergeable         bool
 		bodyPullrequestReason            string
 		bodyPullrequestReviewers         string
 		bodyPullrequestState             string
@@ -1295,6 +1312,9 @@ func newPRUpdateACommentOnAPullRequestCmd() *cobra.Command {
 				if bodyPullrequestDraft {
 					handlers.SetNested(bodyObj, "pullrequest.draft", bodyPullrequestDraft)
 				}
+				if bodyPullrequestMergeable {
+					handlers.SetNested(bodyObj, "pullrequest.mergeable", bodyPullrequestMergeable)
+				}
 				if bodyPullrequestReason != "" {
 					handlers.SetNested(bodyObj, "pullrequest.reason", bodyPullrequestReason)
 				}
@@ -1344,6 +1364,7 @@ func newPRUpdateACommentOnAPullRequestCmd() *cobra.Command {
 	cmd.Flags().BoolVar(&bodyPullrequestCloseSourceBranch, "pullrequest-close-source-branch", false, `A boolean flag indicating if merging the pull request closes the source branch.`)
 	cmd.Flags().StringVar(&bodyPullrequestDescription, "pullrequest-description", "", `Explains what the pull request does.`)
 	cmd.Flags().BoolVar(&bodyPullrequestDraft, "pullrequest-draft", false, `A boolean flag indicating whether the pull request is a draft.`)
+	cmd.Flags().BoolVar(&bodyPullrequestMergeable, "pullrequest-mergeable", false, `A boolean flag indicating whether the pull request passes all merge checks`)
 	cmd.Flags().StringVar(&bodyPullrequestReason, "pullrequest-reason", "", `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`)
 	cmd.Flags().StringVar(&bodyPullrequestReviewers, "pullrequest-reviewers", "", "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.")
 	cmd.Flags().StringVar(&bodyPullrequestState, "pullrequest-state", "", `The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]`)
@@ -1566,6 +1587,58 @@ branch when the pull requests gets accepted.`,
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
 				Method:      "GET",
 				URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/commits",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
+}
+
+// newPRGetFileConflictsForAPullRequestCmd returns the "pr get-file-conflicts-for-a-pull-request" cobra command.
+// operationId: getFileConflictsForAPullRequest
+func newPRGetFileConflictsForAPullRequestCmd() *cobra.Command {
+	var (
+		pullRequestId int
+		repoSlug      string
+		workspace     string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "get-file-conflicts-for-a-pull-request",
+		Short: `Get file conflicts for a pull request`,
+		Long: `Redirects to the [repository file conflicts](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-file-conflicts-spec-get)
+with the revspec that corresponds to the pull request.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pullRequestId == 0 {
+				return fmt.Errorf("--pull-request-id is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			queryParams := map[string]string{}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/conflicts",
 				PathParams:  pathParams,
 				QueryParams: queryParams,
 				Body:        body,

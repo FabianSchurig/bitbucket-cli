@@ -78,6 +78,7 @@ resource "bitbucket_pr_comments" "example" {
   - `close_source_branch` (String) A boolean flag indicating if merging the pull request closes the source branch.
   - `description` (String) Explains what the pull request does.
   - `draft` (String) A boolean flag indicating whether the pull request is a draft.
+  - `mergeable` (String) A boolean flag indicating whether the pull request passes all merge checks
   - `reason` (String) Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.
   - `reviewers` (List of Object) The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.
     - `created_on` (String) created_on

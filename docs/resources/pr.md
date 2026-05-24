@@ -58,6 +58,7 @@ resource "bitbucket_pr" "example" {
     - `hash` (String) hash
 
 - `draft` (String) A boolean flag indicating whether the pull request is a draft. (also computed from API response)
+- `mergeable` (String) A boolean flag indicating whether the pull request passes all merge checks (also computed from API response)
 - `reason` (String) Explains why a pull request was declined. This field is only applicable to pull requests in rejected state. (also computed from API response)
 - `reviewers` (List of Object) The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL. (also computed from API response)
   Nested schema:

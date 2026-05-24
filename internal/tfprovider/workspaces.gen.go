@@ -817,6 +817,7 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -1660,6 +1661,7 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 

@@ -38,6 +38,7 @@ Available operations:
 - resolveACommentThread: Resolve a comment thread [POST]
 - reopenACommentThread: Reopen a comment thread [DELETE]
 - listCommitsOnAPullRequest: List commits on a pull request [GET]
+- getFileConflictsForAPullRequest: Get file conflicts for a pull request [GET]
 - declineAPullRequest: Decline a pull request [POST]
 - listChangesInAPullRequest: List changes in a pull request [GET]
 - getTheDiffStatForAPullRequest: Get the diff stat for a pull request [GET]
@@ -95,6 +96,7 @@ Available operations:
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -323,6 +325,7 @@ new pull request that is created.`,
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -388,6 +391,7 @@ new pull request that is created.`,
 					}},
 				}},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
@@ -427,6 +431,7 @@ new pull request that is created.`,
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -530,6 +535,7 @@ new pull request that is created.`,
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -600,6 +606,7 @@ Only open pull requests can be mutated.`,
 					}},
 				}},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
@@ -639,6 +646,7 @@ Only open pull requests can be mutated.`,
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -801,6 +809,7 @@ request.`,
 					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `hash`, Type: `string`, Desc: `hash`},
 					}},
+					{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -886,6 +895,7 @@ Returns the newly created pull request comment.`,
 					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
 						{Path: `created_on`, Type: `string`, Desc: `created_on`},
@@ -929,6 +939,7 @@ Returns the newly created pull request comment.`,
 					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `hash`, Type: `string`, Desc: `hash`},
 					}},
+					{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -1023,6 +1034,7 @@ Returns the newly created pull request comment.`,
 					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `hash`, Type: `string`, Desc: `hash`},
 					}},
+					{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -1107,6 +1119,7 @@ Returns the newly created pull request comment.`,
 					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
 						{Path: `created_on`, Type: `string`, Desc: `created_on`},
@@ -1150,6 +1163,7 @@ Returns the newly created pull request comment.`,
 					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `hash`, Type: `string`, Desc: `hash`},
 					}},
+					{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -1297,6 +1311,27 @@ branch when the pull requests gets accepted.`,
 			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-commits-get`,
 		},
 		{
+			OperationID: `getFileConflictsForAPullRequest`,
+			Method:      `GET`,
+			Path:        `/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/conflicts`,
+			Summary:     `Get file conflicts for a pull request`,
+			Description: `Redirects to the [repository file conflicts](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-file-conflicts-spec-get)
+with the revspec that corresponds to the pull request.`,
+			Params: []ParamDef{
+				{Name: `pull_request_id`, In: `path`, Type: `integer`, Required: true},
+				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
+				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
+			},
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
+			Scopes: []string{
+				`read:pullrequest:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-conflicts-get`,
+		},
+		{
 			OperationID: `declineAPullRequest`,
 			Method:      `POST`,
 			Path:        `/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/decline`,
@@ -1333,6 +1368,7 @@ branch when the pull requests gets accepted.`,
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -1465,6 +1501,7 @@ with the revspec that corresponds to the pull request.`,
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -1993,6 +2030,7 @@ will cause the task to appear below the comment on a pull request when viewed in
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -2080,6 +2118,7 @@ will cause the task to appear below the comment on a pull request when viewed in
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -2308,6 +2347,7 @@ new pull request that is created.`,
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -2373,6 +2413,7 @@ new pull request that is created.`,
 					}},
 				}},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
@@ -2412,6 +2453,7 @@ new pull request that is created.`,
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -2515,6 +2557,7 @@ new pull request that is created.`,
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -2585,6 +2628,7 @@ Only open pull requests can be mutated.`,
 					}},
 				}},
 				{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 				{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
@@ -2624,6 +2668,7 @@ Only open pull requests can be mutated.`,
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -2786,6 +2831,7 @@ request.`,
 					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `hash`, Type: `string`, Desc: `hash`},
 					}},
+					{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -2871,6 +2917,7 @@ Returns the newly created pull request comment.`,
 					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
 						{Path: `created_on`, Type: `string`, Desc: `created_on`},
@@ -2914,6 +2961,7 @@ Returns the newly created pull request comment.`,
 					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `hash`, Type: `string`, Desc: `hash`},
 					}},
+					{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -3008,6 +3056,7 @@ Returns the newly created pull request comment.`,
 					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `hash`, Type: `string`, Desc: `hash`},
 					}},
+					{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -3092,6 +3141,7 @@ Returns the newly created pull request comment.`,
 					{Path: `close_source_branch`, Type: `bool`, Desc: `A boolean flag indicating if merging the pull request closes the source branch.`},
 					{Path: `description`, Type: `string`, Desc: `Explains what the pull request does.`},
 					{Path: `draft`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request is a draft.`},
+					{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 					{Path: `reason`, Type: `string`, Desc: `Explains why a pull request was declined. This field is only applicable to pull requests in rejected state.`},
 					{Path: `reviewers`, Type: `string`, Desc: "The list of users that were added as reviewers on this pull request when it was created. For performance reasons, the API only includes this list on a pull request's `self` URL.", IsArray: true, ItemFields: []BodyFieldDef{
 						{Path: `created_on`, Type: `string`, Desc: `created_on`},
@@ -3135,6 +3185,7 @@ Returns the newly created pull request comment.`,
 					{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 						{Path: `hash`, Type: `string`, Desc: `hash`},
 					}},
+					{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 					{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -3282,6 +3333,27 @@ branch when the pull requests gets accepted.`,
 			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-commits-get`,
 		},
 		{
+			OperationID: `getFileConflictsForAPullRequest`,
+			Method:      `GET`,
+			Path:        `/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/conflicts`,
+			Summary:     `Get file conflicts for a pull request`,
+			Description: `Redirects to the [repository file conflicts](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-file-conflicts-spec-get)
+with the revspec that corresponds to the pull request.`,
+			Params: []ParamDef{
+				{Name: `pull_request_id`, In: `path`, Type: `integer`, Required: true},
+				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
+				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
+			},
+			BodyFields:     []BodyFieldDef{},
+			ResponseFields: []BodyFieldDef{},
+			HasBody:        false,
+			Paginated:      false,
+			Scopes: []string{
+				`read:pullrequest:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/#api-repositories-workspace-repo-slug-pullrequests-pull-request-id-conflicts-get`,
+		},
+		{
 			OperationID: `declineAPullRequest`,
 			Method:      `POST`,
 			Path:        `/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/decline`,
@@ -3318,6 +3390,7 @@ branch when the pull requests gets accepted.`,
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -3450,6 +3523,7 @@ with the revspec that corresponds to the pull request.`,
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
@@ -3978,6 +4052,7 @@ will cause the task to appear below the comment on a pull request when viewed in
 				{Path: `merge_commit`, Type: `string`, Desc: `merge_commit`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `hash`, Type: `string`, Desc: `hash`},
 				}},
+				{Path: `mergeable`, Type: `bool`, Desc: `A boolean flag indicating whether the pull request passes all merge checks`},
 				{Path: `participants`, Type: `string`, Desc: `        The list of users that are collaborating on this pull request.
         Collaborators are user that:
 
