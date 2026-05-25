@@ -66,3 +66,4 @@ clean:
 generate-docs:
 	go run scripts/gen_tfdocs/main.go
 	go run scripts/gen_mcpdocs/main.go
+	go run scripts/gen_e2e_coverage/main.go

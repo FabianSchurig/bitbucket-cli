@@ -77,8 +77,11 @@ jobs:
       - name: Format
         run: gofmt -w .
 
+      - name: Regenerate E2E coverage doc
+        run: go run scripts/gen_e2e_coverage/main.go
+
       - name: Commit formatting fixes
         uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 # v7.1.0
         with:
           commit_message: "style: apply gofmt formatting [skip ci]"
-          file_pattern: "*.go"
+          file_pattern: "*.go docs/e2e-coverage.md"

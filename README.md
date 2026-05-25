@@ -166,7 +166,7 @@ flowchart TD
 ```
 
 - **`ci.yml`**: builds, lints, vets, runs Go tests, and sends analysis to SonarQube Cloud.
-- **`terraform-tests.yml`**: runs mock-based Terraform acceptance and `terraform test` suites, plus real API tests when credentials exist.
+- **`terraform-tests.yml`**: runs mock-based Terraform acceptance and `terraform test` suites, plus real API tests when credentials exist. See [docs/e2e-coverage.md](./docs/e2e-coverage.md) for the current list of endpoints exercised by the real-API tests.
 - **`schema-sync.yml`**: daily/manual sync that fetches the live Bitbucket spec, regenerates generated artifacts, rebuilds docs, tests everything, and tags a release when the schema changed.
 - **`release.yml`**: publishes tagged binary releases via GoReleaser.
 - **`docker.yml`**: builds multi-arch container images for `bb-cli` and `bb-mcp`, pushes them to GHCR, and publishes the `bb-mcp` server to the [MCP Registry](https://registry.modelcontextprotocol.io).
@@ -192,6 +192,7 @@ Use the short guides on this first page to get started, then switch to the detai
 - **CLI**: [docs/cli.md](./docs/cli.md)
 - **MCP**: [docs/mcp.md](./docs/mcp.md)
 - **Terraform provider docs**: [docs/index.md](./docs/index.md) and the [Terraform Registry docs](https://registry.terraform.io/providers/FabianSchurig/bitbucket/latest)
+- **Real-API E2E test coverage**: [docs/e2e-coverage.md](./docs/e2e-coverage.md) — auto-generated list of which resource groups are exercised by `TestAccRealAPI_*` tests, and which are still missing coverage.
 
 The Terraform documentation under `docs/` is generated. The root README stays focused on orientation, links, architecture, maintenance, and contribution entry points.
 
