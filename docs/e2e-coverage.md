@@ -105,11 +105,12 @@ Manage pipeline SSH key pair for a Bitbucket repository
 
 | CRUD | Method | Path |
 | --- | --- | --- |
+| Create | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` |
 | Read | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` |
 | Update | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` |
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` |
 
-Tests: `TestAccRealAPI_ResourceSSHKeys_CRUD`
+Tests: `TestAccRealAPI_ResourcePipelineSSHKeys_CRUD`
 
 ### `bitbucket_project_user_permissions`
 
@@ -119,6 +120,7 @@ Manage explicit user permissions for a Bitbucket project
 
 | CRUD | Method | Path |
 | --- | --- | --- |
+| Create | `PUT` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/users/{selected_user_id}` |
 | Read | `GET` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/users/{selected_user_id}` |
 | Update | `PUT` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/users/{selected_user_id}` |
 | Delete | `DELETE` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/users/{selected_user_id}` |
@@ -621,6 +623,7 @@ Manage explicit group permissions for a Bitbucket project
 
 | CRUD | Method | Path |
 | --- | --- | --- |
+| Create | `PUT` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/groups/{group_slug}` |
 | Read | `GET` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/groups/{group_slug}` |
 | Update | `PUT` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/groups/{group_slug}` |
 | Delete | `DELETE` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/groups/{group_slug}` |

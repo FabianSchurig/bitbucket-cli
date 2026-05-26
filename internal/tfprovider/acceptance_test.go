@@ -2,7 +2,10 @@ package tfprovider_test
 
 import (
 	"context"
+	"crypto/ed25519"
+	"crypto/rand"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -11,6 +14,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"golang.org/x/crypto/ssh"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
@@ -2171,18 +2176,15 @@ func testAccBranchRestrictionsConfig(workspace, projectKey, repoSlug, pattern st
 
 // ─── Project user permissions acceptance tests ────────────────────────────────
 
-// TestAccRealAPI_DataSource_ProjectUserPermissions reads user permissions for a
-// project. Uses BITBUCKET_TEST_REPO's project to ensure the project exists.
-// This resource only supports Read/Update/Delete (no Create), so we test it
-// as a data source read.
-func TestAccRealAPI_DataSource_ProjectUserPermissions(t *testing.T) {
+// TestAccRealAPI_ResourceProjectUserPermissions_CRUD creates a project, grants
+// user permissions, updates the permission level, and destroys everything.
+func TestAccRealAPI_ResourceProjectUserPermissions_CRUD(t *testing.T) {
 	workspace := skipIfNoRealAPI(t)
-	repoSlug := os.Getenv("BITBUCKET_TEST_REPO")
-	if repoSlug == "" {
-		t.Skip("BITBUCKET_TEST_REPO not set, skipping project user permissions test")
-	}
 
-	// Discover the project key from the existing test repository.
+	suffix := strings.ToLower(acctest.RandStringFromCharSet(6, acctest.CharSetAlpha))
+	projectKey := "TP" + strings.ToUpper(suffix[:5])
+
+	// Get the current user UUID to assign permissions to.
 	c, err := client.NewClient()
 	if err != nil {
 		t.Fatalf("failed to create Bitbucket client: %v", err)
@@ -2190,55 +2192,61 @@ func TestAccRealAPI_DataSource_ProjectUserPermissions(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), testAccRealAPITimeout)
 	defer cancel()
 
-	projectKey, err := testAccRepoProjectKey(ctx, c, workspace, repoSlug)
+	userUUID, err := testAccCurrentUserUUID(ctx, c)
 	if err != nil {
-		t.Fatalf("failed to read project key for repo %s: %v", repoSlug, err)
-	}
-	if projectKey == "" {
-		t.Skip("test repository has no project, skipping project user permissions test")
+		t.Fatalf("failed to read current user UUID: %v", err)
 	}
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		CheckDestroy:             testAccCheckProjectDestroy(workspace, projectKey),
 		Steps: []resource.TestStep{
+			// Create: project + user permission (write)
 			{
-				Config: fmt.Sprintf(`
-					provider "bitbucket" {}
-
-					data "bitbucket_project_user_permissions" "test" {
-						workspace   = %q
-						project_key = %q
-					}
-				`, workspace, projectKey),
+				Config: testAccProjectUserPermissionsConfig(workspace, projectKey, userUUID, "write"),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttrSet("data.bitbucket_project_user_permissions.test", "api_response"),
-					resource.TestCheckResourceAttrSet("data.bitbucket_project_user_permissions.test", "id"),
+					resource.TestCheckResourceAttrSet("bitbucket_project_user_permissions.test", "id"),
+					resource.TestCheckResourceAttrSet("bitbucket_project_user_permissions.test", "api_response"),
 				),
+			},
+			// Update: change permission to admin
+			{
+				Config: testAccProjectUserPermissionsConfig(workspace, projectKey, userUUID, "admin"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_project_user_permissions.test", "id"),
+				),
+			},
+			// Re-plan: must be empty
+			{
+				Config:   testAccProjectUserPermissionsConfig(workspace, projectKey, userUUID, "admin"),
+				PlanOnly: true,
 			},
 		},
 	})
 }
 
-// testAccRepoProjectKey reads the project key from an existing repository.
-func testAccRepoProjectKey(ctx context.Context, c *client.BBClient, workspace, repoSlug string) (string, error) {
-	result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
-		Method:      "GET",
-		URLTemplate: "/repositories/{workspace}/{repo_slug}",
-		PathParams:  map[string]string{"workspace": workspace, "repo_slug": repoSlug},
-	})
-	if err != nil {
-		return "", err
-	}
-	repo, ok := result.(map[string]any)
-	if !ok {
-		return "", fmt.Errorf("unexpected repo response type %T", result)
-	}
-	project, ok := repo["project"].(map[string]any)
-	if !ok {
-		return "", nil
-	}
-	key, _ := project["key"].(string)
-	return key, nil
+func testAccProjectUserPermissionsConfig(workspace, projectKey, userUUID, permission string) string {
+	return fmt.Sprintf(`
+		provider "bitbucket" {}
+
+		resource "bitbucket_projects" "test" {
+			workspace   = %[1]q
+			project_key = %[2]q
+			request_body = jsonencode({
+				name       = "TF ProjPerm Test %[2]s"
+				key        = %[2]q
+				is_private = false
+			})
+		}
+
+		resource "bitbucket_project_user_permissions" "test" {
+			workspace        = %[1]q
+			project_key      = %[2]q
+			selected_user_id = %[3]q
+			request_body     = jsonencode({ permission = %[4]q })
+			depends_on       = [bitbucket_projects.test]
+		}
+	`, workspace, projectKey, userUUID, permission)
 }
 
 // ─── Repository user permissions acceptance tests ─────────────────────────────
@@ -2339,70 +2347,161 @@ func testAccRepoUserPermissionsConfig(workspace, projectKey, repoSlug, userUUID,
 
 // ─── Repository deploy keys (SSH keys / access tokens) acceptance tests ───────
 
-// TestAccRealAPI_DataSource_RepoDeployKeys reads deploy keys from an existing
-// test repository. The repo-deploy-keys resource has HasBody=false in the
-// generated schema, so we test it as a data source (list) operation.
-// Requires BITBUCKET_TEST_REPO to be set.
-func TestAccRealAPI_DataSource_RepoDeployKeys(t *testing.T) {
+// TestAccRealAPI_ResourceRepoDeployKeys_CRUD creates a repository, adds a deploy
+// key (SSH public key), updates its label, and destroys everything.
+func TestAccRealAPI_ResourceRepoDeployKeys_CRUD(t *testing.T) {
 	workspace := skipIfNoRealAPI(t)
-	repoSlug := os.Getenv("BITBUCKET_TEST_REPO")
-	if repoSlug == "" {
-		t.Skip("BITBUCKET_TEST_REPO not set, skipping deploy keys test")
-	}
+
+	suffix := strings.ToLower(acctest.RandStringFromCharSet(6, acctest.CharSetAlpha))
+	repoSlug := "tf-acc-dk-" + suffix
+	projectKey := "TD" + strings.ToUpper(suffix[:5])
+
+	// Generate a fresh SSH key pair for this test.
+	sshPubKey := testAccGenerateSSHPublicKey(t)
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		CheckDestroy:             testAccCheckRepoDestroy(workspace, repoSlug),
 		Steps: []resource.TestStep{
+			// Create: repo + deploy key
 			{
-				Config: fmt.Sprintf(`
-					provider "bitbucket" {}
-
-					data "bitbucket_repo_deploy_keys" "test" {
-						workspace = %q
-						repo_slug = %q
-					}
-				`, workspace, repoSlug),
+				Config: testAccRepoDeployKeysConfig(workspace, projectKey, repoSlug, sshPubKey, "tf-test-key"),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttrSet("data.bitbucket_repo_deploy_keys.test", "api_response"),
-					resource.TestCheckResourceAttrSet("data.bitbucket_repo_deploy_keys.test", "id"),
+					resource.TestCheckResourceAttrSet("bitbucket_repo_deploy_keys.test", "id"),
+					resource.TestCheckResourceAttrSet("bitbucket_repo_deploy_keys.test", "api_response"),
 				),
+			},
+			// Update: change the label
+			{
+				Config: testAccRepoDeployKeysConfig(workspace, projectKey, repoSlug, sshPubKey, "tf-test-key-updated"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_repo_deploy_keys.test", "id"),
+				),
+			},
+			// Re-plan: must be empty
+			{
+				Config:   testAccRepoDeployKeysConfig(workspace, projectKey, repoSlug, sshPubKey, "tf-test-key-updated"),
+				PlanOnly: true,
 			},
 		},
 	})
 }
 
+func testAccRepoDeployKeysConfig(workspace, projectKey, repoSlug, sshKey, label string) string {
+	return fmt.Sprintf(`
+		provider "bitbucket" {}
+
+		resource "bitbucket_projects" "test" {
+			workspace   = %[1]q
+			project_key = %[2]q
+			request_body = jsonencode({
+				name       = "TF DeployKeys Test %[2]s"
+				key        = %[2]q
+				is_private = false
+			})
+		}
+
+		resource "bitbucket_repos" "test" {
+			workspace = %[1]q
+			repo_slug = %[3]q
+			request_body = jsonencode({
+				scm        = "git"
+				is_private = false
+				project    = { key = %[2]q }
+			})
+			depends_on = [bitbucket_projects.test]
+		}
+
+		resource "bitbucket_repo_deploy_keys" "test" {
+			workspace = %[1]q
+			repo_slug = %[3]q
+			key       = %[4]q
+			label     = %[5]q
+			depends_on = [bitbucket_repos.test]
+		}
+	`, workspace, projectKey, repoSlug, sshKey, label)
+}
+
+// testAccGenerateSSHPublicKey generates a fresh SSH public key for deploy key tests.
+func testAccGenerateSSHPublicKey(t *testing.T) string {
+	t.Helper()
+	key, err := testAccGenerateSSHKeyPair()
+	if err != nil {
+		t.Fatalf("failed to generate SSH key pair: %v", err)
+	}
+	return key
+}
+
 // ─── Repository SSH keys (pipeline SSH keys) acceptance tests ─────────────────
 
-// TestAccRealAPI_DataSource_PipelineSSHKeys reads the pipeline SSH key pair
-// configuration from an existing test repository. The pipeline-ssh-keys resource
-// has no Create operation, so we test it as a data source read.
-// Requires BITBUCKET_TEST_REPO to be set.
-func TestAccRealAPI_DataSource_PipelineSSHKeys(t *testing.T) {
+// TestAccRealAPI_ResourcePipelineSSHKeys_CRUD creates a repository, sets an SSH
+// key pair for pipelines, and verifies the lifecycle.
+func TestAccRealAPI_ResourcePipelineSSHKeys_CRUD(t *testing.T) {
 	workspace := skipIfNoRealAPI(t)
-	repoSlug := os.Getenv("BITBUCKET_TEST_REPO")
-	if repoSlug == "" {
-		t.Skip("BITBUCKET_TEST_REPO not set, skipping pipeline SSH keys test")
+
+	suffix := strings.ToLower(acctest.RandStringFromCharSet(6, acctest.CharSetAlpha))
+	repoSlug := "tf-acc-ssh-" + suffix
+	projectKey := "TS" + strings.ToUpper(suffix[:5])
+
+	privKey, pubKey, err := testAccGenerateSSHKeyPairBoth()
+	if err != nil {
+		t.Fatalf("failed to generate SSH key pair: %v", err)
 	}
 
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		CheckDestroy:             testAccCheckRepoDestroy(workspace, repoSlug),
 		Steps: []resource.TestStep{
+			// Create: repo + pipeline SSH key pair
 			{
-				Config: fmt.Sprintf(`
-					provider "bitbucket" {}
-
-					data "bitbucket_pipeline_ssh_keys" "test" {
-						workspace = %q
-						repo_slug = %q
-					}
-				`, workspace, repoSlug),
+				Config: testAccPipelineSSHKeysConfig(workspace, projectKey, repoSlug, privKey, pubKey),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttrSet("data.bitbucket_pipeline_ssh_keys.test", "api_response"),
-					resource.TestCheckResourceAttrSet("data.bitbucket_pipeline_ssh_keys.test", "id"),
+					resource.TestCheckResourceAttrSet("bitbucket_pipeline_ssh_keys.test", "id"),
+					resource.TestCheckResourceAttrSet("bitbucket_pipeline_ssh_keys.test", "api_response"),
 				),
+			},
+			// Re-plan: must be empty
+			{
+				Config:   testAccPipelineSSHKeysConfig(workspace, projectKey, repoSlug, privKey, pubKey),
+				PlanOnly: true,
 			},
 		},
 	})
+}
+
+func testAccPipelineSSHKeysConfig(workspace, projectKey, repoSlug, privateKey, publicKey string) string {
+	return fmt.Sprintf(`
+		provider "bitbucket" {}
+
+		resource "bitbucket_projects" "test" {
+			workspace   = %[1]q
+			project_key = %[2]q
+			request_body = jsonencode({
+				name       = "TF SSH Test %[2]s"
+				key        = %[2]q
+				is_private = false
+			})
+		}
+
+		resource "bitbucket_repos" "test" {
+			workspace = %[1]q
+			repo_slug = %[3]q
+			request_body = jsonencode({
+				scm        = "git"
+				is_private = false
+				project    = { key = %[2]q }
+			})
+			depends_on = [bitbucket_projects.test]
+		}
+
+		resource "bitbucket_pipeline_ssh_keys" "test" {
+			workspace   = %[1]q
+			repo_slug   = %[3]q
+			private_key = %[4]q
+			public_key  = %[5]q
+			depends_on  = [bitbucket_repos.test]
+		}
+	`, workspace, projectKey, repoSlug, privateKey, publicKey)
 }
 
 // testAccCheckRepoDestroy verifies a repository no longer exists.
@@ -2428,4 +2527,35 @@ func testAccCheckRepoDestroy(workspace, repoSlug string) resource.TestCheckFunc 
 		}
 		return nil
 	}
+}
+
+// testAccGenerateSSHKeyPair generates a fresh ed25519 SSH public key string.
+func testAccGenerateSSHKeyPair() (string, error) {
+pubKey, _, err := testAccGenerateSSHKeyPairBoth()
+if err != nil {
+return "", err
+}
+return pubKey, nil
+}
+
+// testAccGenerateSSHKeyPairBoth generates both private and public SSH key strings.
+func testAccGenerateSSHKeyPairBoth() (privateKey, publicKey string, err error) {
+pub, priv, err := ed25519.GenerateKey(rand.Reader)
+if err != nil {
+return "", "", fmt.Errorf("generate ed25519 key: %w", err)
+}
+
+sshPub, err := ssh.NewPublicKey(pub)
+if err != nil {
+return "", "", fmt.Errorf("convert to ssh public key: %w", err)
+}
+publicKey = strings.TrimSpace(string(ssh.MarshalAuthorizedKey(sshPub)))
+
+privBytes, err := ssh.MarshalPrivateKey(priv, "")
+if err != nil {
+return "", "", fmt.Errorf("marshal private key: %w", err)
+}
+privateKey = strings.TrimSpace(string(pem.EncodeToMemory(privBytes)))
+
+return privateKey, publicKey, nil
 }
