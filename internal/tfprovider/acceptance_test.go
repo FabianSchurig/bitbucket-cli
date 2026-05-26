@@ -2058,18 +2058,16 @@ func testAccHooksConfig(workspace, projectKey, repoSlug, url, description string
 			request_body = jsonencode({
 				name       = "TF Hooks Test %[2]s"
 				key        = %[2]q
-				is_private = false
+				is_private = true
 			})
 		}
 
 		resource "bitbucket_repos" "test" {
-			workspace = %[1]q
-			repo_slug = %[3]q
-			request_body = jsonencode({
-				scm        = "git"
-				is_private = true
-				project    = { key = %[2]q }
-			})
+			workspace  = %[1]q
+			repo_slug  = %[3]q
+			scm        = "git"
+			is_private = true
+			project    = { key = %[2]q }
 			depends_on = [bitbucket_projects.test]
 		}
 
@@ -2138,18 +2136,16 @@ func testAccBranchRestrictionsConfig(workspace, projectKey, repoSlug, pattern st
 			request_body = jsonencode({
 				name       = "TF BranchRestr Test %[2]s"
 				key        = %[2]q
-				is_private = false
+				is_private = true
 			})
 		}
 
 		resource "bitbucket_repos" "test" {
-			workspace = %[1]q
-			repo_slug = %[3]q
-			request_body = jsonencode({
-				scm        = "git"
-				is_private = true
-				project    = { key = %[2]q }
-			})
+			workspace  = %[1]q
+			repo_slug  = %[3]q
+			scm        = "git"
+			is_private = true
+			project    = { key = %[2]q }
 			depends_on = [bitbucket_projects.test]
 		}
 
@@ -2235,7 +2231,7 @@ func testAccProjectUserPermissionsConfig(workspace, projectKey, userUUID, permis
 			request_body = jsonencode({
 				name       = "TF ProjPerm Test %[2]s"
 				key        = %[2]q
-				is_private = false
+				is_private = true
 			})
 		}
 
@@ -2320,18 +2316,16 @@ func testAccRepoUserPermissionsConfig(workspace, projectKey, repoSlug, userUUID,
 			request_body = jsonencode({
 				name       = "TF RepoPerm Test %[2]s"
 				key        = %[2]q
-				is_private = false
+				is_private = true
 			})
 		}
 
 		resource "bitbucket_repos" "test" {
-			workspace = %[1]q
-			repo_slug = %[3]q
-			request_body = jsonencode({
-				scm        = "git"
-				is_private = true
-				project    = { key = %[2]q }
-			})
+			workspace  = %[1]q
+			repo_slug  = %[3]q
+			scm        = "git"
+			is_private = true
+			project    = { key = %[2]q }
 			depends_on = [bitbucket_projects.test]
 		}
 
@@ -2397,18 +2391,16 @@ func testAccRepoDeployKeysConfig(workspace, projectKey, repoSlug, sshKey, label 
 			request_body = jsonencode({
 				name       = "TF DeployKeys Test %[2]s"
 				key        = %[2]q
-				is_private = false
+				is_private = true
 			})
 		}
 
 		resource "bitbucket_repos" "test" {
-			workspace = %[1]q
-			repo_slug = %[3]q
-			request_body = jsonencode({
-				scm        = "git"
-				is_private = true
-				project    = { key = %[2]q }
-			})
+			workspace  = %[1]q
+			repo_slug  = %[3]q
+			scm        = "git"
+			is_private = true
+			project    = { key = %[2]q }
 			depends_on = [bitbucket_projects.test]
 		}
 
@@ -2479,18 +2471,16 @@ func testAccPipelineSSHKeysConfig(workspace, projectKey, repoSlug, privateKey, p
 			request_body = jsonencode({
 				name       = "TF SSH Test %[2]s"
 				key        = %[2]q
-				is_private = false
+				is_private = true
 			})
 		}
 
 		resource "bitbucket_repos" "test" {
-			workspace = %[1]q
-			repo_slug = %[3]q
-			request_body = jsonencode({
-				scm        = "git"
-				is_private = true
-				project    = { key = %[2]q }
-			})
+			workspace  = %[1]q
+			repo_slug  = %[3]q
+			scm        = "git"
+			is_private = true
+			project    = { key = %[2]q }
 			depends_on = [bitbucket_projects.test]
 		}
 
