@@ -310,6 +310,44 @@ func TestResourceExtractParamsAndBody(t *testing.T) {
 	}
 }
 
+// TestBuildBody_RequestBodyOverridesBodyFields reproduces the
+// bitbucket_hooks 400 "Bad request" failure observed against the live
+// API: when an operation declares BodyFields (so the schema exposes
+// typed top-level attrs) but the practitioner still sets the
+// `request_body` escape-hatch, the typed fields were silently winning
+// and the raw payload was discarded — producing an empty/incorrect
+// request body. The operator-provided raw JSON must take precedence so
+// the documented escape hatch keeps working regardless of how the
+// operation is modelled.
+func TestBuildBody_RequestBodyOverridesBodyFields(t *testing.T) {
+	group := testResourceGroup()
+	r := &GenericResource{group: group}
+	ctx := context.Background()
+
+	opWithBodyFields := &OperationDef{
+		OperationID: "createWithBodyFields",
+		HasBody:     true,
+		BodyFields: []BodyFieldDef{
+			{Path: "title", Type: "string"},
+		},
+	}
+
+	raw := `{"description":"hook","url":"https://example.com","active":true,"events":["repo:push"]}`
+	source := newMockState(map[string]attr.Value{
+		"title":        types.StringValue("ignored-because-raw-wins"),
+		"request_body": types.StringValue(raw),
+	})
+
+	var diags diag.Diagnostics
+	got := r.buildBody(ctx, opWithBodyFields, source, &diags)
+	if diags.HasError() {
+		t.Fatalf("unexpected diagnostics: %#v", diags)
+	}
+	if got != raw {
+		t.Fatalf("expected raw request_body to override BodyFields, got %q", got)
+	}
+}
+
 // TestResourceExtractParamsFallbackToState reproduces the bug reported in
 // "bitbucket_branch_restrictions Update fails with Missing Required Parameter id".
 // When an in-place Update is planned, the Computed-only path param (e.g. the
