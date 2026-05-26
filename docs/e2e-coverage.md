@@ -4,7 +4,7 @@
 <!-- (`go run scripts/gen_e2e_coverage/main.go`). It is refreshed -->
 <!-- automatically on push to `main` by the CI `format` job. -->
 
-This page lists every Terraform resource group exposed by the provider and whether it is exercised by a real-API acceptance test (functions named `TestAccRealAPI_*` in [`internal/tfprovider/acceptance_test.go`](../internal/tfprovider/acceptance_test.go)).
+This page lists every Terraform resource group exposed by the provider and whether it is exercised by a real-API acceptance test (functions named `TestAccRealAPI_*` in [`internal/tfprovider/acceptance_test.go`](../internal/tfprovider/acceptance_test.go).
 
 A group counts as covered when at least one `TestAccRealAPI_*` test references its Terraform type name (`bitbucket_<group>`) inside the test's HCL configuration. The endpoints listed under each group are the CRUD operations the provider wires up for that group; running the referenced test exercises some or all of them against the real Bitbucket Cloud API.
 

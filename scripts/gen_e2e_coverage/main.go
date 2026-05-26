@@ -193,7 +193,7 @@ func renderMarkdown(groups []groupCoverage) string {
 	b.WriteString("This page lists every Terraform resource group exposed by the provider ")
 	b.WriteString("and whether it is exercised by a real-API acceptance test (functions ")
 	b.WriteString("named `TestAccRealAPI_*` in [`internal/tfprovider/acceptance_test.go`]")
-	b.WriteString("(../internal/tfprovider/acceptance_test.go)).\n\n")
+	b.WriteString("(../internal/tfprovider/acceptance_test.go).\n\n")
 	b.WriteString("A group counts as covered when at least one `TestAccRealAPI_*` test ")
 	b.WriteString("references its Terraform type name (`bitbucket_<group>`) inside the ")
 	b.WriteString("test's HCL configuration. The endpoints listed under each group are ")
