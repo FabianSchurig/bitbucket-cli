@@ -8,7 +8,7 @@ This page lists every Terraform resource group exposed by the provider and wheth
 
 A group counts as covered when at least one `TestAccRealAPI_*` test references its Terraform type name (`bitbucket_<group>`) inside the test's HCL configuration. The endpoints listed under each group are the CRUD operations the provider wires up for that group; running the referenced test exercises some or all of them against the real Bitbucket Cloud API.
 
-**Coverage: 13 / 59 resource groups (22%).**
+**Coverage: 17 / 59 resource groups (28%).**
 
 To add coverage for a missing group, add a new `TestAccRealAPI_*` function in `acceptance_test.go` that uses the corresponding `bitbucket_<group>` resource or data source, then run `make generate-docs` to refresh this file.
 
@@ -28,7 +28,7 @@ Manage Bitbucket branch restrictions
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/branch-restrictions/{id}` |
 | List | `GET` | `/repositories/{workspace}/{repo_slug}/branch-restrictions` |
 
-Tests: `TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers`
+Tests: `TestAccRealAPI_ResourceBranchRestrictions_CRUD` `TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers`
 
 ### `bitbucket_branching_model`
 
@@ -81,6 +81,53 @@ Read subscribable webhook event types in Bitbucket
 
 Tests: `TestAccRealAPI_DataSource_HookTypes`
 
+### `bitbucket_hooks`
+
+_Category: Webhooks_
+
+Manage Bitbucket webhooks
+
+| CRUD | Method | Path |
+| --- | --- | --- |
+| Create | `POST` | `/repositories/{workspace}/{repo_slug}/hooks` |
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/hooks/{uid}` |
+| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/hooks/{uid}` |
+| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/hooks/{uid}` |
+| List | `GET` | `/repositories/{workspace}/{repo_slug}/hooks` |
+
+Tests: `TestAccRealAPI_ResourceHooks_CRUD`
+
+### `bitbucket_pipeline_ssh_keys`
+
+_Category: Pipelines_
+
+Manage pipeline SSH key pair for a Bitbucket repository
+
+| CRUD | Method | Path |
+| --- | --- | --- |
+| Create | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` |
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` |
+| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` |
+| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` |
+
+Tests: `TestAccRealAPI_ResourcePipelineSSHKeys_CRUD`
+
+### `bitbucket_project_user_permissions`
+
+_Category: Projects_
+
+Manage explicit user permissions for a Bitbucket project
+
+| CRUD | Method | Path |
+| --- | --- | --- |
+| Create | `PUT` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/users/{selected_user_id}` |
+| Read | `GET` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/users/{selected_user_id}` |
+| Update | `PUT` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/users/{selected_user_id}` |
+| Delete | `DELETE` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/users/{selected_user_id}` |
+| List | `GET` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/users` |
+
+Tests: `TestAccRealAPI_ResourceProjectUserPermissions_CRUD`
+
 ### `bitbucket_projects`
 
 _Category: Projects_
@@ -112,6 +159,22 @@ Manage Bitbucket branches and tags
 
 Tests: `TestAccRealAPI_DataSource_Commits` `TestAccRealAPI_DataSource_Refs`
 
+### `bitbucket_repo_deploy_keys`
+
+_Category: Deployments_
+
+Manage deploy keys for a Bitbucket repository
+
+| CRUD | Method | Path |
+| --- | --- | --- |
+| Create | `POST` | `/repositories/{workspace}/{repo_slug}/deploy-keys` |
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}` |
+| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}` |
+| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}` |
+| List | `GET` | `/repositories/{workspace}/{repo_slug}/deploy-keys` |
+
+Tests: `TestAccRealAPI_ResourceRepoDeployKeys_CRUD`
+
 ### `bitbucket_repo_user_permissions`
 
 _Category: Repositories_
@@ -126,7 +189,7 @@ Manage explicit user permissions for a Bitbucket repository
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/permissions-config/users/{selected_user_id}` |
 | List | `GET` | `/repositories/{workspace}/{repo_slug}/permissions-config/users` |
 
-Tests: `TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers`
+Tests: `TestAccRealAPI_ResourceBranchRestrictions_OrderInsensitiveUsers` `TestAccRealAPI_ResourceRepoUserPermissions_CRUD`
 
 ### `bitbucket_repos`
 
@@ -323,20 +386,6 @@ Manage GPG keys for a Bitbucket user
 | Delete | `DELETE` | `/users/{selected_user}/gpg-keys/{fingerprint}` |
 | List | `GET` | `/users/{selected_user}/gpg-keys` |
 
-### `bitbucket_hooks`
-
-_Category: Webhooks_
-
-Manage Bitbucket webhooks
-
-| CRUD | Method | Path |
-| --- | --- | --- |
-| Create | `POST` | `/repositories/{workspace}/{repo_slug}/hooks` |
-| Read | `GET` | `/repositories/{workspace}/{repo_slug}/hooks/{uid}` |
-| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/hooks/{uid}` |
-| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/hooks/{uid}` |
-| List | `GET` | `/repositories/{workspace}/{repo_slug}/hooks` |
-
 ### `bitbucket_issue_comments`
 
 _Category: Issues_
@@ -435,18 +484,6 @@ Manage pipeline schedules for a Bitbucket repository
 | Update | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config/schedules/{schedule_uuid}` |
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/pipelines_config/schedules/{schedule_uuid}` |
 | List | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines_config/schedules` |
-
-### `bitbucket_pipeline_ssh_keys`
-
-_Category: Pipelines_
-
-Manage pipeline SSH key pair for a Bitbucket repository
-
-| CRUD | Method | Path |
-| --- | --- | --- |
-| Read | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` |
-| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` |
-| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` |
 
 ### `bitbucket_pipeline_variables`
 
@@ -586,23 +623,11 @@ Manage explicit group permissions for a Bitbucket project
 
 | CRUD | Method | Path |
 | --- | --- | --- |
+| Create | `PUT` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/groups/{group_slug}` |
 | Read | `GET` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/groups/{group_slug}` |
 | Update | `PUT` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/groups/{group_slug}` |
 | Delete | `DELETE` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/groups/{group_slug}` |
 | List | `GET` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/groups` |
-
-### `bitbucket_project_user_permissions`
-
-_Category: Projects_
-
-Manage explicit user permissions for a Bitbucket project
-
-| CRUD | Method | Path |
-| --- | --- | --- |
-| Read | `GET` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/users/{selected_user_id}` |
-| Update | `PUT` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/users/{selected_user_id}` |
-| Delete | `DELETE` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/users/{selected_user_id}` |
-| List | `GET` | `/workspaces/{workspace}/projects/{project_key}/permissions-config/users` |
 
 ### `bitbucket_properties`
 
@@ -615,20 +640,6 @@ Manage Bitbucket application properties
 | Read | `GET` | `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}` |
 | Update | `PUT` | `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}` |
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}` |
-
-### `bitbucket_repo_deploy_keys`
-
-_Category: Deployments_
-
-Manage deploy keys for a Bitbucket repository
-
-| CRUD | Method | Path |
-| --- | --- | --- |
-| Create | `POST` | `/repositories/{workspace}/{repo_slug}/deploy-keys` |
-| Read | `GET` | `/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}` |
-| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}` |
-| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}` |
-| List | `GET` | `/repositories/{workspace}/{repo_slug}/deploy-keys` |
 
 ### `bitbucket_repo_group_permissions`
 

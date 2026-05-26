@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -16,6 +17,45 @@ import (
 	"github.com/FabianSchurig/bitbucket-cli/internal/client"
 	"github.com/FabianSchurig/bitbucket-cli/internal/handlers"
 )
+
+// Tunables for read-after-write 404 retries. Bitbucket Cloud propagation
+// of newly created projects and repositories typically settles within a
+// few seconds; exponential backoff starting at 500ms with up to 5 attempts
+// caps the total wait at ~15s while staying well under any reasonable
+// Terraform operation timeout.
+const (
+	readAfterWriteMaxAttempts = 5
+	readAfterWriteInitialWait = 500 * time.Millisecond
+	readAfterWriteMaxWait     = 8 * time.Second
+)
+
+// diagsContainAPIStatus reports whether any error in diags is an API error
+// for the given HTTP status. The dispatch layer wraps API errors as
+// `Operation <id> failed: <op-prefix>: bitbucket API error <code>: …`, so a
+// substring match on the canonical message is reliable across operations.
+func diagsContainAPIStatus(diags diag.Diagnostics, status int) bool {
+	needle := fmt.Sprintf("bitbucket API error %d", status)
+	for _, d := range diags.Errors() {
+		if strings.Contains(d.Detail(), needle) || strings.Contains(d.Summary(), needle) {
+			return true
+		}
+	}
+	return false
+}
+
+// sleepWithContext sleeps for d or returns the context's error if the
+// context is cancelled or expires first. Used to make retry backoff
+// cancellable.
+func sleepWithContext(ctx context.Context, d time.Duration) error {
+	t := time.NewTimer(d)
+	defer t.Stop()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-t.C:
+		return nil
+	}
+}
 
 // Ensure the implementation satisfies the resource interface.
 var _ resource.Resource = &GenericResource{}
@@ -280,16 +320,70 @@ func (r *GenericResource) Read(ctx context.Context, req resource.ReadRequest, re
 // path/query param required by readOp is null/unknown/empty in state.
 // Update supplies the prior state here so that Computed-only required
 // params can still satisfy the Read; pass nil when no fallback applies.
+//
+// The post-write Read transparently retries on HTTP 404 with exponential
+// backoff. Bitbucket Cloud is eventually consistent for several POST-then-
+// GET flows (notably project and repository creation): a successful POST
+// can be followed by a 404 on the very next GET for the same resource
+// because the new entity has not yet propagated to all read replicas. The
+// resource genuinely exists — a brief retry window converts these
+// transient failures into successful refreshes instead of surfacing
+// confusing "you may not have access … or it no longer exists" errors to
+// end users immediately after a `terraform apply`.
+//
+// Retries are intentionally scoped to refreshState (i.e. the post-write
+// Read after Create/Update and to ImportState). The standalone Read of a
+// resource that has been out-of-band deleted must continue to surface 404
+// promptly so Terraform can mark the resource for re-creation.
 func (r *GenericResource) refreshState(ctx context.Context, readOp *OperationDef, state, paramFallback stateAccessor, diags *diag.Diagnostics) {
 	priorID := readPriorID(ctx, state, diags)
 	if diags.HasError() {
 		return
 	}
-	r.dispatchWithParamFallback(ctx, readOp, state, paramFallback, state, diags)
+	r.dispatchWithReadAfterWriteRetry(ctx, readOp, state, paramFallback, diags)
 	if diags.HasError() {
 		return
 	}
 	restorePriorID(ctx, state, priorID, diags)
+}
+
+// dispatchWithReadAfterWriteRetry performs a Read-style dispatch that
+// tolerates a brief window of eventual consistency on the Bitbucket API.
+// It retries on 404 responses with exponential backoff, bounded by
+// readAfterWriteMaxAttempts attempts and the context deadline.
+//
+// Diagnostics from intermediate retried attempts are discarded: only the
+// final outcome (success, or the last 404) is committed to the caller's
+// diags. Non-404 errors are returned immediately without retry — those
+// indicate real problems (auth, validation, etc.) that retrying cannot
+// fix.
+func (r *GenericResource) dispatchWithReadAfterWriteRetry(ctx context.Context, readOp *OperationDef, state, paramFallback stateAccessor, diags *diag.Diagnostics) {
+	wait := readAfterWriteInitialWait
+	for attempt := 0; attempt < readAfterWriteMaxAttempts; attempt++ {
+		var attemptDiags diag.Diagnostics
+		r.dispatchWithParamFallback(ctx, readOp, state, paramFallback, state, &attemptDiags)
+		if !diagsContainAPIStatus(attemptDiags, 404) {
+			diags.Append(attemptDiags...)
+			return
+		}
+		if attempt == readAfterWriteMaxAttempts-1 {
+			diags.Append(attemptDiags...)
+			return
+		}
+		if err := sleepWithContext(ctx, wait); err != nil {
+			// Surface the original 404 if the context was cancelled while
+			// we were waiting to retry — that error is more informative
+			// than a bare "context deadline exceeded".
+			diags.Append(attemptDiags...)
+			return
+		}
+		if wait < readAfterWriteMaxWait {
+			wait *= 2
+			if wait > readAfterWriteMaxWait {
+				wait = readAfterWriteMaxWait
+			}
+		}
+	}
 }
 
 // readPriorID returns the existing `id` attribute from state. Diagnostics
@@ -530,16 +624,37 @@ func (r *GenericResource) extractParams(ctx context.Context, op *OperationDef, s
 }
 
 // buildBody constructs the JSON request body from plan/state attributes.
+//
+// Precedence:
+//  1. If the user has set the explicit "request_body" attribute, that raw
+//     JSON is sent verbatim. This is the universal escape hatch — it lets
+//     callers pass fields the schema does not expose, or simply continue
+//     using the same body shape across provider upgrades that may add new
+//     individual attributes.
+//  2. Otherwise, when the operation declares BodyFields, the body is built
+//     from individual top-level attributes (e.g. is_private, project, …).
+//  3. Otherwise (no BodyFields), we fall back to whatever raw body was
+//     declared (always request_body — kept for the no-BodyFields path).
+//
+// Treating request_body as an override (rather than silently ignoring it
+// when BodyFields exist) avoids the foot-gun where adding BodyFields to a
+// generated operation suddenly turns every existing request_body-based
+// config into an empty POST body — which the Bitbucket API rejects with
+// `400 Bad request`.
 func (r *GenericResource) buildBody(ctx context.Context, op *OperationDef, source stateAccessor, diags *diag.Diagnostics) string {
 	if !op.HasBody {
 		return ""
+	}
+
+	if raw := rawRequestBody(ctx, source, diags); raw != "" {
+		return raw
 	}
 
 	if len(op.BodyFields) > 0 {
 		return marshalBodyObject(diags, buildExplicitBody(ctx, source, op.BodyFields, diags))
 	}
 
-	return rawRequestBody(ctx, source, diags)
+	return ""
 }
 
 // readListNested reads a ListNestedAttribute from state and returns it as a
