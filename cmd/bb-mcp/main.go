@@ -17,7 +17,7 @@
 //	  export BITBUCKET_USERNAME=myuser
 //	  export BITBUCKET_TOKEN=<token>
 //
-//	OAuth2 access token:
+//	Repository/workspace access token:
 //	  export BITBUCKET_TOKEN=<token>
 //
 //	Bitbucket internal API (e.g. project-branch-restrictions):

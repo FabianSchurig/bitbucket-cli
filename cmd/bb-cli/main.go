@@ -10,7 +10,7 @@
 //	  export BITBUCKET_USERNAME=myuser
 //	  export BITBUCKET_TOKEN=<token>
 //
-//	OAuth2 access token:
+//	Repository/workspace access token:
 //	  export BITBUCKET_TOKEN=<token>
 package main
 
@@ -54,8 +54,8 @@ Set authentication environment variables before running:
     BITBUCKET_USERNAME    your Bitbucket username
     BITBUCKET_TOKEN       your API token
 
-  OAuth2 access token:
-    BITBUCKET_TOKEN       your OAuth2 access token
+  Repository/workspace access token:
+    BITBUCKET_TOKEN       your repository or workspace access token (Bearer)
 
   Internal API (e.g. project-branch-restrictions, /!api/internal/...):
     BITBUCKET_CSRF_TOKEN           value of the csrftoken cookie

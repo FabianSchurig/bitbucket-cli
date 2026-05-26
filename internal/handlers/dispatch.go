@@ -164,21 +164,22 @@ func executeRequest(ctx context.Context, c *client.BBClient, r Request, fetchURL
 	return req.Execute(r.Method, fetchURL)
 }
 
-// applyBasicAuth sets HTTP Basic Auth on the request from the client's
-// Username/Token credentials. Falls back to the standard "x-token-auth"
-// pseudo-username when only a token is configured (workspace/repo access
-// tokens). Does nothing when no token is configured (the request will go out
+// applyBasicAuth sets auth on the request from the client's credentials:
+//   - Username + Token → HTTP Basic Auth (API tokens, app passwords)
+//   - Token alone      → Bearer auth (workspace/repository access tokens)
+//
+// Does nothing when no token is configured (the request will go out
 // unauthenticated and the server will return 401 — that's fine, we don't
 // want to silently invent credentials).
 func applyBasicAuth(req *resty.Request, c *client.BBClient) {
 	if c.Token == "" {
 		return
 	}
-	user := c.Username
-	if user == "" {
-		user = "x-token-auth"
+	if c.Username == "" {
+		req.SetAuthToken(c.Token)
+		return
 	}
-	req.SetBasicAuth(user, c.Token)
+	req.SetBasicAuth(c.Username, c.Token)
 }
 
 // applyInternalAPIAuth configures req with the cookies and headers required

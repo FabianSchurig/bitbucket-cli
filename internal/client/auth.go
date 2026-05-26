@@ -45,7 +45,7 @@ type BBClient struct {
 //
 // Public REST API auth (one of):
 //   - BITBUCKET_USERNAME + BITBUCKET_TOKEN → HTTP Basic Auth
-//   - BITBUCKET_TOKEN alone               → HTTP Basic Auth with "x-token-auth"
+//   - BITBUCKET_TOKEN alone               → Bearer Auth (workspace/repo access tokens)
 //
 // Internal API auth (both required for /!api/internal/ endpoints):
 //   - BITBUCKET_CSRF_TOKEN
@@ -72,8 +72,8 @@ func NewClient() (*BBClient, error) {
 // Authentication precedence (per request, decided by the dispatcher):
 //   - URL contains "/!api/internal/": csrfToken + cloudSessionToken cookies
 //     and X-CSRFToken header. Basic Auth is suppressed.
-//   - Otherwise: HTTP Basic Auth using username + token (or "x-token-auth" +
-//     token when username is empty, for workspace/repository access tokens).
+//   - Username + token: HTTP Basic Auth.
+//   - Token only: Bearer Auth (workspace/repository access tokens).
 func NewClientWithConfig(username, token, baseURL, csrfToken, cloudSessionToken string) (*BBClient, error) {
 	base := baseURL
 	if base == "" {
