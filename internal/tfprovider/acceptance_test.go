@@ -2067,7 +2067,7 @@ func testAccHooksConfig(workspace, projectKey, repoSlug, url, description string
 			repo_slug = %[3]q
 			request_body = jsonencode({
 				scm        = "git"
-				is_private = false
+				is_private = true
 				project    = { key = %[2]q }
 			})
 			depends_on = [bitbucket_projects.test]
@@ -2147,7 +2147,7 @@ func testAccBranchRestrictionsConfig(workspace, projectKey, repoSlug, pattern st
 			repo_slug = %[3]q
 			request_body = jsonencode({
 				scm        = "git"
-				is_private = false
+				is_private = true
 				project    = { key = %[2]q }
 			})
 			depends_on = [bitbucket_projects.test]
@@ -2329,7 +2329,7 @@ func testAccRepoUserPermissionsConfig(workspace, projectKey, repoSlug, userUUID,
 			repo_slug = %[3]q
 			request_body = jsonencode({
 				scm        = "git"
-				is_private = false
+				is_private = true
 				project    = { key = %[2]q }
 			})
 			depends_on = [bitbucket_projects.test]
@@ -2406,7 +2406,7 @@ func testAccRepoDeployKeysConfig(workspace, projectKey, repoSlug, sshKey, label 
 			repo_slug = %[3]q
 			request_body = jsonencode({
 				scm        = "git"
-				is_private = false
+				is_private = true
 				project    = { key = %[2]q }
 			})
 			depends_on = [bitbucket_projects.test]
@@ -2488,7 +2488,7 @@ func testAccPipelineSSHKeysConfig(workspace, projectKey, repoSlug, privateKey, p
 			repo_slug = %[3]q
 			request_body = jsonencode({
 				scm        = "git"
-				is_private = false
+				is_private = true
 				project    = { key = %[2]q }
 			})
 			depends_on = [bitbucket_projects.test]
@@ -2531,31 +2531,31 @@ func testAccCheckRepoDestroy(workspace, repoSlug string) resource.TestCheckFunc 
 
 // testAccGenerateSSHKeyPair generates a fresh ed25519 SSH public key string.
 func testAccGenerateSSHKeyPair() (string, error) {
-_, pubKey, err := testAccGenerateSSHKeyPairBoth()
-if err != nil {
-return "", err
-}
-return pubKey, nil
+	_, pubKey, err := testAccGenerateSSHKeyPairBoth()
+	if err != nil {
+		return "", err
+	}
+	return pubKey, nil
 }
 
 // testAccGenerateSSHKeyPairBoth generates both private and public SSH key strings.
 func testAccGenerateSSHKeyPairBoth() (privateKey, publicKey string, err error) {
-pub, priv, err := ed25519.GenerateKey(rand.Reader)
-if err != nil {
-return "", "", fmt.Errorf("generate ed25519 key: %w", err)
-}
+	pub, priv, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		return "", "", fmt.Errorf("generate ed25519 key: %w", err)
+	}
 
-sshPub, err := ssh.NewPublicKey(pub)
-if err != nil {
-return "", "", fmt.Errorf("convert to ssh public key: %w", err)
-}
-publicKey = strings.TrimSpace(string(ssh.MarshalAuthorizedKey(sshPub)))
+	sshPub, err := ssh.NewPublicKey(pub)
+	if err != nil {
+		return "", "", fmt.Errorf("convert to ssh public key: %w", err)
+	}
+	publicKey = strings.TrimSpace(string(ssh.MarshalAuthorizedKey(sshPub)))
 
-privBytes, err := ssh.MarshalPrivateKey(priv, "")
-if err != nil {
-return "", "", fmt.Errorf("marshal private key: %w", err)
-}
-privateKey = strings.TrimSpace(string(pem.EncodeToMemory(privBytes)))
+	privBytes, err := ssh.MarshalPrivateKey(priv, "")
+	if err != nil {
+		return "", "", fmt.Errorf("marshal private key: %w", err)
+	}
+	privateKey = strings.TrimSpace(string(pem.EncodeToMemory(privBytes)))
 
-return privateKey, publicKey, nil
+	return privateKey, publicKey, nil
 }
