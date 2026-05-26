@@ -2531,7 +2531,7 @@ func testAccCheckRepoDestroy(workspace, repoSlug string) resource.TestCheckFunc 
 
 // testAccGenerateSSHKeyPair generates a fresh ed25519 SSH public key string.
 func testAccGenerateSSHKeyPair() (string, error) {
-pubKey, _, err := testAccGenerateSSHKeyPairBoth()
+_, pubKey, err := testAccGenerateSSHKeyPairBoth()
 if err != nil {
 return "", err
 }
