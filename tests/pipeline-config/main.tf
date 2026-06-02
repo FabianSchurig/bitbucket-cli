@@ -25,3 +25,8 @@ data "bitbucket_pipeline_config" "test" {
   workspace = var.workspace
   repo_slug = var.repo_slug
 }
+
+resource "bitbucket_pipeline_config" "test" {
+  workspace = var.workspace
+  repo_slug = var.repo_slug
+}

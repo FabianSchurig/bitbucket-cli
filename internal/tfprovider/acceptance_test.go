@@ -2549,3 +2549,176 @@ func testAccGenerateSSHKeyPairBoth() (privateKey, publicKey string, err error) {
 
 	return privateKey, publicKey, nil
 }
+
+// ─── Pipelines configuration acceptance tests ────────────────────────────────
+
+// TestAccRealAPI_ResourcePipelineConfig_CRUD creates a repository and then
+// manages its pipelines configuration through the bitbucket_pipeline_config
+// resource. This mirrors the real-world scenario from the issue: enabling
+// Pipelines for a brand new repository. The Bitbucket API exposes no dedicated
+// "create" endpoint for the pipelines configuration — enabling Pipelines is a
+// PUT — so the provider maps Create to that PUT. The test enables Pipelines,
+// then disables it, then asserts the plan is empty.
+func TestAccRealAPI_ResourcePipelineConfig_CRUD(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+
+	suffix := strings.ToLower(acctest.RandStringFromCharSet(6, acctest.CharSetAlpha))
+	repoSlug := "tf-acc-plcfg-" + suffix
+	projectKey := "TC" + strings.ToUpper(suffix[:5])
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		CheckDestroy:             testAccCheckRepoDestroy(workspace, repoSlug),
+		Steps: []resource.TestStep{
+			// Create: repo + enable Pipelines.
+			{
+				Config: testAccPipelineConfigConfig(workspace, projectKey, repoSlug, true),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_pipeline_config.test", "id"),
+					resource.TestCheckResourceAttrSet("bitbucket_pipeline_config.test", "api_response"),
+					resource.TestCheckResourceAttr("bitbucket_pipeline_config.test", "enabled", "true"),
+				),
+			},
+			// Update: disable Pipelines.
+			{
+				Config: testAccPipelineConfigConfig(workspace, projectKey, repoSlug, false),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("bitbucket_pipeline_config.test", "enabled", "false"),
+				),
+			},
+			// Re-plan: must be empty.
+			{
+				Config:   testAccPipelineConfigConfig(workspace, projectKey, repoSlug, false),
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
+// testAccPipelineConfigConfig returns a Terraform config that creates a private
+// repository and sets its pipelines configuration. The pipelines "enabled" flag
+// is passed through request_body so the API receives a proper JSON boolean.
+func testAccPipelineConfigConfig(workspace, projectKey, repoSlug string, enabled bool) string {
+	return fmt.Sprintf(`
+provider "bitbucket" {}
+
+resource "bitbucket_projects" "test" {
+workspace   = %[1]q
+project_key = %[2]q
+request_body = jsonencode({
+name       = "TF PipelineConfig Test %[2]s"
+key        = %[2]q
+is_private = true
+})
+}
+
+resource "bitbucket_repos" "test" {
+workspace  = %[1]q
+repo_slug  = %[3]q
+scm        = "git"
+is_private = true
+project    = { key = %[2]q }
+depends_on = [bitbucket_projects.test]
+}
+
+resource "bitbucket_pipeline_config" "test" {
+workspace    = %[1]q
+repo_slug    = %[3]q
+request_body = jsonencode({ enabled = %[4]t })
+depends_on   = [bitbucket_repos.test]
+}
+`, workspace, projectKey, repoSlug, enabled)
+}
+
+// TestAccRealAPI_ResourcePipelines_Trigger creates a repository, commits a
+// minimal bitbucket-pipelines.yml, enables Pipelines, and then triggers a
+// pipeline run through the bitbucket_pipelines resource. Triggering a pipeline
+// requires both a pipelines definition on the target branch and Pipelines to be
+// enabled, so the test wires those prerequisites up first.
+func TestAccRealAPI_ResourcePipelines_Trigger(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+
+	suffix := strings.ToLower(acctest.RandStringFromCharSet(6, acctest.CharSetAlpha))
+	repoSlug := "tf-acc-pl-" + suffix
+	projectKey := "TR" + strings.ToUpper(suffix[:5])
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		CheckDestroy:             testAccCheckRepoDestroy(workspace, repoSlug),
+		Steps: []resource.TestStep{
+			// Step 1: create repo and enable Pipelines.
+			{
+				Config: testAccPipelineConfigConfig(workspace, projectKey, repoSlug, true),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("bitbucket_pipeline_config.test", "enabled", "true"),
+				),
+			},
+			// Step 2: commit the pipelines definition (PreConfig, after the repo
+			// exists) and trigger a pipeline run on the default branch.
+			{
+				PreConfig: func() { testAccCommitPipelinesYAML(t, workspace, repoSlug) },
+				Config:    testAccPipelinesTriggerConfig(workspace, projectKey, repoSlug),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_pipelines.test", "id"),
+					resource.TestCheckResourceAttrSet("bitbucket_pipelines.test", "api_response"),
+				),
+			},
+		},
+	})
+}
+
+// testAccPipelinesTriggerConfig returns a Terraform config that keeps the repo
+// with Pipelines enabled and triggers a pipeline against the "main" branch.
+func testAccPipelinesTriggerConfig(workspace, projectKey, repoSlug string) string {
+	return testAccPipelineConfigConfig(workspace, projectKey, repoSlug, true) + fmt.Sprintf(`
+resource "bitbucket_pipelines" "test" {
+workspace = %[1]q
+repo_slug = %[2]q
+request_body = jsonencode({
+target = {
+type     = "pipeline_ref_target"
+ref_type = "branch"
+ref_name = "main"
+}
+})
+depends_on = [bitbucket_pipeline_config.test]
+}
+`, workspace, repoSlug)
+}
+
+// testAccCommitPipelinesYAML commits a minimal bitbucket-pipelines.yml to the
+// repository's "main" branch via the Bitbucket /src endpoint. The /src endpoint
+// expects multipart/form-data where each form field name is a file path, which
+// the generic JSON dispatcher does not support, so this helper uses the
+// authenticated resty client directly.
+func testAccCommitPipelinesYAML(t *testing.T, workspace, repoSlug string) {
+	t.Helper()
+
+	c, err := client.NewClient()
+	if err != nil {
+		t.Fatalf("failed to create client: %v", err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), testAccRealAPITimeout)
+	defer cancel()
+
+	const pipelinesYAML = "pipelines:\n" +
+		"  default:\n" +
+		"    - step:\n" +
+		"        script:\n" +
+		"          - echo \"hello from terraform acceptance test\"\n"
+
+	resp, err := c.R().
+		SetContext(ctx).
+		SetFormData(map[string]string{
+			"bitbucket-pipelines.yml": pipelinesYAML,
+			"branch":                  "main",
+			"message":                 "Add pipelines definition (acceptance test)",
+		}).
+		Post(fmt.Sprintf("/repositories/%s/%s/src", workspace, repoSlug))
+	if err != nil {
+		t.Fatalf("failed to commit bitbucket-pipelines.yml: %v", err)
+	}
+	if resp.IsError() {
+		t.Fatalf("failed to commit bitbucket-pipelines.yml: %s", resp.String())
+	}
+}

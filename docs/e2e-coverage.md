@@ -8,7 +8,7 @@ This page lists every Terraform resource group exposed by the provider and wheth
 
 A group counts as covered when at least one `TestAccRealAPI_*` test references its Terraform type name (`bitbucket_<group>`) inside the test's HCL configuration. The endpoints listed under each group are the CRUD operations the provider wires up for that group; running the referenced test exercises some or all of them against the real Bitbucket Cloud API.
 
-**Coverage: 17 / 59 resource groups (28%).**
+**Coverage: 19 / 59 resource groups (32%).**
 
 To add coverage for a missing group, add a new `TestAccRealAPI_*` function in `acceptance_test.go` that uses the corresponding `bitbucket_<group>` resource or data source, then run `make generate-docs` to refresh this file.
 
@@ -97,6 +97,20 @@ Manage Bitbucket webhooks
 
 Tests: `TestAccRealAPI_ResourceHooks_CRUD`
 
+### `bitbucket_pipeline_config`
+
+_Category: Pipelines_
+
+Manage pipeline configuration for a Bitbucket repository
+
+| CRUD | Method | Path |
+| --- | --- | --- |
+| Create | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config` |
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines_config` |
+| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config` |
+
+Tests: `TestAccRealAPI_ResourcePipelineConfig_CRUD` `TestAccRealAPI_ResourcePipelines_Trigger`
+
 ### `bitbucket_pipeline_ssh_keys`
 
 _Category: Pipelines_
@@ -111,6 +125,20 @@ Manage pipeline SSH key pair for a Bitbucket repository
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` |
 
 Tests: `TestAccRealAPI_ResourcePipelineSSHKeys_CRUD`
+
+### `bitbucket_pipelines`
+
+_Category: Pipelines_
+
+Manage Bitbucket Pipelines
+
+| CRUD | Method | Path |
+| --- | --- | --- |
+| Create | `POST` | `/repositories/{workspace}/{repo_slug}/pipelines` |
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines/{pipeline_uuid}` |
+| List | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines` |
+
+Tests: `TestAccRealAPI_ResourcePipelines_Trigger`
 
 ### `bitbucket_project_user_permissions`
 
@@ -426,17 +454,6 @@ Manage pipeline caches for a Bitbucket repository
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/pipelines-config/caches/{cache_uuid}` |
 | List | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines-config/caches` |
 
-### `bitbucket_pipeline_config`
-
-_Category: Pipelines_
-
-Manage pipeline configuration for a Bitbucket repository
-
-| CRUD | Method | Path |
-| --- | --- | --- |
-| Read | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines_config` |
-| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config` |
-
 ### `bitbucket_pipeline_known_hosts`
 
 _Category: Pipelines_
@@ -498,18 +515,6 @@ Manage pipeline variables for a Bitbucket repository
 | Update | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config/variables/{variable_uuid}` |
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/pipelines_config/variables/{variable_uuid}` |
 | List | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines_config/variables` |
-
-### `bitbucket_pipelines`
-
-_Category: Pipelines_
-
-Manage Bitbucket Pipelines
-
-| CRUD | Method | Path |
-| --- | --- | --- |
-| Create | `POST` | `/repositories/{workspace}/{repo_slug}/pipelines` |
-| Read | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines/{pipeline_uuid}` |
-| List | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines` |
 
 ### `bitbucket_pr`
 
