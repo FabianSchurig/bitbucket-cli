@@ -2607,6 +2607,10 @@ func TestAccRealAPI_ResourcePipelineConfig_CRUD(t *testing.T) {
 // authenticated dispatcher so it reflects what Bitbucket actually persisted,
 // independent of the resource's (possibly stale) post-write read.
 func testAccCheckPipelinesEnabled(workspace, repoSlug string, want bool) resource.TestCheckFunc {
+	const (
+		pollInterval   = 2 * time.Second
+		perRequestWait = 10 * time.Second
+	)
 	return func(_ *terraform.State) error {
 		c, err := client.NewClient()
 		if err != nil {
@@ -2616,7 +2620,7 @@ func testAccCheckPipelinesEnabled(workspace, repoSlug string, want bool) resourc
 		var lastSeen any
 		deadline := time.Now().Add(testAccRealAPITimeout)
 		for {
-			ctx, cancel := context.WithTimeout(context.Background(), testAccRealAPITimeout)
+			ctx, cancel := context.WithTimeout(context.Background(), perRequestWait)
 			result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
 				Method:      "GET",
 				URLTemplate: "/repositories/{workspace}/{repo_slug}/pipelines_config",
@@ -2639,7 +2643,7 @@ func testAccCheckPipelinesEnabled(workspace, repoSlug string, want bool) resourc
 				return fmt.Errorf("pipelines_config enabled=%v not observed within %s (last seen %v)",
 					want, testAccRealAPITimeout, lastSeen)
 			}
-			time.Sleep(2 * time.Second)
+			time.Sleep(pollInterval)
 		}
 	}
 }
