@@ -335,7 +335,8 @@ func TestSubResourceGroups_Registered(t *testing.T) {
 			wantList:   "getRepositoryPipelineSchedules",
 		},
 		"pipeline-config": {
-			wantRead: "getRepositoryPipelineConfig",
+			wantCreate: "updateRepositoryPipelineConfig",
+			wantRead:   "getRepositoryPipelineConfig",
 		},
 		"ssh-keys": {
 			wantCreate: "addANewSshKey",

@@ -258,6 +258,12 @@ var CRUDConfig = map[string]CRUDMapping{
 		List:   "getRepositoryPipelineSchedules",
 	},
 	"pipeline-config": {
+		// The Bitbucket API has no dedicated POST endpoint for the pipelines
+		// configuration; enabling pipelines is done by PUTting the desired
+		// configuration. Map Create to the same PUT so the resource can be
+		// created (e.g. to enable pipelines) instead of failing with
+		// "Create not supported".
+		Create: "updateRepositoryPipelineConfig",
 		Read:   "getRepositoryPipelineConfig",
 		Update: "updateRepositoryPipelineConfig",
 	},
