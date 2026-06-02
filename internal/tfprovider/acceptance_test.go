@@ -2827,12 +2827,12 @@ func TestAccRealAPI_ResourceBranchingModel_CRUD(t *testing.T) {
 }
 
 // testAccBranchingModelConfig returns a Terraform config that creates a private
-// repository and configures its branching model. When useMainbranch is true the
+// repository and configures its branching model. When useMainBranch is true the
 // development branch tracks the main branch; otherwise it is pinned to an
 // explicit "main" branch name.
-func testAccBranchingModelConfig(workspace, projectKey, repoSlug string, useMainbranch bool) string {
+func testAccBranchingModelConfig(workspace, projectKey, repoSlug string, useMainBranch bool) string {
 	var development string
-	if useMainbranch {
+	if useMainBranch {
 		development = `{ use_mainbranch = true }`
 	} else {
 		development = `{ use_mainbranch = false, name = "main" }`

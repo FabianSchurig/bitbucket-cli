@@ -77,9 +77,9 @@ func TestCRUDConfig_AllOperationIDsResolve(t *testing.T) {
 // the test forces that decision instead of letting a missing Create slip
 // through silently (issue #100).
 var writableNotCreatableAllowlist = map[string]bool{
-	"addon":                       true,
-	"pipeline-caches":             true,
-	"project-branch-restrictions": true,
+	"addon":                       true, // apps are installed out-of-band, not created via a PUT/POST here
+	"pipeline-caches":             true, // caches are a side effect of pipeline runs; API only lists/reads-URI/deletes
+	"project-branch-restrictions": true, // read/list grouping; creation handled by the -by-pattern/-by-branch-type sub-resources
 }
 
 // TestCRUDConfig_WritableResourcesAreCreatable enforces the invariant violated
