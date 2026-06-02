@@ -10,6 +10,7 @@ description: |-
 Manages Bitbucket pipeline-config via the Bitbucket Cloud API.
 
 ## CRUD Operations
+- **Create**: Supported
 - **Read**: Supported
 - **Update**: Supported
 
@@ -17,6 +18,7 @@ Manages Bitbucket pipeline-config via the Bitbucket Cloud API.
 
 | Operation | Method | Path | API Docs |
 |-----------|--------|------|----------|
+| Create | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-put) |
 | Read | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines_config` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-get) |
 | Update | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-put) |
 
@@ -24,6 +26,7 @@ Manages Bitbucket pipeline-config via the Bitbucket Cloud API.
 
 | Operation | Required Scopes |
 |-----------|----------------|
+| Create | `admin:repository:bitbucket` |
 | Read | `admin:repository:bitbucket` |
 | Update | `admin:repository:bitbucket` |
 

@@ -229,7 +229,7 @@ REST API and have several important caveats:
 |----------|-------------|------|
 | `bitbucket_deployment_variables` | `bitbucket_deployment_variables` | CRUD |
 | `bitbucket_pipeline_caches` | `bitbucket_pipeline_caches` | RDL |
-| `bitbucket_pipeline_config` | `bitbucket_pipeline_config` | RU |
+| `bitbucket_pipeline_config` | `bitbucket_pipeline_config` | CRU |
 | `bitbucket_pipeline_known_hosts` | `bitbucket_pipeline_known_hosts` | CRUDL |
 | `bitbucket_pipeline_oidc` | `bitbucket_pipeline_oidc` | R |
 | `bitbucket_pipeline_oidc_keys` | `bitbucket_pipeline_oidc_keys` | R |

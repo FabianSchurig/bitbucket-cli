@@ -172,14 +172,7 @@ func executeRequest(ctx context.Context, c *client.BBClient, r Request, fetchURL
 // unauthenticated and the server will return 401 — that's fine, we don't
 // want to silently invent credentials).
 func applyBasicAuth(req *resty.Request, c *client.BBClient) {
-	if c.Token == "" {
-		return
-	}
-	if c.Username == "" {
-		req.SetAuthToken(c.Token)
-		return
-	}
-	req.SetBasicAuth(c.Username, c.Token)
+	c.ApplyAuth(req)
 }
 
 // applyInternalAPIAuth configures req with the cookies and headers required

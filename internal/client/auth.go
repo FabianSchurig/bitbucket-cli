@@ -123,6 +123,28 @@ func NewClientWithConfig(username, token, baseURL, csrfToken, cloudSessionToken 
 	}, nil
 }
 
+// ApplyAuth configures req with the public Bitbucket REST API credentials:
+//   - Username + Token → HTTP Basic Auth (API tokens, app passwords)
+//   - Token alone      → Bearer auth (workspace/repository access tokens)
+//
+// It mirrors the per-request authentication the dispatcher applies to
+// non-internal endpoints, and exists so that callers which must talk to the
+// public API outside the JSON dispatcher (e.g. multipart/form-data uploads to
+// the /src endpoint) can authenticate consistently instead of re-implementing
+// the credential-selection logic. Does nothing when no token is configured
+// (the request goes out unauthenticated and the server returns 401 — we never
+// silently invent credentials).
+func (c *BBClient) ApplyAuth(req *resty.Request) {
+	if c.Token == "" {
+		return
+	}
+	if c.Username == "" {
+		req.SetAuthToken(c.Token)
+		return
+	}
+	req.SetBasicAuth(c.Username, c.Token)
+}
+
 // ParseError returns a formatted error from a non-2xx resty response.
 func ParseError(resp *resty.Response) error {
 	return fmt.Errorf("bitbucket API error %d: %s", resp.StatusCode(), resp.String())
