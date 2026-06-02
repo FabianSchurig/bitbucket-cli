@@ -2103,30 +2103,30 @@ func TestAccRealAPI_ResourceBranchRestrictions_CRUD(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create: repo + branch restrictions (no force push on main, require passing builds)
 			{
-				Config: testAccBranchRestrictionsConfig(workspace, projectKey, repoSlug, "main", 0),
+				Config: testAccBranchRestrictionsConfig(workspace, projectKey, repoSlug, "main", 1),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("bitbucket_branch_restrictions.no_force_push", "id"),
 					resource.TestCheckResourceAttrSet("bitbucket_branch_restrictions.no_force_push", "api_response"),
 					resource.TestCheckResourceAttrSet("bitbucket_branch_restrictions.require_passing_builds", "id"),
 				),
 			},
-			// Update: change the pattern
+			// Update: change the required number of passing builds (1 -> 2)
 			{
-				Config: testAccBranchRestrictionsConfig(workspace, projectKey, repoSlug, "main", 1),
+				Config: testAccBranchRestrictionsConfig(workspace, projectKey, repoSlug, "main", 2),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("bitbucket_branch_restrictions.require_passing_builds", "id"),
 				),
 			},
 			// Re-plan with same config: must be empty
 			{
-				Config:   testAccBranchRestrictionsConfig(workspace, projectKey, repoSlug, "main", 1),
+				Config:   testAccBranchRestrictionsConfig(workspace, projectKey, repoSlug, "main", 2),
 				PlanOnly: true,
 			},
 		},
 	})
 }
 
-func testAccBranchRestrictionsConfig(workspace, projectKey, repoSlug, pattern string, minApprovals int) string {
+func testAccBranchRestrictionsConfig(workspace, projectKey, repoSlug, pattern string, requiredBuilds int) string {
 	return fmt.Sprintf(`
 		provider "bitbucket" {}
 
@@ -2167,7 +2167,7 @@ func testAccBranchRestrictionsConfig(workspace, projectKey, repoSlug, pattern st
 			value             = %[5]d
 			depends_on        = [bitbucket_repos.test]
 		}
-	`, workspace, projectKey, repoSlug, pattern, minApprovals)
+	`, workspace, projectKey, repoSlug, pattern, requiredBuilds)
 }
 
 // ─── Project user permissions acceptance tests ────────────────────────────────

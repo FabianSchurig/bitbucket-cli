@@ -1627,13 +1627,19 @@ func formatResponseValue(v any) string {
 
 func responseParamValue(m map[string]any, paramName string) (string, bool) {
 	tryKeys := []string{paramName}
+	// Prefer the canonical identifier field ("id"/"uuid") over the stripped
+	// base name. A path param like "key_id" identifies the resource itself, so
+	// the response's top-level "id" is authoritative. Trying the base first
+	// would mis-resolve when the base collides with an unrelated field — e.g.
+	// a deploy key response carries both a numeric "id" and a "key" (the SSH
+	// public key string), and "key_id" must resolve to "id", not "key".
 	if strings.HasSuffix(paramName, "_uuid") {
 		base := strings.TrimSuffix(paramName, "_uuid")
-		tryKeys = append(tryKeys, base, "uuid")
+		tryKeys = append(tryKeys, "uuid", base)
 	}
 	if strings.HasSuffix(paramName, "_id") {
 		base := strings.TrimSuffix(paramName, "_id")
-		tryKeys = append(tryKeys, base, "id")
+		tryKeys = append(tryKeys, "id", base)
 	}
 	for _, key := range tryKeys {
 		if key == "" {

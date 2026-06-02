@@ -574,6 +574,12 @@ func TestResourceIDHelpers(t *testing.T) {
 	if val, ok := responseParamValue(map[string]any{"issue": "7"}, "issue_id"); !ok || val != "7" {
 		t.Fatalf("expected issue_id fallback, got %q ok=%v", val, ok)
 	}
+	// A deploy key response carries both a numeric "id" and a "key" (the SSH
+	// public key string). The "key_id" path param must resolve to "id", not
+	// to the colliding "key" field.
+	if val, ok := responseParamValue(map[string]any{"id": float64(123), "key": "ssh-ed25519 AAAA", "label": "x"}, "key_id"); !ok || val != "123" {
+		t.Fatalf("expected key_id to resolve to id, got %q ok=%v", val, ok)
+	}
 	if val, ok := responseParamValue(map[string]any{"name": "demo"}, "missing"); !ok || val != "demo" {
 		t.Fatalf("expected extractID fallback, got %q ok=%v", val, ok)
 	}
