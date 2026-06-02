@@ -204,12 +204,14 @@ var CRUDConfig = map[string]CRUDMapping{
 		List:   "listExplicitUserPermissionsForARepository",
 	},
 	"project-group-permissions": {
+		Create: "updateAnExplicitGroupPermissionForAProject",
 		Read:   "getAnExplicitGroupPermissionForAProject",
 		Update: "updateAnExplicitGroupPermissionForAProject",
 		Delete: "deleteAnExplicitGroupPermissionForAProject",
 		List:   "listExplicitGroupPermissionsForAProject",
 	},
 	"project-user-permissions": {
+		Create: "updateAnExplicitUserPermissionForAProject",
 		Read:   "getAnExplicitUserPermissionForAProject",
 		Update: "updateAnExplicitUserPermissionForAProject",
 		Delete: "deleteAnExplicitUserPermissionForAProject",
@@ -236,6 +238,7 @@ var CRUDConfig = map[string]CRUDMapping{
 		List:   "listTags",
 	},
 	"pipeline-ssh-keys": {
+		Create: "updateRepositoryPipelineKeyPair",
 		Read:   "getRepositoryPipelineSshKeyPair",
 		Update: "updateRepositoryPipelineKeyPair",
 		Delete: "deleteRepositoryPipelineKeyPair",
