@@ -8,7 +8,7 @@ This page lists every Terraform resource group exposed by the provider and wheth
 
 A group counts as covered when at least one `TestAccRealAPI_*` test references its Terraform type name (`bitbucket_<group>`) inside the test's HCL configuration. The endpoints listed under each group are the CRUD operations the provider wires up for that group; running the referenced test exercises some or all of them against the real Bitbucket Cloud API.
 
-**Coverage: 19 / 59 resource groups (32%).**
+**Coverage: 22 / 59 resource groups (37%).**
 
 To add coverage for a missing group, add a new `TestAccRealAPI_*` function in `acceptance_test.go` that uses the corresponding `bitbucket_<group>` resource or data source, then run `make generate-docs` to refresh this file.
 
@@ -38,10 +38,11 @@ Manage Bitbucket branching models
 
 | CRUD | Method | Path |
 | --- | --- | --- |
+| Create | `PUT` | `/repositories/{workspace}/{repo_slug}/branching-model/settings` |
 | Read | `GET` | `/repositories/{workspace}/{repo_slug}/branching-model` |
 | Update | `PUT` | `/repositories/{workspace}/{repo_slug}/branching-model/settings` |
 
-Tests: `TestAccRealAPI_DataSource_BranchingModel`
+Tests: `TestAccRealAPI_DataSource_BranchingModel` `TestAccRealAPI_ResourceBranchingModel_CRUD`
 
 ### `bitbucket_commits`
 
@@ -140,6 +141,20 @@ Manage Bitbucket Pipelines
 
 Tests: `TestAccRealAPI_ResourcePipelines_Trigger`
 
+### `bitbucket_project_branching_model`
+
+_Category: Branching Model_
+
+Manage the branching model for a Bitbucket project
+
+| CRUD | Method | Path |
+| --- | --- | --- |
+| Create | `PUT` | `/workspaces/{workspace}/projects/{project_key}/branching-model/settings` |
+| Read | `GET` | `/workspaces/{workspace}/projects/{project_key}/branching-model` |
+| Update | `PUT` | `/workspaces/{workspace}/projects/{project_key}/branching-model/settings` |
+
+Tests: `TestAccRealAPI_ResourceProjectBranchingModel_CRUD`
+
 ### `bitbucket_project_user_permissions`
 
 _Category: Projects_
@@ -203,6 +218,36 @@ Manage deploy keys for a Bitbucket repository
 
 Tests: `TestAccRealAPI_ResourceRepoDeployKeys_CRUD`
 
+### `bitbucket_repo_group_permissions`
+
+_Category: Repositories_
+
+Manage explicit group permissions for a Bitbucket repository
+
+| CRUD | Method | Path |
+| --- | --- | --- |
+| Create | `PUT` | `/repositories/{workspace}/{repo_slug}/permissions-config/groups/{group_slug}` |
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/permissions-config/groups/{group_slug}` |
+| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/permissions-config/groups/{group_slug}` |
+| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/permissions-config/groups/{group_slug}` |
+| List | `GET` | `/repositories/{workspace}/{repo_slug}/permissions-config/groups` |
+
+Tests: `TestAccRealAPI_DataSourceRepoGroupPermissions_Read`
+
+### `bitbucket_repo_settings`
+
+_Category: Repositories_
+
+Manage repository settings inheritance in Bitbucket
+
+| CRUD | Method | Path |
+| --- | --- | --- |
+| Create | `PUT` | `/repositories/{workspace}/{repo_slug}/override-settings` |
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/override-settings` |
+| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/override-settings` |
+
+Tests: `TestAccRealAPI_DataSourceRepoSettings_Read`
+
 ### `bitbucket_repo_user_permissions`
 
 _Category: Repositories_
@@ -233,7 +278,7 @@ Manage Bitbucket repositories
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}` |
 | List | `GET` | `/repositories/{workspace}` |
 
-Tests: `TestAccRealAPI_DataSourceRepos`
+Tests: `TestAccRealAPI_DataSourceRepoGroupPermissions_Read` `TestAccRealAPI_DataSourceRepoSettings_Read` `TestAccRealAPI_DataSourceRepos`
 
 ### `bitbucket_user_emails`
 
@@ -583,17 +628,6 @@ Manage project-level branch restrictions matched by glob pattern in Bitbucket (i
 | Delete | `PUT` | `https://bitbucket.org/!api/internal/workspaces/{workspace}/projects/{project_key}/branch-restrictions/by-pattern/{pattern}` |
 | List | `GET` | `https://bitbucket.org/!api/internal/workspaces/{workspace}/projects/{project_key}/branch-restrictions/group-by-branch/` |
 
-### `bitbucket_project_branching_model`
-
-_Category: Branching Model_
-
-Manage the branching model for a Bitbucket project
-
-| CRUD | Method | Path |
-| --- | --- | --- |
-| Read | `GET` | `/workspaces/{workspace}/projects/{project_key}/branching-model` |
-| Update | `PUT` | `/workspaces/{workspace}/projects/{project_key}/branching-model/settings` |
-
 ### `bitbucket_project_default_reviewers`
 
 _Category: Projects_
@@ -642,22 +676,10 @@ Manage Bitbucket application properties
 
 | CRUD | Method | Path |
 | --- | --- | --- |
+| Create | `PUT` | `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}` |
 | Read | `GET` | `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}` |
 | Update | `PUT` | `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}` |
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}` |
-
-### `bitbucket_repo_group_permissions`
-
-_Category: Repositories_
-
-Manage explicit group permissions for a Bitbucket repository
-
-| CRUD | Method | Path |
-| --- | --- | --- |
-| Read | `GET` | `/repositories/{workspace}/{repo_slug}/permissions-config/groups/{group_slug}` |
-| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/permissions-config/groups/{group_slug}` |
-| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/permissions-config/groups/{group_slug}` |
-| List | `GET` | `/repositories/{workspace}/{repo_slug}/permissions-config/groups` |
 
 ### `bitbucket_repo_runners`
 
@@ -672,17 +694,6 @@ Manage pipeline runners for a Bitbucket repository
 | Update | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines-config/runners/{runner_uuid}` |
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/pipelines-config/runners/{runner_uuid}` |
 | List | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines-config/runners` |
-
-### `bitbucket_repo_settings`
-
-_Category: Repositories_
-
-Manage repository settings inheritance in Bitbucket
-
-| CRUD | Method | Path |
-| --- | --- | --- |
-| Read | `GET` | `/repositories/{workspace}/{repo_slug}/override-settings` |
-| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/override-settings` |
 
 ### `bitbucket_reports`
 

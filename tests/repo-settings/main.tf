@@ -25,3 +25,8 @@ data "bitbucket_repo_settings" "test" {
   repo_slug = var.repo_slug
   workspace = var.workspace
 }
+
+resource "bitbucket_repo_settings" "test" {
+  repo_slug = var.repo_slug
+  workspace = var.workspace
+}

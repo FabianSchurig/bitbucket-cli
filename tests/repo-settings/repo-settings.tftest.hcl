@@ -20,3 +20,18 @@ run "read_repo_settings" {
     error_message = "Expected non-empty id for data source bitbucket_repo_settings"
   }
 }
+
+run "create_repo_settings" {
+  command = apply
+
+  variables {
+    repo_slug = "my-repo"
+    workspace = "my-workspace"
+  }
+
+  # Resource create should succeed with mock provider
+  assert {
+    condition     = bitbucket_repo_settings.test.id != ""
+    error_message = "Expected non-empty id for resource bitbucket_repo_settings"
+  }
+}

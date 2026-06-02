@@ -22,3 +22,20 @@ run "read_properties" {
     error_message = "Expected non-empty id for data source bitbucket_properties"
   }
 }
+
+run "create_properties" {
+  command = apply
+
+  variables {
+    workspace = "my-workspace"
+    repo_slug = "my-repo"
+    app_key = "my-app"
+    property_name = "my-property"
+  }
+
+  # Resource create should succeed with mock provider
+  assert {
+    condition     = bitbucket_properties.test.id != ""
+    error_message = "Expected non-empty id for resource bitbucket_properties"
+  }
+}

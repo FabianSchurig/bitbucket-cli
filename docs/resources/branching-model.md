@@ -10,6 +10,7 @@ description: |-
 Manages Bitbucket branching-model via the Bitbucket Cloud API.
 
 ## CRUD Operations
+- **Create**: Supported
 - **Read**: Supported
 - **Update**: Supported
 
@@ -17,6 +18,7 @@ Manages Bitbucket branching-model via the Bitbucket Cloud API.
 
 | Operation | Method | Path | API Docs |
 |-----------|--------|------|----------|
+| Create | `PUT` | `/repositories/{workspace}/{repo_slug}/branching-model/settings` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-repositories-workspace-repo-slug-branching-model-settings-put) |
 | Read | `GET` | `/repositories/{workspace}/{repo_slug}/branching-model` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-repositories-workspace-repo-slug-branching-model-get) |
 | Update | `PUT` | `/repositories/{workspace}/{repo_slug}/branching-model/settings` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-repositories-workspace-repo-slug-branching-model-settings-put) |
 
@@ -24,6 +26,7 @@ Manages Bitbucket branching-model via the Bitbucket Cloud API.
 
 | Operation | Required Scopes |
 |-----------|----------------|
+| Create | `admin:repository:bitbucket` |
 | Read | `read:repository:bitbucket` |
 | Update | `admin:repository:bitbucket` |
 

@@ -37,3 +37,10 @@ data "bitbucket_properties" "test" {
   app_key = var.app_key
   property_name = var.property_name
 }
+
+resource "bitbucket_properties" "test" {
+  workspace = var.workspace
+  repo_slug = var.repo_slug
+  app_key = var.app_key
+  property_name = var.property_name
+}

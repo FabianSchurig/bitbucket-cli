@@ -2782,3 +2782,238 @@ func testAccCommitPipelinesYAML(t *testing.T, workspace, repoSlug string) {
 			resp.StatusCode(), resp.String())
 	}
 }
+
+// ─── Branching model acceptance tests ────────────────────────────────────────
+
+// TestAccRealAPI_ResourceBranchingModel_CRUD creates a repository and manages
+// its branching model through the bitbucket_branching_model resource. The
+// Bitbucket API exposes no dedicated POST for the branching model — it always
+// exists on a repository and is configured via PUT — so the provider maps
+// Create to that PUT (the same #100 convention used for pipeline_config). This
+// test guards that mapping end to end: without a Create mapping, the apply
+// below would fail with "Create not supported".
+//
+// The configuration only touches user-supplied path params (workspace,
+// repo_slug) plus a request_body, and is fully hermetic: it creates its own
+// project and repository and tears them down via CheckDestroy.
+func TestAccRealAPI_ResourceBranchingModel_CRUD(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+
+	suffix := strings.ToLower(acctest.RandStringFromCharSet(6, acctest.CharSetAlpha))
+	repoSlug := "tf-acc-bmodel-" + suffix
+	projectKey := "TB" + strings.ToUpper(suffix[:5])
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		CheckDestroy:             testAccCheckRepoDestroy(workspace, repoSlug),
+		Steps: []resource.TestStep{
+			// Create: repo + configure branching model (development tracks main).
+			{
+				Config: testAccBranchingModelConfig(workspace, projectKey, repoSlug, true),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_branching_model.test", "id"),
+					resource.TestCheckResourceAttrSet("bitbucket_branching_model.test", "api_response"),
+				),
+			},
+			// Update: point development at an explicit branch instead of main.
+			{
+				Config: testAccBranchingModelConfig(workspace, projectKey, repoSlug, false),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_branching_model.test", "id"),
+				),
+			},
+		},
+	})
+}
+
+// testAccBranchingModelConfig returns a Terraform config that creates a private
+// repository and configures its branching model. When useMainbranch is true the
+// development branch tracks the main branch; otherwise it is pinned to an
+// explicit "main" branch name.
+func testAccBranchingModelConfig(workspace, projectKey, repoSlug string, useMainbranch bool) string {
+	var development string
+	if useMainbranch {
+		development = `{ use_mainbranch = true }`
+	} else {
+		development = `{ use_mainbranch = false, name = "main" }`
+	}
+	return fmt.Sprintf(`
+provider "bitbucket" {}
+
+resource "bitbucket_projects" "test" {
+  workspace   = %[1]q
+  project_key = %[2]q
+  request_body = jsonencode({
+    name       = "TF BranchingModel Test %[2]s"
+    key        = %[2]q
+    is_private = true
+  })
+}
+
+resource "bitbucket_repos" "test" {
+  workspace  = %[1]q
+  repo_slug  = %[3]q
+  scm        = "git"
+  is_private = true
+  project    = { key = %[2]q }
+  depends_on = [bitbucket_projects.test]
+}
+
+resource "bitbucket_branching_model" "test" {
+  workspace    = %[1]q
+  repo_slug    = %[3]q
+  request_body = jsonencode({ development = %[4]s })
+  depends_on   = [bitbucket_repos.test]
+}
+`, workspace, projectKey, repoSlug, development)
+}
+
+// TestAccRealAPI_ResourceProjectBranchingModel_CRUD creates a project and
+// manages its branching model through the bitbucket_project_branching_model
+// resource. Like the repository branching model, the project branching model is
+// configured via PUT with no dedicated POST, so the provider maps Create to the
+// PUT. This test guards that mapping end to end and is hermetic: it creates its
+// own project and removes it via CheckDestroy.
+func TestAccRealAPI_ResourceProjectBranchingModel_CRUD(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+
+	suffix := strings.ToUpper(acctest.RandStringFromCharSet(5, acctest.CharSetAlpha))
+	projectKey := "TP" + suffix
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		CheckDestroy:             testAccCheckProjectDestroy(workspace, projectKey),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccProjectBranchingModelConfig(workspace, projectKey),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("bitbucket_project_branching_model.test", "id"),
+					resource.TestCheckResourceAttrSet("bitbucket_project_branching_model.test", "api_response"),
+				),
+			},
+			// Re-plan with the same config: must be empty (idempotent).
+			{
+				Config:   testAccProjectBranchingModelConfig(workspace, projectKey),
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
+func testAccProjectBranchingModelConfig(workspace, projectKey string) string {
+	return fmt.Sprintf(`
+provider "bitbucket" {}
+
+resource "bitbucket_projects" "test" {
+  workspace   = %[1]q
+  project_key = %[2]q
+  request_body = jsonencode({
+    name       = "TF ProjBranchModel Test %[2]s"
+    key        = %[2]q
+    is_private = true
+  })
+}
+
+resource "bitbucket_project_branching_model" "test" {
+  workspace    = %[1]q
+  project_key  = %[2]q
+  request_body = jsonencode({ development = { use_mainbranch = true } })
+  depends_on   = [bitbucket_projects.test]
+}
+`, workspace, projectKey)
+}
+
+// ─── Repository settings & group permissions read coverage ───────────────────
+
+// testAccRepoOnlyConfig returns a hermetic project+repository pair plus an
+// arbitrary extra block, so read-only data sources can be exercised against a
+// freshly created repository without depending on any pre-existing state.
+func testAccRepoOnlyConfig(workspace, projectKey, repoSlug, extra string) string {
+	return fmt.Sprintf(`
+provider "bitbucket" {}
+
+resource "bitbucket_projects" "test" {
+  workspace   = %[1]q
+  project_key = %[2]q
+  request_body = jsonencode({
+    name       = "TF ReadCov Test %[2]s"
+    key        = %[2]q
+    is_private = true
+  })
+}
+
+resource "bitbucket_repos" "test" {
+  workspace  = %[1]q
+  repo_slug  = %[3]q
+  scm        = "git"
+  is_private = true
+  project    = { key = %[2]q }
+  depends_on = [bitbucket_projects.test]
+}
+
+%[4]s
+`, workspace, projectKey, repoSlug, extra)
+}
+
+// TestAccRealAPI_DataSourceRepoSettings_Read reads the inheritance state for a
+// freshly created repository through the bitbucket_repo_settings data source
+// (GET override-settings). It is hermetic: it creates and destroys its own
+// project and repository.
+func TestAccRealAPI_DataSourceRepoSettings_Read(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+
+	suffix := strings.ToLower(acctest.RandStringFromCharSet(6, acctest.CharSetAlpha))
+	repoSlug := "tf-acc-rsettings-" + suffix
+	projectKey := "TI" + strings.ToUpper(suffix[:5])
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		CheckDestroy:             testAccCheckRepoDestroy(workspace, repoSlug),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccRepoOnlyConfig(workspace, projectKey, repoSlug, `
+data "bitbucket_repo_settings" "test" {
+  workspace  = bitbucket_repos.test.workspace
+  repo_slug  = bitbucket_repos.test.repo_slug
+}
+`),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_repo_settings.test", "api_response"),
+					resource.TestCheckResourceAttrSet("data.bitbucket_repo_settings.test", "id"),
+				),
+			},
+		},
+	})
+}
+
+// TestAccRealAPI_DataSourceRepoGroupPermissions_Read lists the explicit group
+// permissions of a freshly created repository through the
+// bitbucket_repo_group_permissions data source. Only workspace and repo_slug
+// are supplied, so the data source uses the List operation
+// (listExplicitGroupPermissionsForARepository). It is hermetic: it creates and
+// destroys its own project and repository.
+func TestAccRealAPI_DataSourceRepoGroupPermissions_Read(t *testing.T) {
+	workspace := skipIfNoRealAPI(t)
+
+	suffix := strings.ToLower(acctest.RandStringFromCharSet(6, acctest.CharSetAlpha))
+	repoSlug := "tf-acc-rgperm-" + suffix
+	projectKey := "TG" + strings.ToUpper(suffix[:5])
+
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
+		CheckDestroy:             testAccCheckRepoDestroy(workspace, repoSlug),
+		Steps: []resource.TestStep{
+			{
+				Config: testAccRepoOnlyConfig(workspace, projectKey, repoSlug, `
+data "bitbucket_repo_group_permissions" "test" {
+  workspace  = bitbucket_repos.test.workspace
+  repo_slug  = bitbucket_repos.test.repo_slug
+}
+`),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.bitbucket_repo_group_permissions.test", "api_response"),
+				),
+			},
+		},
+	})
+}

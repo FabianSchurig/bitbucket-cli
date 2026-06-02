@@ -20,3 +20,18 @@ run "read_project_branching_model" {
     error_message = "Expected non-empty id for data source bitbucket_project_branching_model"
   }
 }
+
+run "create_project_branching_model" {
+  command = apply
+
+  variables {
+    project_key = "PROJ"
+    workspace = "my-workspace"
+  }
+
+  # Resource create should succeed with mock provider
+  assert {
+    condition     = bitbucket_project_branching_model.test.id != ""
+    error_message = "Expected non-empty id for resource bitbucket_project_branching_model"
+  }
+}
