@@ -110,6 +110,11 @@ var CRUDConfig = map[string]CRUDMapping{
 		List:   "getProjectBranchRestrictionsGroupedByBranch",
 	},
 	"branching-model": {
+		// The branching model always exists on a repository; there is no POST
+		// to create it. Map Create to the same PUT used for Update so the
+		// resource can be created (configured) via Terraform instead of failing
+		// with "Create not supported" — same convention as pipeline-config.
+		Create: "updateTheBranchingModelConfigForARepository",
 		Read:   "getTheBranchingModelForARepository",
 		Update: "updateTheBranchingModelConfigForARepository",
 	},
@@ -139,6 +144,10 @@ var CRUDConfig = map[string]CRUDMapping{
 		List: "searchWorkspace",
 	},
 	"properties": {
+		// Hosted property values are upserted via PUT; there is no separate
+		// POST. Map Create to the PUT so the resource is creatable via
+		// Terraform (same convention as pipeline-config / *-permissions).
+		Create: "updateRepositoryHostedPropertyValue",
 		Read:   "getRepositoryHostedPropertyValue",
 		Update: "updateRepositoryHostedPropertyValue",
 		Delete: "deleteRepositoryHostedPropertyValue",
@@ -191,6 +200,11 @@ var CRUDConfig = map[string]CRUDMapping{
 		Delete: "deleteDeploymentVariable",
 	},
 	"repo-group-permissions": {
+		// Explicit group permissions are upserted via PUT (no POST), exactly
+		// like repo-user-permissions. Map Create to the PUT so the resource is
+		// creatable via Terraform instead of failing with "Create not
+		// supported".
+		Create: "updateAnExplicitGroupPermissionForARepository",
 		Read:   "getAnExplicitGroupPermissionForARepository",
 		Update: "updateAnExplicitGroupPermissionForARepository",
 		Delete: "deleteAnExplicitGroupPermissionForARepository",
@@ -282,6 +296,9 @@ var CRUDConfig = map[string]CRUDMapping{
 		List:   "listRepositoryForks",
 	},
 	"project-branching-model": {
+		// Singleton config (always present); enable management via PUT-as-Create
+		// like branching-model / pipeline-config.
+		Create: "updateTheBranchingModelConfigForAProject",
 		Read:   "getTheBranchingModelForAProject",
 		Update: "updateTheBranchingModelConfigForAProject",
 	},
@@ -358,6 +375,10 @@ var CRUDConfig = map[string]CRUDMapping{
 		List: "listUserPermissionsInAWorkspace",
 	},
 	"repo-settings": {
+		// Repository settings inheritance is a singleton set via PUT; map
+		// Create to the PUT so the resource is creatable via Terraform
+		// (same convention as pipeline-config / branching-model).
+		Create: "setTheInheritanceStateForRepositorySettings",
 		Read:   "retrieveTheInheritanceStateForRepositorySettings",
 		Update: "setTheInheritanceStateForRepositorySettings",
 	},
