@@ -109,7 +109,7 @@ Manage pipeline configuration for a Bitbucket repository
 | Read | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines_config` |
 | Update | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config` |
 
-Tests: `TestAccRealAPI_ResourcePipelineConfig_CRUD` `TestAccRealAPI_ResourcePipelines_Trigger`
+Tests: `TestAccRealAPI_ResourcePipelineConfig_CRUD`
 
 ### `bitbucket_pipeline_ssh_keys`
 
