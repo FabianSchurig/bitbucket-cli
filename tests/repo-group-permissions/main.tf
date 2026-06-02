@@ -31,3 +31,9 @@ data "bitbucket_repo_group_permissions" "test" {
   workspace = var.workspace
   group_slug = var.group_slug
 }
+
+resource "bitbucket_repo_group_permissions" "test" {
+  group_slug = var.group_slug
+  repo_slug = var.repo_slug
+  workspace = var.workspace
+}

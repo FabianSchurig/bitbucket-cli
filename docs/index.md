@@ -145,8 +145,8 @@ operation groups. Each resource group maps to a set of CRUD operations.
 
 | Resource | Data Source | CRUD |
 |----------|-------------|------|
-| `bitbucket_branching_model` | `bitbucket_branching_model` | RU |
-| `bitbucket_project_branching_model` | `bitbucket_project_branching_model` | RU |
+| `bitbucket_branching_model` | `bitbucket_branching_model` | CRU |
+| `bitbucket_project_branching_model` | `bitbucket_project_branching_model` | CRU |
 
 
 ### Code Search
@@ -256,7 +256,7 @@ REST API and have several important caveats:
 
 | Resource | Data Source | CRUD |
 |----------|-------------|------|
-| `bitbucket_properties` | `bitbucket_properties` | RUD |
+| `bitbucket_properties` | `bitbucket_properties` | CRUD |
 
 
 ### Pull Requests
@@ -290,8 +290,8 @@ REST API and have several important caveats:
 |----------|-------------|------|
 | `bitbucket_commit_file` | `bitbucket_commit_file` | CR |
 | `bitbucket_forked_repository` | `bitbucket_forked_repository` | CL |
-| `bitbucket_repo_group_permissions` | `bitbucket_repo_group_permissions` | RUDL |
-| `bitbucket_repo_settings` | `bitbucket_repo_settings` | RU |
+| `bitbucket_repo_group_permissions` | `bitbucket_repo_group_permissions` | CRUDL |
+| `bitbucket_repo_settings` | `bitbucket_repo_settings` | CRU |
 | `bitbucket_repo_user_permissions` | `bitbucket_repo_user_permissions` | CRUDL |
 | `bitbucket_repos` | `bitbucket_repos` | CRUDL |
 

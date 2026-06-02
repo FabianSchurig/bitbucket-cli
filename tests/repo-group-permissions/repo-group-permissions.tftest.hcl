@@ -21,3 +21,19 @@ run "read_repo_group_permissions" {
     error_message = "Expected non-empty id for data source bitbucket_repo_group_permissions"
   }
 }
+
+run "create_repo_group_permissions" {
+  command = apply
+
+  variables {
+    group_slug = "developers"
+    repo_slug = "my-repo"
+    workspace = "my-workspace"
+  }
+
+  # Resource create should succeed with mock provider
+  assert {
+    condition     = bitbucket_repo_group_permissions.test.id != ""
+    error_message = "Expected non-empty id for resource bitbucket_repo_group_permissions"
+  }
+}

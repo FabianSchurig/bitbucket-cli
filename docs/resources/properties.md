@@ -10,6 +10,7 @@ description: |-
 Manages Bitbucket properties via the Bitbucket Cloud API.
 
 ## CRUD Operations
+- **Create**: Supported
 - **Read**: Supported
 - **Update**: Supported
 - **Delete**: Supported
@@ -18,6 +19,7 @@ Manages Bitbucket properties via the Bitbucket Cloud API.
 
 | Operation | Method | Path | API Docs |
 |-----------|--------|------|----------|
+| Create | `PUT` | `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-properties-app-key-property-name-put) |
 | Read | `GET` | `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-properties-app-key-property-name-get) |
 | Update | `PUT` | `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-properties-app-key-property-name-put) |
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-properties-app-key-property-name-delete) |
@@ -26,6 +28,7 @@ Manages Bitbucket properties via the Bitbucket Cloud API.
 
 | Operation | Required Scopes |
 |-----------|----------------|
+| Create | — |
 | Read | — |
 | Update | — |
 | Delete | — |

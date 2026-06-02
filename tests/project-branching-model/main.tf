@@ -25,3 +25,8 @@ data "bitbucket_project_branching_model" "test" {
   project_key = var.project_key
   workspace = var.workspace
 }
+
+resource "bitbucket_project_branching_model" "test" {
+  project_key = var.project_key
+  workspace = var.workspace
+}

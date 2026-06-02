@@ -25,3 +25,8 @@ data "bitbucket_branching_model" "test" {
   repo_slug = var.repo_slug
   workspace = var.workspace
 }
+
+resource "bitbucket_branching_model" "test" {
+  repo_slug = var.repo_slug
+  workspace = var.workspace
+}
