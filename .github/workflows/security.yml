@@ -46,7 +46,7 @@ jobs:
         run: pip install zizmor==1.25.2
 
       - name: Run zizmor
-        run: zizmor --format=sarif --persona=regular . > "${RUNNER_TEMP}/zizmor.sarif"
+        run: zizmor --format=sarif --persona=regular . > "${{ runner.temp }}/zizmor.sarif"
         env:
           GH_TOKEN: ${{ github.token }}
 
