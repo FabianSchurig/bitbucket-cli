@@ -368,7 +368,7 @@ func newWorkspacesCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyActive {
+				if cmd.Flags().Changed("active") {
 					handlers.SetNested(bodyObj, "active", bodyActive)
 				}
 				if bodyDescription != "" {
@@ -491,7 +491,7 @@ func newWorkspacesUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyActive {
+				if cmd.Flags().Changed("active") {
 					handlers.SetNested(bodyObj, "active", bodyActive)
 				}
 				if bodyDescription != "" {

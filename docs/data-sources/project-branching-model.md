@@ -13,13 +13,13 @@ Reads Bitbucket project-branching-model via the Bitbucket Cloud API.
 
 | Operation | Method | Path | API Docs |
 |-----------|--------|------|----------|
-| Read | `GET` | `/workspaces/{workspace}/projects/{project_key}/branching-model` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-workspaces-workspace-projects-project-key-branching-model-get) |
+| Read | `GET` | `/workspaces/{workspace}/projects/{project_key}/branching-model/settings` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-workspaces-workspace-projects-project-key-branching-model-settings-get) |
 
 ## Required Permissions (OAuth2 Scopes)
 
 | Operation | Required Scopes |
 |-----------|----------------|
-| Read | `read:repository:bitbucket` |
+| Read | `admin:project:bitbucket` |
 
 ## Example Usage
 
@@ -44,18 +44,20 @@ output "project_branching_model_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `branch_types` (List of Object) The active branch types.
+- `branch_types` (List of Object) branch_types
   Nested schema:
-  - `kind` (String) The kind of branch. [feature, bugfix, release, hotfix]
-  - `prefix` (String) The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The prefix must be a valid prefix for a branch and must always exist. It cannot be blank, empty or `null`.
+  - `enabled` (String) Whether the branch type is enabled or not. A disabled branch type may contain an invalid `prefix`.
+  - `kind` (String) The kind of the branch type. [feature, bugfix, release, hotfix]
+  - `prefix` (String) The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid.
 
 - `development` (Object) development
   Nested schema:
-  - `name` (String) Name of the target branch. If inherited by a repository, it will default to the main branch if the specified branch does not exist.
-  - `use_mainbranch` (String) Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`).
+  - `name` (String) The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur.
+  - `use_mainbranch` (String) Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name.
 
 - `production` (Object) production
   Nested schema:
-  - `name` (String) Name of the target branch. If inherited by a repository, it will default to the main branch if the specified branch does not exist.
-  - `use_mainbranch` (String) Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`).
+  - `enabled` (String) Indicates if branch is enabled or not.
+  - `name` (String) The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur.
+  - `use_mainbranch` (String) Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name.
 

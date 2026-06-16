@@ -951,6 +951,7 @@ components:
             properties:
               is_valid:
                 type: boolean
+                readOnly: true
                 description: Indicates if the configured branch is valid, that is,
                   if the configured branch actually exists currently. Is always `true`
                   when `use_mainbranch` is `true` (even if the main branch does not
@@ -976,6 +977,7 @@ components:
             properties:
               is_valid:
                 type: boolean
+                readOnly: true
                 description: Indicates if the configured branch is valid, that is,
                   if the configured branch actually exists currently. Is always `true`
                   when `use_mainbranch` is `true` (even if the main branch does not

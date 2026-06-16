@@ -518,7 +518,7 @@ func newPRCreateAPullRequestCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyCloseSourceBranch {
+				if cmd.Flags().Changed("close-source-branch") {
 					handlers.SetNested(bodyObj, "close_source_branch", bodyCloseSourceBranch)
 				}
 				if bodyDescription != "" {
@@ -527,10 +527,10 @@ func newPRCreateAPullRequestCmd() *cobra.Command {
 				if bodyDestinationCommitHash != "" {
 					handlers.SetNested(bodyObj, "destination.commit.hash", bodyDestinationCommitHash)
 				}
-				if bodyDraft {
+				if cmd.Flags().Changed("draft") {
 					handlers.SetNested(bodyObj, "draft", bodyDraft)
 				}
-				if bodyMergeable {
+				if cmd.Flags().Changed("mergeable") {
 					handlers.SetNested(bodyObj, "mergeable", bodyMergeable)
 				}
 				if bodyReason != "" {
@@ -726,7 +726,7 @@ Only open pull requests can be mutated.`,
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyCloseSourceBranch {
+				if cmd.Flags().Changed("close-source-branch") {
 					handlers.SetNested(bodyObj, "close_source_branch", bodyCloseSourceBranch)
 				}
 				if bodyDescription != "" {
@@ -735,10 +735,10 @@ Only open pull requests can be mutated.`,
 				if bodyDestinationCommitHash != "" {
 					handlers.SetNested(bodyObj, "destination.commit.hash", bodyDestinationCommitHash)
 				}
-				if bodyDraft {
+				if cmd.Flags().Changed("draft") {
 					handlers.SetNested(bodyObj, "draft", bodyDraft)
 				}
-				if bodyMergeable {
+				if cmd.Flags().Changed("mergeable") {
 					handlers.SetNested(bodyObj, "mergeable", bodyMergeable)
 				}
 				if bodyReason != "" {
@@ -1084,19 +1084,19 @@ Returns the newly created pull request comment.`,
 				if bodyParentId != 0 {
 					handlers.SetNested(bodyObj, "parent.id", bodyParentId)
 				}
-				if bodyPending {
+				if cmd.Flags().Changed("pending") {
 					handlers.SetNested(bodyObj, "pending", bodyPending)
 				}
-				if bodyPullrequestCloseSourceBranch {
+				if cmd.Flags().Changed("pullrequest-close-source-branch") {
 					handlers.SetNested(bodyObj, "pullrequest.close_source_branch", bodyPullrequestCloseSourceBranch)
 				}
 				if bodyPullrequestDescription != "" {
 					handlers.SetNested(bodyObj, "pullrequest.description", bodyPullrequestDescription)
 				}
-				if bodyPullrequestDraft {
+				if cmd.Flags().Changed("pullrequest-draft") {
 					handlers.SetNested(bodyObj, "pullrequest.draft", bodyPullrequestDraft)
 				}
-				if bodyPullrequestMergeable {
+				if cmd.Flags().Changed("pullrequest-mergeable") {
 					handlers.SetNested(bodyObj, "pullrequest.mergeable", bodyPullrequestMergeable)
 				}
 				if bodyPullrequestReason != "" {
@@ -1300,19 +1300,19 @@ func newPRUpdateACommentOnAPullRequestCmd() *cobra.Command {
 				if bodyParentId != 0 {
 					handlers.SetNested(bodyObj, "parent.id", bodyParentId)
 				}
-				if bodyPending {
+				if cmd.Flags().Changed("pending") {
 					handlers.SetNested(bodyObj, "pending", bodyPending)
 				}
-				if bodyPullrequestCloseSourceBranch {
+				if cmd.Flags().Changed("pullrequest-close-source-branch") {
 					handlers.SetNested(bodyObj, "pullrequest.close_source_branch", bodyPullrequestCloseSourceBranch)
 				}
 				if bodyPullrequestDescription != "" {
 					handlers.SetNested(bodyObj, "pullrequest.description", bodyPullrequestDescription)
 				}
-				if bodyPullrequestDraft {
+				if cmd.Flags().Changed("pullrequest-draft") {
 					handlers.SetNested(bodyObj, "pullrequest.draft", bodyPullrequestDraft)
 				}
-				if bodyPullrequestMergeable {
+				if cmd.Flags().Changed("pullrequest-mergeable") {
 					handlers.SetNested(bodyObj, "pullrequest.mergeable", bodyPullrequestMergeable)
 				}
 				if bodyPullrequestReason != "" {
@@ -1851,7 +1851,7 @@ func newPRMergeAPullRequestCmd() *cobra.Command {
 			}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyCloseSourceBranch {
+				if cmd.Flags().Changed("close-source-branch") {
 					handlers.SetNested(bodyObj, "close_source_branch", bodyCloseSourceBranch)
 				}
 				if bodyMergeStrategy != "" {
@@ -2320,7 +2320,7 @@ will cause the task to appear below the comment on a pull request when viewed in
 				if bodyContentRaw != "" {
 					handlers.SetNested(bodyObj, "content.raw", bodyContentRaw)
 				}
-				if bodyPending {
+				if cmd.Flags().Changed("pending") {
 					handlers.SetNested(bodyObj, "pending", bodyPending)
 				}
 				if len(bodyObj) > 0 {

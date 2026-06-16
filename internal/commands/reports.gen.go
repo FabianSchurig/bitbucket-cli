@@ -238,7 +238,7 @@ func newReportsCreateOrUpdateReportCmd() *cobra.Command {
 				if bodyLogoUrl != "" {
 					handlers.SetNested(bodyObj, "logo_url", bodyLogoUrl)
 				}
-				if bodyRemoteLinkEnabled {
+				if cmd.Flags().Changed("remote-link-enabled") {
 					handlers.SetNested(bodyObj, "remote_link_enabled", bodyRemoteLinkEnabled)
 				}
 				if bodyReportType != "" {

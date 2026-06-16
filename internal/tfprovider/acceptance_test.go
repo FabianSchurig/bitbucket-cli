@@ -2407,8 +2407,10 @@ func testAccRepoDeployKeysConfig(workspace, projectKey, repoSlug, sshKey, label 
 		resource "bitbucket_repo_deploy_keys" "test" {
 			workspace = %[1]q
 			repo_slug = %[3]q
-			key       = %[4]q
-			label     = %[5]q
+			request_body = jsonencode({
+				key   = %[4]q
+				label = %[5]q
+			})
 			depends_on = [bitbucket_repos.test]
 		}
 	`, workspace, projectKey, repoSlug, sshKey, label)

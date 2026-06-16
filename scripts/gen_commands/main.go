@@ -249,7 +249,7 @@ if {{.GoName}} != 0 {
 handlers.SetNested(bodyObj, "{{.Path}}", {{.GoName}})
 }
 {{- else if eq .GoType "bool"}}
-if {{.GoName}} {
+if cmd.Flags().Changed("{{.FlagName}}") {
 handlers.SetNested(bodyObj, "{{.Path}}", {{.GoName}})
 }
 {{- end}}

@@ -120,6 +120,7 @@ func newDeploymentsAddARepositoryDeployKeyCmd() *cobra.Command {
 	var (
 		repoSlug  string
 		workspace string
+		body      string
 	)
 
 	cmd := &cobra.Command{
@@ -143,7 +144,13 @@ func newDeploymentsAddARepositoryDeployKeyCmd() *cobra.Command {
 				return err
 			}
 			queryParams := map[string]string{}
-			body := ""
+			if body == "" {
+				bodyObj := map[string]any{}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
 				Method:      "POST",
 				URLTemplate: "/repositories/{workspace}/{repo_slug}/deploy-keys",
@@ -156,6 +163,7 @@ func newDeploymentsAddARepositoryDeployKeyCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
 
@@ -217,6 +225,7 @@ func newDeploymentsUpdateARepositoryDeployKeyCmd() *cobra.Command {
 		keyId     string
 		repoSlug  string
 		workspace string
+		body      string
 	)
 
 	cmd := &cobra.Command{
@@ -244,7 +253,13 @@ func newDeploymentsUpdateARepositoryDeployKeyCmd() *cobra.Command {
 				return err
 			}
 			queryParams := map[string]string{}
-			body := ""
+			if body == "" {
+				bodyObj := map[string]any{}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
 				Method:      "PUT",
 				URLTemplate: "/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}",
@@ -258,6 +273,7 @@ func newDeploymentsUpdateARepositoryDeployKeyCmd() *cobra.Command {
 	cmd.Flags().StringVar(&keyId, "key-id", "", "key_id (path parameter)")
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
 

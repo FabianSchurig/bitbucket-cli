@@ -348,13 +348,13 @@ func newIssuesCreateAnIssueCmd() *cobra.Command {
 				if bodyRepositoryFullName != "" {
 					handlers.SetNested(bodyObj, "repository.full_name", bodyRepositoryFullName)
 				}
-				if bodyRepositoryHasIssues {
+				if cmd.Flags().Changed("repository-has-issues") {
 					handlers.SetNested(bodyObj, "repository.has_issues", bodyRepositoryHasIssues)
 				}
-				if bodyRepositoryHasWiki {
+				if cmd.Flags().Changed("repository-has-wiki") {
 					handlers.SetNested(bodyObj, "repository.has_wiki", bodyRepositoryHasWiki)
 				}
-				if bodyRepositoryIsPrivate {
+				if cmd.Flags().Changed("repository-is-private") {
 					handlers.SetNested(bodyObj, "repository.is_private", bodyRepositoryIsPrivate)
 				}
 				if bodyRepositoryLanguage != "" {
@@ -492,7 +492,7 @@ When the job has been accepted, it will return a 202 (Accepted) along with a uni
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyIncludeAttachments {
+				if cmd.Flags().Changed("include-attachments") {
 					handlers.SetNested(bodyObj, "include_attachments", bodyIncludeAttachments)
 				}
 				if bodyProjectKey != "" {
@@ -501,7 +501,7 @@ When the job has been accepted, it will return a 202 (Accepted) along with a uni
 				if bodyProjectName != "" {
 					handlers.SetNested(bodyObj, "project_name", bodyProjectName)
 				}
-				if bodySendEmail {
+				if cmd.Flags().Changed("send-email") {
 					handlers.SetNested(bodyObj, "send_email", bodySendEmail)
 				}
 				if bodyType != "" {

@@ -88,13 +88,11 @@ Available operations:
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
 				}},
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `enabled`, Type: `bool`, Desc: `Indicates if branch is enabled or not.`},
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
@@ -123,13 +121,11 @@ Available operations:
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
 				}},
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `enabled`, Type: `bool`, Desc: `Indicates if branch is enabled or not.`},
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
@@ -141,13 +137,11 @@ Available operations:
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
 				}},
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `enabled`, Type: `bool`, Desc: `Indicates if branch is enabled or not.`},
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
@@ -253,13 +247,11 @@ Available operations:
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
 				}},
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `enabled`, Type: `bool`, Desc: `Indicates if branch is enabled or not.`},
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
@@ -288,13 +280,11 @@ Available operations:
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
 				}},
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `enabled`, Type: `bool`, Desc: `Indicates if branch is enabled or not.`},
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
@@ -306,13 +296,11 @@ Available operations:
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
 				}},
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `enabled`, Type: `bool`, Desc: `Indicates if branch is enabled or not.`},
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
@@ -388,13 +376,11 @@ Available operations:
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
 				}},
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `enabled`, Type: `bool`, Desc: `Indicates if branch is enabled or not.`},
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
@@ -423,13 +409,11 @@ Available operations:
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
 				}},
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `enabled`, Type: `bool`, Desc: `Indicates if branch is enabled or not.`},
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
@@ -441,13 +425,11 @@ Available operations:
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
 				}},
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `enabled`, Type: `bool`, Desc: `Indicates if branch is enabled or not.`},
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
@@ -553,13 +535,11 @@ Available operations:
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
 				}},
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `enabled`, Type: `bool`, Desc: `Indicates if branch is enabled or not.`},
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
@@ -588,13 +568,11 @@ Available operations:
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
 				}},
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `enabled`, Type: `bool`, Desc: `Indicates if branch is enabled or not.`},
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
@@ -606,13 +584,11 @@ Available operations:
 					{Path: `prefix`, Type: `string`, Desc: "The prefix for this branch type. A branch with this prefix will be classified as per `kind`. The `prefix` of an enabled branch type must be a valid branch prefix.Additionally, it cannot be blank, empty or `null`. The `prefix` for a disabled branch type can be empty or invalid."},
 				}},
 				{Path: `development`, Type: `string`, Desc: `development`, IsObject: true, ItemFields: []BodyFieldDef{
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},
 				{Path: `production`, Type: `string`, Desc: `production`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `enabled`, Type: `bool`, Desc: `Indicates if branch is enabled or not.`},
-					{Path: `is_valid`, Type: `bool`, Desc: "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings."},
 					{Path: `name`, Type: `string`, Desc: "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur."},
 					{Path: `use_mainbranch`, Type: `bool`, Desc: "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name."},
 				}},

@@ -39,7 +39,7 @@ Manage Bitbucket branching models
 | CRUD | Method | Path |
 | --- | --- | --- |
 | Create | `PUT` | `/repositories/{workspace}/{repo_slug}/branching-model/settings` |
-| Read | `GET` | `/repositories/{workspace}/{repo_slug}/branching-model` |
+| Read | `GET` | `/repositories/{workspace}/{repo_slug}/branching-model/settings` |
 | Update | `PUT` | `/repositories/{workspace}/{repo_slug}/branching-model/settings` |
 
 Tests: `TestAccRealAPI_DataSource_BranchingModel` `TestAccRealAPI_ResourceBranchingModel_CRUD`
@@ -150,7 +150,7 @@ Manage the branching model for a Bitbucket project
 | CRUD | Method | Path |
 | --- | --- | --- |
 | Create | `PUT` | `/workspaces/{workspace}/projects/{project_key}/branching-model/settings` |
-| Read | `GET` | `/workspaces/{workspace}/projects/{project_key}/branching-model` |
+| Read | `GET` | `/workspaces/{workspace}/projects/{project_key}/branching-model/settings` |
 | Update | `PUT` | `/workspaces/{workspace}/projects/{project_key}/branching-model/settings` |
 
 Tests: `TestAccRealAPI_ResourceProjectBranchingModel_CRUD`

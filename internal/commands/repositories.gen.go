@@ -299,13 +299,13 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 				if bodyFullName != "" {
 					handlers.SetNested(bodyObj, "full_name", bodyFullName)
 				}
-				if bodyHasIssues {
+				if cmd.Flags().Changed("has-issues") {
 					handlers.SetNested(bodyObj, "has_issues", bodyHasIssues)
 				}
-				if bodyHasWiki {
+				if cmd.Flags().Changed("has-wiki") {
 					handlers.SetNested(bodyObj, "has_wiki", bodyHasWiki)
 				}
-				if bodyIsPrivate {
+				if cmd.Flags().Changed("is-private") {
 					handlers.SetNested(bodyObj, "is_private", bodyIsPrivate)
 				}
 				if bodyLanguage != "" {
@@ -335,10 +335,10 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 				if bodyProjectDescription != "" {
 					handlers.SetNested(bodyObj, "project.description", bodyProjectDescription)
 				}
-				if bodyProjectHasPubliclyVisibleRepos {
+				if cmd.Flags().Changed("project-has-publicly-visible-repos") {
 					handlers.SetNested(bodyObj, "project.has_publicly_visible_repos", bodyProjectHasPubliclyVisibleRepos)
 				}
-				if bodyProjectIsPrivate {
+				if cmd.Flags().Changed("project-is-private") {
 					handlers.SetNested(bodyObj, "project.is_private", bodyProjectIsPrivate)
 				}
 				if bodyProjectKey != "" {
@@ -487,13 +487,13 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 				if bodyFullName != "" {
 					handlers.SetNested(bodyObj, "full_name", bodyFullName)
 				}
-				if bodyHasIssues {
+				if cmd.Flags().Changed("has-issues") {
 					handlers.SetNested(bodyObj, "has_issues", bodyHasIssues)
 				}
-				if bodyHasWiki {
+				if cmd.Flags().Changed("has-wiki") {
 					handlers.SetNested(bodyObj, "has_wiki", bodyHasWiki)
 				}
-				if bodyIsPrivate {
+				if cmd.Flags().Changed("is-private") {
 					handlers.SetNested(bodyObj, "is_private", bodyIsPrivate)
 				}
 				if bodyLanguage != "" {
@@ -523,10 +523,10 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 				if bodyProjectDescription != "" {
 					handlers.SetNested(bodyObj, "project.description", bodyProjectDescription)
 				}
-				if bodyProjectHasPubliclyVisibleRepos {
+				if cmd.Flags().Changed("project-has-publicly-visible-repos") {
 					handlers.SetNested(bodyObj, "project.has_publicly_visible_repos", bodyProjectHasPubliclyVisibleRepos)
 				}
-				if bodyProjectIsPrivate {
+				if cmd.Flags().Changed("project-is-private") {
 					handlers.SetNested(bodyObj, "project.is_private", bodyProjectIsPrivate)
 				}
 				if bodyProjectKey != "" {
@@ -865,13 +865,13 @@ func newReposForkARepositoryCmd() *cobra.Command {
 				if bodyFullName != "" {
 					handlers.SetNested(bodyObj, "full_name", bodyFullName)
 				}
-				if bodyHasIssues {
+				if cmd.Flags().Changed("has-issues") {
 					handlers.SetNested(bodyObj, "has_issues", bodyHasIssues)
 				}
-				if bodyHasWiki {
+				if cmd.Flags().Changed("has-wiki") {
 					handlers.SetNested(bodyObj, "has_wiki", bodyHasWiki)
 				}
-				if bodyIsPrivate {
+				if cmd.Flags().Changed("is-private") {
 					handlers.SetNested(bodyObj, "is_private", bodyIsPrivate)
 				}
 				if bodyLanguage != "" {
@@ -901,10 +901,10 @@ func newReposForkARepositoryCmd() *cobra.Command {
 				if bodyProjectDescription != "" {
 					handlers.SetNested(bodyObj, "project.description", bodyProjectDescription)
 				}
-				if bodyProjectHasPubliclyVisibleRepos {
+				if cmd.Flags().Changed("project-has-publicly-visible-repos") {
 					handlers.SetNested(bodyObj, "project.has_publicly_visible_repos", bodyProjectHasPubliclyVisibleRepos)
 				}
-				if bodyProjectIsPrivate {
+				if cmd.Flags().Changed("project-is-private") {
 					handlers.SetNested(bodyObj, "project.is_private", bodyProjectIsPrivate)
 				}
 				if bodyProjectKey != "" {
@@ -1080,7 +1080,7 @@ func newReposCreateAWebhookForARepositoryCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyActive {
+				if cmd.Flags().Changed("active") {
 					handlers.SetNested(bodyObj, "active", bodyActive)
 				}
 				if bodyDescription != "" {
@@ -1215,7 +1215,7 @@ func newReposUpdateAWebhookForARepositoryCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyActive {
+				if cmd.Flags().Changed("active") {
 					handlers.SetNested(bodyObj, "active", bodyActive)
 				}
 				if bodyDescription != "" {

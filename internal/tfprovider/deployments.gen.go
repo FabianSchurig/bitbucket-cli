@@ -150,7 +150,7 @@ administered through admin.atlassian.com.
 					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 			},
-			HasBody:   false,
+			HasBody:   true,
 			Paginated: false,
 			Scopes: []string{
 				`admin:repository:bitbucket`,
@@ -273,7 +273,7 @@ administered through admin.atlassian.com.
 					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 			},
-			HasBody:   false,
+			HasBody:   true,
 			Paginated: false,
 			Scopes: []string{
 				`admin:repository:bitbucket`,
@@ -756,7 +756,7 @@ administered through admin.atlassian.com.
 					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 			},
-			HasBody:   false,
+			HasBody:   true,
 			Paginated: false,
 			Scopes: []string{
 				`admin:repository:bitbucket`,
@@ -879,7 +879,7 @@ administered through admin.atlassian.com.
 					{Path: `uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
 				}},
 			},
-			HasBody:   false,
+			HasBody:   true,
 			Paginated: false,
 			Scopes: []string{
 				`admin:repository:bitbucket`,

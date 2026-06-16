@@ -476,7 +476,7 @@ func newSnippetsCreateACommentOnASnippetCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodySnippetIsPrivate {
+				if cmd.Flags().Changed("snippet-is-private") {
 					handlers.SetNested(bodyObj, "snippet.is_private", bodySnippetIsPrivate)
 				}
 				if bodySnippetScm != "" {
@@ -605,7 +605,7 @@ func newSnippetsUpdateACommentOnASnippetCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodySnippetIsPrivate {
+				if cmd.Flags().Changed("snippet-is-private") {
 					handlers.SetNested(bodyObj, "snippet.is_private", bodySnippetIsPrivate)
 				}
 				if bodySnippetScm != "" {

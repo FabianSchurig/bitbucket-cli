@@ -225,7 +225,7 @@ func newHooksCreateAWebhookForARepositoryCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyActive {
+				if cmd.Flags().Changed("active") {
 					handlers.SetNested(bodyObj, "active", bodyActive)
 				}
 				if bodyDescription != "" {
@@ -360,7 +360,7 @@ func newHooksUpdateAWebhookForARepositoryCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyActive {
+				if cmd.Flags().Changed("active") {
 					handlers.SetNested(bodyObj, "active", bodyActive)
 				}
 				if bodyDescription != "" {
@@ -534,7 +534,7 @@ func newHooksCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyActive {
+				if cmd.Flags().Changed("active") {
 					handlers.SetNested(bodyObj, "active", bodyActive)
 				}
 				if bodyDescription != "" {
@@ -657,7 +657,7 @@ func newHooksUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyActive {
+				if cmd.Flags().Changed("active") {
 					handlers.SetNested(bodyObj, "active", bodyActive)
 				}
 				if bodyDescription != "" {

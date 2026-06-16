@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -755,6 +756,8 @@ func readAttrValue(v attr.Value, f BodyFieldDef) (any, bool) {
 		return readNestedListAttrValue(v, f.ItemFields)
 	case f.IsArray:
 		return readSimpleListAttrValue(v)
+	case f.Type == "bool":
+		return readBoolAttrValue(v)
 	default:
 		return readStringAttrValue(v)
 	}
@@ -1226,6 +1229,8 @@ func bodyFieldValue(ctx context.Context, source stateAccessor, bf BodyFieldDef, 
 		return arr, arr != nil
 	case bf.Type == "int":
 		return readBodyInt64Value(ctx, source, attrName, diags)
+	case bf.Type == "bool":
+		return readBodyBoolValue(ctx, source, attrName, diags)
 	default:
 		return readBodyStringValue(ctx, source, attrName, diags)
 	}
@@ -1249,6 +1254,24 @@ func readBodyInt64Value(ctx context.Context, source stateAccessor, attrName stri
 		return 0, false
 	}
 	return val.ValueInt64(), true
+}
+
+// readBodyBoolValue reads a boolean-typed body field. The attribute is modeled
+// as a StringAttribute (string-everywhere convention), so the stored value is
+// "true"/"false"; it is parsed into a real bool so the request body carries a
+// JSON boolean (e.g. {"enabled": true}) instead of a string ({"enabled": "true"}).
+// If the value is not a recognized boolean it is passed through unchanged.
+func readBodyBoolValue(ctx context.Context, source stateAccessor, attrName string, diags *diag.Diagnostics) (any, bool) {
+	var val types.String
+	d := source.GetAttribute(ctx, attrPath(attrName), &val)
+	diags.Append(d...)
+	if d.HasError() || val.IsNull() || val.IsUnknown() || val.ValueString() == "" {
+		return nil, false
+	}
+	if b, err := strconv.ParseBool(val.ValueString()); err == nil {
+		return b, true
+	}
+	return val.ValueString(), true
 }
 
 func marshalBodyObject(diags *diag.Diagnostics, bodyObj map[string]any) string {
@@ -1319,6 +1342,21 @@ func readStringAttrValue(v attr.Value) (any, bool) {
 	sv, ok := v.(types.String)
 	if !ok || sv.IsNull() || sv.IsUnknown() || sv.ValueString() == "" {
 		return nil, false
+	}
+	return sv.ValueString(), true
+}
+
+// readBoolAttrValue reads a boolean-typed nested attribute value. Nested body
+// fields are modeled as StringAttribute, so the value is "true"/"false"; it is
+// parsed into a real bool so the request body carries a JSON boolean. Values
+// that are not recognized booleans are passed through unchanged.
+func readBoolAttrValue(v attr.Value) (any, bool) {
+	sv, ok := v.(types.String)
+	if !ok || sv.IsNull() || sv.IsUnknown() || sv.ValueString() == "" {
+		return nil, false
+	}
+	if b, err := strconv.ParseBool(sv.ValueString()); err == nil {
+		return b, true
 	}
 	return sv.ValueString(), true
 }

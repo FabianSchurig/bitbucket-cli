@@ -524,6 +524,22 @@ func TestResourceReadValueHelpers(t *testing.T) {
 	if got, ok := readAttrValue(types.ListNull(types.StringType), BodyFieldDef{Path: "tags", Type: "string", IsArray: true}); ok || got != nil {
 		t.Fatalf("expected null list to be skipped, got %#v ok=%v", got, ok)
 	}
+
+	// Boolean body fields are modeled as strings but must serialize as real
+	// JSON booleans, not quoted strings.
+	boolField := BodyFieldDef{Path: "enabled", Type: "bool"}
+	if got, ok := readAttrValue(types.StringValue("true"), boolField); !ok || got != true {
+		t.Fatalf("expected bool true, got %#v ok=%v", got, ok)
+	}
+	if got, ok := readAttrValue(types.StringValue("false"), boolField); !ok || got != false {
+		t.Fatalf("expected bool false, got %#v ok=%v", got, ok)
+	}
+	if got, ok := readAttrValue(types.StringValue(""), boolField); ok || got != nil {
+		t.Fatalf("expected empty bool to be skipped, got %#v ok=%v", got, ok)
+	}
+	if got, ok := readAttrValue(types.StringValue("maybe"), boolField); !ok || got != "maybe" {
+		t.Fatalf("expected unparseable bool to pass through, got %#v ok=%v", got, ok)
+	}
 }
 
 func TestResourceResponseValueHelpers(t *testing.T) {

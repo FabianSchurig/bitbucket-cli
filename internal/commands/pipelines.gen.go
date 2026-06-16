@@ -216,7 +216,7 @@ func newPipelinesCreateDeploymentVariableCmd() *cobra.Command {
 				if bodyKey != "" {
 					handlers.SetNested(bodyObj, "key", bodyKey)
 				}
-				if bodySecured {
+				if cmd.Flags().Changed("secured") {
 					handlers.SetNested(bodyObj, "secured", bodySecured)
 				}
 				if bodyUuid != "" {
@@ -300,7 +300,7 @@ func newPipelinesUpdateDeploymentVariableCmd() *cobra.Command {
 				if bodyKey != "" {
 					handlers.SetNested(bodyObj, "key", bodyKey)
 				}
-				if bodySecured {
+				if cmd.Flags().Changed("secured") {
 					handlers.SetNested(bodyObj, "secured", bodySecured)
 				}
 				if bodyUuid != "" {
@@ -563,13 +563,13 @@ func newPipelinesCreatePipelineForRepositoryCmd() *cobra.Command {
 				if bodyRepositoryFullName != "" {
 					handlers.SetNested(bodyObj, "repository.full_name", bodyRepositoryFullName)
 				}
-				if bodyRepositoryHasIssues {
+				if cmd.Flags().Changed("repository-has-issues") {
 					handlers.SetNested(bodyObj, "repository.has_issues", bodyRepositoryHasIssues)
 				}
-				if bodyRepositoryHasWiki {
+				if cmd.Flags().Changed("repository-has-wiki") {
 					handlers.SetNested(bodyObj, "repository.has_wiki", bodyRepositoryHasWiki)
 				}
-				if bodyRepositoryIsPrivate {
+				if cmd.Flags().Changed("repository-is-private") {
 					handlers.SetNested(bodyObj, "repository.is_private", bodyRepositoryIsPrivate)
 				}
 				if bodyRepositoryLanguage != "" {
@@ -1714,7 +1714,7 @@ func newPipelinesUpdateRepositoryPipelineConfigCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyEnabled {
+				if cmd.Flags().Changed("enabled") {
 					handlers.SetNested(bodyObj, "enabled", bodyEnabled)
 				}
 				if bodyRepositoryDescription != "" {
@@ -1726,13 +1726,13 @@ func newPipelinesUpdateRepositoryPipelineConfigCmd() *cobra.Command {
 				if bodyRepositoryFullName != "" {
 					handlers.SetNested(bodyObj, "repository.full_name", bodyRepositoryFullName)
 				}
-				if bodyRepositoryHasIssues {
+				if cmd.Flags().Changed("repository-has-issues") {
 					handlers.SetNested(bodyObj, "repository.has_issues", bodyRepositoryHasIssues)
 				}
-				if bodyRepositoryHasWiki {
+				if cmd.Flags().Changed("repository-has-wiki") {
 					handlers.SetNested(bodyObj, "repository.has_wiki", bodyRepositoryHasWiki)
 				}
-				if bodyRepositoryIsPrivate {
+				if cmd.Flags().Changed("repository-is-private") {
 					handlers.SetNested(bodyObj, "repository.is_private", bodyRepositoryIsPrivate)
 				}
 				if bodyRepositoryLanguage != "" {
@@ -1951,7 +1951,7 @@ func newPipelinesCreateRepositoryPipelineScheduleCmd() *cobra.Command {
 				if bodyCronPattern != "" {
 					handlers.SetNested(bodyObj, "cron_pattern", bodyCronPattern)
 				}
-				if bodyEnabled {
+				if cmd.Flags().Changed("enabled") {
 					handlers.SetNested(bodyObj, "enabled", bodyEnabled)
 				}
 				if bodyTargetRefName != "" {
@@ -2082,7 +2082,7 @@ func newPipelinesUpdateRepositoryPipelineScheduleCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
-				if bodyEnabled {
+				if cmd.Flags().Changed("enabled") {
 					handlers.SetNested(bodyObj, "enabled", bodyEnabled)
 				}
 				if len(bodyObj) > 0 {
@@ -2793,7 +2793,7 @@ func newPipelinesCreateRepositoryPipelineVariableCmd() *cobra.Command {
 				if bodyKey != "" {
 					handlers.SetNested(bodyObj, "key", bodyKey)
 				}
-				if bodySecured {
+				if cmd.Flags().Changed("secured") {
 					handlers.SetNested(bodyObj, "secured", bodySecured)
 				}
 				if bodyUuid != "" {
@@ -2922,7 +2922,7 @@ func newPipelinesUpdateRepositoryPipelineVariableCmd() *cobra.Command {
 				if bodyKey != "" {
 					handlers.SetNested(bodyObj, "key", bodyKey)
 				}
-				if bodySecured {
+				if cmd.Flags().Changed("secured") {
 					handlers.SetNested(bodyObj, "secured", bodySecured)
 				}
 				if bodyUuid != "" {

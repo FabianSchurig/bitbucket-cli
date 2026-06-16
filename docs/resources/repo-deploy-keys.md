@@ -53,6 +53,7 @@ resource "bitbucket_repo_deploy_keys" "example" {
 
 ### Optional
 - `key_id` (String) Path parameter (auto-populated from API response).
+- `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only
 
