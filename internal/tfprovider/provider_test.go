@@ -351,7 +351,7 @@ func TestSubResourceGroups_Registered(t *testing.T) {
 			wantList:   "listRepositoryForks",
 		},
 		"project-branching-model": {
-			wantRead: "getTheBranchingModelForAProject",
+			wantRead: "getTheBranchingModelConfigForAProject",
 		},
 		"pipeline-oidc": {
 			wantRead: "getOIDCConfiguration",

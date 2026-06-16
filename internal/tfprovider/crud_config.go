@@ -114,8 +114,17 @@ var CRUDConfig = map[string]CRUDMapping{
 		// to create it. Map Create to the same PUT used for Update so the
 		// resource can be created (configured) via Terraform instead of failing
 		// with "Create not supported" — same convention as pipeline-config.
+		//
+		// Read uses the *settings* GET (not the active-model GET) so the read
+		// response shape matches the PUT body/schema: the settings endpoint
+		// returns branch_types as {enabled, kind, prefix} and development/
+		// production as {is_valid, name, use_mainbranch}, whereas the
+		// active-model endpoint omits `enabled` and uses a different
+		// development/production shape. Reading from the active model would
+		// produce values whose object type diverges from the schema derived
+		// from the PUT body, triggering a "Value Conversion Error".
 		Create: "updateTheBranchingModelConfigForARepository",
-		Read:   "getTheBranchingModelForARepository",
+		Read:   "getTheBranchingModelConfigForARepository",
 		Update: "updateTheBranchingModelConfigForARepository",
 	},
 	"commit-statuses": {
@@ -297,9 +306,11 @@ var CRUDConfig = map[string]CRUDMapping{
 	},
 	"project-branching-model": {
 		// Singleton config (always present); enable management via PUT-as-Create
-		// like branching-model / pipeline-config.
+		// like branching-model / pipeline-config. Read uses the *settings* GET
+		// so the read response shape matches the PUT body/schema (see the
+		// repository "branching-model" mapping above for details).
 		Create: "updateTheBranchingModelConfigForAProject",
-		Read:   "getTheBranchingModelForAProject",
+		Read:   "getTheBranchingModelConfigForAProject",
 		Update: "updateTheBranchingModelConfigForAProject",
 	},
 	"pipeline-oidc": {

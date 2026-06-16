@@ -19,7 +19,7 @@ Manages Bitbucket project-branching-model via the Bitbucket Cloud API.
 | Operation | Method | Path | API Docs |
 |-----------|--------|------|----------|
 | Create | `PUT` | `/workspaces/{workspace}/projects/{project_key}/branching-model/settings` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-workspaces-workspace-projects-project-key-branching-model-settings-put) |
-| Read | `GET` | `/workspaces/{workspace}/projects/{project_key}/branching-model` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-workspaces-workspace-projects-project-key-branching-model-get) |
+| Read | `GET` | `/workspaces/{workspace}/projects/{project_key}/branching-model/settings` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-workspaces-workspace-projects-project-key-branching-model-settings-get) |
 | Update | `PUT` | `/workspaces/{workspace}/projects/{project_key}/branching-model/settings` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-branching-model/#api-workspaces-workspace-projects-project-key-branching-model-settings-put) |
 
 ## Required Permissions (OAuth2 Scopes)
@@ -27,7 +27,7 @@ Manages Bitbucket project-branching-model via the Bitbucket Cloud API.
 | Operation | Required Scopes |
 |-----------|----------------|
 | Create | `admin:project:bitbucket` |
-| Read | `read:repository:bitbucket` |
+| Read | `admin:project:bitbucket` |
 | Update | `admin:project:bitbucket` |
 
 ## Example Usage
