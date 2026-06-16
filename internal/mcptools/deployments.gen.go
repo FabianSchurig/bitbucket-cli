@@ -60,43 +60,9 @@ Available operations:
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-				{Path: `added_on`, Type: `string`, Desc: `added_on`},
-				{Path: `comment`, Type: `string`, Desc: `The comment parsed from the deploy key (if present)`},
-				{Path: `key`, Type: `string`, Desc: `The deploy key value.`},
-				{Path: `label`, Type: `string`, Desc: `The user-defined label for the deploy key`},
-				{Path: `last_used`, Type: `string`, Desc: `last_used`},
-				{Path: `owner.display_name`, Type: `string`, Desc: `display_name`},
-				{Path: `owner.uuid`, Type: `string`, Desc: `uuid`},
-				{Path: `repository.description`, Type: `string`, Desc: `description`},
-				{Path: `repository.fork_policy`, Type: `string`, Desc: `
-Controls the rules for forking this repository.
-
-* **allow_forks**: unrestricted forking
-* **no_public_forks**: restrict forking to private forks (forks cannot
-  be made public later)
-* **no_forks**: deny all forking
- [allow_forks, no_public_forks, no_forks]`},
-				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-				{Path: `repository.has_issues`, Type: `bool`, Desc: `
-The issue tracker for this repository is enabled. Issue Tracker
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-				{Path: `repository.is_private`, Type: `bool`, Desc: `is_private`},
-				{Path: `repository.language`, Type: `string`, Desc: `language`},
-				{Path: `repository.name`, Type: `string`, Desc: `name`},
-				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
-				{Path: `repository.size`, Type: `int`, Desc: `size`},
-				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `getARepositoryDeployKey`,
@@ -124,43 +90,9 @@ administered through admin.atlassian.com.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{
-				{Path: `added_on`, Type: `string`, Desc: `added_on`},
-				{Path: `comment`, Type: `string`, Desc: `The comment parsed from the deploy key (if present)`},
-				{Path: `key`, Type: `string`, Desc: `The deploy key value.`},
-				{Path: `label`, Type: `string`, Desc: `The user-defined label for the deploy key`},
-				{Path: `last_used`, Type: `string`, Desc: `last_used`},
-				{Path: `owner.display_name`, Type: `string`, Desc: `display_name`},
-				{Path: `owner.uuid`, Type: `string`, Desc: `uuid`},
-				{Path: `repository.description`, Type: `string`, Desc: `description`},
-				{Path: `repository.fork_policy`, Type: `string`, Desc: `
-Controls the rules for forking this repository.
-
-* **allow_forks**: unrestricted forking
-* **no_public_forks**: restrict forking to private forks (forks cannot
-  be made public later)
-* **no_forks**: deny all forking
- [allow_forks, no_public_forks, no_forks]`},
-				{Path: `repository.full_name`, Type: `string`, Desc: `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`},
-				{Path: `repository.has_issues`, Type: `bool`, Desc: `
-The issue tracker for this repository is enabled. Issue Tracker
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-				{Path: `repository.has_wiki`, Type: `bool`, Desc: `
-The wiki for this repository is enabled. Wiki
-features are not supported for repositories in workspaces
-administered through admin.atlassian.com.
-`},
-				{Path: `repository.is_private`, Type: `bool`, Desc: `is_private`},
-				{Path: `repository.language`, Type: `string`, Desc: `language`},
-				{Path: `repository.name`, Type: `string`, Desc: `name`},
-				{Path: `repository.scm`, Type: `string`, Desc: `[git]`},
-				{Path: `repository.size`, Type: `int`, Desc: `size`},
-				{Path: `repository.uuid`, Type: `string`, Desc: `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`},
-			},
-			HasBody:   true,
-			Paginated: false,
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
 		},
 		{
 			OperationID: `deleteARepositoryDeployKey`,

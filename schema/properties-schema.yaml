@@ -153,6 +153,14 @@ paths:
       - oauth2: []
       - basic: []
       - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - admin:workspace:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
   /repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}:
     put:
       responses:
@@ -280,6 +288,14 @@ paths:
       - oauth2: []
       - basic: []
       - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - admin:workspace:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
   /repositories/{workspace}/{repo_slug}/pullrequests/{pullrequest_id}/properties/{app_key}/{property_name}:
     put:
       responses:
@@ -425,6 +441,14 @@ paths:
       - oauth2: []
       - basic: []
       - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - admin:workspace:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
   /users/{selected_user}/properties/{app_key}/{property_name}:
     put:
       responses:
@@ -534,6 +558,14 @@ paths:
       - oauth2: []
       - basic: []
       - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - admin:workspace:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
 components:
   schemas:
     application_property:

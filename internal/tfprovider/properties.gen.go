@@ -50,7 +50,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: false,
-			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-commit-commit-properties-app-key-property-name-get`,
+			Scopes: []string{
+				`admin:workspace:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-commit-commit-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updateCommitHostedPropertyValue`,
@@ -108,7 +111,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: false,
-			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-properties-app-key-property-name-get`,
+			Scopes: []string{
+				`admin:workspace:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updateRepositoryHostedPropertyValue`,
@@ -165,7 +171,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: false,
-			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-pullrequests-pullrequest-id-properties-app-key-property-name-get`,
+			Scopes: []string{
+				`admin:workspace:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-pullrequests-pullrequest-id-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updatePullRequestHostedPropertyValue`,
@@ -222,7 +231,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: false,
-			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-users-selected-user-properties-app-key-property-name-get`,
+			Scopes: []string{
+				`admin:workspace:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-users-selected-user-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updateUserHostedPropertyValue`,
@@ -279,7 +291,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: false,
-			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-commit-commit-properties-app-key-property-name-get`,
+			Scopes: []string{
+				`admin:workspace:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-commit-commit-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updateCommitHostedPropertyValue`,
@@ -337,7 +352,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: false,
-			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-properties-app-key-property-name-get`,
+			Scopes: []string{
+				`admin:workspace:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updateRepositoryHostedPropertyValue`,
@@ -394,7 +412,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: false,
-			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-pullrequests-pullrequest-id-properties-app-key-property-name-get`,
+			Scopes: []string{
+				`admin:workspace:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-repositories-workspace-repo-slug-pullrequests-pullrequest-id-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updatePullRequestHostedPropertyValue`,
@@ -451,7 +472,10 @@ Available operations:
 			},
 			HasBody:   false,
 			Paginated: false,
-			DocURL:    `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-users-selected-user-properties-app-key-property-name-get`,
+			Scopes: []string{
+				`admin:workspace:bitbucket`,
+			},
+			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-properties/#api-users-selected-user-properties-app-key-property-name-get`,
 		},
 		{
 			OperationID: `updateUserHostedPropertyValue`,

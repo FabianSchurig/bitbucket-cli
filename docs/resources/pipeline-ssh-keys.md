@@ -10,6 +10,7 @@ description: |-
 Manages Bitbucket pipeline-ssh-keys via the Bitbucket Cloud API.
 
 ## CRUD Operations
+- **Create**: Supported
 - **Read**: Supported
 - **Update**: Supported
 - **Delete**: Supported
@@ -18,6 +19,7 @@ Manages Bitbucket pipeline-ssh-keys via the Bitbucket Cloud API.
 
 | Operation | Method | Path | API Docs |
 |-----------|--------|------|----------|
+| Create | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-key-pair-put) |
 | Read | `GET` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-key-pair-get) |
 | Update | `PUT` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-key-pair-put) |
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/pipelines_config/ssh/key_pair` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pipelines/#api-repositories-workspace-repo-slug-pipelines-config-ssh-key-pair-delete) |
@@ -26,6 +28,7 @@ Manages Bitbucket pipeline-ssh-keys via the Bitbucket Cloud API.
 
 | Operation | Required Scopes |
 |-----------|----------------|
+| Create | `admin:pipeline:bitbucket` |
 | Read | `read:pipeline:bitbucket` |
 | Update | `admin:pipeline:bitbucket` |
 | Delete | `admin:pipeline:bitbucket` |

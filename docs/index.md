@@ -234,7 +234,7 @@ REST API and have several important caveats:
 | `bitbucket_pipeline_oidc` | `bitbucket_pipeline_oidc` | R |
 | `bitbucket_pipeline_oidc_keys` | `bitbucket_pipeline_oidc_keys` | R |
 | `bitbucket_pipeline_schedules` | `bitbucket_pipeline_schedules` | CRUDL |
-| `bitbucket_pipeline_ssh_keys` | `bitbucket_pipeline_ssh_keys` | RUD |
+| `bitbucket_pipeline_ssh_keys` | `bitbucket_pipeline_ssh_keys` | CRUD |
 | `bitbucket_pipeline_variables` | `bitbucket_pipeline_variables` | CRUDL |
 | `bitbucket_pipelines` | `bitbucket_pipelines` | CRL |
 | `bitbucket_repo_runners` | `bitbucket_repo_runners` | CRUDL |
@@ -247,8 +247,8 @@ REST API and have several important caveats:
 | Resource | Data Source | CRUD |
 |----------|-------------|------|
 | `bitbucket_project_default_reviewers` | `bitbucket_project_default_reviewers` | CRDL |
-| `bitbucket_project_group_permissions` | `bitbucket_project_group_permissions` | RUDL |
-| `bitbucket_project_user_permissions` | `bitbucket_project_user_permissions` | RUDL |
+| `bitbucket_project_group_permissions` | `bitbucket_project_group_permissions` | CRUDL |
+| `bitbucket_project_user_permissions` | `bitbucket_project_user_permissions` | CRUDL |
 | `bitbucket_projects` | `bitbucket_projects` | CRUDL |
 
 

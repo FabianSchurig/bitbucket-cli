@@ -21,3 +21,19 @@ run "read_project_user_permissions" {
     error_message = "Expected non-empty id for data source bitbucket_project_user_permissions"
   }
 }
+
+run "create_project_user_permissions" {
+  command = apply
+
+  variables {
+    project_key = "PROJ"
+    selected_user_id = "{user-uuid}"
+    workspace = "my-workspace"
+  }
+
+  # Resource create should succeed with mock provider
+  assert {
+    condition     = bitbucket_project_user_permissions.test.id != ""
+    error_message = "Expected non-empty id for resource bitbucket_project_user_permissions"
+  }
+}
