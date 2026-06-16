@@ -167,11 +167,9 @@ scoops:
     homepage: "https://github.com/FabianSchurig/bitbucket-cli"
     license: AGPL-3.0
 
-homebrew_casks:
+brews:
   - name: bitbucket-cli
     ids:
-      - bb-cli
-    binaries:
       - bb-cli
     repository:
       owner: FabianSchurig
@@ -181,8 +179,6 @@ homebrew_casks:
     homepage: "https://github.com/FabianSchurig/bitbucket-cli"
   - name: bitbucket-mcp
     ids:
-      - bb-mcp
-    binaries:
       - bb-mcp
     repository:
       owner: FabianSchurig
