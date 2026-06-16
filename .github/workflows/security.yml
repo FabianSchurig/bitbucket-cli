@@ -42,10 +42,19 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install zizmor
+        run: pip install zizmor==1.25.2
+
       - name: Run zizmor
-        uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6
+        run: zizmor --format=sarif --persona=regular . > "${RUNNER_TEMP}/zizmor.sarif"
         env:
           GH_TOKEN: ${{ github.token }}
+
+      - name: Upload SARIF to GitHub Advanced Security
+        uses: github/codeql-action/upload-sarif@87557b9c84dde89fdd9b10e88954ac2f4248e463 # v4.36.1
+        with:
+          sarif_file: ${{ runner.temp }}/zizmor.sarif
+          category: zizmor
 
   dependency-review:
     name: Dependency Review
