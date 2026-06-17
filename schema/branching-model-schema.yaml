@@ -246,13 +246,6 @@ paths:
         \ the\nproject setting inheritance.\n\n\nWe have deprecated this side effect\
         \ and will remove it on 1 August 2022."
       summary: Update the branching model config for a repository
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/branching_model_settings'
-        description: The branching model settings to update.
-        required: true
       responses:
         '200':
           description: The updated branching model configuration
@@ -619,13 +612,6 @@ paths:
         that branches will not be deleted by default. A request without a\n`default_branch_deletion`\
         \ property will leave it unchanged. Other values\nwould be ignored."
       summary: Update the branching model config for a project
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/branching_model_settings'
-        description: The branching model settings to update.
-        required: true
       responses:
         '200':
           description: The updated branching model configuration
@@ -951,7 +937,6 @@ components:
             properties:
               is_valid:
                 type: boolean
-                readOnly: true
                 description: Indicates if the configured branch is valid, that is,
                   if the configured branch actually exists currently. Is always `true`
                   when `use_mainbranch` is `true` (even if the main branch does not
@@ -977,7 +962,6 @@ components:
             properties:
               is_valid:
                 type: boolean
-                readOnly: true
                 description: Indicates if the configured branch is valid, that is,
                   if the configured branch actually exists currently. Is always `true`
                   when `use_mainbranch` is `true` (even if the main branch does not

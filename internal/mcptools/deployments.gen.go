@@ -61,7 +61,7 @@ Available operations:
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
+			HasBody:    false,
 			Paginated:  false,
 		},
 		{
@@ -91,7 +91,7 @@ Available operations:
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
+			HasBody:    false,
 			Paginated:  false,
 		},
 		{
