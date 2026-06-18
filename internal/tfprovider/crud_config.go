@@ -162,7 +162,7 @@ var CRUDConfig = map[string]CRUDMapping{
 		Delete: "deleteRepositoryHostedPropertyValue",
 	},
 	"addon": {
-		Read:   "getTheClientKeyOfAConnectAddon",
+		List:   "getTheClientKeyOfAConnectAddon",
 		Update: "updateAnInstalledApp",
 		Delete: "deleteAnApp",
 	},

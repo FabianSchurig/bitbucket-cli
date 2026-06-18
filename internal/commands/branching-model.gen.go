@@ -145,8 +145,17 @@ func newBranchingModelGetTheBranchingModelConfigForARepositoryCmd() *cobra.Comma
 // operationId: updateTheBranchingModelConfigForARepository
 func newBranchingModelUpdateTheBranchingModelConfigForARepositoryCmd() *cobra.Command {
 	var (
-		repoSlug  string
-		workspace string
+		repoSlug                     string
+		workspace                    string
+		bodyBranchTypes              string
+		bodyDevelopmentIsValid       bool
+		bodyDevelopmentName          string
+		bodyDevelopmentUseMainbranch bool
+		bodyProductionEnabled        bool
+		bodyProductionIsValid        bool
+		bodyProductionName           string
+		bodyProductionUseMainbranch  bool
+		body                         string
 	)
 
 	cmd := &cobra.Command{
@@ -170,7 +179,37 @@ func newBranchingModelUpdateTheBranchingModelConfigForARepositoryCmd() *cobra.Co
 				return err
 			}
 			queryParams := map[string]string{}
-			body := ""
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyBranchTypes != "" {
+					handlers.SetNested(bodyObj, "branch_types", bodyBranchTypes)
+				}
+				if cmd.Flags().Changed("development-is-valid") {
+					handlers.SetNested(bodyObj, "development.is_valid", bodyDevelopmentIsValid)
+				}
+				if bodyDevelopmentName != "" {
+					handlers.SetNested(bodyObj, "development.name", bodyDevelopmentName)
+				}
+				if cmd.Flags().Changed("development-use-mainbranch") {
+					handlers.SetNested(bodyObj, "development.use_mainbranch", bodyDevelopmentUseMainbranch)
+				}
+				if cmd.Flags().Changed("production-enabled") {
+					handlers.SetNested(bodyObj, "production.enabled", bodyProductionEnabled)
+				}
+				if cmd.Flags().Changed("production-is-valid") {
+					handlers.SetNested(bodyObj, "production.is_valid", bodyProductionIsValid)
+				}
+				if bodyProductionName != "" {
+					handlers.SetNested(bodyObj, "production.name", bodyProductionName)
+				}
+				if cmd.Flags().Changed("production-use-mainbranch") {
+					handlers.SetNested(bodyObj, "production.use_mainbranch", bodyProductionUseMainbranch)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
 				Method:      "PUT",
 				URLTemplate: "/repositories/{workspace}/{repo_slug}/branching-model/settings",
@@ -183,6 +222,15 @@ func newBranchingModelUpdateTheBranchingModelConfigForARepositoryCmd() *cobra.Co
 	}
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyBranchTypes, "branch-types", "", `branch_types`)
+	cmd.Flags().BoolVar(&bodyDevelopmentIsValid, "development-is-valid", false, "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings.")
+	cmd.Flags().StringVar(&bodyDevelopmentName, "development-name", "", "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur.")
+	cmd.Flags().BoolVar(&bodyDevelopmentUseMainbranch, "development-use-mainbranch", false, "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name.")
+	cmd.Flags().BoolVar(&bodyProductionEnabled, "production-enabled", false, `Indicates if branch is enabled or not.`)
+	cmd.Flags().BoolVar(&bodyProductionIsValid, "production-is-valid", false, "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings.")
+	cmd.Flags().StringVar(&bodyProductionName, "production-name", "", "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur.")
+	cmd.Flags().BoolVar(&bodyProductionUseMainbranch, "production-use-mainbranch", false, "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name.")
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
 
@@ -325,8 +373,17 @@ func newBranchingModelGetTheBranchingModelConfigForAProjectCmd() *cobra.Command 
 // operationId: updateTheBranchingModelConfigForAProject
 func newBranchingModelUpdateTheBranchingModelConfigForAProjectCmd() *cobra.Command {
 	var (
-		projectKey string
-		workspace  string
+		projectKey                   string
+		workspace                    string
+		bodyBranchTypes              string
+		bodyDevelopmentIsValid       bool
+		bodyDevelopmentName          string
+		bodyDevelopmentUseMainbranch bool
+		bodyProductionEnabled        bool
+		bodyProductionIsValid        bool
+		bodyProductionName           string
+		bodyProductionUseMainbranch  bool
+		body                         string
 	)
 
 	cmd := &cobra.Command{
@@ -350,7 +407,37 @@ func newBranchingModelUpdateTheBranchingModelConfigForAProjectCmd() *cobra.Comma
 				return err
 			}
 			queryParams := map[string]string{}
-			body := ""
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyBranchTypes != "" {
+					handlers.SetNested(bodyObj, "branch_types", bodyBranchTypes)
+				}
+				if cmd.Flags().Changed("development-is-valid") {
+					handlers.SetNested(bodyObj, "development.is_valid", bodyDevelopmentIsValid)
+				}
+				if bodyDevelopmentName != "" {
+					handlers.SetNested(bodyObj, "development.name", bodyDevelopmentName)
+				}
+				if cmd.Flags().Changed("development-use-mainbranch") {
+					handlers.SetNested(bodyObj, "development.use_mainbranch", bodyDevelopmentUseMainbranch)
+				}
+				if cmd.Flags().Changed("production-enabled") {
+					handlers.SetNested(bodyObj, "production.enabled", bodyProductionEnabled)
+				}
+				if cmd.Flags().Changed("production-is-valid") {
+					handlers.SetNested(bodyObj, "production.is_valid", bodyProductionIsValid)
+				}
+				if bodyProductionName != "" {
+					handlers.SetNested(bodyObj, "production.name", bodyProductionName)
+				}
+				if cmd.Flags().Changed("production-use-mainbranch") {
+					handlers.SetNested(bodyObj, "production.use_mainbranch", bodyProductionUseMainbranch)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
 				Method:      "PUT",
 				URLTemplate: "/workspaces/{workspace}/projects/{project_key}/branching-model/settings",
@@ -363,5 +450,14 @@ func newBranchingModelUpdateTheBranchingModelConfigForAProjectCmd() *cobra.Comma
 	}
 	cmd.Flags().StringVar(&projectKey, "project-key", "", "project_key (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyBranchTypes, "branch-types", "", `branch_types`)
+	cmd.Flags().BoolVar(&bodyDevelopmentIsValid, "development-is-valid", false, "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings.")
+	cmd.Flags().StringVar(&bodyDevelopmentName, "development-name", "", "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur.")
+	cmd.Flags().BoolVar(&bodyDevelopmentUseMainbranch, "development-use-mainbranch", false, "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name.")
+	cmd.Flags().BoolVar(&bodyProductionEnabled, "production-enabled", false, `Indicates if branch is enabled or not.`)
+	cmd.Flags().BoolVar(&bodyProductionIsValid, "production-is-valid", false, "Indicates if the configured branch is valid, that is, if the configured branch actually exists currently. Is always `true` when `use_mainbranch` is `true` (even if the main branch does not exist). This field is read-only. This field is ignored when updating/creating settings.")
+	cmd.Flags().StringVar(&bodyProductionName, "production-name", "", "The configured branch. It must be `null` when `use_mainbranch` is `true`. Otherwise it must be a non-empty value. It is possible for the configured branch to not exist (e.g. it was deleted after the settings are set). In this case `is_valid` will be `false`. The branch must exist when updating/setting the `name` or an error will occur.")
+	cmd.Flags().BoolVar(&bodyProductionUseMainbranch, "production-use-mainbranch", false, "Indicates if the setting points at an explicit branch (`false`) or tracks the main branch (`true`). When `true` the `name` must be `null` or not provided. When `false` the `name` must contain a non-empty branch name.")
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
