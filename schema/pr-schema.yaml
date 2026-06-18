@@ -3810,8 +3810,6 @@ components:
             description: The pull request's current status.
             enum:
             - OPEN
-            - DRAFT
-            - QUEUED
             - MERGED
             - DECLINED
             - SUPERSEDED

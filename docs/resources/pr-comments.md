@@ -84,7 +84,7 @@ resource "bitbucket_pr_comments" "example" {
     - `created_on` (String) created_on
     - `display_name` (String) display_name
     - `uuid` (String) uuid
-  - `state` (String) The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]
+  - `state` (String) The pull request's current status. [OPEN, MERGED, DECLINED, SUPERSEDED]
   - `title` (String) Title of the pull request.
   - `id` (String) The pull request's unique ID. Note that pull request IDs are only unique within their associated repository.
 

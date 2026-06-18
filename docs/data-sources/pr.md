@@ -103,5 +103,5 @@ output "pr_response" {
   - `commit` (Object) commit
     - `hash` (String) hash
 
-- `state` (String) The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED]
+- `state` (String) The pull request's current status. [OPEN, MERGED, DECLINED, SUPERSEDED]
 - `title` (String) Title of the pull request.
