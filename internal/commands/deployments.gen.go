@@ -118,8 +118,27 @@ func newDeploymentsListRepositoryDeployKeysCmd() *cobra.Command {
 // operationId: addARepositoryDeployKey
 func newDeploymentsAddARepositoryDeployKeyCmd() *cobra.Command {
 	var (
-		repoSlug  string
-		workspace string
+		repoSlug                  string
+		workspace                 string
+		bodyAddedOn               string
+		bodyComment               string
+		bodyKey                   string
+		bodyLabel                 string
+		bodyLastUsed              string
+		bodyOwnerDisplayName      string
+		bodyOwnerUuid             string
+		bodyRepositoryDescription string
+		bodyRepositoryForkPolicy  string
+		bodyRepositoryFullName    string
+		bodyRepositoryHasIssues   bool
+		bodyRepositoryHasWiki     bool
+		bodyRepositoryIsPrivate   bool
+		bodyRepositoryLanguage    string
+		bodyRepositoryName        string
+		bodyRepositoryScm         string
+		bodyRepositorySize        int
+		bodyRepositoryUuid        string
+		body                      string
 	)
 
 	cmd := &cobra.Command{
@@ -143,7 +162,67 @@ func newDeploymentsAddARepositoryDeployKeyCmd() *cobra.Command {
 				return err
 			}
 			queryParams := map[string]string{}
-			body := ""
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyAddedOn != "" {
+					handlers.SetNested(bodyObj, "added_on", bodyAddedOn)
+				}
+				if bodyComment != "" {
+					handlers.SetNested(bodyObj, "comment", bodyComment)
+				}
+				if bodyKey != "" {
+					handlers.SetNested(bodyObj, "key", bodyKey)
+				}
+				if bodyLabel != "" {
+					handlers.SetNested(bodyObj, "label", bodyLabel)
+				}
+				if bodyLastUsed != "" {
+					handlers.SetNested(bodyObj, "last_used", bodyLastUsed)
+				}
+				if bodyOwnerDisplayName != "" {
+					handlers.SetNested(bodyObj, "owner.display_name", bodyOwnerDisplayName)
+				}
+				if bodyOwnerUuid != "" {
+					handlers.SetNested(bodyObj, "owner.uuid", bodyOwnerUuid)
+				}
+				if bodyRepositoryDescription != "" {
+					handlers.SetNested(bodyObj, "repository.description", bodyRepositoryDescription)
+				}
+				if bodyRepositoryForkPolicy != "" {
+					handlers.SetNested(bodyObj, "repository.fork_policy", bodyRepositoryForkPolicy)
+				}
+				if bodyRepositoryFullName != "" {
+					handlers.SetNested(bodyObj, "repository.full_name", bodyRepositoryFullName)
+				}
+				if cmd.Flags().Changed("repository-has-issues") {
+					handlers.SetNested(bodyObj, "repository.has_issues", bodyRepositoryHasIssues)
+				}
+				if cmd.Flags().Changed("repository-has-wiki") {
+					handlers.SetNested(bodyObj, "repository.has_wiki", bodyRepositoryHasWiki)
+				}
+				if cmd.Flags().Changed("repository-is-private") {
+					handlers.SetNested(bodyObj, "repository.is_private", bodyRepositoryIsPrivate)
+				}
+				if bodyRepositoryLanguage != "" {
+					handlers.SetNested(bodyObj, "repository.language", bodyRepositoryLanguage)
+				}
+				if bodyRepositoryName != "" {
+					handlers.SetNested(bodyObj, "repository.name", bodyRepositoryName)
+				}
+				if bodyRepositoryScm != "" {
+					handlers.SetNested(bodyObj, "repository.scm", bodyRepositoryScm)
+				}
+				if bodyRepositorySize != 0 {
+					handlers.SetNested(bodyObj, "repository.size", bodyRepositorySize)
+				}
+				if bodyRepositoryUuid != "" {
+					handlers.SetNested(bodyObj, "repository.uuid", bodyRepositoryUuid)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
 				Method:      "POST",
 				URLTemplate: "/repositories/{workspace}/{repo_slug}/deploy-keys",
@@ -156,6 +235,40 @@ func newDeploymentsAddARepositoryDeployKeyCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyAddedOn, "added-on", "", `added_on`)
+	cmd.Flags().StringVar(&bodyComment, "comment", "", `The comment parsed from the deploy key (if present)`)
+	cmd.Flags().StringVar(&bodyKey, "key", "", `The deploy key value.`)
+	cmd.Flags().StringVar(&bodyLabel, "label", "", `The user-defined label for the deploy key`)
+	cmd.Flags().StringVar(&bodyLastUsed, "last-used", "", `last_used`)
+	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `display_name`)
+	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `uuid`)
+	cmd.Flags().StringVar(&bodyRepositoryDescription, "repository-description", "", `description`)
+	cmd.Flags().StringVar(&bodyRepositoryForkPolicy, "repository-fork-policy", "", `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`)
+	cmd.Flags().StringVar(&bodyRepositoryFullName, "repository-full-name", "", `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`)
+	cmd.Flags().BoolVar(&bodyRepositoryHasIssues, "repository-has-issues", false, `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`)
+	cmd.Flags().BoolVar(&bodyRepositoryHasWiki, "repository-has-wiki", false, `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`)
+	cmd.Flags().BoolVar(&bodyRepositoryIsPrivate, "repository-is-private", false, `is_private`)
+	cmd.Flags().StringVar(&bodyRepositoryLanguage, "repository-language", "", `language`)
+	cmd.Flags().StringVar(&bodyRepositoryName, "repository-name", "", `name`)
+	cmd.Flags().StringVar(&bodyRepositoryScm, "repository-scm", "", `[git]`)
+	cmd.Flags().IntVar(&bodyRepositorySize, "repository-size", 0, `size`)
+	cmd.Flags().StringVar(&bodyRepositoryUuid, "repository-uuid", "", `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`)
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
 
@@ -214,9 +327,28 @@ func newDeploymentsGetARepositoryDeployKeyCmd() *cobra.Command {
 // operationId: updateARepositoryDeployKey
 func newDeploymentsUpdateARepositoryDeployKeyCmd() *cobra.Command {
 	var (
-		keyId     string
-		repoSlug  string
-		workspace string
+		keyId                     string
+		repoSlug                  string
+		workspace                 string
+		bodyAddedOn               string
+		bodyComment               string
+		bodyKey                   string
+		bodyLabel                 string
+		bodyLastUsed              string
+		bodyOwnerDisplayName      string
+		bodyOwnerUuid             string
+		bodyRepositoryDescription string
+		bodyRepositoryForkPolicy  string
+		bodyRepositoryFullName    string
+		bodyRepositoryHasIssues   bool
+		bodyRepositoryHasWiki     bool
+		bodyRepositoryIsPrivate   bool
+		bodyRepositoryLanguage    string
+		bodyRepositoryName        string
+		bodyRepositoryScm         string
+		bodyRepositorySize        int
+		bodyRepositoryUuid        string
+		body                      string
 	)
 
 	cmd := &cobra.Command{
@@ -244,7 +376,67 @@ func newDeploymentsUpdateARepositoryDeployKeyCmd() *cobra.Command {
 				return err
 			}
 			queryParams := map[string]string{}
-			body := ""
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyAddedOn != "" {
+					handlers.SetNested(bodyObj, "added_on", bodyAddedOn)
+				}
+				if bodyComment != "" {
+					handlers.SetNested(bodyObj, "comment", bodyComment)
+				}
+				if bodyKey != "" {
+					handlers.SetNested(bodyObj, "key", bodyKey)
+				}
+				if bodyLabel != "" {
+					handlers.SetNested(bodyObj, "label", bodyLabel)
+				}
+				if bodyLastUsed != "" {
+					handlers.SetNested(bodyObj, "last_used", bodyLastUsed)
+				}
+				if bodyOwnerDisplayName != "" {
+					handlers.SetNested(bodyObj, "owner.display_name", bodyOwnerDisplayName)
+				}
+				if bodyOwnerUuid != "" {
+					handlers.SetNested(bodyObj, "owner.uuid", bodyOwnerUuid)
+				}
+				if bodyRepositoryDescription != "" {
+					handlers.SetNested(bodyObj, "repository.description", bodyRepositoryDescription)
+				}
+				if bodyRepositoryForkPolicy != "" {
+					handlers.SetNested(bodyObj, "repository.fork_policy", bodyRepositoryForkPolicy)
+				}
+				if bodyRepositoryFullName != "" {
+					handlers.SetNested(bodyObj, "repository.full_name", bodyRepositoryFullName)
+				}
+				if cmd.Flags().Changed("repository-has-issues") {
+					handlers.SetNested(bodyObj, "repository.has_issues", bodyRepositoryHasIssues)
+				}
+				if cmd.Flags().Changed("repository-has-wiki") {
+					handlers.SetNested(bodyObj, "repository.has_wiki", bodyRepositoryHasWiki)
+				}
+				if cmd.Flags().Changed("repository-is-private") {
+					handlers.SetNested(bodyObj, "repository.is_private", bodyRepositoryIsPrivate)
+				}
+				if bodyRepositoryLanguage != "" {
+					handlers.SetNested(bodyObj, "repository.language", bodyRepositoryLanguage)
+				}
+				if bodyRepositoryName != "" {
+					handlers.SetNested(bodyObj, "repository.name", bodyRepositoryName)
+				}
+				if bodyRepositoryScm != "" {
+					handlers.SetNested(bodyObj, "repository.scm", bodyRepositoryScm)
+				}
+				if bodyRepositorySize != 0 {
+					handlers.SetNested(bodyObj, "repository.size", bodyRepositorySize)
+				}
+				if bodyRepositoryUuid != "" {
+					handlers.SetNested(bodyObj, "repository.uuid", bodyRepositoryUuid)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
 				Method:      "PUT",
 				URLTemplate: "/repositories/{workspace}/{repo_slug}/deploy-keys/{key_id}",
@@ -258,6 +450,40 @@ func newDeploymentsUpdateARepositoryDeployKeyCmd() *cobra.Command {
 	cmd.Flags().StringVar(&keyId, "key-id", "", "key_id (path parameter)")
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyAddedOn, "added-on", "", `added_on`)
+	cmd.Flags().StringVar(&bodyComment, "comment", "", `The comment parsed from the deploy key (if present)`)
+	cmd.Flags().StringVar(&bodyKey, "key", "", `The deploy key value.`)
+	cmd.Flags().StringVar(&bodyLabel, "label", "", `The user-defined label for the deploy key`)
+	cmd.Flags().StringVar(&bodyLastUsed, "last-used", "", `last_used`)
+	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `display_name`)
+	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `uuid`)
+	cmd.Flags().StringVar(&bodyRepositoryDescription, "repository-description", "", `description`)
+	cmd.Flags().StringVar(&bodyRepositoryForkPolicy, "repository-fork-policy", "", `
+Controls the rules for forking this repository.
+
+* **allow_forks**: unrestricted forking
+* **no_public_forks**: restrict forking to private forks (forks cannot
+  be made public later)
+* **no_forks**: deny all forking
+ [allow_forks, no_public_forks, no_forks]`)
+	cmd.Flags().StringVar(&bodyRepositoryFullName, "repository-full-name", "", `The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.`)
+	cmd.Flags().BoolVar(&bodyRepositoryHasIssues, "repository-has-issues", false, `
+The issue tracker for this repository is enabled. Issue Tracker
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`)
+	cmd.Flags().BoolVar(&bodyRepositoryHasWiki, "repository-has-wiki", false, `
+The wiki for this repository is enabled. Wiki
+features are not supported for repositories in workspaces
+administered through admin.atlassian.com.
+`)
+	cmd.Flags().BoolVar(&bodyRepositoryIsPrivate, "repository-is-private", false, `is_private`)
+	cmd.Flags().StringVar(&bodyRepositoryLanguage, "repository-language", "", `language`)
+	cmd.Flags().StringVar(&bodyRepositoryName, "repository-name", "", `name`)
+	cmd.Flags().StringVar(&bodyRepositoryScm, "repository-scm", "", `[git]`)
+	cmd.Flags().IntVar(&bodyRepositorySize, "repository-size", 0, `size`)
+	cmd.Flags().StringVar(&bodyRepositoryUuid, "repository-uuid", "", `The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.`)
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
 
