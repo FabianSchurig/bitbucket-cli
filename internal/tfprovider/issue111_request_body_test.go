@@ -45,9 +45,18 @@ func reproRepoServer(t *testing.T) *httptest.Server {
 		defer mu.Unlock()
 		switch r.Method {
 		case http.MethodPost, http.MethodPut:
-			b, _ := io.ReadAll(r.Body)
+			b, err := io.ReadAll(r.Body)
+			if err != nil {
+				t.Errorf("read request body: %v", err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
 			var body map[string]any
-			_ = json.Unmarshal(b, &body)
+			if err := json.Unmarshal(b, &body); err != nil {
+				t.Errorf("unmarshal request body: %v", err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
 			if d, ok := body["description"].(string); ok {
 				desc = d
 			}
