@@ -344,7 +344,7 @@ Manage Bitbucket Connect addons
 | --- | --- | --- |
 | Update | `PUT` | `/addon` |
 | Delete | `DELETE` | `/addon` |
-| List | `GET` | `/addon/linkers` |
+| List | `GET` | `/addon/{addon_key}/client-key` |
 
 ### `bitbucket_annotations`
 
