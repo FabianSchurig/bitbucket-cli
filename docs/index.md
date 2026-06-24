@@ -131,7 +131,7 @@ operation groups. Each resource group maps to a set of CRUD operations.
 
 | Resource | Data Source | CRUD |
 |----------|-------------|------|
-| `bitbucket_addon` | `bitbucket_addon` | RUD |
+| `bitbucket_addon` | `bitbucket_addon` | UDL |
 
 
 ### Branch Restrictions
