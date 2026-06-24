@@ -63,7 +63,23 @@ func (r *GenericResource) ModifyPlan(ctx context.Context, req resource.ModifyPla
 		return
 	}
 
-	for name, attr := range r.schemaAttrs {
+	// schemaAttrs is normally populated by Schema(), but the framework does
+	// not guarantee Schema() runs on the same resource instance it uses for
+	// PlanResourceChange — it serves a cached provider schema instead. When
+	// the cache is empty we must rebuild it here; otherwise the loop below
+	// would iterate zero attributes, vacuously conclude "all equal", and
+	// clobber the plan with prior state. That regression nulls configured
+	// non-Computed attributes such as request_body ("planned value
+	// cty.NullVal does not match config value") and silently drops genuine
+	// updates to body fields like description.
+	schemaAttrs := r.modifyPlanSchemaAttrs(ctx)
+	if len(schemaAttrs) == 0 {
+		// Couldn't determine the attribute set — never substitute prior
+		// state blindly. Defer to the framework's default planning.
+		return
+	}
+
+	for name, attr := range schemaAttrs {
 		if !isConfigurableAttr(attr) {
 			continue
 		}
@@ -90,8 +106,21 @@ func (r *GenericResource) ModifyPlan(ctx context.Context, req resource.ModifyPla
 	resp.Plan.Raw = req.State.Raw
 }
 
-// topLevelObjectAsMap decodes a tftypes object value (e.g. the Raw value
-// of a resource's Config or State) into a map keyed by attribute name.
+// modifyPlanSchemaAttrs returns the resource's schema attribute map for use
+// by ModifyPlan. It prefers the cache populated by Schema(), but the
+// terraform-plugin-framework does not guarantee Schema() has run on the
+// instance handling PlanResourceChange (it serves a cached provider schema).
+// When the cache is empty the map is rebuilt on demand and memoized so the
+// plan walk has a complete, accurate view of every configurable attribute.
+func (r *GenericResource) modifyPlanSchemaAttrs(ctx context.Context) map[string]schema.Attribute {
+	if len(r.schemaAttrs) > 0 {
+		return r.schemaAttrs
+	}
+	var sresp resource.SchemaResponse
+	r.Schema(ctx, resource.SchemaRequest{}, &sresp)
+	return r.schemaAttrs
+}
+
 func topLevelObjectAsMap(v tftypes.Value) (map[string]tftypes.Value, error) {
 	m := map[string]tftypes.Value{}
 	if err := v.As(&m); err != nil {
