@@ -237,10 +237,8 @@ func (e PullrequestRenderedTitleMarkup) Valid() bool {
 // Defines values for PullrequestState.
 const (
 	PullrequestStateDECLINED   PullrequestState = "DECLINED"
-	PullrequestStateDRAFT      PullrequestState = "DRAFT"
 	PullrequestStateMERGED     PullrequestState = "MERGED"
 	PullrequestStateOPEN       PullrequestState = "OPEN"
-	PullrequestStateQUEUED     PullrequestState = "QUEUED"
 	PullrequestStateSUPERSEDED PullrequestState = "SUPERSEDED"
 )
 
@@ -249,13 +247,9 @@ func (e PullrequestState) Valid() bool {
 	switch e {
 	case PullrequestStateDECLINED:
 		return true
-	case PullrequestStateDRAFT:
-		return true
 	case PullrequestStateMERGED:
 		return true
 	case PullrequestStateOPEN:
-		return true
-	case PullrequestStateQUEUED:
 		return true
 	case PullrequestStateSUPERSEDED:
 		return true

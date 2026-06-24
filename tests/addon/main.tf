@@ -14,7 +14,13 @@ variable "workspace" {
   default = "test-workspace"
 }
 
+variable "addon_key" {
+  type    = string
+  default = "example-value"
+}
+
 provider "bitbucket" {}
 
 data "bitbucket_addon" "test" {
+  addon_key = var.addon_key
 }

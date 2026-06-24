@@ -10,36 +10,38 @@ description: |-
 Manages Bitbucket addon via the Bitbucket Cloud API.
 
 ## CRUD Operations
+- **Read**: Supported
 - **Update**: Supported
 - **Delete**: Supported
-- **List**: Supported (via data source)
 
 ## API Endpoints
 
 | Operation | Method | Path | API Docs |
 |-----------|--------|------|----------|
+| Read | `GET` | `/addon/{addon_key}/client-key` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-addon/#api-addon-addon-key-client-key-get) |
 | Update | `PUT` | `/addon` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-addon/#api-addon-put) |
 | Delete | `DELETE` | `/addon` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-addon/#api-addon-delete) |
-| List | `GET` | `/addon/linkers` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-addon/#api-addon-linkers-get) |
 
 ## Required Permissions (OAuth2 Scopes)
 
 | Operation | Required Scopes |
 |-----------|----------------|
+| Read | `admin:workspace:bitbucket` |
 | Update | — |
 | Delete | — |
-| List | — |
 
 ## Example Usage
 
 ```hcl
 resource "bitbucket_addon" "example" {
+  addon_key = "example-value"
 }
 ```
 
 ## Schema
 
 ### Required
+- `addon_key` (String) Path parameter.
 
 ### Read-Only
 

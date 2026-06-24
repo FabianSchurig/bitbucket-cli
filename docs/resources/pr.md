@@ -71,7 +71,7 @@ resource "bitbucket_pr" "example" {
   - `commit` (Object) commit
     - `hash` (String) hash
 
-- `state` (String) The pull request's current status. [OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED] (also computed from API response)
+- `state` (String) The pull request's current status. [OPEN, MERGED, DECLINED, SUPERSEDED] (also computed from API response)
 - `title` (String) Title of the pull request. (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 

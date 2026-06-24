@@ -162,9 +162,9 @@ var CRUDConfig = map[string]CRUDMapping{
 		Delete: "deleteRepositoryHostedPropertyValue",
 	},
 	"addon": {
+		List:   "getTheClientKeyOfAConnectAddon",
 		Update: "updateAnInstalledApp",
 		Delete: "deleteAnApp",
-		List:   "listLinkersForAnApp",
 	},
 	// ─── Sub-resource CRUD mappings ───────────────────────────────────────────
 	// These reference operations that live inside existing generated groups

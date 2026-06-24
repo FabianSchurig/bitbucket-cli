@@ -246,6 +246,13 @@ paths:
         \ the\nproject setting inheritance.\n\n\nWe have deprecated this side effect\
         \ and will remove it on 1 August 2022."
       summary: Update the branching model config for a repository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/branching_model_settings'
+        description: The updated branching model configuration
+        required: false
       responses:
         '200':
           description: The updated branching model configuration
@@ -612,6 +619,13 @@ paths:
         that branches will not be deleted by default. A request without a\n`default_branch_deletion`\
         \ property will leave it unchanged. Other values\nwould be ignored."
       summary: Update the branching model config for a project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/branching_model_settings'
+        description: The updated branching model configuration
+        required: false
       responses:
         '200':
           description: The updated branching model configuration
