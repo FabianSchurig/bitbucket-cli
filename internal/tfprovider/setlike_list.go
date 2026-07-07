@@ -307,15 +307,24 @@ func asymmetricObjectEqual(left, right types.Object) bool {
 	// user-provided attributes (e.g. just {uuid}) while state contains
 	// additional Computed attributes (display_name, created_on, links, etc.).
 	// We verify that every attribute in left matches the corresponding
-	// attribute in right (with Unknown on left wildcarding any value on right),
-	// but right can have extra attributes that left doesn't have.
+	// attribute in right (with Unknown or Null on left wildcarding any value on
+	// right), but right can have extra attributes that left doesn't have.
 	for k, lv := range leftAttrs {
 		rv, ok := rightAttrs[k]
 		if !ok {
 			return false
 		}
-		// Asymmetric tolerance: Unknown on left wildcards anything on right.
-		if lv.IsUnknown() {
+		// Asymmetric tolerance: Unknown OR Null on left wildcards anything on
+		// right. Unknown covers the framework plan path (Computed inner fields
+		// are Unknown in proposedNew); Null covers the ModifyPlan path, which
+		// compares Config vs State — there the same Computed inner fields are
+		// Null (unspecified by the user) rather than Unknown, so without Null
+		// tolerance a reordered list like users[*] would be judged "changed"
+		// (config display_name=null vs state display_name="…"), defeating the
+		// prior-state substitution. During Create/Update apply the left side is
+		// the concrete API response, so a genuinely populated field is never
+		// Null there and this wildcard does not mask real differences.
+		if lv.IsUnknown() || lv.IsNull() {
 			continue
 		}
 		// Strict equality otherwise (including when right is Unknown, which

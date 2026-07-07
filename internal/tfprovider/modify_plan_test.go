@@ -67,6 +67,61 @@ func TestAttrValuesSemanticallyEqual_SetLikeList(t *testing.T) {
 	}
 }
 
+// TestAttrValuesSemanticallyEqual_SetLikeList_NullComputedInnerFields is a
+// regression test for the branch-restrictions OrderInsensitiveUsers failure.
+// ModifyPlan compares Config vs State: the config side of a nested-object list
+// carries only user-supplied fields (e.g. {uuid}), with Computed inner fields
+// (display_name, links, …) left NULL — whereas prior state has them populated
+// from the API. When the list is reordered, the set must still compare equal so
+// ModifyPlan substitutes prior state and does not promote sibling Computed
+// attributes to Unknown (which produced a perpetual in-place diff).
+func TestAttrValuesSemanticallyEqual_SetLikeList_NullComputedInnerFields(t *testing.T) {
+	ctx := context.Background()
+	itemFields := []BodyFieldDef{
+		{Path: "uuid", Type: "string"},
+		{Path: "display_name", Type: "string"},
+	}
+	objType := tftypes.Object{AttributeTypes: map[string]tftypes.Type{
+		"uuid":         tftypes.String,
+		"display_name": tftypes.String,
+	}}
+	listTfType := tftypes.List{ElementType: objType}
+
+	// config item: only uuid set, display_name NULL (unspecified computed field)
+	cfgItem := func(uuid string) tftypes.Value {
+		return tftypes.NewValue(objType, map[string]tftypes.Value{
+			"uuid":         tftypes.NewValue(tftypes.String, uuid),
+			"display_name": tftypes.NewValue(tftypes.String, nil),
+		})
+	}
+	// state item: uuid + populated display_name (from the API)
+	stItem := func(uuid, name string) tftypes.Value {
+		return tftypes.NewValue(objType, map[string]tftypes.Value{
+			"uuid":         tftypes.NewValue(tftypes.String, uuid),
+			"display_name": tftypes.NewValue(tftypes.String, name),
+		})
+	}
+	cfg := tftypes.NewValue(listTfType, []tftypes.Value{cfgItem("b"), cfgItem("a")})
+	st := tftypes.NewValue(listTfType, []tftypes.Value{stItem("a", "Alice"), stItem("b", "Bob")})
+
+	a := resourceschema.ListNestedAttribute{
+		Optional:   true,
+		Computed:   true,
+		CustomType: setLikeListTypeFor(itemFields),
+		NestedObject: resourceschema.NestedAttributeObject{
+			Attributes: buildNestedItemAttrs(itemFields),
+		},
+	}
+	if equal, ok := attrValuesSemanticallyEqual(ctx, cfg, st, a); !ok || !equal {
+		t.Fatalf("reordered set-like list with null computed inner fields should be equal, got equal=%v ok=%v", equal, ok)
+	}
+	// A genuine change to a user-supplied field must still be detected.
+	stChanged := tftypes.NewValue(listTfType, []tftypes.Value{stItem("a", "Alice"), stItem("c", "Carol")})
+	if equal, ok := attrValuesSemanticallyEqual(ctx, cfg, stChanged, a); !ok || equal {
+		t.Fatalf("set-like list with a different uuid must be unequal, got equal=%v ok=%v", equal, ok)
+	}
+}
+
 // TestIsConfigurableAttr ensures Computed-only attributes (id,
 // api_response, response fields) are skipped by the ModifyPlan walk,
 // otherwise the raw equality check would always flag them as "changed"
