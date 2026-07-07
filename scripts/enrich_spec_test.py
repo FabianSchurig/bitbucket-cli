@@ -58,6 +58,37 @@ class ApplyRequestBodyPatchesTests(unittest.TestCase):
             spec["paths"]["/workspaces/{workspace}/projects"]["post"],
         )
 
+    def test_injects_inline_body_when_schema_ref_resolves(self):
+        # Branching-model style: inline requestBody referencing a schema that
+        # exists -> injected.
+        path = "/repositories/{workspace}/{repo_slug}/branching-model/settings"
+        spec = {
+            "paths": {path: {"put": {"operationId": "updateTheBranchingModelConfigForARepository"}}},
+            "components": {
+                "schemas": {"branching_model_settings": {"type": "object"}},
+                "requestBodies": {},
+            },
+        }
+        applied = enrich_spec.apply_request_body_patches(spec)
+        self.assertEqual(applied, 1)
+        rb = spec["paths"][path]["put"]["requestBody"]
+        self.assertEqual(
+            rb["content"]["application/json"]["schema"]["$ref"],
+            "#/components/schemas/branching_model_settings",
+        )
+
+    def test_skips_inline_body_when_schema_ref_missing(self):
+        # Same operation but the referenced schema is absent -> skipped, no
+        # dangling reference introduced.
+        path = "/repositories/{workspace}/{repo_slug}/branching-model/settings"
+        spec = {
+            "paths": {path: {"put": {"operationId": "updateTheBranchingModelConfigForARepository"}}},
+            "components": {"schemas": {}, "requestBodies": {}},
+        }
+        applied = enrich_spec.apply_request_body_patches(spec)
+        self.assertEqual(applied, 0)
+        self.assertNotIn("requestBody", spec["paths"][path]["put"])
+
 
 if __name__ == "__main__":
     unittest.main()

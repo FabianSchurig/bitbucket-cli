@@ -63,27 +63,67 @@ REQUEST_BODY_PATCHES: dict[tuple[str, str], dict] = {
     ("post", "/workspaces/{workspace}/projects"): {
         "$ref": "#/components/requestBodies/project"
     },
+    # update the branching model config (repository + project). The live spec
+    # omits the requestBody for both PUTs, so HasBody=false and the settings
+    # (development/production/branch_types) are unreachable except via the raw
+    # request_body. Reference the published branching_model_settings schema.
+    ("put", "/repositories/{workspace}/{repo_slug}/branching-model/settings"): {
+        "content": {
+            "application/json": {
+                "schema": {"$ref": "#/components/schemas/branching_model_settings"}
+            }
+        },
+        "description": "The updated branching model configuration",
+        "required": False,
+    },
+    ("put", "/workspaces/{workspace}/projects/{project_key}/branching-model/settings"): {
+        "content": {
+            "application/json": {
+                "schema": {"$ref": "#/components/schemas/branching_model_settings"}
+            }
+        },
+        "description": "The updated branching model configuration",
+        "required": False,
+    },
 }
+
+
+def _refs_resolvable(node, spec: dict) -> bool:
+    """Return True when every ``$ref`` in ``node`` resolves within ``spec``.
+
+    Guards apply_request_body_patches against introducing a dangling reference
+    (e.g. if Atlassian renames a component), which would break partitioning.
+    """
+    if isinstance(node, dict):
+        ref = node.get("$ref")
+        if isinstance(ref, str) and ref.startswith("#/"):
+            target = spec
+            for part in ref.lstrip("#/").split("/"):
+                if isinstance(target, dict) and part in target:
+                    target = target[part]
+                else:
+                    return False
+        return all(_refs_resolvable(v, spec) for v in node.values())
+    if isinstance(node, list):
+        return all(_refs_resolvable(item, spec) for item in node)
+    return True
 
 
 def apply_request_body_patches(spec: dict) -> int:
     """Inject requestBody objects for operations the live spec leaves bodyless.
 
     Applies each entry in REQUEST_BODY_PATCHES only when the target operation
-    exists and does not already declare a requestBody. When a patch is a $ref
-    into components/requestBodies, it is skipped unless the referenced component
-    is present, so partitioning never encounters a dangling reference.
+    exists, does not already declare a requestBody, and every ``$ref`` inside
+    the patch resolves against the current spec — so partitioning never
+    encounters a dangling reference.
     """
-    request_bodies = spec.get("components", {}).get("requestBodies", {})
     applied = 0
     for (method, path), body in REQUEST_BODY_PATCHES.items():
         op = spec.get("paths", {}).get(path, {}).get(method)
         if not op or op.get("requestBody"):
             continue
-        ref = body.get("$ref", "")
-        if ref.startswith("#/components/requestBodies/"):
-            if ref.rsplit("/", 1)[-1] not in request_bodies:
-                continue
+        if not _refs_resolvable(body, spec):
+            continue
         op["requestBody"] = copy.deepcopy(body)
         applied += 1
     return applied

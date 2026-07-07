@@ -59,3 +59,54 @@ func TestModifyPlan_RebuildsSchemaAttrsWhenCacheEmpty(t *testing.T) {
 		t.Fatal("request_body was nulled in the plan; ModifyPlan substituted prior state despite a real change")
 	}
 }
+
+// TestModifyPlan_UnsetComputedAttrPreservesState is a regression test for the
+// branching-model perpetual no-op diff. When an Optional+Computed attribute is
+// left unset (null) in config but populated in prior state, it must not be
+// treated as a change. Otherwise ModifyPlan bails, sibling Computed attributes
+// get promoted to Unknown, and Terraform reports a spurious in-place update on
+// every plan even though nothing changed.
+func TestModifyPlan_UnsetComputedAttrPreservesState(t *testing.T) {
+	ctx := context.Background()
+
+	var sresp resource.SchemaResponse
+	(&GenericResource{group: ReposResourceGroup}).Schema(ctx, resource.SchemaRequest{}, &sresp)
+	objType := sresp.Schema.Type().TerraformType(ctx).(tftypes.Object)
+
+	stateVals := map[string]tftypes.Value{}
+	cfgVals := map[string]tftypes.Value{}
+	for name, ty := range objType.AttributeTypes {
+		stateVals[name] = tftypes.NewValue(ty, nil)
+		cfgVals[name] = tftypes.NewValue(ty, nil)
+	}
+	// description: managed and unchanged (same in config and state).
+	stateVals["description"] = tftypes.NewValue(tftypes.String, "foo")
+	cfgVals["description"] = tftypes.NewValue(tftypes.String, "foo")
+	// language: Optional+Computed, populated in state, left unset in config.
+	stateVals["language"] = tftypes.NewValue(tftypes.String, "go")
+	cfgVals["language"] = tftypes.NewValue(tftypes.String, nil)
+
+	state := tftypes.NewValue(objType, stateVals)
+	cfg := tftypes.NewValue(objType, cfgVals)
+
+	r := &GenericResource{group: ReposResourceGroup}
+	req := resource.ModifyPlanRequest{
+		State:  tfsdk.State{Schema: sresp.Schema, Raw: state},
+		Config: tfsdk.Config{Schema: sresp.Schema, Raw: cfg},
+		Plan:   tfsdk.Plan{Schema: sresp.Schema, Raw: cfg},
+	}
+	resp := resource.ModifyPlanResponse{Plan: tfsdk.Plan{Schema: sresp.Schema, Raw: cfg}}
+	r.ModifyPlan(ctx, req, &resp)
+
+	planMap := map[string]tftypes.Value{}
+	if err := resp.Plan.Raw.As(&planMap); err != nil {
+		t.Fatalf("decode plan: %v", err)
+	}
+	var lang *string
+	if err := planMap["language"].As(&lang); err != nil {
+		t.Fatalf("decode language: %v", err)
+	}
+	if lang == nil || *lang != "go" {
+		t.Fatalf("expected language preserved from prior state (%q), got %v", "go", lang)
+	}
+}

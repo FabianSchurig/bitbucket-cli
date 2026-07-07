@@ -313,6 +313,13 @@ paths:
       - forge-oauth2
       - api-token
       operationId: updateTheBranchingModelConfigForARepository
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/branching_model_settings'
+        description: The updated branching model configuration
+        required: false
     parameters:
     - name: repo_slug
       in: path
@@ -679,6 +686,13 @@ paths:
       - forge-oauth2
       - api-token
       operationId: updateTheBranchingModelConfigForAProject
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/branching_model_settings'
+        description: The updated branching model configuration
+        required: false
     parameters:
     - name: project_key
       in: path

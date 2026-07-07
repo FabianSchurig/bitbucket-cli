@@ -6,6 +6,7 @@ Locations:
 
 - `terraform/reality-checks/01_create_repo` — creates a repo and then adds a branch restriction, a webhook, and a pipeline variable.
 - `terraform/reality-checks/02_import_and_manage` — issue #111 coverage: reads a workspace (data source), creates a project via `request_body = jsonencode(...)`, and creates repositories using both typed fields (`description`, `project.key`) and the raw `request_body` escape hatch.
+- `terraform/reality-checks/03_branching_model` — verifies the repository and project branching-model resources expose typed body fields (`branch_types`) and are idempotent + update-detecting.
 
 ## Reality-check 02 — issue #111 (import & manage projects/repos)
 
@@ -68,6 +69,32 @@ terraform plan -var typed_use_request_body=true
 # 4) clean up
 terraform destroy -auto-approve
 ```
+
+## Reality-check 03 — branching-model typed fields
+
+Verifies the repository and project branching-model resources expose typed
+body fields instead of only the raw `request_body`. Bitbucket's live spec omits
+the `requestBody` on both branching-model PUT operations, so `HasBody` was false
+and the settings were unreachable. `scripts/enrich_spec.py` now injects the
+`branching_model_settings` body (regression-proofed against the daily
+schema-sync that previously overwrote the hand-edited schema YAML in `#110`).
+
+```bash
+cd terraform/reality-checks/03_branching_model
+terraform apply -auto-approve                      # create repo/project + models
+terraform plan -var feature_prefix=feature2/       # update detected (branch_types)
+terraform plan                                     # No changes (idempotent)
+terraform destroy -auto-approve
+```
+
+Notes:
+
+- `branch_types` must enumerate all four kinds (feature/bugfix/release/hotfix) —
+  Bitbucket always returns the complete set.
+- `development`/`production` are left unmanaged: their nested `is_valid` field is
+  read-only but not marked `readOnly` in the spec, so managing them yields a
+  benign no-op re-plan. The resource-level `ModifyPlan` now preserves unset
+  Optional+Computed attributes from prior state, so leaving them unset is stable.
 
 Running the combined reality-check
 

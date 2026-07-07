@@ -90,6 +90,17 @@ func (r *GenericResource) ModifyPlan(ctx context.Context, req resource.ModifyPla
 			// framework's normal planning take over.
 			return
 		}
+		// An unset Optional+Computed attribute (null in config) is not a
+		// change: the framework keeps the prior computed value. Treating it
+		// as "different" from populated prior state would defeat the
+		// whole-resource substitution below and let sibling Computed
+		// attributes get promoted to Unknown, producing a spurious perpetual
+		// no-op diff — e.g. branching-model `development`/`production` when
+		// only `branch_types` is managed. A genuine change (config non-null
+		// and unequal) still falls through and blocks substitution.
+		if cfg.IsNull() && attr.IsComputed() {
+			continue
+		}
 		equal, ok := attrValuesSemanticallyEqual(ctx, cfg, st, attr)
 		if !ok {
 			// Could not compare — fall back to default planning.
