@@ -20,13 +20,13 @@ jobs:
       - name: Install bb-cli from tap
         run: |
           brew tap FabianSchurig/tap
-          brew install bitbucket-cli
+          brew install --cask bitbucket-cli
 
       - name: Verify bb-cli
         run: bb-cli --help
 
       - name: Install bb-mcp from tap
-        run: brew install bitbucket-mcp
+        run: brew install --cask bitbucket-mcp
 
       - name: Verify bb-mcp
         run: bb-mcp --help
