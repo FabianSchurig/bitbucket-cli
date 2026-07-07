@@ -52,3 +52,23 @@ resource "bitbucket_pipeline_caches" "example" {
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `uri` (String) The uri for pipeline cache content.
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/repo_slug/cache_uuid`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_pipeline_caches.example
+  id = "my-workspace/my-repo/{cache-uuid}"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_pipeline_caches.example "my-workspace/my-repo/{cache-uuid}"
+```

@@ -74,3 +74,23 @@ resource "bitbucket_workspace_runners" "example" {
 
 - `updated_on` (String) The timestamp when the runner was last updated.
 - `uuid` (String) The UUID identifying the runner.
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/runner_uuid`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_workspace_runners.example
+  id = "my-workspace/{runner-uuid}"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_workspace_runners.example "my-workspace/{runner-uuid}"
+```

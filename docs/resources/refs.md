@@ -73,3 +73,23 @@ resource "bitbucket_refs" "example" {
     - `state` (String) [approved, changes_requested, <nil>]
 
 - `type` (String) type
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/repo_slug/name`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_refs.example
+  id = "my-workspace/my-repo/main"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_refs.example "my-workspace/my-repo/main"
+```

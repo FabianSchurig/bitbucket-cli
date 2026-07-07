@@ -61,3 +61,23 @@ resource "bitbucket_workspace_pipeline_variables" "example" {
 - `secured` (String) If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.
 - `uuid` (String) The UUID identifying the variable.
 - `value` (String) The value of the variable. If the variable is secured, this will be empty.
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/variable_uuid`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_workspace_pipeline_variables.example
+  id = "my-workspace/{variable-uuid}"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_workspace_pipeline_variables.example "my-workspace/{variable-uuid}"
+```

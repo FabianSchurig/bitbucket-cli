@@ -73,3 +73,23 @@ resource "bitbucket_snippets" "example" {
 - `scm` (String) The DVCS used to store the snippet. [git]
 - `title` (String) title
 - `updated_on` (String) updated_on
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/encoded_id`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_snippets.example
+  id = "my-workspace/snippet-id"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_snippets.example "my-workspace/snippet-id"
+```

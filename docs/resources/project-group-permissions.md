@@ -80,3 +80,23 @@ resource "bitbucket_project_group_permissions" "example" {
   - `uuid` (String) The project's immutable id.
 
 - `type` (String) type
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/project_key/group_slug`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_project_group_permissions.example
+  id = "my-workspace/PROJ/developers"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_project_group_permissions.example "my-workspace/PROJ/developers"
+```

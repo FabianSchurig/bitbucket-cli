@@ -73,3 +73,23 @@ resource "bitbucket_annotations" "example" {
 - `created_on` (String) The timestamp when the report was created.
 - `summary` (String) The message to display to users.
 - `updated_on` (String) The timestamp when the report was updated.
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/repo_slug/commit/report_id/annotation_id`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_annotations.example
+  id = "my-workspace/my-repo/abc123def/report-uuid/{annotation-id}"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_annotations.example "my-workspace/my-repo/abc123def/report-uuid/{annotation-id}"
+```

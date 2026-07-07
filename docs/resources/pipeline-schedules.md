@@ -73,3 +73,23 @@ resource "bitbucket_pipeline_schedules" "example" {
 - `created_on` (String) The timestamp when the schedule was created.
 - `updated_on` (String) The timestamp when the schedule was updated.
 - `uuid` (String) The UUID identifying the schedule.
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/repo_slug/schedule_uuid`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_pipeline_schedules.example
+  id = "my-workspace/my-repo/{schedule-uuid}"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_pipeline_schedules.example "my-workspace/my-repo/{schedule-uuid}"
+```

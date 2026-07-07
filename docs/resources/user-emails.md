@@ -44,3 +44,23 @@ resource "bitbucket_user_emails" "example" {
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `email`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_user_emails.example
+  id = "user@example.com"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_user_emails.example "user@example.com"
+```

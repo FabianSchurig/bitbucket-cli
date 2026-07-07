@@ -85,3 +85,23 @@ resource "bitbucket_project_user_permissions" "example" {
   - `is_staff` (String) is_staff
   - `nickname` (String) Account name defined by the owner. Should be used instead of the "username" field. Note that "nickname" cannot be used in place of "username" in URLs and queries, as "nickname" is not guaranteed to be unique.
 
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/project_key/selected_user_id`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_project_user_permissions.example
+  id = "my-workspace/PROJ/{user-uuid}"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_project_user_permissions.example "my-workspace/PROJ/{user-uuid}"
+```

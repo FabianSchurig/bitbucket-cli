@@ -57,3 +57,23 @@ resource "bitbucket_default_reviewers" "example" {
 - `created_on` (String) created_on
 - `display_name` (String) display_name
 - `uuid` (String) uuid
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/repo_slug/target_username`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_default_reviewers.example
+  id = "my-workspace/my-repo/jdoe"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_default_reviewers.example "my-workspace/my-repo/jdoe"
+```

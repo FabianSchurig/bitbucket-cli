@@ -92,3 +92,23 @@ resource "bitbucket_repos" "example" {
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
 - `updated_on` (String) updated_on
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/repo_slug`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_repos.example
+  id = "my-workspace/my-repo"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_repos.example "my-workspace/my-repo"
+```

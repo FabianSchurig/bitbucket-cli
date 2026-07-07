@@ -88,3 +88,23 @@ resource "bitbucket_commits" "example" {
   - `markup` (String) The type of markup language the raw content is to be interpreted in. [markdown, creole, plaintext]
   - `raw` (String) The text as it was typed by a user.
 
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/repo_slug/commit`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_commits.example
+  id = "my-workspace/my-repo/abc123def"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_commits.example "my-workspace/my-repo/abc123def"
+```

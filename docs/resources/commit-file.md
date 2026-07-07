@@ -51,3 +51,23 @@ resource "bitbucket_commit_file" "example" {
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `type` (String) type
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/repo_slug/commit/path`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_commit_file.example
+  id = "my-workspace/my-repo/abc123def/README.md"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_commit_file.example "my-workspace/my-repo/abc123def/README.md"
+```

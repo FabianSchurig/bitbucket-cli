@@ -77,3 +77,23 @@ resource "bitbucket_project_deploy_keys" "example" {
   - `updated_on` (String) updated_on
   - `uuid` (String) The project's immutable id.
 
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/project_key/key_id`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_project_deploy_keys.example
+  id = "my-workspace/PROJ/123"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_project_deploy_keys.example "my-workspace/PROJ/123"
+```

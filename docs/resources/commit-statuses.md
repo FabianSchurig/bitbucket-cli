@@ -68,3 +68,23 @@ resource "bitbucket_commit_statuses" "example" {
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
 - `updated_on` (String) updated_on
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/repo_slug/commit/key`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_commit_statuses.example
+  id = "my-workspace/my-repo/abc123def/build-key"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_commit_statuses.example "my-workspace/my-repo/abc123def/build-key"
+```

@@ -89,3 +89,23 @@ resource "bitbucket_pipelines" "example" {
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) The timestamp when the pipeline was created.
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/repo_slug/pipeline_uuid`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_pipelines.example
+  id = "my-workspace/my-repo/pipeline-uuid"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_pipelines.example "my-workspace/my-repo/pipeline-uuid"
+```

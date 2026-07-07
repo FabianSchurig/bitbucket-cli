@@ -41,3 +41,23 @@ resource "bitbucket_pipeline_oidc" "example" {
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_pipeline_oidc.example
+  id = "my-workspace"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_pipeline_oidc.example "my-workspace"
+```

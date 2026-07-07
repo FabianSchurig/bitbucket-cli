@@ -84,3 +84,23 @@ resource "bitbucket_repo_group_permissions" "example" {
   - `uuid` (String) The repository's immutable id. This can be used as a substitute for the slug segment in URLs. Doing this guarantees your URLs will survive renaming of the repository by its owner, or even transfer of the repository to a different user.
 
 - `type` (String) type
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/repo_slug/group_slug`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_repo_group_permissions.example
+  id = "my-workspace/my-repo/developers"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_repo_group_permissions.example "my-workspace/my-repo/developers"
+```

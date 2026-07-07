@@ -106,3 +106,23 @@ resource "bitbucket_issue_comments" "example" {
   - `display_name` (String) display_name
   - `uuid` (String) uuid
 
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/repo_slug/issue_id/comment_id`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_issue_comments.example
+  id = "my-workspace/my-repo/1/1"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_issue_comments.example "my-workspace/my-repo/1/1"
+```

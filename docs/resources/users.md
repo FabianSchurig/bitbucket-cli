@@ -47,3 +47,23 @@ resource "bitbucket_users" "example" {
 - `created_on` (String) created_on
 - `display_name` (String) display_name
 - `uuid` (String) uuid
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `selected_user`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_users.example
+  id = "jdoe"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_users.example "jdoe"
+```

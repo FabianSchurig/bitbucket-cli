@@ -61,3 +61,23 @@ resource "bitbucket_workspace_permissions" "example" {
   - `updated_on` (String) updated_on
   - `uuid` (String) The workspace's immutable id.
 
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_workspace_permissions.example
+  id = "my-workspace"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_workspace_permissions.example "my-workspace"
+```

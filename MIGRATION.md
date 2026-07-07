@@ -17,6 +17,39 @@ It was generated with `python3 scripts/gen_migration.py --output MIGRATION.md`, 
 4. Rename common path inputs like `owner` → `workspace` and `repository` → `repo_slug`.
 5. Review objects that split into multiple generated resources, especially repositories and variables.
 
+## Importing existing resources
+
+Every resource with a Read operation supports `terraform import`. The import ID is the slash-separated list of the resource's path parameter values, in URL order — the same values you would put in the resource block. Each resource's doc page under `docs/resources/` shows its exact import ID and a ready-to-copy example.
+
+Common formats:
+
+| Resource | Import ID | Example |
+|---|---|---|
+| `bitbucket_projects` | `workspace/project_key` | `my-workspace/PROJ` |
+| `bitbucket_repos` | `workspace/repo_slug` | `my-workspace/my-repo` |
+| `bitbucket_pipeline_config` | `workspace/repo_slug` | `my-workspace/my-repo` |
+| `bitbucket_branch_restrictions` | `workspace/repo_slug/id` | `my-workspace/my-repo/1` |
+
+Recommended flow: write the resource block with the desired configuration, add an `import` block (Terraform 1.5+) or run `terraform import`, then `terraform plan` to review and reconcile any drift.
+
+```hcl
+# 1. Declare the resource with the config you want to enforce
+resource "bitbucket_repos" "app" {
+  workspace   = "my-workspace"
+  repo_slug   = "my-repo"
+  description = "Managed by Terraform"
+  is_private  = true
+}
+
+# 2. Import the existing resource (Terraform 1.5+)
+import {
+  to = bitbucket_repos.app
+  id = "my-workspace/my-repo"
+}
+```
+
+> Tip: for a large estate, generate one `import` block per repository/project from your existing inventory, run `terraform plan -generate-config-out=…` to scaffold the resource blocks, then trim them down to the fields you want to manage.
+
 ## Provider block changes
 
 ### Example
@@ -50,10 +83,10 @@ provider "bitbucket" {
 
 - Matched legacy resources: **24 / 26**
 - Legacy-only resources: **2**
-- New-only resources: **30**
+- New-only resources: **33**
 - Matched legacy data sources: **12 / 16**
 - Legacy-only data sources: **4**
-- New-only data sources: **45**
+- New-only data sources: **48**
 
 ## Quick rename table for matched resources
 
@@ -386,6 +419,9 @@ provider "bitbucket" {
 - [`bitbucket_pipelines`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/pipelines.md)
 - [`bitbucket_pr`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/pr.md)
 - [`bitbucket_pr_comments`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/pr-comments.md)
+- [`bitbucket_project_branch_restrictions`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/project-branch-restrictions.md)
+- [`bitbucket_project_branch_restrictions_by_branch_type`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/project-branch-restrictions-by-branch-type.md)
+- [`bitbucket_project_branch_restrictions_by_pattern`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/project-branch-restrictions-by-pattern.md)
 - [`bitbucket_project_deploy_keys`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/project-deploy-keys.md)
 - [`bitbucket_properties`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/properties.md)
 - [`bitbucket_refs`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/refs.md)
@@ -426,6 +462,9 @@ provider "bitbucket" {
 - [`bitbucket_pipelines`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/pipelines.md)
 - [`bitbucket_pr`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/pr.md)
 - [`bitbucket_pr_comments`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/pr-comments.md)
+- [`bitbucket_project_branch_restrictions`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/project-branch-restrictions.md)
+- [`bitbucket_project_branch_restrictions_by_branch_type`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/project-branch-restrictions-by-branch-type.md)
+- [`bitbucket_project_branch_restrictions_by_pattern`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/project-branch-restrictions-by-pattern.md)
 - [`bitbucket_project_branching_model`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/project-branching-model.md)
 - [`bitbucket_project_default_reviewers`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/project-default-reviewers.md)
 - [`bitbucket_project_deploy_keys`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/project-deploy-keys.md)

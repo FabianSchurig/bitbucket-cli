@@ -111,3 +111,23 @@ resource "bitbucket_pr" "example" {
 
 - `task_count` (String) The number of open tasks for a specific pull request.
 - `updated_on` (String) The ISO8601 timestamp the request was last updated.
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/repo_slug/pull_request_id`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_pr.example
+  id = "my-workspace/my-repo/1"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_pr.example "my-workspace/my-repo/1"
+```

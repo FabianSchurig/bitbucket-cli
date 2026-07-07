@@ -63,3 +63,23 @@ resource "bitbucket_workspace_members" "example" {
   - `updated_on` (String) updated_on
   - `uuid` (String) The workspace's immutable id.
 
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/member`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_workspace_members.example
+  id = "my-workspace/{member-uuid}"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_workspace_members.example "my-workspace/{member-uuid}"
+```

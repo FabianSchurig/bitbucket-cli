@@ -76,3 +76,23 @@ resource "bitbucket_reports" "example" {
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) The timestamp when the report was created.
 - `updated_on` (String) The timestamp when the report was updated.
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `workspace/repo_slug/commit/report_id`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_reports.example
+  id = "my-workspace/my-repo/abc123def/report-uuid"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_reports.example "my-workspace/my-repo/abc123def/report-uuid"
+```

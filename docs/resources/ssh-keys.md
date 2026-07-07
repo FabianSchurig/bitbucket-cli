@@ -70,3 +70,23 @@ resource "bitbucket_ssh_keys" "example" {
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: `selected_user/key_id`.
+
+Using an `import` block (Terraform 1.5+):
+
+```hcl
+import {
+  to = bitbucket_ssh_keys.example
+  id = "jdoe/123"
+}
+```
+
+Or with the CLI:
+
+```shell
+terraform import bitbucket_ssh_keys.example "jdoe/123"
+```

@@ -53,6 +53,8 @@ type GroupData struct {
 	OverlapFields      []FieldDoc   // fields that are both writable and computed (Optional+Computed)
 	CRUDOps            []CRUDOpInfo // CRUD operation details (scopes, doc links)
 	IsInternalAPI      bool         // true if any operation targets bitbucket.org/!api/internal/...
+	ImportID           string       // slash-separated path-param format for import, e.g. "workspace/repo_slug"
+	ImportIDExample    string       // example import ID with placeholder values
 }
 
 // FieldDoc describes a Terraform attribute for documentation.
@@ -206,7 +208,7 @@ func buildGroups() []GroupData {
 
 		// Derive body fields, response fields, and overlaps.
 		requiredBodyFields, bodyFields, responseFields, overlapFields, hasBody := deriveFieldsFull(name, groupIndex)
-
+		importID, importIDExample := deriveImportID(name, groupIndex, pv)
 		// Remove optional body/overlap/response fields that collide with computed params
 		// (e.g., "name" may be both a computed path param and an optional body field).
 		// Required body fields are NOT filtered: the provider schema marks them Required
@@ -261,6 +263,8 @@ func buildGroups() []GroupData {
 			OverlapFields:      overlapFields,
 			CRUDOps:            crudOps,
 			IsInternalAPI:      isInternal,
+			ImportID:           importID,
+			ImportIDExample:    importIDExample,
 		})
 	}
 	sort.Slice(groups, func(i, j int) bool { return groups[i].Name < groups[j].Name })
@@ -385,6 +389,55 @@ func deriveDSParams(name string, index map[string]tfprovider.ResourceGroup) (req
 		}
 	}
 	return required, optional
+}
+
+// deriveImportID computes the `terraform import` ID format for a resource from
+// its Read operation's required path parameters, in URL-template order —
+// matching the runtime ImportState logic (internal/tfprovider/resource.go).
+// Returns the slash-separated attribute-name format (e.g. "workspace/repo_slug")
+// and an example ID built from the documentation placeholder values. Returns
+// empty strings when the resource has no Read operation (import unsupported) or
+// no required path parameters.
+func deriveImportID(name string, index map[string]tfprovider.ResourceGroup, paramValues map[string]string) (idFormat, idExample string) {
+	rg, ok := index[name]
+	if !ok || rg.Ops.Read == nil {
+		return "", ""
+	}
+	readOp := rg.Ops.Read
+	requiredSet := map[string]bool{}
+	for _, p := range readOp.Params {
+		if p.In == "path" && p.Required {
+			requiredSet[p.Name] = true
+		}
+	}
+	var formatParts, exampleParts []string
+	pathTemplate := readOp.Path
+	for len(pathTemplate) > 0 {
+		start := strings.Index(pathTemplate, "{")
+		if start == -1 {
+			break
+		}
+		end := strings.Index(pathTemplate[start:], "}")
+		if end == -1 {
+			break
+		}
+		pname := pathTemplate[start+1 : start+end]
+		pathTemplate = pathTemplate[start+end+1:]
+		if !requiredSet[pname] {
+			continue
+		}
+		attr := tfprovider.ParamAttrName(pname)
+		formatParts = append(formatParts, attr)
+		ex := paramValues[attr]
+		if ex == "" {
+			ex = attr
+		}
+		exampleParts = append(exampleParts, ex)
+	}
+	if len(formatParts) == 0 {
+		return "", ""
+	}
+	return strings.Join(formatParts, "/"), strings.Join(exampleParts, "/")
 }
 
 // deriveFieldsFull extracts required body fields, optional body fields, response fields,
@@ -932,6 +985,28 @@ resource "{{.TFName}}" "example" {
 - ` + "`" + `api_response` + "`" + ` (String) The raw JSON response from the Bitbucket API.
 {{- range .ResponseFields}}
 - ` + "`" + `{{.Name}}` + "`" + ` ({{fieldType .}}) {{.Desc}}{{renderNestedFields .ItemFields}}
+{{- end}}
+{{- if .ImportID}}
+
+## Import
+
+Existing resources can be imported into Terraform state. The import ID is the
+slash-separated list of path parameter values in URL order: ` + "`" + `{{.ImportID}}` + "`" + `.
+
+Using an ` + "`import`" + ` block (Terraform 1.5+):
+
+` + "```" + `hcl
+import {
+  to = {{.TFName}}.example
+  id = "{{.ImportIDExample}}"
+}
+` + "```" + `
+
+Or with the CLI:
+
+` + "```" + `shell
+terraform import {{.TFName}}.example "{{.ImportIDExample}}"
+` + "```" + `
 {{- end}}
 `
 

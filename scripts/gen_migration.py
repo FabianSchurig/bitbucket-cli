@@ -413,6 +413,54 @@ def render(repo_root: Path) -> str:
         "repositories and variables."
     )
     lines.append("")
+    lines.append("## Importing existing resources")
+    lines.append("")
+    lines.append(
+        "Every resource with a Read operation supports `terraform import`. The import "
+        "ID is the slash-separated list of the resource's path parameter values, in "
+        "URL order — the same values you would put in the resource block. Each "
+        "resource's doc page under `docs/resources/` shows its exact import ID and a "
+        "ready-to-copy example."
+    )
+    lines.append("")
+    lines.append("Common formats:")
+    lines.append("")
+    lines.append("| Resource | Import ID | Example |")
+    lines.append("|---|---|---|")
+    lines.append("| `bitbucket_projects` | `workspace/project_key` | `my-workspace/PROJ` |")
+    lines.append("| `bitbucket_repos` | `workspace/repo_slug` | `my-workspace/my-repo` |")
+    lines.append("| `bitbucket_pipeline_config` | `workspace/repo_slug` | `my-workspace/my-repo` |")
+    lines.append("| `bitbucket_branch_restrictions` | `workspace/repo_slug/id` | `my-workspace/my-repo/1` |")
+    lines.append("")
+    lines.append(
+        "Recommended flow: write the resource block with the desired configuration, "
+        "add an `import` block (Terraform 1.5+) or run `terraform import`, then "
+        "`terraform plan` to review and reconcile any drift."
+    )
+    lines.append("")
+    lines.append("```hcl")
+    lines.append("# 1. Declare the resource with the config you want to enforce")
+    lines.append('resource "bitbucket_repos" "app" {')
+    lines.append("  workspace   = \"my-workspace\"")
+    lines.append("  repo_slug   = \"my-repo\"")
+    lines.append("  description = \"Managed by Terraform\"")
+    lines.append("  is_private  = true")
+    lines.append("}")
+    lines.append("")
+    lines.append("# 2. Import the existing resource (Terraform 1.5+)")
+    lines.append("import {")
+    lines.append("  to = bitbucket_repos.app")
+    lines.append('  id = "my-workspace/my-repo"')
+    lines.append("}")
+    lines.append("```")
+    lines.append("")
+    lines.append(
+        "> Tip: for a large estate, generate one `import` block per repository/project "
+        "from your existing inventory, run `terraform plan -generate-config-out=…` to "
+        "scaffold the resource blocks, then trim them down to the fields you want to "
+        "manage."
+    )
+    lines.append("")
     lines.append("## Provider block changes")
     lines.append("")
     lines.append("### Example")
