@@ -3061,8 +3061,12 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 // operationId: createPipelineVariableForTeam
 func newPipelinesCreatePipelineVariableForTeamCmd() *cobra.Command {
 	var (
-		username string
-		body     string
+		username    string
+		bodyKey     string
+		bodySecured bool
+		bodyUuid    string
+		bodyValue   string
+		body        string
 	)
 
 	cmd := &cobra.Command{
@@ -3085,6 +3089,18 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyKey != "" {
+					handlers.SetNested(bodyObj, "key", bodyKey)
+				}
+				if cmd.Flags().Changed("secured") {
+					handlers.SetNested(bodyObj, "secured", bodySecured)
+				}
+				if bodyUuid != "" {
+					handlers.SetNested(bodyObj, "uuid", bodyUuid)
+				}
+				if bodyValue != "" {
+					handlers.SetNested(bodyObj, "value", bodyValue)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -3101,6 +3117,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 		},
 	}
 	cmd.Flags().StringVar(&username, "username", "", "username (path parameter)")
+	cmd.Flags().StringVar(&bodyKey, "key", "", `The unique name of the variable.`)
+	cmd.Flags().BoolVar(&bodySecured, "secured", false, `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`)
+	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID identifying the variable.`)
+	cmd.Flags().StringVar(&bodyValue, "value", "", `The value of the variable. If the variable is secured, this will be empty.`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -3157,6 +3177,10 @@ func newPipelinesUpdatePipelineVariableForTeamCmd() *cobra.Command {
 	var (
 		username     string
 		variableUuid string
+		bodyKey      string
+		bodySecured  bool
+		bodyUuid     string
+		bodyValue    string
 		body         string
 	)
 
@@ -3184,6 +3208,18 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyKey != "" {
+					handlers.SetNested(bodyObj, "key", bodyKey)
+				}
+				if cmd.Flags().Changed("secured") {
+					handlers.SetNested(bodyObj, "secured", bodySecured)
+				}
+				if bodyUuid != "" {
+					handlers.SetNested(bodyObj, "uuid", bodyUuid)
+				}
+				if bodyValue != "" {
+					handlers.SetNested(bodyObj, "value", bodyValue)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -3201,6 +3237,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 	}
 	cmd.Flags().StringVar(&username, "username", "", "username (path parameter)")
 	cmd.Flags().StringVar(&variableUuid, "variable-uuid", "", "variable_uuid (path parameter)")
+	cmd.Flags().StringVar(&bodyKey, "key", "", `The unique name of the variable.`)
+	cmd.Flags().BoolVar(&bodySecured, "secured", false, `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`)
+	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID identifying the variable.`)
+	cmd.Flags().StringVar(&bodyValue, "value", "", `The value of the variable. If the variable is secured, this will be empty.`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -3305,6 +3345,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 func newPipelinesCreatePipelineVariableForUserCmd() *cobra.Command {
 	var (
 		selectedUser string
+		bodyKey      string
+		bodySecured  bool
+		bodyUuid     string
+		bodyValue    string
 		body         string
 	)
 
@@ -3328,6 +3372,18 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyKey != "" {
+					handlers.SetNested(bodyObj, "key", bodyKey)
+				}
+				if cmd.Flags().Changed("secured") {
+					handlers.SetNested(bodyObj, "secured", bodySecured)
+				}
+				if bodyUuid != "" {
+					handlers.SetNested(bodyObj, "uuid", bodyUuid)
+				}
+				if bodyValue != "" {
+					handlers.SetNested(bodyObj, "value", bodyValue)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -3344,6 +3400,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 		},
 	}
 	cmd.Flags().StringVar(&selectedUser, "selected-user", "", "selected_user (path parameter)")
+	cmd.Flags().StringVar(&bodyKey, "key", "", `The unique name of the variable.`)
+	cmd.Flags().BoolVar(&bodySecured, "secured", false, `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`)
+	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID identifying the variable.`)
+	cmd.Flags().StringVar(&bodyValue, "value", "", `The value of the variable. If the variable is secured, this will be empty.`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -3400,6 +3460,10 @@ func newPipelinesUpdatePipelineVariableForUserCmd() *cobra.Command {
 	var (
 		selectedUser string
 		variableUuid string
+		bodyKey      string
+		bodySecured  bool
+		bodyUuid     string
+		bodyValue    string
 		body         string
 	)
 
@@ -3427,6 +3491,18 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyKey != "" {
+					handlers.SetNested(bodyObj, "key", bodyKey)
+				}
+				if cmd.Flags().Changed("secured") {
+					handlers.SetNested(bodyObj, "secured", bodySecured)
+				}
+				if bodyUuid != "" {
+					handlers.SetNested(bodyObj, "uuid", bodyUuid)
+				}
+				if bodyValue != "" {
+					handlers.SetNested(bodyObj, "value", bodyValue)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -3444,6 +3520,10 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 	}
 	cmd.Flags().StringVar(&selectedUser, "selected-user", "", "selected_user (path parameter)")
 	cmd.Flags().StringVar(&variableUuid, "variable-uuid", "", "variable_uuid (path parameter)")
+	cmd.Flags().StringVar(&bodyKey, "key", "", `The unique name of the variable.`)
+	cmd.Flags().BoolVar(&bodySecured, "secured", false, `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`)
+	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID identifying the variable.`)
+	cmd.Flags().StringVar(&bodyValue, "value", "", `The value of the variable. If the variable is secured, this will be empty.`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -3846,8 +3926,12 @@ func newPipelinesGetPipelineVariablesForWorkspaceCmd() *cobra.Command {
 // operationId: createPipelineVariableForWorkspace
 func newPipelinesCreatePipelineVariableForWorkspaceCmd() *cobra.Command {
 	var (
-		workspace string
-		body      string
+		workspace   string
+		bodyKey     string
+		bodySecured bool
+		bodyUuid    string
+		bodyValue   string
+		body        string
 	)
 
 	cmd := &cobra.Command{
@@ -3869,6 +3953,18 @@ func newPipelinesCreatePipelineVariableForWorkspaceCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyKey != "" {
+					handlers.SetNested(bodyObj, "key", bodyKey)
+				}
+				if cmd.Flags().Changed("secured") {
+					handlers.SetNested(bodyObj, "secured", bodySecured)
+				}
+				if bodyUuid != "" {
+					handlers.SetNested(bodyObj, "uuid", bodyUuid)
+				}
+				if bodyValue != "" {
+					handlers.SetNested(bodyObj, "value", bodyValue)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -3885,6 +3981,10 @@ func newPipelinesCreatePipelineVariableForWorkspaceCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyKey, "key", "", `The unique name of the variable.`)
+	cmd.Flags().BoolVar(&bodySecured, "secured", false, `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`)
+	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID identifying the variable.`)
+	cmd.Flags().StringVar(&bodyValue, "value", "", `The value of the variable. If the variable is secured, this will be empty.`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -3940,6 +4040,10 @@ func newPipelinesUpdatePipelineVariableForWorkspaceCmd() *cobra.Command {
 	var (
 		workspace    string
 		variableUuid string
+		bodyKey      string
+		bodySecured  bool
+		bodyUuid     string
+		bodyValue    string
 		body         string
 	)
 
@@ -3966,6 +4070,18 @@ func newPipelinesUpdatePipelineVariableForWorkspaceCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyKey != "" {
+					handlers.SetNested(bodyObj, "key", bodyKey)
+				}
+				if cmd.Flags().Changed("secured") {
+					handlers.SetNested(bodyObj, "secured", bodySecured)
+				}
+				if bodyUuid != "" {
+					handlers.SetNested(bodyObj, "uuid", bodyUuid)
+				}
+				if bodyValue != "" {
+					handlers.SetNested(bodyObj, "value", bodyValue)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -3983,6 +4099,10 @@ func newPipelinesUpdatePipelineVariableForWorkspaceCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&variableUuid, "variable-uuid", "", "variable_uuid (path parameter)")
+	cmd.Flags().StringVar(&bodyKey, "key", "", `The unique name of the variable.`)
+	cmd.Flags().BoolVar(&bodySecured, "secured", false, `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`)
+	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID identifying the variable.`)
+	cmd.Flags().StringVar(&bodyValue, "value", "", `The value of the variable. If the variable is secured, this will be empty.`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }

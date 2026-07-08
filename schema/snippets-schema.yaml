@@ -190,7 +190,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
       requestBody:
-        $ref: '#/components/requestBodies/snippet'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/snippet'
+        description: The new snippet object.
+        required: true
       security:
       - oauth2:
         - snippet:write
@@ -291,7 +296,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
       requestBody:
-        $ref: '#/components/requestBodies/snippet'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/snippet'
+        description: The new snippet object.
+        required: true
       security:
       - oauth2:
         - snippet:write

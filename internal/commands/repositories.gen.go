@@ -1510,10 +1510,11 @@ func newReposGetAnExplicitGroupPermissionForARepositoryCmd() *cobra.Command {
 // operationId: updateAnExplicitGroupPermissionForARepository
 func newReposUpdateAnExplicitGroupPermissionForARepositoryCmd() *cobra.Command {
 	var (
-		groupSlug string
-		repoSlug  string
-		workspace string
-		body      string
+		groupSlug      string
+		repoSlug       string
+		workspace      string
+		bodyPermission string
+		body           string
 	)
 
 	cmd := &cobra.Command{
@@ -1543,6 +1544,9 @@ func newReposUpdateAnExplicitGroupPermissionForARepositoryCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyPermission != "" {
+					handlers.SetNested(bodyObj, "permission", bodyPermission)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -1561,6 +1565,7 @@ func newReposUpdateAnExplicitGroupPermissionForARepositoryCmd() *cobra.Command {
 	cmd.Flags().StringVar(&groupSlug, "group-slug", "", "group_slug (path parameter)")
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyPermission, "permission", "", `[read, write, admin]`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -1733,6 +1738,7 @@ func newReposUpdateAnExplicitUserPermissionForARepositoryCmd() *cobra.Command {
 		repoSlug       string
 		selectedUserId string
 		workspace      string
+		bodyPermission string
 		body           string
 	)
 
@@ -1763,6 +1769,9 @@ func newReposUpdateAnExplicitUserPermissionForARepositoryCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyPermission != "" {
+					handlers.SetNested(bodyObj, "permission", bodyPermission)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -1781,6 +1790,7 @@ func newReposUpdateAnExplicitUserPermissionForARepositoryCmd() *cobra.Command {
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&selectedUserId, "selected-user-id", "", "selected_user_id (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyPermission, "permission", "", `[read, write, admin]`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }

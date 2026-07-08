@@ -55,7 +55,6 @@ output "repo_group_permissions_response" {
   - `name` (String) name
   - `slug` (String) The "sluggified" version of the group's name. This contains only ASCII
 
-- `permission` (String) [read, write, admin, none]
 - `repository` (Object) repository
   Nested schema:
   - `created_on` (String) created_on

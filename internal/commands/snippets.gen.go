@@ -117,7 +117,14 @@ func newSnippetsListSnippetsCmd() *cobra.Command {
 // operationId: createASnippet
 func newSnippetsCreateASnippetCmd() *cobra.Command {
 	var (
-		body string
+		bodyCreatorDisplayName string
+		bodyCreatorUuid        string
+		bodyIsPrivate          bool
+		bodyOwnerDisplayName   string
+		bodyOwnerUuid          string
+		bodyScm                string
+		bodyTitle              string
+		body                   string
 	)
 
 	cmd := &cobra.Command{
@@ -134,6 +141,27 @@ func newSnippetsCreateASnippetCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyCreatorDisplayName != "" {
+					handlers.SetNested(bodyObj, "creator.display_name", bodyCreatorDisplayName)
+				}
+				if bodyCreatorUuid != "" {
+					handlers.SetNested(bodyObj, "creator.uuid", bodyCreatorUuid)
+				}
+				if cmd.Flags().Changed("is-private") {
+					handlers.SetNested(bodyObj, "is_private", bodyIsPrivate)
+				}
+				if bodyOwnerDisplayName != "" {
+					handlers.SetNested(bodyObj, "owner.display_name", bodyOwnerDisplayName)
+				}
+				if bodyOwnerUuid != "" {
+					handlers.SetNested(bodyObj, "owner.uuid", bodyOwnerUuid)
+				}
+				if bodyScm != "" {
+					handlers.SetNested(bodyObj, "scm", bodyScm)
+				}
+				if bodyTitle != "" {
+					handlers.SetNested(bodyObj, "title", bodyTitle)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -149,6 +177,13 @@ func newSnippetsCreateASnippetCmd() *cobra.Command {
 			})
 		},
 	}
+	cmd.Flags().StringVar(&bodyCreatorDisplayName, "creator-display-name", "", `display_name`)
+	cmd.Flags().StringVar(&bodyCreatorUuid, "creator-uuid", "", `uuid`)
+	cmd.Flags().BoolVar(&bodyIsPrivate, "is-private", false, `is_private`)
+	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `display_name`)
+	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `uuid`)
+	cmd.Flags().StringVar(&bodyScm, "scm", "", `The DVCS used to store the snippet. [git]`)
+	cmd.Flags().StringVar(&bodyTitle, "title", "", `title`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -208,8 +243,15 @@ func newSnippetsListSnippetsInAWorkspaceCmd() *cobra.Command {
 // operationId: createASnippetForAWorkspace
 func newSnippetsCreateASnippetForAWorkspaceCmd() *cobra.Command {
 	var (
-		workspace string
-		body      string
+		workspace              string
+		bodyCreatorDisplayName string
+		bodyCreatorUuid        string
+		bodyIsPrivate          bool
+		bodyOwnerDisplayName   string
+		bodyOwnerUuid          string
+		bodyScm                string
+		bodyTitle              string
+		body                   string
 	)
 
 	cmd := &cobra.Command{
@@ -231,6 +273,27 @@ func newSnippetsCreateASnippetForAWorkspaceCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyCreatorDisplayName != "" {
+					handlers.SetNested(bodyObj, "creator.display_name", bodyCreatorDisplayName)
+				}
+				if bodyCreatorUuid != "" {
+					handlers.SetNested(bodyObj, "creator.uuid", bodyCreatorUuid)
+				}
+				if cmd.Flags().Changed("is-private") {
+					handlers.SetNested(bodyObj, "is_private", bodyIsPrivate)
+				}
+				if bodyOwnerDisplayName != "" {
+					handlers.SetNested(bodyObj, "owner.display_name", bodyOwnerDisplayName)
+				}
+				if bodyOwnerUuid != "" {
+					handlers.SetNested(bodyObj, "owner.uuid", bodyOwnerUuid)
+				}
+				if bodyScm != "" {
+					handlers.SetNested(bodyObj, "scm", bodyScm)
+				}
+				if bodyTitle != "" {
+					handlers.SetNested(bodyObj, "title", bodyTitle)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -247,6 +310,13 @@ func newSnippetsCreateASnippetForAWorkspaceCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&bodyCreatorDisplayName, "creator-display-name", "", `display_name`)
+	cmd.Flags().StringVar(&bodyCreatorUuid, "creator-uuid", "", `uuid`)
+	cmd.Flags().BoolVar(&bodyIsPrivate, "is-private", false, `is_private`)
+	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `display_name`)
+	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `uuid`)
+	cmd.Flags().StringVar(&bodyScm, "scm", "", `The DVCS used to store the snippet. [git]`)
+	cmd.Flags().StringVar(&bodyTitle, "title", "", `title`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }

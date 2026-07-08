@@ -1406,7 +1406,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
       requestBody:
-        $ref: '#/components/requestBodies/project'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/project'
+        required: true
       security:
       - oauth2:
         - project:admin
@@ -1611,7 +1615,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
       requestBody:
-        $ref: '#/components/requestBodies/project'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/project'
+        required: true
       security:
       - oauth2:
         - project:admin

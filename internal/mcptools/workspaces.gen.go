@@ -302,9 +302,23 @@ workspace.`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			BodyFields: []BodyFieldDef{
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `owner.display_name`, Type: `string`, Desc: `display_name`},
+				{Path: `owner.uuid`, Type: `string`, Desc: `uuid`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `getAProjectForAWorkspace`,
@@ -330,9 +344,23 @@ workspace.`,
 				{Name: `project_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			BodyFields: []BodyFieldDef{
+				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
+Indicates whether the project contains publicly visible repositories.
+Note that private projects cannot contain public repositories.`},
+				{Path: `is_private`, Type: `bool`, Desc: `
+Indicates whether the project is publicly accessible, or whether it is
+private to the team and consequently only visible to team members.
+Note that private projects cannot contain public repositories.`},
+				{Path: `key`, Type: `string`, Desc: `The project's key.`},
+				{Path: `name`, Type: `string`, Desc: `The name of the project.`},
+				{Path: `owner.display_name`, Type: `string`, Desc: `display_name`},
+				{Path: `owner.uuid`, Type: `string`, Desc: `uuid`},
+				{Path: `uuid`, Type: `string`, Desc: `The project's immutable id.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `deleteAProjectForAWorkspace`,

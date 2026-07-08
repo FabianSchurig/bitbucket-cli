@@ -2813,7 +2813,11 @@ paths:
         schema:
           type: string
       requestBody:
-        $ref: '#/components/requestBodies/pipeline_variable2'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pipeline_variable'
+        description: The variable to create.
       responses:
         '201':
           description: The created variable.
@@ -2909,7 +2913,12 @@ paths:
         schema:
           type: string
       requestBody:
-        $ref: '#/components/requestBodies/pipeline_variable'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pipeline_variable'
+        description: The updated variable.
+        required: true
       responses:
         '200':
           description: The variable was updated.
@@ -3016,7 +3025,11 @@ paths:
         schema:
           type: string
       requestBody:
-        $ref: '#/components/requestBodies/pipeline_variable2'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pipeline_variable'
+        description: The variable to create.
       responses:
         '201':
           description: The created variable.
@@ -3114,7 +3127,12 @@ paths:
         schema:
           type: string
       requestBody:
-        $ref: '#/components/requestBodies/pipeline_variable'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pipeline_variable'
+        description: The updated variable.
+        required: true
       responses:
         '200':
           description: The variable was updated.
@@ -3497,7 +3515,11 @@ paths:
         schema:
           type: string
       requestBody:
-        $ref: '#/components/requestBodies/pipeline_variable2'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pipeline_variable'
+        description: The variable to create.
       responses:
         '201':
           description: The created variable.
@@ -3603,7 +3625,12 @@ paths:
         schema:
           type: string
       requestBody:
-        $ref: '#/components/requestBodies/pipeline_variable'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pipeline_variable'
+        description: The updated variable.
+        required: true
       responses:
         '200':
           description: The variable was updated.

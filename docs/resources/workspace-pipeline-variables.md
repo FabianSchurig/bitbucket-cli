@@ -51,16 +51,16 @@ resource "bitbucket_workspace_pipeline_variables" "example" {
 
 ### Optional
 - `variable_uuid` (String) Path parameter (auto-populated from API response).
+- `key` (String) The unique name of the variable. (also computed from API response)
+- `secured` (String) If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API. (also computed from API response)
+- `uuid` (String) The UUID identifying the variable. (also computed from API response)
+- `value` (String) The value of the variable. If the variable is secured, this will be empty. (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `key` (String) The unique name of the variable.
-- `secured` (String) If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.
-- `uuid` (String) The UUID identifying the variable.
-- `value` (String) The value of the variable. If the variable is secured, this will be empty.
 
 ## Import
 

@@ -60,9 +60,11 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			BodyFields: []BodyFieldDef{
+				{Path: `_attributes`, Type: `string`, Desc: `_attributes [public, read_only]`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `deleteCommitHostedPropertyValue`,
@@ -109,9 +111,11 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			BodyFields: []BodyFieldDef{
+				{Path: `_attributes`, Type: `string`, Desc: `_attributes [public, read_only]`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `deleteRepositoryHostedPropertyValue`,
@@ -159,9 +163,11 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			BodyFields: []BodyFieldDef{
+				{Path: `_attributes`, Type: `string`, Desc: `_attributes [public, read_only]`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `deletePullRequestHostedPropertyValue`,
@@ -206,9 +212,11 @@ Available operations:
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `property_name`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			BodyFields: []BodyFieldDef{
+				{Path: `_attributes`, Type: `string`, Desc: `_attributes [public, read_only]`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `deleteUserHostedPropertyValue`,

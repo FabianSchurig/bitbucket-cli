@@ -50,6 +50,19 @@ resource "bitbucket_snippets" "example" {
 ### Optional
 - `encoded_id` (String) Path parameter (auto-populated from API response).
 - `workspace` (String) Path parameter (auto-populated from API response).
+- `creator` (Object) creator (also computed from API response)
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
+- `is_private` (String) is_private (also computed from API response)
+- `owner` (Object) owner (also computed from API response)
+  Nested schema:
+  - `display_name` (String) display_name
+  - `uuid` (String) uuid
+
+- `scm` (String) The DVCS used to store the snippet. [git] (also computed from API response)
+- `title` (String) title (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 
 ### Read-Only
@@ -57,21 +70,6 @@ resource "bitbucket_snippets" "example" {
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
-- `creator` (Object) creator
-  Nested schema:
-  - `created_on` (String) created_on
-  - `display_name` (String) display_name
-  - `uuid` (String) uuid
-
-- `is_private` (String) is_private
-- `owner` (Object) owner
-  Nested schema:
-  - `created_on` (String) created_on
-  - `display_name` (String) display_name
-  - `uuid` (String) uuid
-
-- `scm` (String) The DVCS used to store the snippet. [git]
-- `title` (String) title
 - `updated_on` (String) updated_on
 
 ## Import

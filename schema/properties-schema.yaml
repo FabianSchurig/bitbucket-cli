@@ -50,7 +50,12 @@ paths:
         schema:
           type: string
       requestBody:
-        $ref: '#/components/requestBodies/application_property'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/application_property'
+        description: The application property to create or update.
+        required: true
       tags:
       - properties
       security:
@@ -197,7 +202,12 @@ paths:
         schema:
           type: string
       requestBody:
-        $ref: '#/components/requestBodies/application_property'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/application_property'
+        description: The application property to create or update.
+        required: true
       tags:
       - properties
       security:
@@ -338,7 +348,12 @@ paths:
         schema:
           type: string
       requestBody:
-        $ref: '#/components/requestBodies/application_property'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/application_property'
+        description: The application property to create or update.
+        required: true
       tags:
       - properties
       security:
@@ -479,7 +494,12 @@ paths:
         schema:
           type: string
       requestBody:
-        $ref: '#/components/requestBodies/application_property'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/application_property'
+        description: The application property to create or update.
+        required: true
       tags:
       - properties
       security:

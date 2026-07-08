@@ -1452,7 +1452,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
       requestBody:
-        $ref: '#/components/requestBodies/bitbucket.apps.permissions.serializers.RepoPermissionUpdateSchema'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/bitbucket.apps.permissions.serializers.RepoPermissionUpdateSchema'
+        description: The permission to grant
+        required: true
       security:
       - oauth2:
         - repository:admin
@@ -1794,7 +1799,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
       requestBody:
-        $ref: '#/components/requestBodies/bitbucket.apps.permissions.serializers.RepoPermissionUpdateSchema'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/bitbucket.apps.permissions.serializers.RepoPermissionUpdateSchema'
+        description: The permission to grant
+        required: true
       security:
       - oauth2:
         - repository:admin

@@ -1120,7 +1120,9 @@ administered through admin.atlassian.com.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
+			BodyFields: []BodyFieldDef{
+				{Path: `permission`, Type: `string`, Desc: `[read, write, admin]`, Required: true},
+			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `group`, Type: `string`, Desc: `group`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `full_slug`, Type: `string`, Desc: "The concatenation of the workspace's slug and the group's slug,\nseparated with a colon (e.g. `acme:developers`)\n"},
@@ -1333,7 +1335,9 @@ administered through admin.atlassian.com.
 				{Name: `selected_user_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
+			BodyFields: []BodyFieldDef{
+				{Path: `permission`, Type: `string`, Desc: `[read, write, admin]`, Required: true},
+			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `permission`, Type: `string`, Desc: `[read, write, admin, none]`},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -2756,7 +2760,9 @@ administered through admin.atlassian.com.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
+			BodyFields: []BodyFieldDef{
+				{Path: `permission`, Type: `string`, Desc: `[read, write, admin]`, Required: true},
+			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `group`, Type: `string`, Desc: `group`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `full_slug`, Type: `string`, Desc: "The concatenation of the workspace's slug and the group's slug,\nseparated with a colon (e.g. `acme:developers`)\n"},
@@ -2969,7 +2975,9 @@ administered through admin.atlassian.com.
 				{Name: `selected_user_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
+			BodyFields: []BodyFieldDef{
+				{Path: `permission`, Type: `string`, Desc: `[read, write, admin]`, Required: true},
+			},
 			ResponseFields: []BodyFieldDef{
 				{Path: `permission`, Type: `string`, Desc: `[read, write, admin, none]`},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{

@@ -123,12 +123,13 @@ func newPropertiesGetCommitHostedPropertyValueCmd() *cobra.Command {
 // operationId: updateCommitHostedPropertyValue
 func newPropertiesUpdateCommitHostedPropertyValueCmd() *cobra.Command {
 	var (
-		workspace    string
-		repoSlug     string
-		commit       string
-		appKey       string
-		propertyName string
-		body         string
+		workspace      string
+		repoSlug       string
+		commit         string
+		appKey         string
+		propertyName   string
+		bodyAttributes string
+		body           string
 	)
 
 	cmd := &cobra.Command{
@@ -166,6 +167,9 @@ func newPropertiesUpdateCommitHostedPropertyValueCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyAttributes != "" {
+					handlers.SetNested(bodyObj, "_attributes", bodyAttributes)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -186,6 +190,7 @@ func newPropertiesUpdateCommitHostedPropertyValueCmd() *cobra.Command {
 	cmd.Flags().StringVar(&commit, "commit", "", "commit (path parameter)")
 	cmd.Flags().StringVar(&appKey, "app-key", "", "app_key (path parameter)")
 	cmd.Flags().StringVar(&propertyName, "property-name", "", "property_name (path parameter)")
+	cmd.Flags().StringVar(&bodyAttributes, "-attributes", "", `_attributes [public, read_only]`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -314,11 +319,12 @@ func newPropertiesGetRepositoryHostedPropertyValueCmd() *cobra.Command {
 // operationId: updateRepositoryHostedPropertyValue
 func newPropertiesUpdateRepositoryHostedPropertyValueCmd() *cobra.Command {
 	var (
-		workspace    string
-		repoSlug     string
-		appKey       string
-		propertyName string
-		body         string
+		workspace      string
+		repoSlug       string
+		appKey         string
+		propertyName   string
+		bodyAttributes string
+		body           string
 	)
 
 	cmd := &cobra.Command{
@@ -352,6 +358,9 @@ func newPropertiesUpdateRepositoryHostedPropertyValueCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyAttributes != "" {
+					handlers.SetNested(bodyObj, "_attributes", bodyAttributes)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -371,6 +380,7 @@ func newPropertiesUpdateRepositoryHostedPropertyValueCmd() *cobra.Command {
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&appKey, "app-key", "", "app_key (path parameter)")
 	cmd.Flags().StringVar(&propertyName, "property-name", "", "property_name (path parameter)")
+	cmd.Flags().StringVar(&bodyAttributes, "-attributes", "", `_attributes [public, read_only]`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -499,12 +509,13 @@ func newPropertiesGetPullRequestHostedPropertyValueCmd() *cobra.Command {
 // operationId: updatePullRequestHostedPropertyValue
 func newPropertiesUpdatePullRequestHostedPropertyValueCmd() *cobra.Command {
 	var (
-		workspace     string
-		repoSlug      string
-		pullrequestId string
-		appKey        string
-		propertyName  string
-		body          string
+		workspace      string
+		repoSlug       string
+		pullrequestId  string
+		appKey         string
+		propertyName   string
+		bodyAttributes string
+		body           string
 	)
 
 	cmd := &cobra.Command{
@@ -542,6 +553,9 @@ func newPropertiesUpdatePullRequestHostedPropertyValueCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyAttributes != "" {
+					handlers.SetNested(bodyObj, "_attributes", bodyAttributes)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -562,6 +576,7 @@ func newPropertiesUpdatePullRequestHostedPropertyValueCmd() *cobra.Command {
 	cmd.Flags().StringVar(&pullrequestId, "pullrequest-id", "", "pullrequest_id (path parameter)")
 	cmd.Flags().StringVar(&appKey, "app-key", "", "app_key (path parameter)")
 	cmd.Flags().StringVar(&propertyName, "property-name", "", "property_name (path parameter)")
+	cmd.Flags().StringVar(&bodyAttributes, "-attributes", "", `_attributes [public, read_only]`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
@@ -684,10 +699,11 @@ func newPropertiesRetrieveUserHostedPropertyValueCmd() *cobra.Command {
 // operationId: updateUserHostedPropertyValue
 func newPropertiesUpdateUserHostedPropertyValueCmd() *cobra.Command {
 	var (
-		selectedUser string
-		appKey       string
-		propertyName string
-		body         string
+		selectedUser   string
+		appKey         string
+		propertyName   string
+		bodyAttributes string
+		body           string
 	)
 
 	cmd := &cobra.Command{
@@ -717,6 +733,9 @@ func newPropertiesUpdateUserHostedPropertyValueCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyAttributes != "" {
+					handlers.SetNested(bodyObj, "_attributes", bodyAttributes)
+				}
 				if len(bodyObj) > 0 {
 					b, _ := json.Marshal(bodyObj)
 					body = string(b)
@@ -735,6 +754,7 @@ func newPropertiesUpdateUserHostedPropertyValueCmd() *cobra.Command {
 	cmd.Flags().StringVar(&selectedUser, "selected-user", "", "selected_user (path parameter)")
 	cmd.Flags().StringVar(&appKey, "app-key", "", "app_key (path parameter)")
 	cmd.Flags().StringVar(&propertyName, "property-name", "", "property_name (path parameter)")
+	cmd.Flags().StringVar(&bodyAttributes, "-attributes", "", `_attributes [public, read_only]`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }

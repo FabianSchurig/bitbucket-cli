@@ -944,9 +944,14 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			Params: []ParamDef{
 				{Name: `username`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			BodyFields: []BodyFieldDef{
+				{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+				{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+				{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `getPipelineVariableForTeam`,
@@ -974,9 +979,14 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `username`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			BodyFields: []BodyFieldDef{
+				{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+				{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+				{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `deletePipelineVariableForTeam`,
@@ -1019,9 +1029,14 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			Params: []ParamDef{
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			BodyFields: []BodyFieldDef{
+				{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+				{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+				{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `getPipelineVariableForUser`,
@@ -1049,9 +1064,14 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			BodyFields: []BodyFieldDef{
+				{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+				{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+				{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `deletePipelineVariableForUser`,
@@ -1188,9 +1208,14 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			BodyFields: []BodyFieldDef{
+				{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+				{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+				{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `getPipelineVariableForWorkspace`,
@@ -1216,9 +1241,14 @@ This endpoint has been deprecated, and you should use the new workspaces endpoin
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `variable_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    true,
-			Paginated:  false,
+			BodyFields: []BodyFieldDef{
+				{Path: `key`, Type: `string`, Desc: `The unique name of the variable.`},
+				{Path: `secured`, Type: `bool`, Desc: `If true, this variable will be treated as secured. The value will never be exposed in the logs or the REST API.`},
+				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the variable.`},
+				{Path: `value`, Type: `string`, Desc: `The value of the variable. If the variable is secured, this will be empty.`},
+			},
+			HasBody:   true,
+			Paginated: false,
 		},
 		{
 			OperationID: `deletePipelineVariableForWorkspace`,
