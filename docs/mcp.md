@@ -6,8 +6,11 @@
 
 ### Homebrew (macOS and Linux)
 
+To install via our custom tap, tap the repository and trust the formula to reduce supply chain risks:
+
 ```bash
 brew tap FabianSchurig/tap
+brew trust --formula FabianSchurig/tap/bitbucket-mcp
 brew install bitbucket-mcp
 ```
 
