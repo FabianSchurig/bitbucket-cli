@@ -133,4 +133,3 @@ func TestRegister_GetPromptReturnsContent(t *testing.T) {
 		t.Error("expected templated Pull Request ID to be present in griller output")
 	}
 }
-
