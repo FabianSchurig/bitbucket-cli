@@ -14,9 +14,10 @@ jobs:
     name: Test Homebrew install
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-    container:
-      image: homebrew/brew:latest
     steps:
+      - name: Set up Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
       - name: Install bb-cli from tap
         run: |
           brew tap FabianSchurig/tap
