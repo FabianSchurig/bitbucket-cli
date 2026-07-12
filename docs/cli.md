@@ -14,6 +14,17 @@ brew trust --formula FabianSchurig/tap/bitbucket-cli
 brew install bitbucket-cli
 ```
 
+> [!NOTE]
+> **macOS "Unidentified Developer" Warning**
+> Because our pre-built binaries are not signed/notarized with a paid Apple Developer ID, macOS Gatekeeper will block execution with a warning when installed via Homebrew.
+> 
+> You can bypass this warning by running:
+> ```bash
+> xattr -d com.apple.quarantine $(which bb-cli)
+> ```
+> *Alternatively, you can choose **Allow Anyway** under System Settings > Privacy & Security.*
+> *In the future, we may obtain a paid Apple Developer Membership to sign and notarize the pre-compiled binaries natively.*
+
 ### Install script
 
 Download and install the latest release automatically:
@@ -39,6 +50,8 @@ curl -fsSL https://raw.githubusercontent.com/FabianSchurig/bitbucket-cli/main/in
 ```
 
 ### Go install
+
+If you are on macOS and want to bypass the Gatekeeper warning completely without running `xattr`, you can compile the binary locally using `go install`:
 
 ```bash
 go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-cli@latest
