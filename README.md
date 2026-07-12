@@ -34,12 +34,20 @@ Low-maintenance Bitbucket Cloud tooling built from the live OpenAPI spec: a CLI 
 
 ## Install
 
-### Homebrew (macOS and Linux)
+### Homebrew (macOS & Linux)
 
+To install the CLI tool directly via our custom tap with implicit trust verification, execute:
 ```bash
-brew tap FabianSchurig/tap
-brew install bitbucket-cli
+brew install fabianschurig/tap/bitbucket-cli
 ```
+
+Or to install the MCP server:
+```bash
+brew install fabianschurig/tap/bitbucket-mcp
+```
+
+*(Note: If you previously tapped the old cask, you can safely untap via `brew untap fabianschurig/tap` before running the command).*
+
 
 ### APT (Debian / Ubuntu)
 

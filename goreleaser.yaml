@@ -167,26 +167,34 @@ scoops:
     homepage: "https://github.com/FabianSchurig/bitbucket-cli"
     license: AGPL-3.0
 
-homebrew_casks:
+brews:
   - name: bitbucket-cli
     ids:
       - bb-cli
-    binaries:
-      - bb-cli
     repository:
       owner: FabianSchurig
       name: homebrew-tap
       token: "{{ .Env.TAP_GITHUB_TOKEN }}"
-    description: "A CLI tool for interacting with Bitbucket."
+    directory: Formula
     homepage: "https://github.com/FabianSchurig/bitbucket-cli"
+    description: "A CLI tool for interacting with Bitbucket."
+    license: AGPL-3.0
+    install: |
+      bin.install "bb-cli"
+    test: |
+      system "#{bin}/bb-cli", "--version"
   - name: bitbucket-mcp
     ids:
       - bb-mcp
-    binaries:
-      - bb-mcp
     repository:
       owner: FabianSchurig
       name: homebrew-tap
       token: "{{ .Env.TAP_GITHUB_TOKEN }}"
-    description: "An MCP server for interacting with Bitbucket via AI agents."
+    directory: Formula
     homepage: "https://github.com/FabianSchurig/bitbucket-cli"
+    description: "An MCP server for interacting with Bitbucket via AI agents."
+    license: AGPL-3.0
+    install: |
+      bin.install "bb-mcp"
+    test: |
+      assert_match "stdio", shell_output("#{bin}/bb-mcp --help", 2)
