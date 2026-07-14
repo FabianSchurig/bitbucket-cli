@@ -4,6 +4,11 @@
 
 ## Install
 
+Choose whichever install path fits your setup:
+
+- **Direct binary (`bb-mcp`)**: Homebrew, install script, or `go install`
+- **Containerized**: Docker image from GHCR
+
 ### Homebrew (macOS and Linux)
 
 To install via our custom tap, tap the repository and trust the formula to reduce supply chain risks:
@@ -41,12 +46,17 @@ go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-mcp@latest
 
 ### Docker
 
-Multi-arch container images are published to GHCR on every release:
+Multi-arch container images are published to GHCR on every release.
+
+Use a pinned tag for reproducible behavior:
 
 ```bash
-docker pull ghcr.io/fabianschurig/bitbucket-mcp:latest
-docker run -e BITBUCKET_USERNAME -e BITBUCKET_TOKEN -p 8080:8080 ghcr.io/fabianschurig/bitbucket-mcp:latest --transport sse --addr :8080
+docker pull ghcr.io/fabianschurig/bitbucket-mcp:0.18.5
+docker run --rm -i --env-file "${HOME}/.config/bitbucket-mcp.env" -p 8080:8080 ghcr.io/fabianschurig/bitbucket-mcp:0.18.5 --transport sse --addr :8080
 ```
+
+> [!TIP]
+> If credentials are already exported in your shell, `-e BITBUCKET_USERNAME -e BITBUCKET_TOKEN` forwards host environment values to the container.
 
 ### MCP Registry
 
@@ -54,20 +64,52 @@ docker run -e BITBUCKET_USERNAME -e BITBUCKET_TOKEN -p 8080:8080 ghcr.io/fabians
 
 ## Authenticate
 
-API token:
+`bb-mcp` supports Atlassian scoped API tokens (recommended), and Bitbucket workspace/repository access tokens.
+
+> Atlassian scoped API tokens use `:bitbucket`-suffixed scopes and are distinct from legacy Bitbucket App Passwords.
+
+### Create a scoped API token
+
+1. Go to <https://id.atlassian.com/manage-profile/security/api-tokens>.
+2. Click **Create API token with scopes**.
+3. Select **Bitbucket**, then choose scopes you need, for example:
+   - `read:repository:bitbucket`, `read:pullrequest:bitbucket`
+   - `read:account`, `read:me`
+   - add `write:*` scopes only when you need write access
+4. Copy the token (usually starts with `ATATT...`). You cannot view it again later.
+
+### Provide credentials (shared env file location)
+
+Use a single env file location for both direct `bb-mcp` and Docker flows:
+
+`$HOME/.config/bitbucket-mcp.env`
+
+Using an API token (username is your **Atlassian account email**):
 
 ```bash
 export BITBUCKET_USERNAME="your-email@example.com"
 export BITBUCKET_TOKEN="your-api-token"
 ```
 
-Workspace or repository access token:
+Using a workspace or repository access token (no username required):
 
 ```bash
 export BITBUCKET_TOKEN="your-access-token"
 ```
 
+Recommended env file content (**unquoted** values):
+
+```env
+BITBUCKET_USERNAME=your-email@example.com
+BITBUCKET_TOKEN=ATATT...
+```
+
+> [!WARNING]
+> **Quotes in `.env` files.** The `export` examples above use quotes because your shell strips them. Docker `--env-file` passes values verbatim, so quoted values include the quote characters and can cause `401 Unauthorized`.
+
 ## Run the server
+
+If installed directly:
 
 Default stdio transport:
 
@@ -79,6 +121,12 @@ HTTP SSE transport:
 
 ```bash
 bb-mcp --transport sse --addr :8080
+```
+
+If running with Docker:
+
+```bash
+docker run --rm -i --env-file "${HOME}/.config/bitbucket-mcp.env" -p 8080:8080 ghcr.io/fabianschurig/bitbucket-mcp:0.18.5 --transport sse --addr :8080
 ```
 
 ## How the tools are structured
@@ -141,7 +189,9 @@ When no `mcp_config.yaml` is present in the working directory the server uses a 
 
 To override, create an `mcp_config.yaml` in your working directory — use [`internal/config/default_mcp_config.yaml`](../internal/config/default_mcp_config.yaml) as a commented starting point.
 
-## Example VS Code configuration
+## Example VS Code configuration (direct `bb-mcp`)
+
+This uses your local `bb-mcp` binary and the shared env file location:
 
 ```json
 {
@@ -150,10 +200,32 @@ To override, create an `mcp_config.yaml` in your working directory — use [`int
 			"type": "stdio",
 			"command": "bb-mcp",
 			"args": ["--config", "${workspaceFolder}/mcp_config.yaml"],
-			"envFile": "${workspaceFolder}/.env"
+			"envFile": "${userHome}/.config/bitbucket-mcp.env"
 		}
 	},
 	"inputs": []
+}
+```
+
+## Example Docker configuration (`mcp.json`)
+
+Runs the server in a container, reading credentials from the same shared env file location:
+
+```json
+{
+  "mcpServers": {
+    "bitbucket-mcp-server": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "--env-file",
+        "${userHome}/.config/bitbucket-mcp.env",
+        "ghcr.io/fabianschurig/bitbucket-mcp:0.18.5"
+      ]
+    }
+  }
 }
 ```
 
@@ -169,6 +241,22 @@ Use `bb-mcp` when you want an agent to:
 
 - **stdio**: best for local MCP clients such as Claude Desktop
 - **SSE**: best when your MCP client expects an HTTP endpoint
+
+## Troubleshooting
+
+### `401 Unauthorized`
+
+Credentials were rejected. Common causes:
+
+- **Quotes in `--env-file`.** Remove surrounding quotes in `~/.config/bitbucket-mcp.env` values.
+- **Wrong username.** `BITBUCKET_USERNAME` must be your Atlassian **email** (not Bitbucket handle).
+- **Stale process.** Restart your MCP server/client after editing the env file.
+- **Bad token value.** Token expired/revoked, or includes trailing whitespace/newline.
+
+### `401` vs `403`
+
+- `401` = authentication failed (credentials rejected)
+- `403` = authenticated, but missing required scope
 
 ## Related links
 
