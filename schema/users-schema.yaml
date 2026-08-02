@@ -38,6 +38,7 @@ paths:
         scopes:
         - read:user:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
       operationId: getCurrentUser
     parameters: []
