@@ -67,6 +67,7 @@ Available operations:
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `is_personal`, Type: `bool`, Desc: `Indicates whether the workspace belongs to an individual user.`},
 					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
@@ -134,6 +135,7 @@ private to the members and consequently only visible to members.`},
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `is_personal`, Type: `bool`, Desc: `Indicates whether the workspace belongs to an individual user.`},
 					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
@@ -171,6 +173,7 @@ private to the members and consequently only visible to members.`},
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+				{Path: `is_personal`, Type: `bool`, Desc: `Indicates whether the workspace belongs to an individual user.`},
 				{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 				{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
@@ -204,6 +207,7 @@ private to the members and consequently only visible to members.`},
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+				{Path: `is_personal`, Type: `bool`, Desc: `Indicates whether the workspace belongs to an individual user.`},
 				{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 				{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
@@ -378,6 +382,7 @@ workspace.`,
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `is_personal`, Type: `bool`, Desc: `Indicates whether the workspace belongs to an individual user.`},
 					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
@@ -418,6 +423,7 @@ private to the members and consequently only visible to members.`},
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `is_personal`, Type: `bool`, Desc: `Indicates whether the workspace belongs to an individual user.`},
 					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
@@ -460,6 +466,7 @@ private to the members and consequently only visible to members.`},
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `is_personal`, Type: `bool`, Desc: `Indicates whether the workspace belongs to an individual user.`},
 					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
@@ -942,6 +949,7 @@ During a key rotation period, two keys may be returned.`,
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `is_personal`, Type: `bool`, Desc: `Indicates whether the workspace belongs to an individual user.`},
 					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
@@ -1009,6 +1017,7 @@ private to the members and consequently only visible to members.`},
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `is_personal`, Type: `bool`, Desc: `Indicates whether the workspace belongs to an individual user.`},
 					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
@@ -1046,6 +1055,7 @@ private to the members and consequently only visible to members.`},
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+				{Path: `is_personal`, Type: `bool`, Desc: `Indicates whether the workspace belongs to an individual user.`},
 				{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 				{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
@@ -1079,6 +1089,7 @@ private to the members and consequently only visible to members.`},
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+				{Path: `is_personal`, Type: `bool`, Desc: `Indicates whether the workspace belongs to an individual user.`},
 				{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 				{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
@@ -1253,6 +1264,7 @@ workspace.`,
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `is_personal`, Type: `bool`, Desc: `Indicates whether the workspace belongs to an individual user.`},
 					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
@@ -1293,6 +1305,7 @@ private to the members and consequently only visible to members.`},
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `is_personal`, Type: `bool`, Desc: `Indicates whether the workspace belongs to an individual user.`},
 					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},
@@ -1335,6 +1348,7 @@ private to the members and consequently only visible to members.`},
 * **allow_forks**: unrestricted forking
 * **internal_only**: prevents forking of private repositories outside the workspace or to public repositories
  [allow_forks, internal_only]`},
+					{Path: `is_personal`, Type: `bool`, Desc: `Indicates whether the workspace belongs to an individual user.`},
 					{Path: `is_privacy_enforced`, Type: `bool`, Desc: `Indicates whether the workspace enforces private content, or whether it allows public content.`},
 					{Path: `is_private`, Type: `bool`, Desc: `Indicates whether the workspace is publicly accessible, or whether it is
 private to the members and consequently only visible to members.`},

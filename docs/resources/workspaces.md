@@ -46,6 +46,7 @@ resource "bitbucket_workspaces" "example" {
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
 - `forking_mode` (String) Controls the rules for forking repositories within this workspace.
+- `is_personal` (String) Indicates whether the workspace belongs to an individual user.
 - `is_privacy_enforced` (String) Indicates whether the workspace enforces private content, or whether it allows public content.
 - `is_private` (String) Indicates whether the workspace is publicly accessible, or whether it is
 - `name` (String) The name of the workspace.

@@ -1183,8 +1183,8 @@ components:
             description: The name of the environment.
       x-bb-default-fields:
       - uuid
-      x-bb-url: /rest/2.0/accounts/{target_user.uuid}/repositories/{repository.uuid}/environments/{uuid}
-      x-bb-batch-url: /rest/2.0/accounts/{target_user.uuid}/repositories/{repository.uuid}/environments_batch
+      x-bb-url: /rest/2.0/accounts/{workspace.uuid}/repositories/{repository.uuid}/environments/{uuid}
+      x-bb-batch-url: /rest/2.0/accounts/{workspace.uuid}/repositories/{repository.uuid}/environments_batch
       x-bb-batch-max-size: 100
     deployment_release:
       allOf:

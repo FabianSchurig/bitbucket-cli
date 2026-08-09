@@ -4113,6 +4113,10 @@ components:
               or whether it is
 
               private to the members and consequently only visible to members.'
+          is_personal:
+            type: boolean
+            description: Indicates whether the workspace belongs to an individual
+              user.
           is_privacy_enforced:
             type: boolean
             description: Indicates whether the workspace enforces private content,

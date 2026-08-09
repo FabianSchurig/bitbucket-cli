@@ -823,7 +823,7 @@ components:
       x-bb-default-fields:
       - uuid
       - commitHash
-      x-bb-url: /rest/2.0/accounts/{target_user.uuid}/repositories/{repository.uuid}/commits/{commitHash}/reports/{uuid}
+      x-bb-url: /rest/2.0/accounts/{workspace.uuid}/repositories/{repository.uuid}/commits/{commitHash}/reports/{uuid}
     report_annotation:
       allOf:
       - $ref: '#/components/schemas/object'
@@ -900,7 +900,7 @@ components:
             description: The timestamp when the report was updated.
       x-bb-default-fields:
       - uuid
-      x-bb-url: /rest/2.0/accounts/{target_user.uuid}/repositories/{repository.uuid}/commits/{commit.hash}/reports/{reportUuid}/annotations/{uuid}
+      x-bb-url: /rest/2.0/accounts/{workspace.uuid}/repositories/{repository.uuid}/commits/{commit.hash}/reports/{reportUuid}/annotations/{uuid}
     report_data:
       type: object
       title: Report Data
