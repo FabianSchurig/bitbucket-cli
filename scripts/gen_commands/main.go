@@ -32,6 +32,7 @@ type CommandData struct {
 	Use         string
 	Short       string
 	Long        string
+	Deprecated  bool
 	Method      string
 	Path        string
 	Flags       []FlagData
@@ -105,6 +106,7 @@ func operationToCommand(op spec.OperationDef) CommandData {
 		Use:         spec.ToKebab(op.OperationID),
 		Short:       op.Summary,
 		Long:        op.Description,
+		Deprecated:  op.Deprecated,
 		Method:      op.Method,
 		Path:        op.Path,
 		Flags:       flags,
@@ -189,6 +191,9 @@ cmd := &cobra.Command{
 Use:   "{{.Use}}",
 Short: {{goStringLit .Short}},
 Long:  {{goStringLit .Long}},
+{{- if .Deprecated}}
+Deprecated: "This API endpoint is deprecated.",
+{{- end}}
 RunE: func(cmd *cobra.Command, args []string) error {
 pathParams := map[string]string{
 {{- range .Flags}}

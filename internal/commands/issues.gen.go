@@ -95,6 +95,7 @@ func newIssuesListComponentsCmd() *cobra.Command {
 
 This resource is only available on repositories that have the issue
 tracker enabled.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"repo_slug": repoSlug,
@@ -144,9 +145,10 @@ func newIssuesGetAComponentForIssuesCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "get-a-component-for-issues",
-		Short: `Get a component for issues`,
-		Long:  `Returns the specified issue tracker component object.`,
+		Use:        "get-a-component-for-issues",
+		Short:      `Get a component for issues`,
+		Long:       `Returns the specified issue tracker component object.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"component_id": strconv.Itoa(componentId),
@@ -197,9 +199,10 @@ func newIssuesListIssuesCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "list-issues",
-		Short: `List issues`,
-		Long:  `Returns the issues in the issue tracker.`,
+		Use:        "list-issues",
+		Short:      `List issues`,
+		Long:       `Returns the issues in the issue tracker.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"repo_slug": repoSlug,
@@ -278,9 +281,10 @@ func newIssuesCreateAnIssueCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "create-an-issue",
-		Short: `Create an issue`,
-		Long:  "Creates a new issue.\n\nThis call requires authentication. Private repositories or private\nissue trackers require the caller to authenticate with an account that\nhas appropriate authorization.\n\nThe authenticated user is used for the issue's `reporter` field.",
+		Use:        "create-an-issue",
+		Short:      `Create an issue`,
+		Long:       "Creates a new issue.\n\nThis call requires authentication. Private repositories or private\nissue trackers require the caller to authenticate with an account that\nhas appropriate authorization.\n\nThe authenticated user is used for the issue's `reporter` field.",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"repo_slug": repoSlug,
@@ -473,6 +477,7 @@ func newIssuesExportIssuesCmd() *cobra.Command {
 
 When the job has been accepted, it will return a 202 (Accepted) along with a unique url to this job in the
 'Location' response header. This url is the endpoint for where the user can obtain their zip files."`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"repo_slug": repoSlug,
@@ -544,9 +549,10 @@ func newIssuesCheckIssueExportStatusCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "check-issue-export-status",
-		Short: `Check issue export status`,
-		Long:  "This endpoint is used to poll for the progress of an issue export\njob and return the zip file after the job is complete.\nAs long as the job is running, this will return a 202 response\nwith in the response body a description of the current status.\n\nAfter the job has been scheduled, but before it starts executing, the endpoint\nreturns a 202 response with status `ACCEPTED`.\n\nOnce it starts running, it is a 202 response with status `STARTED` and progress filled.\n\nAfter it is finished, it becomes a 200 response with status `SUCCESS` or `FAILURE`.",
+		Use:        "check-issue-export-status",
+		Short:      `Check issue export status`,
+		Long:       "This endpoint is used to poll for the progress of an issue export\njob and return the zip file after the job is complete.\nAs long as the job is running, this will return a 202 response\nwith in the response body a description of the current status.\n\nAfter the job has been scheduled, but before it starts executing, the endpoint\nreturns a 202 response with status `ACCEPTED`.\n\nOnce it starts running, it is a 202 response with status `STARTED` and progress filled.\n\nAfter it is finished, it becomes a 200 response with status `SUCCESS` or `FAILURE`.",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"repo_name": repoName,
@@ -599,9 +605,10 @@ func newIssuesCheckIssueImportStatusCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "check-issue-import-status",
-		Short: `Check issue import status`,
-		Long:  "When using GET, this endpoint reports the status of the current import task.\n\nAfter the job has been scheduled, but before it starts executing, the endpoint\nreturns a 202 response with status `ACCEPTED`.\n\nOnce it starts running, it is a 202 response with status `STARTED` and progress filled.\n\nAfter it is finished, it becomes a 200 response with status `SUCCESS` or `FAILURE`.",
+		Use:        "check-issue-import-status",
+		Short:      `Check issue import status`,
+		Long:       "When using GET, this endpoint reports the status of the current import task.\n\nAfter the job has been scheduled, but before it starts executing, the endpoint\nreturns a 202 response with status `ACCEPTED`.\n\nOnce it starts running, it is a 202 response with status `STARTED` and progress filled.\n\nAfter it is finished, it becomes a 200 response with status `SUCCESS` or `FAILURE`.",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"repo_slug": repoSlug,
@@ -644,9 +651,10 @@ func newIssuesImportIssuesCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "import-issues",
-		Short: `Import issues`,
-		Long:  "A POST request to this endpoint will import the zip file given by the archive parameter into the repository. All\nexisting issues will be deleted and replaced by the contents of the imported zip file.\n\nImports are done through a multipart/form-data POST. There is one valid and required form field, with the name\n\"archive,\" which needs to be a file field:\n\n```\n$ curl -u <username> -X POST -F archive=@/path/to/file.zip https://api.bitbucket.org/2.0/repositories/<owner_username>/<repo_slug>/issues/import\n```",
+		Use:        "import-issues",
+		Short:      `Import issues`,
+		Long:       "A POST request to this endpoint will import the zip file given by the archive parameter into the repository. All\nexisting issues will be deleted and replaced by the contents of the imported zip file.\n\nImports are done through a multipart/form-data POST. There is one valid and required form field, with the name\n\"archive,\" which needs to be a file field:\n\n```\n$ curl -u <username> -X POST -F archive=@/path/to/file.zip https://api.bitbucket.org/2.0/repositories/<owner_username>/<repo_slug>/issues/import\n```",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"repo_slug": repoSlug,
@@ -690,9 +698,10 @@ func newIssuesGetAnIssueCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "get-an-issue",
-		Short: `Get an issue`,
-		Long:  `Returns the specified issue.`,
+		Use:        "get-an-issue",
+		Short:      `Get an issue`,
+		Long:       `Returns the specified issue.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -741,9 +750,10 @@ func newIssuesUpdateAnIssueCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "update-an-issue",
-		Short: `Update an issue`,
-		Long:  "Modifies the issue.\n\n```\n$ curl https://api.bitbucket.org/2.0/repostories/evzijst/dogslow/issues/123 \\\n  -u evzijst -s -X PUT -H 'Content-Type: application/json' \\\n  -d '{\n  \"title\": \"Updated title\",\n  \"assignee\": {\n    \"account_id\": \"5d5355e8c6b9320d9ea5b28d\"\n  },\n  \"priority\": \"minor\",\n  \"version\": {\n    \"name\": \"1.0\"\n  },\n  \"component\": null\n}'\n```\n\nThis example changes the `title`, `assignee`, `priority` and the\n`version`. It also removes the value of the `component` from the issue\nby setting the field to `null`. Any field not present keeps its existing\nvalue.\n\nEach time an issue is edited in the UI or through the API, an immutable\nchange record is created under the `/issues/123/changes` endpoint. It\nalso has a comment associated with the change.",
+		Use:        "update-an-issue",
+		Short:      `Update an issue`,
+		Long:       "Modifies the issue.\n\n```\n$ curl https://api.bitbucket.org/2.0/repostories/evzijst/dogslow/issues/123 \\\n  -u evzijst -s -X PUT -H 'Content-Type: application/json' \\\n  -d '{\n  \"title\": \"Updated title\",\n  \"assignee\": {\n    \"account_id\": \"5d5355e8c6b9320d9ea5b28d\"\n  },\n  \"priority\": \"minor\",\n  \"version\": {\n    \"name\": \"1.0\"\n  },\n  \"component\": null\n}'\n```\n\nThis example changes the `title`, `assignee`, `priority` and the\n`version`. It also removes the value of the `component` from the issue\nby setting the field to `null`. Any field not present keeps its existing\nvalue.\n\nEach time an issue is edited in the UI or through the API, an immutable\nchange record is created under the `/issues/123/changes` endpoint. It\nalso has a comment associated with the change.",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -796,6 +806,7 @@ func newIssuesDeleteAnIssueCmd() *cobra.Command {
 		Short: `Delete an issue`,
 		Long: `Deletes the specified issue. This requires write access to the
 repository.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -855,6 +866,7 @@ This returns the files' meta data. This does not return the files'
 actual contents.
 
 The files are always ordered by their upload date.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -909,9 +921,10 @@ func newIssuesUploadAnAttachmentToAnIssueCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "upload-an-attachment-to-an-issue",
-		Short: `Upload an attachment to an issue`,
-		Long:  "Upload new issue attachments.\n\nTo upload files, perform a `multipart/form-data` POST containing one\nor more file fields.\n\nWhen a file is uploaded with the same name as an existing attachment,\nthen the existing file will be replaced.",
+		Use:        "upload-an-attachment-to-an-issue",
+		Short:      `Upload an attachment to an issue`,
+		Long:       "Upload new issue attachments.\n\nTo upload files, perform a `multipart/form-data` POST containing one\nor more file fields.\n\nWhen a file is uploaded with the same name as an existing attachment,\nthen the existing file will be replaced.",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -971,6 +984,7 @@ the raw contents.
 
 The redirect URL contains a one-time token that has a limited lifetime.
 As a result, the link should not be persisted, stored, or shared.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -1025,9 +1039,10 @@ func newIssuesDeleteAnAttachmentForAnIssueCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "delete-an-attachment-for-an-issue",
-		Short: `Delete an attachment for an issue`,
-		Long:  `Deletes an attachment.`,
+		Use:        "delete-an-attachment-for-an-issue",
+		Short:      `Delete an attachment for an issue`,
+		Long:       `Deletes an attachment.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -1086,9 +1101,10 @@ func newIssuesListChangesOnAnIssueCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "list-changes-on-an-issue",
-		Short: `List changes on an issue`,
-		Long:  "Returns the list of all changes that have been made to the specified\nissue. Changes are returned in chronological order with the oldest\nchange first.\n\nEach time an issue is edited in the UI or through the API, an immutable\nchange record is created under the `/issues/123/changes` endpoint. It\nalso has a comment associated with the change.\n\nNote that this operation is changing significantly, due to privacy changes.\nSee the [announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-changes-gdpr/#changes-to-the-issue-changes-api)\nfor details.\n\nChanges support [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) that\ncan be used to search for specific changes. For instance, to see\nwhen an issue transitioned to \"resolved\":\n\n```\n$ curl -s https://api.bitbucket.org/2.0/repositories/site/master/issues/1/changes \\\n   -G --data-urlencode='q=changes.state.new = \"resolved\"'\n```\n\nThis resource is only available on repositories that have the issue\ntracker enabled.\n\nN.B.\n\nThe `changes.assignee` and `changes.assignee_account_id` fields are not\na `user` object. Instead, they contain the raw `username` and\n`account_id` of the user. This is to protect the integrity of the audit\nlog even after a user account gets deleted.\n\nThe `changes.assignee` field is deprecated will disappear in the\nfuture. Use `changes.assignee_account_id` instead.",
+		Use:        "list-changes-on-an-issue",
+		Short:      `List changes on an issue`,
+		Long:       "Returns the list of all changes that have been made to the specified\nissue. Changes are returned in chronological order with the oldest\nchange first.\n\nEach time an issue is edited in the UI or through the API, an immutable\nchange record is created under the `/issues/123/changes` endpoint. It\nalso has a comment associated with the change.\n\nNote that this operation is changing significantly, due to privacy changes.\nSee the [announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-changes-gdpr/#changes-to-the-issue-changes-api)\nfor details.\n\nChanges support [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) that\ncan be used to search for specific changes. For instance, to see\nwhen an issue transitioned to \"resolved\":\n\n```\n$ curl -s https://api.bitbucket.org/2.0/repositories/site/master/issues/1/changes \\\n   -G --data-urlencode='q=changes.state.new = \"resolved\"'\n```\n\nThis resource is only available on repositories that have the issue\ntracker enabled.\n\nN.B.\n\nThe `changes.assignee` and `changes.assignee_account_id` fields are not\na `user` object. Instead, they contain the raw `username` and\n`account_id` of the user. This is to protect the integrity of the audit\nlog even after a user account gets deleted.\n\nThe `changes.assignee` field is deprecated will disappear in the\nfuture. Use `changes.assignee_account_id` instead.",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -1182,9 +1198,10 @@ func newIssuesModifyTheStateOfAnIssueCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "modify-the-state-of-an-issue",
-		Short: `Modify the state of an issue`,
-		Long:  "Makes a change to the specified issue.\n\nFor example, to change an issue's state and assignee, create a new\nchange object that modifies these fields:\n\n```\ncurl https://api.bitbucket.org/2.0/site/master/issues/1234/changes \\\n  -s -u evzijst -X POST -H \"Content-Type: application/json\" \\\n  -d '{\n    \"changes\": {\n      \"assignee_account_id\": {\n        \"new\": \"557058:c0b72ad0-1cb5-4018-9cdc-0cde8492c443\"\n      },\n      \"state\": {\n        \"new\": 'resolved\"\n      }\n    }\n    \"message\": {\n      \"raw\": \"This is now resolved.\"\n    }\n  }'\n```\n\nThe above example also includes a custom comment to go alongside the\nchange. This comment will also be visible on the issue page in the UI.\n\nThe fields of the `changes` object are strings, not objects. This\nallows for immutable change log records, even after user accounts,\nmilestones, or other objects recorded in a change entry, get renamed or\ndeleted.\n\nThe `assignee_account_id` field stores the account id. When POSTing a\nnew change and changing the assignee, the client should therefore use\nthe user's account_id in the `changes.assignee_account_id.new` field.\n\nThis call requires authentication. Private repositories or private\nissue trackers require the caller to authenticate with an account that\nhas appropriate authorization.",
+		Use:        "modify-the-state-of-an-issue",
+		Short:      `Modify the state of an issue`,
+		Long:       "Makes a change to the specified issue.\n\nFor example, to change an issue's state and assignee, create a new\nchange object that modifies these fields:\n\n```\ncurl https://api.bitbucket.org/2.0/site/master/issues/1234/changes \\\n  -s -u evzijst -X POST -H \"Content-Type: application/json\" \\\n  -d '{\n    \"changes\": {\n      \"assignee_account_id\": {\n        \"new\": \"557058:c0b72ad0-1cb5-4018-9cdc-0cde8492c443\"\n      },\n      \"state\": {\n        \"new\": 'resolved\"\n      }\n    }\n    \"message\": {\n      \"raw\": \"This is now resolved.\"\n    }\n  }'\n```\n\nThe above example also includes a custom comment to go alongside the\nchange. This comment will also be visible on the issue page in the UI.\n\nThe fields of the `changes` object are strings, not objects. This\nallows for immutable change log records, even after user accounts,\nmilestones, or other objects recorded in a change entry, get renamed or\ndeleted.\n\nThe `assignee_account_id` field stores the account id. When POSTing a\nnew change and changing the assignee, the client should therefore use\nthe user's account_id in the `changes.assignee_account_id.new` field.\n\nThis call requires authentication. Private repositories or private\nissue trackers require the caller to authenticate with an account that\nhas appropriate authorization.",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -1383,6 +1400,7 @@ func newIssuesGetIssueChangeObjectCmd() *cobra.Command {
 
 This resource is only available on repositories that have the issue
 tracker enabled.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"change_id": changeId,
@@ -1440,9 +1458,10 @@ func newIssuesListCommentsOnAnIssueCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "list-comments-on-an-issue",
-		Short: `List comments on an issue`,
-		Long:  "Returns a paginated list of all comments that were made on the\nspecified issue.\n\nThe default sorting is oldest to newest and can be overridden with\nthe `sort` query parameter.\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.",
+		Use:        "list-comments-on-an-issue",
+		Short:      `List comments on an issue`,
+		Long:       "Returns a paginated list of all comments that were made on the\nspecified issue.\n\nThe default sorting is oldest to newest and can be overridden with\nthe `sort` query parameter.\n\nThis endpoint also supports filtering and sorting of the results. See\n[filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -1520,9 +1539,10 @@ func newIssuesCreateACommentOnAnIssueCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "create-a-comment-on-an-issue",
-		Short: `Create a comment on an issue`,
-		Long:  "Creates a new issue comment.\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/prlinks/issues/42/comments/ \\\n  -X POST -u evzijst \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"content\": {\"raw\": \"Lorem ipsum.\"}}'\n```",
+		Use:        "create-a-comment-on-an-issue",
+		Short:      `Create a comment on an issue`,
+		Long:       "Creates a new issue comment.\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/prlinks/issues/42/comments/ \\\n  -X POST -u evzijst \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"content\": {\"raw\": \"Lorem ipsum.\"}}'\n```",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -1659,9 +1679,10 @@ func newIssuesGetACommentOnAnIssueCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "get-a-comment-on-an-issue",
-		Short: `Get a comment on an issue`,
-		Long:  `Returns the specified issue comment object.`,
+		Use:        "get-a-comment-on-an-issue",
+		Short:      `Get a comment on an issue`,
+		Long:       `Returns the specified issue comment object.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"comment_id": strconv.Itoa(commentId),
@@ -1737,9 +1758,10 @@ func newIssuesUpdateACommentOnAnIssueCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "update-a-comment-on-an-issue",
-		Short: `Update a comment on an issue`,
-		Long:  "Updates the content of the specified issue comment. Note that only\nthe `content.raw` field can be modified.\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/prlinks/issues/42/comments/5728901 \\\n  -X PUT -u evzijst \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"content\": {\"raw\": \"Lorem ipsum.\"}'\n```",
+		Use:        "update-a-comment-on-an-issue",
+		Short:      `Update a comment on an issue`,
+		Long:       "Updates the content of the specified issue comment. Note that only\nthe `content.raw` field can be modified.\n\n```\n$ curl https://api.bitbucket.org/2.0/repositories/atlassian/prlinks/issues/42/comments/5728901 \\\n  -X PUT -u evzijst \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"content\": {\"raw\": \"Lorem ipsum.\"}'\n```",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"comment_id": strconv.Itoa(commentId),
@@ -1881,9 +1903,10 @@ func newIssuesDeleteACommentOnAnIssueCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "delete-a-comment-on-an-issue",
-		Short: `Delete a comment on an issue`,
-		Long:  `Deletes the specified comment.`,
+		Use:        "delete-a-comment-on-an-issue",
+		Short:      `Delete a comment on an issue`,
+		Long:       `Deletes the specified comment.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"comment_id": strconv.Itoa(commentId),
@@ -1942,6 +1965,7 @@ func newIssuesCheckIfCurrentUserVotedForAnIssueCmd() *cobra.Command {
 		Long: `Check whether the authenticated user has voted for this issue.
 A 204 status code indicates that the user has voted, while a 404
 implies they haven't.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -1996,6 +2020,7 @@ func newIssuesVoteForAnIssueCmd() *cobra.Command {
 
 To cast your vote, do an empty PUT. The 204 status code indicates that
 the operation was successful.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -2044,9 +2069,10 @@ func newIssuesRemoveVoteForAnIssueCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "remove-vote-for-an-issue",
-		Short: `Remove vote for an issue`,
-		Long:  `Retract your vote.`,
+		Use:        "remove-vote-for-an-issue",
+		Short:      `Remove vote for an issue`,
+		Long:       `Retract your vote.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -2099,6 +2125,7 @@ func newIssuesCheckIfCurrentUserIsWatchingAIssueCmd() *cobra.Command {
 		Short: `Check if current user is watching a issue`,
 		Long: `Indicated whether or not the authenticated user is watching this
 issue.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -2153,6 +2180,7 @@ func newIssuesWatchAnIssueCmd() *cobra.Command {
 
 To start watching this issue, do an empty PUT. The 204 status code
 indicates that the operation was successful.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -2201,9 +2229,10 @@ func newIssuesStopWatchingAnIssueCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "stop-watching-an-issue",
-		Short: `Stop watching an issue`,
-		Long:  `Stop watching this issue.`,
+		Use:        "stop-watching-an-issue",
+		Short:      `Stop watching an issue`,
+		Long:       `Stop watching this issue.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"issue_id":  issueId,
@@ -2260,6 +2289,7 @@ func newIssuesListMilestonesCmd() *cobra.Command {
 
 This resource is only available on repositories that have the issue
 tracker enabled.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"repo_slug": repoSlug,
@@ -2309,9 +2339,10 @@ func newIssuesGetAMilestoneCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "get-a-milestone",
-		Short: `Get a milestone`,
-		Long:  `Returns the specified issue tracker milestone object.`,
+		Use:        "get-a-milestone",
+		Short:      `Get a milestone`,
+		Long:       `Returns the specified issue tracker milestone object.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"milestone_id": strconv.Itoa(milestoneId),
@@ -2368,6 +2399,7 @@ func newIssuesListDefinedVersionsForIssuesCmd() *cobra.Command {
 
 This resource is only available on repositories that have the issue
 tracker enabled.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"repo_slug": repoSlug,
@@ -2417,9 +2449,10 @@ func newIssuesGetADefinedVersionForIssuesCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "get-a-defined-version-for-issues",
-		Short: `Get a defined version for issues`,
-		Long:  `Returns the specified issue tracker version object.`,
+		Use:        "get-a-defined-version-for-issues",
+		Short:      `Get a defined version for issues`,
+		Long:       `Returns the specified issue tracker version object.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"repo_slug":  repoSlug,

@@ -97,6 +97,7 @@ Returns a paginated list of all public repositories.
 
 This endpoint also supports filtering and sorting of the results. See
 [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{}
 			handlers.InferRepoContext(pathParams)
@@ -2120,9 +2121,10 @@ func newReposListRepositoryPermissionsForAUserCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "list-repository-permissions-for-a-user",
-		Short: `List repository permissions for a user`,
-		Long:  "**This endpoint is deprecated. Please use the\n[workspace scoped alternative](/cloud/bitbucket/rest/api-group-repositories/#api-user-workspaces-workspace-permissions-repositories-get).**\n\nReturns an object for each repository the caller has explicit access\nto and their effective permission — the highest level of permission the\ncaller has. This does not return public repositories that the user was\nnot granted any specific permission in, and does not distinguish between\nexplicit and implicit privileges.\n\nPermissions can be:\n\n* `admin`\n* `write`\n* `read`\n\nResults may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering) by\nrepository or permission by adding the following query string\nparameters:\n\n* `q=repository.name=\"geordi\"` or `q=permission>\"read\"`\n* `sort=repository.name`\n\nNote that the query parameter values need to be URL escaped so that `=`\nwould become `%3D`.",
+		Use:        "list-repository-permissions-for-a-user",
+		Short:      `List repository permissions for a user`,
+		Long:       "**This endpoint is deprecated. Please use the\n[workspace scoped alternative](/cloud/bitbucket/rest/api-group-repositories/#api-user-workspaces-workspace-permissions-repositories-get).**\n\nReturns an object for each repository the caller has explicit access\nto and their effective permission — the highest level of permission the\ncaller has. This does not return public repositories that the user was\nnot granted any specific permission in, and does not distinguish between\nexplicit and implicit privileges.\n\nPermissions can be:\n\n* `admin`\n* `write`\n* `read`\n\nResults may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering) by\nrepository or permission by adding the following query string\nparameters:\n\n* `q=repository.name=\"geordi\"` or `q=permission>\"read\"`\n* `sort=repository.name`\n\nNote that the query parameter values need to be URL escaped so that `=`\nwould become `%3D`.",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{}
 			handlers.InferRepoContext(pathParams)

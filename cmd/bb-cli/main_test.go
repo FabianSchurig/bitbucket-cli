@@ -25,6 +25,7 @@ func TestNewRootCmd(t *testing.T) {
 	if cmd.Use != "bb-cli" {
 		t.Fatalf("unexpected command use %q", cmd.Use)
 	}
+
 	if cmd.Version == "" {
 		t.Fatal("expected version on root command")
 	}
@@ -36,6 +37,18 @@ func TestNewRootCmd(t *testing.T) {
 		if sub.PersistentFlags().Lookup("output") == nil {
 			t.Fatalf("expected --output flag on %s", sub.Name())
 		}
+	}
+
+}
+
+func TestDeprecatedCommandsAreMarked(t *testing.T) {
+	cmd := newRootCmd()
+	deprecated, _, err := cmd.Find([]string{"workspaces", "list-workspaces-for-the-current-user"})
+	if err != nil {
+		t.Fatalf("finding deprecated command: %v", err)
+	}
+	if deprecated.Deprecated == "" {
+		t.Fatal("expected deprecated command to be marked")
 	}
 }
 
