@@ -153,6 +153,31 @@ bb-cli pr list-pull-requests --help
 
 If you know the Bitbucket API area but not the exact command name, start with the group help first.
 
+## Shell autocompletion
+
+`bb-cli` can generate completion scripts for Bash, Fish, PowerShell, and Zsh:
+
+```bash
+# Bash
+source <(bb-cli completion bash)
+
+# Fish
+bb-cli completion fish | source
+
+# Zsh
+source <(bb-cli completion zsh)
+```
+
+For PowerShell, run:
+
+```powershell
+bb-cli completion powershell | Out-String | Invoke-Expression
+```
+
+These commands enable completion for the current shell session. See
+`bb-cli completion <shell> --help` for instructions on installing completion
+persistently.
+
 ## When to use the CLI
 
 Use `bb-cli` when you want:
