@@ -1,7 +1,7 @@
 module github.com/FabianSchurig/bitbucket-cli
 
-go 1.25.13
-
+go 1.25
+toolchain go1.25.13
 require (
 	github.com/fatih/color v1.19.0
 	github.com/go-resty/resty/v2 v2.17.2
