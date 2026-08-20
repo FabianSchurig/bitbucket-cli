@@ -2,11 +2,11 @@
 # Dockerfile for bitbucket-cli
 #
 # Uses a two-stage build per target:
-#   1. golang:1 (official, has git) — builds the binary with `go install`
-#   2. dhi.io/golang:1 (hardened runtime) — receives only the compiled binary
+#   1. golang:1 (official, has git) — builds a static binary with `go install`
+#   2. scratch — receives only the compiled binary and CA bundle
 #
-# The hardened base image has no package manager, so we cannot install git
-# into it directly; the builder stage handles all compilation.
+# The runtime image is intentionally package-free to minimize the attack
+# surface; the builder stage handles all compilation.
 #
 # Targets:
 #   bb-cli  — Bitbucket CLI
@@ -28,14 +28,17 @@ FROM golang:1 AS build-bb-cli
 ARG VERSION=latest
 
 # Use GOPROXY=direct so Go fetches directly from GitHub, bypassing the slow proxy cache
-RUN GOPROXY=direct go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-cli@${VERSION}
+RUN CGO_ENABLED=0 GOPROXY=direct go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-cli@${VERSION}
 
-# --- bb-cli: hardened runtime ---
-FROM dhi.io/golang:1 AS bb-cli
+# --- bb-cli: minimal runtime ---
+FROM scratch AS bb-cli
 
 COPY --from=build-bb-cli /go/bin/bb-cli /usr/local/bin/bb-cli
+COPY --from=build-bb-cli /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
-ENTRYPOINT ["bb-cli"]
+USER 65532:65532
+
+ENTRYPOINT ["/usr/local/bin/bb-cli"]
 
 # --- bb-mcp: build stage ---
 FROM golang:1 AS build-bb-mcp
@@ -43,14 +46,17 @@ FROM golang:1 AS build-bb-mcp
 ARG VERSION=latest
 
 # Use GOPROXY=direct so Go fetches directly from GitHub, bypassing the slow proxy cache
-RUN GOPROXY=direct go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-mcp@${VERSION}
+RUN CGO_ENABLED=0 GOPROXY=direct go install github.com/FabianSchurig/bitbucket-cli/cmd/bb-mcp@${VERSION}
 
-# --- bb-mcp: hardened runtime ---
-FROM dhi.io/golang:1 AS bb-mcp
+# --- bb-mcp: minimal runtime ---
+FROM scratch AS bb-mcp
 
 COPY --from=build-bb-mcp /go/bin/bb-mcp /usr/local/bin/bb-mcp
+COPY --from=build-bb-mcp /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
+USER 65532:65532
 
 LABEL io.modelcontextprotocol.server.name="io.github.FabianSchurig/bitbucket-mcp"
 
 EXPOSE 8080
-ENTRYPOINT ["bb-mcp"]
+ENTRYPOINT ["/usr/local/bin/bb-mcp"]
