@@ -40,12 +40,12 @@ RUN CGO_ENABLED=0 go build -o /out/bb-cli ./cmd/bb-cli
 # --- bb-cli: minimal runtime ---
 FROM scratch AS bb-cli
 
-COPY --from=build-bb-cli /out/bb-cli /usr/local/bin/bb-cli
+COPY --from=build-bb-cli /out/bb-cli /bb-cli
 COPY --from=build-bb-cli /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 USER 65532:65532
 
-ENTRYPOINT ["/usr/local/bin/bb-cli"]
+ENTRYPOINT ["/bb-cli"]
 
 # --- bb-mcp: build stage ---
 FROM build-base AS build-bb-mcp
@@ -55,7 +55,7 @@ RUN CGO_ENABLED=0 go build -o /out/bb-mcp ./cmd/bb-mcp
 # --- bb-mcp: minimal runtime ---
 FROM scratch AS bb-mcp
 
-COPY --from=build-bb-mcp /out/bb-mcp /usr/local/bin/bb-mcp
+COPY --from=build-bb-mcp /out/bb-mcp /bb-mcp
 COPY --from=build-bb-mcp /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 USER 65532:65532
@@ -63,4 +63,4 @@ USER 65532:65532
 LABEL io.modelcontextprotocol.server.name="io.github.FabianSchurig/bitbucket-mcp"
 
 EXPOSE 8080
-ENTRYPOINT ["/usr/local/bin/bb-mcp"]
+ENTRYPOINT ["/bb-mcp"]
