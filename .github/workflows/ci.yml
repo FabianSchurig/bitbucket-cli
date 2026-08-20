@@ -68,13 +68,13 @@ jobs:
         run: docker build --target bb-cli -t bb-cli:test .
 
       - name: Verify bb-cli image
-        run: docker run --rm bb-cli:test --help
+        run: timeout 10s docker run --rm bb-cli:test --help
 
       - name: Build bb-mcp image
         run: docker build --target bb-mcp -t bb-mcp:test .
 
       - name: Verify bb-mcp image
-        run: docker run --rm bb-mcp:test --help
+        run: timeout 10s docker run --rm bb-mcp:test --help
 
   # Runs only on push events so that the GITHUB_TOKEN write scope is never
   # issued to a pull-request runner (including fork PRs).
