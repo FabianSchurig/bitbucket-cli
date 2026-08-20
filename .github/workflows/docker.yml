@@ -1,10 +1,9 @@
 name: Docker
 
 on:
-  workflow_run:
-    workflows: ["Release"]
-    types:
-      - completed
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 permissions:
@@ -20,9 +19,6 @@ jobs:
       packages: write
       id-token: write
       security-events: write
-    if: >
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     strategy:
       matrix:
         include:
@@ -33,7 +29,6 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
           persist-credentials: false
 
       - name: Normalize repository owner
@@ -42,16 +37,7 @@ jobs:
 
       - name: Determine image tag
         id: version
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
-          REF_NAME: ${{ github.ref_name }}
-        run: |
-          if [ "$EVENT_NAME" = "workflow_run" ]; then
-            echo "tag=$HEAD_BRANCH" >> $GITHUB_OUTPUT
-          else
-            echo "tag=$REF_NAME" >> $GITHUB_OUTPUT
-          fi
+        run: echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3 # v4.1.0
@@ -115,23 +101,14 @@ jobs:
     name: Publish to MCP Registry
     needs: [docker]
     runs-on: ubuntu-latest
-    if: >
-      startsWith(github.ref, 'refs/tags/v') ||
-      (github.event_name == 'workflow_run' && startsWith(github.event.workflow_run.head_branch, 'v'))
+    if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - name: Checkout code
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Set version in server.json
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
         run: |
-          if [ "$EVENT_NAME" = "workflow_run" ]; then
-            VERSION="${HEAD_BRANCH#v}"
-          else
-            VERSION="${GITHUB_REF#refs/tags/v}"
-          fi
+          VERSION="${GITHUB_REF#refs/tags/v}"
           jq --arg v "$VERSION" '
             .version = $v |
             .packages[0].identifier = ("ghcr.io/fabianschurig/bitbucket-mcp:" + $v)
