@@ -3023,6 +3023,7 @@ func newPipelinesGetPipelineVariablesForTeamCmd() *cobra.Command {
 		Short: `List variables for an account`,
 		Long: `Find account level variables.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"username": username,
@@ -3074,6 +3075,7 @@ func newPipelinesCreatePipelineVariableForTeamCmd() *cobra.Command {
 		Short: `Create a variable for a user`,
 		Long: `Create an account level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"username": username,
@@ -3138,6 +3140,7 @@ func newPipelinesGetPipelineVariableForTeamCmd() *cobra.Command {
 		Short: `Get a variable for a team`,
 		Long: `Retrieve a team level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"username":      username,
@@ -3189,6 +3192,7 @@ func newPipelinesUpdatePipelineVariableForTeamCmd() *cobra.Command {
 		Short: `Update a variable for a team`,
 		Long: `Update a team level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"username":      username,
@@ -3258,6 +3262,7 @@ func newPipelinesDeletePipelineVariableForTeamCmd() *cobra.Command {
 		Short: `Delete a variable for a team`,
 		Long: `Delete a team level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"username":      username,
@@ -3306,6 +3311,7 @@ func newPipelinesGetPipelineVariablesForUserCmd() *cobra.Command {
 		Short: `List variables for a user`,
 		Long: `Find user level variables.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"selected_user": selectedUser,
@@ -3357,6 +3363,7 @@ func newPipelinesCreatePipelineVariableForUserCmd() *cobra.Command {
 		Short: `Create a variable for a user`,
 		Long: `Create a user level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"selected_user": selectedUser,
@@ -3421,6 +3428,7 @@ func newPipelinesGetPipelineVariableForUserCmd() *cobra.Command {
 		Short: `Get a variable for a user`,
 		Long: `Retrieve a user level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"selected_user": selectedUser,
@@ -3472,6 +3480,7 @@ func newPipelinesUpdatePipelineVariableForUserCmd() *cobra.Command {
 		Short: `Update a variable for a user`,
 		Long: `Update a user level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"selected_user": selectedUser,
@@ -3541,6 +3550,7 @@ func newPipelinesDeletePipelineVariableForUserCmd() *cobra.Command {
 		Short: `Delete a variable for a user`,
 		Long: `Delete an account level variable.
 This endpoint has been deprecated, and you should use the new workspaces endpoint. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"selected_user": selectedUser,

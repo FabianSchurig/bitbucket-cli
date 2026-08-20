@@ -41,6 +41,7 @@ type Op struct {
 	OperationID  string             `yaml:"operationId"`
 	Summary      string             `yaml:"summary"`
 	Description  string             `yaml:"description"`
+	Deprecated   bool               `yaml:"deprecated"`
 	Tags         []string           `yaml:"tags"`
 	Parameters   []Parameter        `yaml:"parameters"`
 	RequestBody  *RequestBody       `yaml:"requestBody"`

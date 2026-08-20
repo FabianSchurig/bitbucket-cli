@@ -191,6 +191,7 @@ type OperationDef struct {
 	Path           string
 	Summary        string
 	Description    string
+	Deprecated     bool
 	Params         []ParamDef
 	BodyFields     []BodyField
 	ResponseFields []BodyField // Flattened fields from the response schema
@@ -240,6 +241,7 @@ func BuildOperation(pe PathEntry, entry MethodOp, schema *Schema) OperationDef {
 		Path:           pe.Path,
 		Summary:        op.Summary,
 		Description:    op.Description,
+		Deprecated:     op.Deprecated,
 		Params:         paramDefs,
 		BodyFields:     bodyFields,
 		ResponseFields: responseFields,

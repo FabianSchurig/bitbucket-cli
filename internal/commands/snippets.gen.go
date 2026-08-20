@@ -80,9 +80,10 @@ func newSnippetsListSnippetsCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "list-snippets",
-		Short: `List snippets`,
-		Long:  "**This endpoint is deprecated. Please use the\n[workspace scoped alternative](/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-get).**\n\nReturns all snippets. Like pull requests, repositories and workspaces, the\nfull set of snippets is defined by what the current user has access to.\n\nThis includes all snippets owned by any of the workspaces the user is a member of,\nor snippets by other users that the current user is either watching or has collaborated\non (for instance by commenting on it).\n\nTo limit the set of returned snippets, apply the\n`?role=[owner|contributor|member]` query parameter where the roles are\ndefined as follows:\n\n* `owner`: all snippets owned by the current user\n* `contributor`: all snippets owned by, or watched by the current user\n* `member`: created in a workspaces or watched by the current user\n\nWhen no role is specified, all public snippets are returned, as well as all\nprivately owned snippets watched or commented on.\n\nThe returned response is a normal paginated JSON list. This endpoint\nonly supports `application/json` responses and no\n`multipart/form-data` or `multipart/related`. As a result, it is not\npossible to include the file contents.",
+		Use:        "list-snippets",
+		Short:      `List snippets`,
+		Long:       "**This endpoint is deprecated. Please use the\n[workspace scoped alternative](/cloud/bitbucket/rest/api-group-snippets/#api-snippets-workspace-get).**\n\nReturns all snippets. Like pull requests, repositories and workspaces, the\nfull set of snippets is defined by what the current user has access to.\n\nThis includes all snippets owned by any of the workspaces the user is a member of,\nor snippets by other users that the current user is either watching or has collaborated\non (for instance by commenting on it).\n\nTo limit the set of returned snippets, apply the\n`?role=[owner|contributor|member]` query parameter where the roles are\ndefined as follows:\n\n* `owner`: all snippets owned by the current user\n* `contributor`: all snippets owned by, or watched by the current user\n* `member`: created in a workspaces or watched by the current user\n\nWhen no role is specified, all public snippets are returned, as well as all\nprivately owned snippets watched or commented on.\n\nThe returned response is a normal paginated JSON list. This endpoint\nonly supports `application/json` responses and no\n`multipart/form-data` or `multipart/related`. As a result, it is not\npossible to include the file contents.",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{}
 			handlers.InferRepoContext(pathParams)
@@ -1077,9 +1078,10 @@ func newSnippetsListUsersWatchingASnippetCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "list-users-watching-a-snippet",
-		Short: `List users watching a snippet`,
-		Long:  `Returns a paginated list of all users watching a specific snippet.`,
+		Use:        "list-users-watching-a-snippet",
+		Short:      `List users watching a snippet`,
+		Long:       `Returns a paginated list of all users watching a specific snippet.`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"encoded_id": encodedId,

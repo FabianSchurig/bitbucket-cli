@@ -78,9 +78,10 @@ func newWorkspacesListWorkspacesForTheCurrentUserCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "list-workspaces-for-the-current-user",
-		Short: `List workspaces for the current user`,
-		Long:  "**This endpoint is deprecated. Please use the supported alternatives:**\n* [List workspaces for user](/cloud/bitbucket/rest/api-group-workspaces/#api-user-workspaces-get)\n* [Get user permission on a workspace](/cloud/bitbucket/rest/api-group-workspaces/#api-user-workspaces-workspace-permission-get)\n\nReturns an object for each workspace the caller is a member of, and\ntheir effective role - the highest level of privilege the caller has.\nIf a user is a member of multiple groups with distinct roles, only the\nhighest level is returned.\n\nPermissions can be:\n\n* `owner`\n* `collaborator`\n* `member`\n\n**The `collaborator` role is being removed from the Bitbucket Cloud API. For more information,\nsee the [deprecation announcement](/cloud/bitbucket/deprecation-notice-collaborator-role/).**\n\n**When you move your administration from Bitbucket Cloud to admin.atlassian.com, the following fields on\n`workspace_membership` will no longer be present: `last_accessed` and `added_on`. See the\n[deprecation announcement](/cloud/bitbucket/announcement-breaking-change-workspace-membership/).**\n\nResults may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering) by\nworkspace or permission by adding the following query string parameters:\n\n* `q=workspace.slug=\"bbworkspace1\"` or `q=permission=\"owner\"`\n* `sort=workspace.slug`\n\nNote that the query parameter values need to be URL escaped so that `=`\nwould become `%3D`.",
+		Use:        "list-workspaces-for-the-current-user",
+		Short:      `List workspaces for the current user`,
+		Long:       "**This endpoint is deprecated. Please use the supported alternatives:**\n* [List workspaces for user](/cloud/bitbucket/rest/api-group-workspaces/#api-user-workspaces-get)\n* [Get user permission on a workspace](/cloud/bitbucket/rest/api-group-workspaces/#api-user-workspaces-workspace-permission-get)\n\nReturns an object for each workspace the caller is a member of, and\ntheir effective role - the highest level of privilege the caller has.\nIf a user is a member of multiple groups with distinct roles, only the\nhighest level is returned.\n\nPermissions can be:\n\n* `owner`\n* `collaborator`\n* `member`\n\n**The `collaborator` role is being removed from the Bitbucket Cloud API. For more information,\nsee the [deprecation announcement](/cloud/bitbucket/deprecation-notice-collaborator-role/).**\n\n**When you move your administration from Bitbucket Cloud to admin.atlassian.com, the following fields on\n`workspace_membership` will no longer be present: `last_accessed` and `added_on`. See the\n[deprecation announcement](/cloud/bitbucket/announcement-breaking-change-workspace-membership/).**\n\nResults may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering) by\nworkspace or permission by adding the following query string parameters:\n\n* `q=workspace.slug=\"bbworkspace1\"` or `q=permission=\"owner\"`\n* `sort=workspace.slug`\n\nNote that the query parameter values need to be URL escaped so that `=`\nwould become `%3D`.",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{}
 			handlers.InferRepoContext(pathParams)
@@ -212,9 +213,10 @@ func newWorkspacesListWorkspacesForUserCmd() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:   "list-workspaces-for-user",
-		Short: `List workspaces for user`,
-		Long:  "**This endpoint is deprecated. Please use the\n[supported alternative](/cloud/bitbucket/rest/api-group-workspaces/#api-user-workspaces-get).**\n\nReturns a list of workspaces accessible by the authenticated user.\n\nResults may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering) by\nworkspace or permission by adding the following query string parameters:\n\n* `q=slug=\"bbworkspace1\"` or `q=is_private=true`\n* `sort=created_on`\n\nNote that the query parameter values need to be URL escaped so that `=`\nwould become `%3D`.\n\n**The `collaborator` role is being removed from the Bitbucket Cloud API. For more information,\nsee the [deprecation announcement](/cloud/bitbucket/deprecation-notice-collaborator-role/).**",
+		Use:        "list-workspaces-for-user",
+		Short:      `List workspaces for user`,
+		Long:       "**This endpoint is deprecated. Please use the\n[supported alternative](/cloud/bitbucket/rest/api-group-workspaces/#api-user-workspaces-get).**\n\nReturns a list of workspaces accessible by the authenticated user.\n\nResults may be further [filtered or sorted](/cloud/bitbucket/rest/intro/#filtering) by\nworkspace or permission by adding the following query string parameters:\n\n* `q=slug=\"bbworkspace1\"` or `q=is_private=true`\n* `sort=created_on`\n\nNote that the query parameter values need to be URL escaped so that `=`\nwould become `%3D`.\n\n**The `collaborator` role is being removed from the Bitbucket Cloud API. For more information,\nsee the [deprecation announcement](/cloud/bitbucket/deprecation-notice-collaborator-role/).**",
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{}
 			handlers.InferRepoContext(pathParams)
