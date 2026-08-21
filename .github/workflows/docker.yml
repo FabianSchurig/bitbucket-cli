@@ -81,10 +81,12 @@ jobs:
         with:
           image: ghcr.io/${{ steps.owner.outputs.lowercase }}/${{ matrix.image }}@${{ steps.build.outputs.digest }}
           artifact-name: sbom-${{ matrix.image }}.spdx.json
+          upload-release-assets: false
 
       - name: Scan ${{ matrix.image }} for CVEs
         uses: anchore/scan-action@e1165082ffb1fe366ebaf02d8526e7c4989ea9d2 # v7.4.0
         id: scan
+        if: ${{ !cancelled() }}
         with:
           image: ghcr.io/${{ steps.owner.outputs.lowercase }}/${{ matrix.image }}@${{ steps.build.outputs.digest }}
           fail-build: false
@@ -92,7 +94,7 @@ jobs:
 
       - name: Upload CVE scan report
         uses: github/codeql-action/upload-sarif@1a818fd5f97ed0ee9a823421bd5b171add01227f # v4.36.2
-        if: always()
+        if: ${{ always() && steps.scan.outputs.sarif != '' }}
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
           category: docker-${{ matrix.image }}
