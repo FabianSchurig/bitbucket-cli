@@ -54,6 +54,28 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+  docker-smoke:
+    name: Docker smoke test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Build bb-cli image
+        run: docker build --target bb-cli -t bb-cli:test .
+
+      - name: Verify bb-cli image
+        run: timeout 10s docker run --rm bb-cli:test --help
+
+      - name: Build bb-mcp image
+        run: docker build --target bb-mcp -t bb-mcp:test .
+
+      - name: Verify bb-mcp image
+        run: timeout 10s docker run --rm bb-mcp:test --help
+
   # Runs only on push events so that the GITHUB_TOKEN write scope is never
   # issued to a pull-request runner (including fork PRs).
   # Credentials are intentionally persisted so git-auto-commit-action can push.
