@@ -58,6 +58,20 @@ docker run --rm -i --env-file "${HOME}/.config/bitbucket-mcp.env" -p 8080:8080 g
 > [!TIP]
 > If credentials are already exported in your shell, `-e BITBUCKET_USERNAME -e BITBUCKET_TOKEN` forwards host environment values to the container.
 
+#### SBOM and CVE reports
+
+Each released image has an SPDX 2.3 SBOM and a Grype vulnerability report generated from the pushed image digest.
+
+- On the matching [GitHub Release](https://github.com/FabianSchurig/bitbucket-cli/releases): `sbom-bitbucket-mcp.spdx.json`, `cves-bitbucket-mcp.json`, and `cves-bitbucket-mcp.txt` (the `.txt` is the human-readable Grype table).
+- On the image itself, as a signed attestation bound to the digest:
+
+```bash
+gh attestation verify oci://ghcr.io/fabianschurig/bitbucket-mcp:latest --owner FabianSchurig
+gh attestation download oci://ghcr.io/fabianschurig/bitbucket-mcp:latest --owner FabianSchurig
+```
+
+The runtime image is built `FROM scratch` and contains only the static binary and CA certificates, so there is no OS package layer to scan or patch.
+
 ### MCP Registry
 
 `bb-mcp` is published to the [MCP Registry](https://registry.modelcontextprotocol.io) automatically on every release. MCP-compatible clients can discover and install it from the registry.

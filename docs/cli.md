@@ -66,6 +66,20 @@ docker pull ghcr.io/fabianschurig/bitbucket-cli:latest
 docker run -e BITBUCKET_USERNAME -e BITBUCKET_TOKEN ghcr.io/fabianschurig/bitbucket-cli:latest --help
 ```
 
+#### SBOM and CVE reports
+
+Each released image has an SPDX 2.3 SBOM and a Grype vulnerability report generated from the pushed image digest.
+
+- On the matching [GitHub Release](https://github.com/FabianSchurig/bitbucket-cli/releases): `sbom-bitbucket-cli.spdx.json`, `cves-bitbucket-cli.json`, and `cves-bitbucket-cli.txt` (the `.txt` is the human-readable Grype table).
+- On the image itself, as a signed attestation bound to the digest:
+
+```bash
+gh attestation verify oci://ghcr.io/fabianschurig/bitbucket-cli:latest --owner FabianSchurig
+gh attestation download oci://ghcr.io/fabianschurig/bitbucket-cli:latest --owner FabianSchurig
+```
+
+The runtime image is built `FROM scratch` and contains only the static binary and CA certificates, so there is no OS package layer to scan or patch.
+
 ### Download binaries
 
 You can also download binaries from the [GitHub Releases](https://github.com/FabianSchurig/bitbucket-cli/releases) page.

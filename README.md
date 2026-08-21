@@ -183,8 +183,29 @@ flowchart TD
 - **`terraform-tests.yml`**: runs mock-based Terraform acceptance and `terraform test` suites, plus real API tests when credentials exist. See [docs/e2e-coverage.md](./docs/e2e-coverage.md) for the current list of endpoints exercised by the real-API tests.
 - **`schema-sync.yml`**: daily/manual sync that fetches the live Bitbucket spec, regenerates generated artifacts, rebuilds docs, tests everything, and tags a release when the schema changed.
 - **`release.yml`**: publishes tagged binary releases via GoReleaser.
-- **`docker.yml`**: builds multi-arch container images for `bb-cli` and `bb-mcp`, pushes them to GHCR, and publishes the `bb-mcp` server to the [MCP Registry](https://registry.modelcontextprotocol.io).
+- **`docker.yml`**: builds multi-arch container images for `bb-cli` and `bb-mcp`, pushes them to GHCR, publishes their SBOM and CVE reports (see [Supply chain: SBOM and CVE reports](#supply-chain-sbom-and-cve-reports)), and publishes the `bb-mcp` server to the [MCP Registry](https://registry.modelcontextprotocol.io).
 - **`terraform-release.yml`**: mirrors the tagged source into `terraform-provider-bitbucket` and publishes the Terraform provider release.
+
+## Supply chain: SBOM and CVE reports
+
+Every released container image ships with a Software Bill of Materials and a vulnerability report in standard formats. Both are produced from the exact image digest that was pushed to GHCR.
+
+| Artifact | Format | Where to get it |
+| --- | --- | --- |
+| Image SBOM | SPDX 2.3 JSON | `sbom-bitbucket-cli.spdx.json` / `sbom-bitbucket-mcp.spdx.json` on the matching [GitHub Release](https://github.com/FabianSchurig/bitbucket-cli/releases), or as a signed attestation on the image itself |
+| Image CVE report | Grype JSON + plain-text table | `cves-bitbucket-cli.{json,txt}` / `cves-bitbucket-mcp.{json,txt}` on the matching GitHub Release |
+| Source SBOM | SPDX JSON | Attached to the GitHub Release by `release.yml` (covers the git tag, not the image) |
+
+The SBOM is also attached to the image as a signed, digest-bound [GitHub attestation](https://docs.github.com/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds), so consumers can verify and fetch it without any access to this repository:
+
+```bash
+gh attestation verify oci://ghcr.io/fabianschurig/bitbucket-mcp:latest --owner FabianSchurig
+gh attestation download oci://ghcr.io/fabianschurig/bitbucket-mcp:latest --owner FabianSchurig
+```
+
+Runtime images are built `FROM scratch` and contain only the static binary plus CA certificates, so the SBOM is deliberately small and there is no OS package surface to patch.
+
+Vulnerability scan results are additionally uploaded to GitHub code scanning (categories `docker-bitbucket-cli` and `docker-bitbucket-mcp`) for maintainers, and the Go module tree is checked by `govulncheck` in `security.yml`.
 
 ## How this differs from `DrFaust92/terraform-provider-bitbucket`
 
