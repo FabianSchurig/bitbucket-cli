@@ -1,4 +1,6 @@
+import tempfile
 import unittest
+from pathlib import Path
 
 import scripts.partition_spec as partition_spec
 
@@ -97,6 +99,20 @@ class InlineRequestBodyRefsTests(unittest.TestCase):
         post = out["paths"]["/workspaces/{workspace}/projects"]["post"]
         self.assertNotIn("$ref", post["requestBody"])
         self.assertIn("project", out["components"]["schemas"])
+
+
+class WriteSchemaTests(unittest.TestCase):
+    def test_preserves_existing_schema_when_new_schema_has_no_paths(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_path = Path(temp_dir) / "issues-schema.yaml"
+            existing = "openapi: 3.0.0\npaths:\n  /issues:\n    get: {}\n"
+            output_path.write_text(existing)
+
+            partition_spec.write_schema(
+                {"paths": {}, "components": {"schemas": {}}}, output_path
+            )
+
+            self.assertEqual(output_path.read_text(), existing)
 
 
 if __name__ == "__main__":

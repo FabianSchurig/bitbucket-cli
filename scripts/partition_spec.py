@@ -650,7 +650,26 @@ def build_schema(spec: dict, group: dict) -> dict:
 
 
 def write_schema(out: dict, output_path: Path) -> None:
-    """Write a schema dict to a YAML file."""
+    """Write a schema dict to a YAML file.
+
+    Do not replace a populated schema with an empty one. The live Bitbucket
+    specification can temporarily omit an API group, and deleting its schema
+    would also delete all generated commands, MCP tools, and Terraform
+    resources for that group.
+    """
+    if not out["paths"] and output_path.exists():
+        try:
+            existing = yaml.safe_load(output_path.read_text())
+        except yaml.YAMLError:
+            existing = None
+        if isinstance(existing, dict) and existing.get("paths"):
+            print(
+                f"Warning: preserving existing schema for '{output_path}' "
+                "because the live spec contains no paths",
+                file=sys.stderr,
+            )
+            return
+
     output_path.write_text(
         yaml.dump(out, default_flow_style=False,
                   sort_keys=False, allow_unicode=True)
