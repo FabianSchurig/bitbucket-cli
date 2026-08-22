@@ -101,7 +101,7 @@ export BITBUCKET_TOKEN="your-access-token"
 
 ## Mental model
 
-- Commands are grouped by Bitbucket API area such as `pr`, `repos`, `pipelines`, or `issues`.
+- Commands are grouped by Bitbucket API area such as `pr`, `repos`, or `pipelines`.
 - Generated command names stay close to the Bitbucket API operation names.
 - `--output table|json|id` controls rendering.
 - Pagination follows Bitbucket `next` links automatically unless you pass `--all=false`.

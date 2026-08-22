@@ -145,7 +145,7 @@ docker run --rm -i --env-file "${HOME}/.config/bitbucket-mcp.env" -p 8080:8080 g
 
 ## How the tools are structured
 
-- Tools are grouped by Bitbucket area such as pull requests, repositories, pipelines, or issues.
+- Tools are grouped by Bitbucket area such as pull requests, repositories, or pipelines.
 - Each tool accepts an `operation` parameter instead of creating one MCP tool per endpoint.
 - Parameters map closely to the Bitbucket API, so required path/query/body inputs stay easy to trace.
 - The grouped design keeps the MCP surface smaller while still exposing broad API coverage.
