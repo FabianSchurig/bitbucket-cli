@@ -104,8 +104,8 @@ class InlineRequestBodyRefsTests(unittest.TestCase):
 class WriteSchemaTests(unittest.TestCase):
     def test_preserves_existing_schema_when_new_schema_has_no_paths(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            output_path = Path(temp_dir) / "issues-schema.yaml"
-            existing = "openapi: 3.0.0\npaths:\n  /issues:\n    get: {}\n"
+            output_path = Path(temp_dir) / "schema.yaml"
+            existing = "openapi: 3.0.0\npaths:\n  /existing:\n    get: {}\n"
             output_path.write_text(existing)
 
             partition_spec.write_schema(
