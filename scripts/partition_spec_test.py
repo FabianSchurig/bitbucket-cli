@@ -114,6 +114,21 @@ class WriteSchemaTests(unittest.TestCase):
 
             self.assertEqual(output_path.read_text(), existing)
 
+    def test_writes_empty_schema_without_populated_existing_schema(self):
+        for existing in (None, "openapi: 3.0.0\npaths: {}\n", "paths: ["):
+            with self.subTest(existing=existing):
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    output_path = Path(temp_dir) / "empty-schema.yaml"
+                    if existing is not None:
+                        output_path.write_text(existing)
+
+                    partition_spec.write_schema(
+                        {"paths": {}, "components": {"schemas": {"kept": {}}}},
+                        output_path,
+                    )
+
+                    self.assertIn("kept: {}", output_path.read_text())
+
 
 if __name__ == "__main__":
     unittest.main()
