@@ -783,3 +783,4 @@ Manage pipeline runners for a Bitbucket workspace
 | Update | `PUT` | `/workspaces/{workspace}/pipelines-config/runners/{runner_uuid}` |
 | Delete | `DELETE` | `/workspaces/{workspace}/pipelines-config/runners/{runner_uuid}` |
 | List | `GET` | `/workspaces/{workspace}/pipelines-config/runners` |
+
