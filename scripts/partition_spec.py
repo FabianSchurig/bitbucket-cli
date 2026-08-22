@@ -292,40 +292,6 @@ COMMAND_GROUPS = {
                                   "variables, runners, caches, and schedules.",
         },
     },
-    "issues": {
-        "filename": "issues-schema.yaml",
-        "title": "Bitbucket Issues CLI",
-        "tags": {"Issue tracker"},
-        "paths": [
-            "/repositories/{workspace}/{repo_slug}/issues",
-            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}",
-            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/attachments",
-            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/attachments/{path}",
-            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/changes",
-            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/changes/{change_id}",
-            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments",
-            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments/{comment_id}",
-            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/vote",
-            "/repositories/{workspace}/{repo_slug}/issues/{issue_id}/watch",
-            "/repositories/{workspace}/{repo_slug}/issues/export",
-            "/repositories/{workspace}/{repo_slug}/issues/export/{repo_name}-issues-{task_id}.zip",
-            "/repositories/{workspace}/{repo_slug}/issues/import",
-            "/repositories/{workspace}/{repo_slug}/components",
-            "/repositories/{workspace}/{repo_slug}/components/{component_id}",
-            "/repositories/{workspace}/{repo_slug}/milestones",
-            "/repositories/{workspace}/{repo_slug}/milestones/{milestone_id}",
-            "/repositories/{workspace}/{repo_slug}/versions",
-            "/repositories/{workspace}/{repo_slug}/versions/{version_id}",
-        ],
-        "cli_meta": {
-            "x-cli-command-name": "Issues",
-            "x-cli-command-use": "issues",
-            "x-cli-command-short": "Manage Bitbucket issues",
-            "x-cli-command-long": "Commands for listing, creating, updating, "
-                                  "and managing issues, comments, attachments, "
-                                  "components, milestones, and versions.",
-        },
-    },
     "snippets": {
         "filename": "snippets-schema.yaml",
         "title": "Bitbucket Snippets CLI",
@@ -650,7 +616,26 @@ def build_schema(spec: dict, group: dict) -> dict:
 
 
 def write_schema(out: dict, output_path: Path) -> None:
-    """Write a schema dict to a YAML file."""
+    """Write a schema dict to a YAML file.
+
+    Do not replace a populated schema with an empty one. The live Bitbucket
+    specification can temporarily omit an API group, and deleting its schema
+    would also delete all generated commands, MCP tools, and Terraform
+    resources for that group.
+    """
+    if not out["paths"] and output_path.exists():
+        try:
+            existing = yaml.safe_load(output_path.read_text())
+        except (OSError, UnicodeDecodeError, yaml.YAMLError):
+            existing = None
+        if isinstance(existing, dict) and existing.get("paths"):
+            print(
+                f"Warning: preserving existing schema for '{output_path}' "
+                "because the live spec contains no paths",
+                file=sys.stderr,
+            )
+            return
+
     output_path.write_text(
         yaml.dump(out, default_flow_style=False,
                   sort_keys=False, allow_unicode=True)

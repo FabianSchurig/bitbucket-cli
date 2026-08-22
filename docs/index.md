@@ -215,14 +215,6 @@ REST API and have several important caveats:
 | `bitbucket_project_branch_restrictions_by_pattern` | `bitbucket_project_branch_restrictions_by_pattern` | CRUDL |
 
 
-### Issues
-
-| Resource | Data Source | CRUD |
-|----------|-------------|------|
-| `bitbucket_issue_comments` | `bitbucket_issue_comments` | CRUDL |
-| `bitbucket_issues` | `bitbucket_issues` | CRUDL |
-
-
 ### Pipelines
 
 | Resource | Data Source | CRUD |

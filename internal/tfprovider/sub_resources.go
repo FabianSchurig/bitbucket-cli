@@ -59,7 +59,6 @@ var subResources = []subResource{
 	subResourceForGroup("annotations", "Manage report annotations for a Bitbucket commit", &ReportsResourceGroup),
 	subResourceForGroup("commit-file", "Manage file contents via commits in a Bitbucket repository", &ReposResourceGroup),
 	subResourceForGroup("pr-comments", "Manage comments on a Bitbucket pull request", &PRResourceGroup),
-	subResourceForGroup("issue-comments", "Manage comments on a Bitbucket issue", &IssuesResourceGroup),
 	// ─── Wave 3: DevSecOps-focused sub-resources ────────────────────────────
 	subResourceForGroup("repo-runners", "Manage pipeline runners for a Bitbucket repository", &PipelinesResourceGroup),
 	subResourceForGroup("workspace-runners", "Manage pipeline runners for a Bitbucket workspace", &PipelinesResourceGroup),

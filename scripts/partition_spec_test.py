@@ -1,4 +1,6 @@
+import tempfile
 import unittest
+from pathlib import Path
 
 import scripts.partition_spec as partition_spec
 
@@ -97,6 +99,67 @@ class InlineRequestBodyRefsTests(unittest.TestCase):
         post = out["paths"]["/workspaces/{workspace}/projects"]["post"]
         self.assertNotIn("$ref", post["requestBody"])
         self.assertIn("project", out["components"]["schemas"])
+
+
+class WriteSchemaTests(unittest.TestCase):
+    def test_preserves_existing_schema_when_new_schema_has_no_paths(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_path = Path(temp_dir) / "schema.yaml"
+            existing = "openapi: 3.0.0\npaths:\n  /existing:\n    get: {}\n"
+            output_path.write_text(existing)
+
+            partition_spec.write_schema(
+                {"paths": {}, "components": {"schemas": {}}}, output_path
+            )
+
+            self.assertEqual(output_path.read_text(), existing)
+
+    def test_writes_empty_schema_when_existing_schema_is_missing_or_unusable(self):
+        for existing in (None, "paths: [", b"\xff"):
+            with self.subTest(existing=existing):
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    output_path = Path(temp_dir) / "empty-schema.yaml"
+                    if existing is not None:
+                        if isinstance(existing, bytes):
+                            output_path.write_bytes(existing)
+                        else:
+                            output_path.write_text(existing)
+
+                    partition_spec.write_schema(
+                        {"paths": {}, "components": {"schemas": {"kept": {}}}},
+                        output_path,
+                    )
+
+                    self.assertIn("kept: {}", output_path.read_text())
+
+    def test_writes_empty_schema_when_existing_schema_has_no_paths(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_path = Path(temp_dir) / "empty-schema.yaml"
+            output_path.write_text("openapi: 3.0.0\npaths: {}\n")
+
+            partition_spec.write_schema(
+                {"paths": {}, "components": {"schemas": {"kept": {}}}},
+                output_path,
+            )
+
+            self.assertIn("kept: {}", output_path.read_text())
+
+    def test_overwrites_existing_schema_when_new_schema_has_paths(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_path = Path(temp_dir) / "schema.yaml"
+            output_path.write_text("openapi: 3.0.0\npaths:\n  /old:\n    get: {}\n")
+
+            partition_spec.write_schema(
+                {
+                    "paths": {"/new": {"post": {}}},
+                    "components": {"schemas": {}},
+                },
+                output_path,
+            )
+
+            written = output_path.read_text()
+            self.assertIn("/new:", written)
+            self.assertNotIn("/old:", written)
 
 
 if __name__ == "__main__":

@@ -48,7 +48,6 @@ jobs:
           - pr
           - projects
           - workspaces
-          - issues
           - hooks
           - snippets
           - refs

@@ -186,6 +186,24 @@ flowchart TD
 - **`docker.yml`**: builds multi-arch container images for `bb-cli` and `bb-mcp`, pushes them to GHCR, publishes their SBOM and CVE reports (see [Supply chain: SBOM and CVE reports](#supply-chain-sbom-and-cve-reports)), and publishes the `bb-mcp` server to the [MCP Registry](https://registry.modelcontextprotocol.io).
 - **`terraform-release.yml`**: mirrors the tagged source into `terraform-provider-bitbucket` and publishes the Terraform provider release.
 
+### Schema sync safety
+
+The live OpenAPI document is treated as an input, not as an authority to delete a
+working API group because of a transient omission. When a group extracts with no
+paths, `partition_spec.py` preserves its existing populated schema; a genuinely
+empty or new group is still written normally. If Bitbucket removes only some
+endpoints, that is treated as an intentional change: generated code and
+`CRUDConfig` are rebuilt, and the invariant tests fail if any hand-maintained
+mapping still references a removed operation.
+
+Acceptance tests in `internal/tfprovider/acceptance_test.go` are hand-written and
+are never deleted by schema generation. Generated Terraform fixtures are
+regenerated from the surviving resource groups, while the schema-sync build and
+test gate, including the mock Terraform acceptance suites, must pass before any
+change is committed or released. The generated
+[real-API coverage report](./docs/e2e-coverage.md) makes missing group coverage
+visible without requiring manual bookkeeping.
+
 ## Supply chain: SBOM and CVE reports
 
 Every released container image ships with a Software Bill of Materials and a vulnerability report in standard formats. Both are produced from the exact image digest that was pushed to GHCR.

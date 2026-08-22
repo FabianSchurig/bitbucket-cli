@@ -158,48 +158,6 @@ Manage Bitbucket project-level branch restrictions (internal API)
 
 ---
 
-## `bitbucket_issues`
-
-Manage the issue tracker for a Bitbucket repository.
-
-| Operation | Method | Description |
-|-----------|--------|-------------|
-| `listComponents` | `GET` | Returns the components that have been defined in the issue tracker. |
-| `getAComponentForIssues` | `GET` | Returns the specified issue tracker component object. |
-| `listIssues` | `GET` | Lists issues in the repository tracker. Filter with the q parameter: ✏️ |
-| `createAnIssue` | `POST` | Creates a new issue. Required body fields: title. Optional: content.raw (markdown body), kind ("bug", "enhancement", "proposal", "task"), priority ("trivial", "minor", "major", "critical", "blocker"), assignee.uuid. ✏️ |
-| `exportIssues` | `POST` | A POST request to this endpoint initiates a new background celery task that archives the repo's issues. |
-| `checkIssueExportStatus` | `GET` | This endpoint is used to poll for the progress of an issue export |
-| `checkIssueImportStatus` | `GET` | When using GET, this endpoint reports the status of the current import task. |
-| `importIssues` | `POST` | A POST request to this endpoint will import the zip file given by the archive parameter into the repository. All |
-| `getAnIssue` | `GET` | Returns the specified issue. |
-| `updateAnIssue` | `PUT` | Modifies the issue. |
-| `deleteAnIssue` | `DELETE` | Deletes the specified issue. This requires write access to the |
-| `listAttachmentsForAnIssue` | `GET` | Returns all attachments for this issue. |
-| `uploadAnAttachmentToAnIssue` | `POST` | Upload new issue attachments. |
-| `getAttachmentForAnIssue` | `GET` | Returns the contents of the specified file attachment. |
-| `deleteAnAttachmentForAnIssue` | `DELETE` | Deletes an attachment. |
-| `listChangesOnAnIssue` | `GET` | Returns the list of all changes that have been made to the specified |
-| `modifyTheStateOfAnIssue` | `POST` | Makes a change to the specified issue. |
-| `getIssueChangeObject` | `GET` | Returns the specified issue change object. |
-| `listCommentsOnAnIssue` | `GET` | Returns a paginated list of all comments that were made on the |
-| `createACommentOnAnIssue` | `POST` | Creates a new issue comment. |
-| `getACommentOnAnIssue` | `GET` | Returns the specified issue comment object. |
-| `updateACommentOnAnIssue` | `PUT` | Updates the content of the specified issue comment. Note that only |
-| `deleteACommentOnAnIssue` | `DELETE` | Deletes the specified comment. |
-| `checkIfCurrentUserVotedForAnIssue` | `GET` | Check whether the authenticated user has voted for this issue. |
-| `voteForAnIssue` | `PUT` | Vote for this issue. |
-| `removeVoteForAnIssue` | `DELETE` | Retract your vote. |
-| `checkIfCurrentUserIsWatchingAIssue` | `GET` | Indicated whether or not the authenticated user is watching this |
-| `watchAnIssue` | `PUT` | Start watching this issue. |
-| `stopWatchingAnIssue` | `DELETE` | Stop watching this issue. |
-| `listMilestones` | `GET` | Returns the milestones that have been defined in the issue tracker. |
-| `getAMilestone` | `GET` | Returns the specified issue tracker milestone object. |
-| `listDefinedVersionsForIssues` | `GET` | Returns the versions that have been defined in the issue tracker. |
-| `getADefinedVersionForIssues` | `GET` | Returns the specified issue tracker version object. |
-
----
-
 ## `bitbucket_pipelines`
 
 Inspect and trigger Bitbucket Pipelines (CI/CD).
