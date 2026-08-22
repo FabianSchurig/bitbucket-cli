@@ -626,7 +626,7 @@ def write_schema(out: dict, output_path: Path) -> None:
     if not out["paths"] and output_path.exists():
         try:
             existing = yaml.safe_load(output_path.read_text())
-        except yaml.YAMLError:
+        except (OSError, UnicodeDecodeError, yaml.YAMLError):
             existing = None
         if isinstance(existing, dict) and existing.get("paths"):
             print(
