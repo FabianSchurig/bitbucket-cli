@@ -129,6 +129,23 @@ class WriteSchemaTests(unittest.TestCase):
 
                     self.assertIn("kept: {}", output_path.read_text())
 
+    def test_overwrites_existing_schema_when_new_schema_has_paths(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_path = Path(temp_dir) / "schema.yaml"
+            output_path.write_text("openapi: 3.0.0\npaths:\n  /old:\n    get: {}\n")
+
+            partition_spec.write_schema(
+                {
+                    "paths": {"/new": {"post": {}}},
+                    "components": {"schemas": {}},
+                },
+                output_path,
+            )
+
+            written = output_path.read_text()
+            self.assertIn("/new:", written)
+            self.assertNotIn("/old:", written)
+
 
 if __name__ == "__main__":
     unittest.main()
