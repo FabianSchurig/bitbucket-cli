@@ -411,8 +411,6 @@ provider "bitbucket" {
 - [`bitbucket_downloads`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/downloads.md)
 - [`bitbucket_gpg_keys`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/gpg-keys.md)
 - [`bitbucket_hook_types`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/hook-types.md)
-- [`bitbucket_issue_comments`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/issue-comments.md)
-- [`bitbucket_issues`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/issues.md)
 - [`bitbucket_pipeline_caches`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/pipeline-caches.md)
 - [`bitbucket_pipeline_oidc`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/pipeline-oidc.md)
 - [`bitbucket_pipeline_oidc_keys`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/pipeline-oidc-keys.md)
@@ -451,8 +449,6 @@ provider "bitbucket" {
 - [`bitbucket_forked_repository`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/forked-repository.md)
 - [`bitbucket_gpg_keys`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/gpg-keys.md)
 - [`bitbucket_hooks`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/hooks.md)
-- [`bitbucket_issue_comments`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/issue-comments.md)
-- [`bitbucket_issues`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/issues.md)
 - [`bitbucket_pipeline_caches`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/pipeline-caches.md)
 - [`bitbucket_pipeline_config`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/pipeline-config.md)
 - [`bitbucket_pipeline_known_hosts`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/data-sources/pipeline-known-hosts.md)
@@ -504,4 +500,3 @@ Cases that still need manual review:
 - objects missing from one provider or the other
 - nested or computed fields
 - fields whose semantics changed even when the name looks similar
-

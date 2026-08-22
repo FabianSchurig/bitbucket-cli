@@ -215,7 +215,6 @@ func TestGeneratedResourceGroups_AllGroupsHaveOps(t *testing.T) {
 		tfprovider.WorkspacesResourceGroup,
 		tfprovider.ProjectsResourceGroup,
 		tfprovider.PipelinesResourceGroup,
-		tfprovider.IssuesResourceGroup,
 		tfprovider.SnippetsResourceGroup,
 		tfprovider.DeploymentsResourceGroup,
 		tfprovider.BranchRestrictionsResourceGroup,
@@ -227,8 +226,8 @@ func TestGeneratedResourceGroups_AllGroupsHaveOps(t *testing.T) {
 		tfprovider.AddonResourceGroup,
 	}
 
-	if len(groups) != 20 {
-		t.Fatalf("expected 20 resource groups, got %d", len(groups))
+	if len(groups) != 19 {
+		t.Fatalf("expected 19 resource groups, got %d", len(groups))
 	}
 
 	for _, g := range groups {
@@ -377,11 +376,6 @@ func TestSubResourceGroups_Registered(t *testing.T) {
 			wantRead:   "getACommentOnAPullRequest",
 			wantList:   "listCommentsOnAPullRequest",
 		},
-		"issue-comments": {
-			wantCreate: "createACommentOnAnIssue",
-			wantRead:   "getACommentOnAnIssue",
-			wantList:   "listCommentsOnAnIssue",
-		},
 	}
 
 	for typeName, expected := range subResources {
@@ -429,7 +423,6 @@ func subResourceParents() []tfprovider.ResourceGroup {
 		tfprovider.UsersResourceGroup,
 		tfprovider.BranchingModelResourceGroup,
 		tfprovider.ReportsResourceGroup,
-		tfprovider.IssuesResourceGroup,
 	}
 }
 

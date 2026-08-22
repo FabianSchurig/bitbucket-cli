@@ -411,24 +411,6 @@ func startMockServer(t *testing.T) *httptest.Server {
 		_ = json.NewEncoder(w).Encode(map[string]any{"id": 1, "content": map[string]any{"raw": "new comment"}})
 	})
 
-	// Issue comments endpoint
-	mux.HandleFunc("/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments/{comment_id}", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		switch r.Method {
-		case http.MethodGet:
-			_ = json.NewEncoder(w).Encode(map[string]any{"id": 1, "content": map[string]any{"raw": "test issue comment"}})
-		case http.MethodPut:
-			_ = json.NewEncoder(w).Encode(map[string]any{"id": 1, "content": map[string]any{"raw": "updated issue comment"}})
-		case http.MethodDelete:
-			w.WriteHeader(http.StatusNoContent)
-		}
-	})
-	mux.HandleFunc("POST /repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		_ = json.NewEncoder(w).Encode(map[string]any{"id": 1, "content": map[string]any{"raw": "new issue comment"}})
-	})
-
 	// Catch-all for any other API calls during tests
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -1068,35 +1050,6 @@ func TestAccResourcePRComments_CRUD(t *testing.T) {
 				`, srv.URL),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("bitbucket_pr_comments.test", "api_response"),
-				),
-			},
-		},
-	})
-}
-
-func TestAccResourceIssueComments_CRUD(t *testing.T) {
-	srv := startMockServer(t)
-	defer srv.Close()
-	setMockEnv(t, srv.URL)
-
-	resource.Test(t, resource.TestCase{
-		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
-		Steps: []resource.TestStep{
-			{
-				Config: fmt.Sprintf(`
-					provider "bitbucket" {
-						base_url = %q
-					}
-
-					resource "bitbucket_issue_comments" "test" {
-						workspace  = "testworkspace"
-						repo_slug  = "test-repo"
-						issue_id   = "1"
-						comment_id = "1"
-					}
-				`, srv.URL),
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttrSet("bitbucket_issue_comments.test", "api_response"),
 				),
 			},
 		},

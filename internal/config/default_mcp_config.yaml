@@ -180,25 +180,6 @@ tool_overrides:
           Returns matching file paths and surrounding line snippets (content_matches).
           Prefer this over getFileOrDirectoryContents when the file location is unknown.
 
-  # ── Issues ───────────────────────────────────────────────────────────────────
-  bitbucket_issues:
-    description: >
-      Manage the issue tracker for a Bitbucket repository.
-    operations:
-      listIssues:
-        description: >
-          Lists issues in the repository tracker. Filter with the q parameter:
-            q=status="open"         — open issues
-            q=assignee.uuid="{me}"  — assigned to current user
-            q=kind="bug"            — bugs only
-          Returns id, title, status, kind, priority, assignee, and created_on.
-      createAnIssue:
-        description: >
-          Creates a new issue. Required body fields: title. Optional: content.raw
-          (markdown body), kind ("bug", "enhancement", "proposal", "task"),
-          priority ("trivial", "minor", "major", "critical", "blocker"),
-          assignee.uuid.
-
   # ── Commit Statuses ──────────────────────────────────────────────────────────
   bitbucket_commit-statuses:
     description: >

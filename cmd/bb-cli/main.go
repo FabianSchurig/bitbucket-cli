@@ -95,9 +95,6 @@ Set authentication environment variables before running:
 	pipelinesCmd := commands.NewPipelinesCommand()
 	commands.AddOutputFlag(pipelinesCmd)
 
-	issuesCmd := commands.NewIssuesCommand()
-	commands.AddOutputFlag(issuesCmd)
-
 	snippetsCmd := commands.NewSnippetsCommand()
 	commands.AddOutputFlag(snippetsCmd)
 
@@ -131,7 +128,7 @@ Set authentication environment variables before running:
 	rootCmd.AddCommand(
 		prCmd, hooksCmd, searchCmd, refsCmd, commitsCmd, reportsCmd,
 		reposCmd, workspacesCmd, projectsCmd, pipelinesCmd,
-		issuesCmd, snippetsCmd, deploymentsCmd,
+		snippetsCmd, deploymentsCmd,
 		branchRestrictionsCmd, projectBranchRestrictionsCmd,
 		branchingModelCmd, commitStatusesCmd,
 		downloadsCmd, usersCmd, propertiesCmd, addonCmd,

@@ -180,7 +180,6 @@ The reference is regenerated automatically from the Bitbucket OpenAPI schemas wh
 | `bitbucket_commits` | Commit history, diffs, branch comparisons |
 | `bitbucket_refs` | Branches and tags |
 | `bitbucket_search` | Full-text code search across all repos |
-| `bitbucket_issues` | Issue tracker |
 | `bitbucket_commit-statuses` | CI status checks per commit/PR |
 | `bitbucket_deployments` | Deployment environment tracking |
 | `bitbucket_branch-restrictions` | Branch protection rules |

@@ -459,34 +459,6 @@ Manage GPG keys for a Bitbucket user
 | Delete | `DELETE` | `/users/{selected_user}/gpg-keys/{fingerprint}` |
 | List | `GET` | `/users/{selected_user}/gpg-keys` |
 
-### `bitbucket_issue_comments`
-
-_Category: Issues_
-
-Manage comments on a Bitbucket issue
-
-| CRUD | Method | Path |
-| --- | --- | --- |
-| Create | `POST` | `/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments` |
-| Read | `GET` | `/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments/{comment_id}` |
-| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments/{comment_id}` |
-| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments/{comment_id}` |
-| List | `GET` | `/repositories/{workspace}/{repo_slug}/issues/{issue_id}/comments` |
-
-### `bitbucket_issues`
-
-_Category: Issues_
-
-Manage Bitbucket issues
-
-| CRUD | Method | Path |
-| --- | --- | --- |
-| Create | `POST` | `/repositories/{workspace}/{repo_slug}/issues` |
-| Read | `GET` | `/repositories/{workspace}/{repo_slug}/issues/{issue_id}` |
-| Update | `PUT` | `/repositories/{workspace}/{repo_slug}/issues/{issue_id}` |
-| Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/issues/{issue_id}` |
-| List | `GET` | `/repositories/{workspace}/{repo_slug}/issues` |
-
 ### `bitbucket_pipeline_caches`
 
 _Category: Pipelines_
@@ -811,4 +783,3 @@ Manage pipeline runners for a Bitbucket workspace
 | Update | `PUT` | `/workspaces/{workspace}/pipelines-config/runners/{runner_uuid}` |
 | Delete | `DELETE` | `/workspaces/{workspace}/pipelines-config/runners/{runner_uuid}` |
 | List | `GET` | `/workspaces/{workspace}/pipelines-config/runners` |
-

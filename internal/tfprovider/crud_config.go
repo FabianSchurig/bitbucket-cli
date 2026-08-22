@@ -34,13 +34,6 @@ var CRUDConfig = map[string]CRUDMapping{
 		Read: "getAWorkspace",
 		List: "listWorkspacesForUser",
 	},
-	"issues": {
-		Create: "createAnIssue",
-		Read:   "getAnIssue",
-		Update: "updateAnIssue",
-		Delete: "deleteAnIssue",
-		List:   "listIssues",
-	},
 	"hooks": {
 		Create: "createAWebhookForARepository",
 		Read:   "getAWebhookForARepository",
@@ -339,13 +332,6 @@ var CRUDConfig = map[string]CRUDMapping{
 		Update: "updateACommentOnAPullRequest",
 		Delete: "deleteACommentOnAPullRequest",
 		List:   "listCommentsOnAPullRequest",
-	},
-	"issue-comments": {
-		Create: "createACommentOnAnIssue",
-		Read:   "getACommentOnAnIssue",
-		Update: "updateACommentOnAnIssue",
-		Delete: "deleteACommentOnAnIssue",
-		List:   "listCommentsOnAnIssue",
 	},
 	// ─── Wave 3: DevSecOps-focused sub-resource CRUD mappings ────────────────
 	"repo-runners": {
