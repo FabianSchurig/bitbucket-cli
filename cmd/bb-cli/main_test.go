@@ -43,7 +43,7 @@ func TestNewRootCmd(t *testing.T) {
 
 func TestDeprecatedCommandsAreMarked(t *testing.T) {
 	cmd := newRootCmd()
-	deprecated, _, err := cmd.Find([]string{"workspaces", "list-workspaces-for-the-current-user"})
+	deprecated, _, err := cmd.Find([]string{"workspaces", "list-workspaces-for-user"})
 	if err != nil {
 		t.Fatalf("finding deprecated command: %v", err)
 	}
