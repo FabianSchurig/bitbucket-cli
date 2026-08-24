@@ -89,7 +89,7 @@ jobs:
       # Signed, digest-bound SBOM that image users can fetch with
       # `gh attestation verify` or `cosign` without access to this repository.
       - name: Attest SBOM for ${{ matrix.image }}
-        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4.1.0
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         if: ${{ !cancelled() && steps.sbom.outcome == 'success' }}
         with:
           subject-name: ghcr.io/${{ steps.owner.outputs.lowercase }}/${{ matrix.image }}
