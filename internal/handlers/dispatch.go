@@ -133,35 +133,59 @@ func buildURL(template string, pathParams map[string]string) string {
 // requests do not inherit a stray Authorization header (the internal endpoint
 // returns 401 when both cookies and Basic Auth are present).
 func executeRequest(ctx context.Context, c *client.BBClient, r Request, fetchURL, baseURL string) (*resty.Response, error) {
-	req := c.R().SetContext(ctx)
+	newRequest := func(withPublicAuth bool) (*resty.Request, error) {
+		req := c.R().SetContext(ctx)
 
-	if isInternalAPI(fetchURL) {
-		if c.CSRFToken == "" || c.CloudSessionToken == "" {
-			return nil, fmt.Errorf(
-				"internal Bitbucket API endpoint %s requires cookie auth: "+
-					"set BITBUCKET_CSRF_TOKEN and BITBUCKET_CLOUD_SESSION_TOKEN "+
-					"(HTTP Basic Auth is not supported by /!api/internal/ endpoints)",
-				fetchURL,
-			)
+		if isInternalAPI(fetchURL) {
+			if c.CSRFToken == "" || c.CloudSessionToken == "" {
+				return nil, fmt.Errorf(
+					"internal Bitbucket API endpoint %s requires cookie auth: "+
+						"set BITBUCKET_CSRF_TOKEN and BITBUCKET_CLOUD_SESSION_TOKEN "+
+						"(HTTP Basic Auth is not supported by /!api/internal/ endpoints)",
+					fetchURL,
+				)
+			}
+			applyInternalAPIAuth(req, c)
+		} else if withPublicAuth {
+			applyBasicAuth(req, c)
 		}
-		applyInternalAPIAuth(req, c)
-	} else {
-		applyBasicAuth(req, c)
-	}
 
-	if fetchURL == baseURL {
-		for k, v := range r.QueryParams {
-			if v != "" && v != "0" && v != "false" {
-				req = req.SetQueryParam(k, v)
+		if fetchURL == baseURL {
+			for k, v := range r.QueryParams {
+				if v != "" && v != "0" && v != "false" {
+					req = req.SetQueryParam(k, v)
+				}
 			}
 		}
+
+		if r.Body != "" && (r.Method == "POST" || r.Method == "PUT" || r.Method == "PATCH") {
+			req = req.SetHeader("Content-Type", "application/json").SetBody(r.Body)
+		}
+
+		return req, nil
 	}
 
-	if r.Body != "" && (r.Method == "POST" || r.Method == "PUT" || r.Method == "PATCH") {
-		req = req.SetHeader("Content-Type", "application/json").SetBody(r.Body)
+	req, err := newRequest(true)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := req.Execute(r.Method, fetchURL)
+	if err == nil && c.Token != "" && shouldRetryWithoutAuth(r.Method, fetchURL, resp) {
+		req, err = newRequest(false)
+		if err != nil {
+			return nil, err
+		}
+		return req.Execute(r.Method, fetchURL)
 	}
 
-	return req.Execute(r.Method, fetchURL)
+	return resp, err
+}
+
+func shouldRetryWithoutAuth(method, url string, resp *resty.Response) bool {
+	return (method == http.MethodGet || method == http.MethodHead) &&
+		!isInternalAPI(url) &&
+		resp.StatusCode() == http.StatusForbidden &&
+		strings.Contains(resp.String(), "This resource does not support authentication using the provided token")
 }
 
 // applyBasicAuth sets auth on the request from the client's credentials:

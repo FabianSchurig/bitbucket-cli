@@ -178,6 +178,72 @@ func TestDispatch_APIError(t *testing.T) {
 	}
 }
 
+func TestDispatch_GET_RetriesWithoutUnsupportedAuth(t *testing.T) {
+	var requests int
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests++
+		if requests == 1 {
+			if _, _, ok := r.BasicAuth(); !ok {
+				t.Error("expected the first request to use authentication")
+			}
+			w.Header().Set(headerContentType, contentTypeJSON)
+			w.WriteHeader(http.StatusForbidden)
+			_, _ = w.Write([]byte(`{"type":"error","error":{"message":"This resource does not support authentication using the provided token"}}`))
+			return
+		}
+		if r.Header.Get("Authorization") != "" {
+			t.Error("expected the retry to omit authentication")
+		}
+		w.Header().Set(headerContentType, contentTypeJSON)
+		_ = json.NewEncoder(w).Encode(map[string]any{"type": "subject_types"})
+	}))
+	defer srv.Close()
+
+	c := &client.BBClient{
+		Client:   resty.New().SetBaseURL(srv.URL),
+		Username: "u",
+		Token:    "p",
+	}
+	_, err := handlers.DispatchRaw(context.Background(), c, handlers.Request{
+		Method:      http.MethodGet,
+		URLTemplate: "/hook_events",
+	})
+	if err != nil {
+		t.Fatalf(dispatchErrFmt, err)
+	}
+	if requests != 2 {
+		t.Fatalf("expected an unauthenticated retry, got %d requests", requests)
+	}
+}
+
+func TestDispatch_POST_DoesNotRetryWithoutUnsupportedAuth(t *testing.T) {
+	var requests int
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		requests++
+		w.Header().Set(headerContentType, contentTypeJSON)
+		w.WriteHeader(http.StatusForbidden)
+		_, _ = w.Write([]byte(`{"type":"error","error":{"message":"This resource does not support authentication using the provided token"}}`))
+	}))
+	defer srv.Close()
+
+	c := &client.BBClient{
+		Client:   resty.New().SetBaseURL(srv.URL),
+		Username: "u",
+		Token:    "p",
+	}
+	_, err := handlers.DispatchRaw(context.Background(), c, handlers.Request{
+		Method:      http.MethodPost,
+		URLTemplate: "/hook_events",
+		Body:        `{}`,
+	})
+	if err == nil {
+		t.Fatal("expected authenticated POST failure")
+	}
+	if requests != 1 {
+		t.Fatalf("expected no unauthenticated retry for POST, got %d requests", requests)
+	}
+}
+
 // TestDispatch_AbsoluteURLTemplate verifies that an absolute URL in
 // URLTemplate is sent as-is, ignoring the client's BaseURL. This is required
 // for Bitbucket's internal endpoints which live on a different host
