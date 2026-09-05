@@ -1977,9 +1977,9 @@ func TestAccRealAPI_ResourceHooks_CRUD(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories(),
 		CheckDestroy:             testAccCheckRepoDestroy(workspace, repoSlug),
 		Steps: []resource.TestStep{
-			// Create: repo + webhook pointing to Jenkins URL
+			// Create: repo + webhook pointing to a resolvable public URL
 			{
-				Config: testAccHooksConfig(workspace, projectKey, repoSlug, "https://jenkins.example.com/bitbucket-hook/", "Jenkins Webhook", true),
+				Config: testAccHooksConfig(workspace, projectKey, repoSlug, "https://example.com/bitbucket-hook/", "Jenkins Webhook", true),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("bitbucket_hooks.jenkins", "id"),
 					resource.TestCheckResourceAttrSet("bitbucket_hooks.jenkins", "api_response"),
@@ -1987,14 +1987,14 @@ func TestAccRealAPI_ResourceHooks_CRUD(t *testing.T) {
 			},
 			// Update: change URL and description
 			{
-				Config: testAccHooksConfig(workspace, projectKey, repoSlug, "https://jenkins.example.com/bitbucket-hook/v2/", "Jenkins Webhook Updated", true),
+				Config: testAccHooksConfig(workspace, projectKey, repoSlug, "https://example.com/bitbucket-hook/v2/", "Jenkins Webhook Updated", true),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("bitbucket_hooks.jenkins", "id"),
 				),
 			},
 			// Re-plan with same config: must be empty
 			{
-				Config:   testAccHooksConfig(workspace, projectKey, repoSlug, "https://jenkins.example.com/bitbucket-hook/v2/", "Jenkins Webhook Updated", true),
+				Config:   testAccHooksConfig(workspace, projectKey, repoSlug, "https://example.com/bitbucket-hook/v2/", "Jenkins Webhook Updated", true),
 				PlanOnly: true,
 			},
 		},
