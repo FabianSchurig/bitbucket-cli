@@ -1,6 +1,6 @@
 module github.com/FabianSchurig/bitbucket-cli
 
-go 1.25.13
+go 1.26.0
 
 require (
 	github.com/fatih/color v1.19.0
@@ -10,7 +10,7 @@ require (
 	github.com/hashicorp/terraform-plugin-testing v1.16.0
 	github.com/modelcontextprotocol/go-sdk v1.7.0
 	github.com/spf13/cobra v1.10.2
-	golang.org/x/crypto v0.55.0
+	golang.org/x/crypto v0.56.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
