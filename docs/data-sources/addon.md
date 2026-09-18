@@ -19,7 +19,7 @@ Reads Bitbucket addon via the Bitbucket Cloud API.
 
 | Operation | Required Scopes |
 |-----------|----------------|
-| List | `admin:workspace:bitbucket` |
+| List | `read:workspace:bitbucket` |
 
 ## Example Usage
 

@@ -509,7 +509,13 @@ paths:
         \ parameters_ are used to supply\nthe necessary metadata to determine which\
         \ type of pipeline will be instantiated. These query parameters\nare derived\
         \ from the JSON equivalent by turning each property into a key-value pair\
-        \ with the JSON path\nof the property as the new key.\n\n## Trigger on-demand\
+        \ with the JSON path\nof the property as the new key.\n\n## Optional on-demand\
+        \ query parameters\n\nUse `merge_defaults=true` to merge repository-level\
+        \ defaults into the supplied YAML. Pipelines merges\n`image`, `options`, `clone`,\
+        \ `export`, `labels`, and definitions. The supplied YAML still controls\n\
+        pipeline steps.\n\nUse `target_branch_to_create` to create a branch from the\
+        \ requested branch or commit target before the\nrun starts. Pipelines then\
+        \ uses the new branch as the on-demand pipeline target.\n\n## Trigger on-demand\
         \ pipeline for a branch\n\nYou can initiate an on-demand pipeline for a specific\
         \ branch. This branch will be used to determine\nwhich pipeline definition\
         \ from the supplied YAML configuration will be applied to initiate the pipeline.\n\
@@ -572,6 +578,21 @@ paths:
         description: The repository.
         required: true
         in: path
+        schema:
+          type: string
+      - name: merge_defaults
+        description: Whether to merge repository-level defaults into the supplied
+          YAML. Defaults to false.
+        required: false
+        in: query
+        schema:
+          type: boolean
+          default: false
+      - name: target_branch_to_create
+        description: Optional branch name to create from the requested branch or commit
+          target.
+        required: false
+        in: query
         schema:
           type: string
       requestBody:

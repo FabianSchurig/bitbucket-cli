@@ -2598,6 +2598,7 @@ paths:
       x-atlassian-auth-types:
       - api-token
       operationId: listRepositoryPermissionsForAUser
+      x-bb-cli-retained: true
     parameters: []
   /user/workspaces/{workspace}/permissions/repositories:
     get:

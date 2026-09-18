@@ -480,6 +480,20 @@ COMMAND_GROUPS = {
 
 HTTP_METHODS = {"get", "post", "put", "patch", "delete"}
 
+# Canonical method ordering used when a path item is rebuilt, so retained
+# operations land in the same slot they occupied before and the committed
+# schema stays diff-stable.
+METHOD_ORDER = ("get", "post", "put", "patch", "delete")
+
+
+def order_path_item(path_item: dict) -> dict:
+    """Return ``path_item`` with methods first (canonical order), rest after."""
+    ordered = {m: path_item[m] for m in METHOD_ORDER if m in path_item}
+    ordered.update({k: v for k, v in path_item.items()
+                    if k not in HTTP_METHODS})
+    return ordered
+
+
 
 def collect_refs(node, spec, collected: set):
     """Walk the node tree, collecting all $ref targets recursively."""
@@ -615,6 +629,106 @@ def build_schema(spec: dict, group: dict) -> dict:
     return out
 
 
+def load_existing_schema(path: Path) -> dict:
+    """Load a previously generated schema file, returning {} when unusable."""
+    if not path.exists():
+        return {}
+    try:
+        existing = yaml.safe_load(path.read_text())
+    except (OSError, UnicodeDecodeError, yaml.YAMLError):
+        return {}
+    return existing if isinstance(existing, dict) else {}
+
+
+def published_operations(schemas: list[dict]) -> set[tuple[str, str]]:
+    """Collect every ``(path, method)`` published by the freshly built schemas."""
+    published: set[tuple[str, str]] = set()
+    for out in schemas:
+        for path, path_item in (out.get("paths") or {}).items():
+            if not isinstance(path_item, dict):
+                continue
+            for method in path_item:
+                if method in HTTP_METHODS:
+                    published.add((path, method))
+    return published
+
+
+def merge_retained_operations(
+    out: dict, existing: dict, published: set[tuple[str, str]]
+) -> list[str]:
+    """Carry forward operations that vanished from the published spec.
+
+    Atlassian regularly deletes *deprecated but still functional* endpoints
+    from ``swagger.v3.json`` (for example ``GET /snippets`` and
+    ``GET /workspaces``). Taking those deletions at face value would silently
+    remove CLI commands, MCP tools and Terraform resources in an automatically
+    released patch version, and would break hand-written references such as
+    ``internal/tfprovider/crud_config.go``.
+
+    Instead, an operation that exists in the previously committed schema but is
+    no longer published anywhere is copied forward, flagged ``deprecated: true``
+    and annotated with ``x-bb-cli-retained: true`` so the reason is visible in
+    the schema, the CLI, and the generated docs. ``published`` therefore has to
+    cover *all* groups, so an endpoint that merely moved between groups is not
+    duplicated.
+
+    Retiring a retained endpoint for good is a deliberate, reviewable act:
+    delete it from ``schema/*-schema.yaml`` and it is gone, because the
+    committed schema is the only baseline this function reads.
+
+    Returns the operationIds (or ``"<method> <path>"`` when an id is missing)
+    that were retained.
+    """
+    existing_paths = existing.get("paths")
+    if not isinstance(existing_paths, dict):
+        return []
+
+    retained: list[str] = []
+    for path, path_item in existing_paths.items():
+        if not isinstance(path_item, dict):
+            continue
+        for method, op in path_item.items():
+            if method not in HTTP_METHODS or not isinstance(op, dict):
+                continue
+            if (path, method) in published:
+                continue
+            target_item = out["paths"].setdefault(path, {})
+            # Preserve path-level parameters when the whole path disappeared.
+            if "parameters" in path_item and "parameters" not in target_item:
+                target_item["parameters"] = copy.deepcopy(
+                    path_item["parameters"])
+            retained_op = copy.deepcopy(op)
+            retained_op["deprecated"] = True
+            retained_op["x-bb-cli-retained"] = True
+            target_item[method] = retained_op
+            out["paths"][path] = order_path_item(target_item)
+            retained.append(retained_op.get("operationId") or f"{method} {path}")
+
+    if not retained:
+        return []
+
+    # Copy every component schema the retained operations reference (they
+    # resolve against the previously committed, self-contained file).
+    refs: set = set()
+    for path, path_item in out["paths"].items():
+        for method, op in path_item.items():
+            if method in HTTP_METHODS and isinstance(op, dict) and op.get("x-bb-cli-retained"):
+                collect_refs(op, existing, refs)
+    existing_schemas = (existing.get("components") or {}).get("schemas") or {}
+    target_schemas = out.setdefault(
+        "components", {}).setdefault("schemas", {})
+    for ref in sorted(refs):
+        parts = ref.lstrip("#/").split("/")
+        if len(parts) >= 3 and parts[0] == "components" and parts[1] == "schemas":
+            name = parts[2]
+            if name not in target_schemas and name in existing_schemas:
+                target_schemas[name] = copy.deepcopy(existing_schemas[name])
+
+    # Keep path ordering alphabetical, matching freshly extracted output.
+    out["paths"] = dict(sorted(out["paths"].items()))
+    return retained
+
+
 def write_schema(out: dict, output_path: Path) -> None:
     """Write a schema dict to a YAML file.
 
@@ -666,9 +780,17 @@ def main():
 
     if all_mode:
         output_dir = safe_dir(sys.argv[2])
-        for group in COMMAND_GROUPS.values():
-            out = build_schema(spec, group)
-            write_schema(out, output_dir / group["filename"])
+        # Build every group first so retention can tell "removed upstream" from
+        # "moved to a different group file".
+        built = [(group, build_schema(spec, group))
+                 for group in COMMAND_GROUPS.values()]
+        published = published_operations([out for _, out in built])
+        for group, out in built:
+            output_path = output_dir / group["filename"]
+            retained = merge_retained_operations(
+                out, load_existing_schema(output_path), published)
+            report_retained(retained, output_path)
+            write_schema(out, output_path)
     else:
         output_path = safe_path(sys.argv[2], {".yaml", ".yml"})
         # Determine group from output filename, default to "pr"
@@ -678,7 +800,20 @@ def main():
                 group_key = key
                 break
         out = build_schema(spec, COMMAND_GROUPS[group_key])
+        retained = merge_retained_operations(
+            out, load_existing_schema(output_path), published_operations([out]))
+        report_retained(retained, output_path)
         write_schema(out, output_path)
+
+
+def report_retained(retained: list[str], output_path: Path) -> None:
+    """Log retained operations so schema-sync runs document what was kept."""
+    if not retained:
+        return
+    print(
+        f"Retained {len(retained)} operation(s) missing from the live spec in "
+        f"'{output_path.name}': {', '.join(sorted(retained))}"
+    )
 
 
 def post_process_schema(out: dict) -> None:

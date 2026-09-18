@@ -159,7 +159,7 @@ paths:
       - state: Current
         scheme: oauth2
         scopes:
-        - admin:workspace:bitbucket
+        - read:workspace:bitbucket
       x-atlassian-auth-types:
       - forge-oauth2
       operationId: getTheClientKeyOfAConnectAddon

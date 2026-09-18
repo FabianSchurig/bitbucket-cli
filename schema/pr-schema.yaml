@@ -1566,9 +1566,7 @@ paths:
           description: 'If the authenticated user does not have access to the pull
             request,
 
-            if the provided comment is not a top-level comment,
-
-            or if the comment is not on the diff.'
+            or if the provided comment is not a top-level comment.'
           content:
             application/json:
               schema:
