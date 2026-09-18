@@ -28,7 +28,7 @@ Manages Bitbucket addon via the Bitbucket Cloud API.
 |-----------|----------------|
 | Update | — |
 | Delete | — |
-| List | `admin:workspace:bitbucket` |
+| List | `read:workspace:bitbucket` |
 
 ## Example Usage
 

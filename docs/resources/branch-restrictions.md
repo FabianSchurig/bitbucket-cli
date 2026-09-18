@@ -66,6 +66,7 @@ resource "bitbucket_branch_restrictions" "example" {
   - `name` (String) name
   - `slug` (String) The "sluggified" version of the group's name. This contains only ASCII
 
+- `pipelines_source_branches` (List of String) List of source branch names allowed to push back to the restricted branch. Used in conjunction with pipeline-based restrictions. (also computed from API response)
 - `users` (List of Object) users (also computed from API response)
   Nested schema:
   - `created_on` (String) created_on

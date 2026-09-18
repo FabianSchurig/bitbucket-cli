@@ -96,7 +96,7 @@ Track deployments across environments (staging, production, etc.).
 | `listRepositoryDeployKeys` | `GET` | Returns all deploy-keys belonging to a repository. |
 | `addARepositoryDeployKey` | `POST` | Create a new deploy key in a repository. Note: If authenticating a deploy key |
 | `getARepositoryDeployKey` | `GET` | Returns the deploy key belonging to a specific key. |
-| `updateARepositoryDeployKey` | `PUT` | Create a new deploy key in a repository. |
+| `updateARepositoryDeployKey` | `PUT` | Update an existing deploy key in a repository. |
 | `deleteARepositoryDeployKey` | `DELETE` | This deletes a deploy key from a repository. |
 | `getDeploymentsForRepository` | `GET` | Find deployments |
 | `getDeploymentForRepository` | `GET` | Retrieve a deployment |
@@ -276,6 +276,7 @@ Typical workflow:
 | `resolveACommentThread` | `POST` | Resolve a comment thread |
 | `reopenACommentThread` | `DELETE` | Reopen a comment thread |
 | `listCommitsOnAPullRequest` | `GET` | Returns a paginated list of the pull request's commits. |
+| `getFileConflictsForAPullRequest` | `GET` | Redirects to the [repository file conflicts](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-file-conflicts-spec-get) |
 | `declineAPullRequest` | `POST` | Declines the pull request. |
 | `listChangesInAPullRequest` | `GET` | Returns the list of files changed in the pull request with their change type (added, modified, removed). Use this to understand the scope of changes before reading individual file diffs. ✏️ |
 | `getTheDiffStatForAPullRequest` | `GET` | Redirects to the [repository diffstat](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get) |
@@ -412,8 +413,8 @@ Search for code across all repositories in a Bitbucket workspace. Use operation 
 
 | Operation | Method | Description |
 |-----------|--------|-------------|
-| `searchTeam` | `GET` | Search for code in the repositories of the specified team. |
-| `searchAccount` | `GET` | Search for code in the repositories of the specified user. |
+| `searchTeam` | `GET` | This API will be deprecated on November 1, 2026. |
+| `searchAccount` | `GET` | This API will be deprecated on November 1, 2026. |
 | `searchWorkspace` | `GET` | Full-text and path search across all repos in a workspace. search_query examples: ✏️ |
 
 ---
@@ -426,7 +427,7 @@ Manage Bitbucket snippets
 |-----------|--------|-------------|
 | `listSnippets` | `GET` | **This endpoint is deprecated. Please use the |
 | `createASnippet` | `POST` | Creates a new snippet under the authenticated user's account. |
-| `listSnippetsInAWorkspace` | `GET` | Identical to [`/snippets`](/cloud/bitbucket/rest/api-group-snippets/#api-snippets-get), except that the result is further filtered |
+| `listSnippetsInAWorkspace` | `GET` | Returns a paginated list of snippets owned by `{workspace}`. |
 | `createASnippetForAWorkspace` | `POST` | Identical to [`/snippets`](/cloud/bitbucket/rest/api-group-snippets/#api-snippets-post), except that the new snippet will be |
 | `getASnippet` | `GET` | Retrieves a single snippet. |
 | `updateASnippet` | `PUT` | Used to update a snippet. Use this to add and delete files and to |

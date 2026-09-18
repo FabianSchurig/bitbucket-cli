@@ -56,6 +56,7 @@ output "branch_restrictions_response" {
   - `name` (String) name
   - `slug` (String) The "sluggified" version of the group's name. This contains only ASCII
 
+- `pipelines_source_branches` (List of String) List of source branch names allowed to push back to the restricted branch. Used in conjunction with pipeline-based restrictions.
 - `users` (List of Object) users
   Nested schema:
   - `created_on` (String) created_on

@@ -132,7 +132,7 @@ Available operations:
 			Method:      `GET`,
 			Path:        `/snippets/{workspace}`,
 			Summary:     `List snippets in a workspace`,
-			Description: "Identical to [`/snippets`](/cloud/bitbucket/rest/api-group-snippets/#api-snippets-get), except that the result is further filtered\nby the snippet owner and only those that are owned by `{workspace}` are\nreturned.",
+			Description: "Returns a paginated list of snippets owned by `{workspace}`.\n\nTo limit the set of returned snippets, apply the\n`?role=[owner|contributor|member]` query parameter where the roles are\ndefined as follows:\n\n* `owner`: snippets owned by `{workspace}` that also belong to the current user\n    (only returns results when `{workspace}` is the current user's personal workspace)\n* `contributor`: snippets owned by `{workspace}` that the current user is watching,\n    plus any owned by `{workspace}` and the current user\n* `member`: all snippets owned by `{workspace}` if the current user is a member,\n    otherwise only those the current user is watching\n\nWhen no role is specified, all snippets owned by `{workspace}` are returned.\n\nIf the current user is not a member of `{workspace}`, only public snippets are\nreturned regardless of role.\n\nThe returned response is a normal paginated JSON list. This endpoint\nonly supports `application/json` responses and no\n`multipart/form-data` or `multipart/related`. As a result, it is not\npossible to include the file contents.",
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `role`, In: `query`, Type: `string`, Required: false},
@@ -900,7 +900,7 @@ to indicate success.`,
 			Method:      `GET`,
 			Path:        `/snippets/{workspace}`,
 			Summary:     `List snippets in a workspace`,
-			Description: "Identical to [`/snippets`](/cloud/bitbucket/rest/api-group-snippets/#api-snippets-get), except that the result is further filtered\nby the snippet owner and only those that are owned by `{workspace}` are\nreturned.",
+			Description: "Returns a paginated list of snippets owned by `{workspace}`.\n\nTo limit the set of returned snippets, apply the\n`?role=[owner|contributor|member]` query parameter where the roles are\ndefined as follows:\n\n* `owner`: snippets owned by `{workspace}` that also belong to the current user\n    (only returns results when `{workspace}` is the current user's personal workspace)\n* `contributor`: snippets owned by `{workspace}` that the current user is watching,\n    plus any owned by `{workspace}` and the current user\n* `member`: all snippets owned by `{workspace}` if the current user is a member,\n    otherwise only those the current user is watching\n\nWhen no role is specified, all snippets owned by `{workspace}` are returned.\n\nIf the current user is not a member of `{workspace}`, only public snippets are\nreturned regardless of role.\n\nThe returned response is a normal paginated JSON list. This endpoint\nonly supports `application/json` responses and no\n`multipart/form-data` or `multipart/related`. As a result, it is not\npossible to include the file contents.",
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `role`, In: `query`, Type: `string`, Required: false},

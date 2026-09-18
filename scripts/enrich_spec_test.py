@@ -1,4 +1,7 @@
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
 import scripts.enrich_spec as enrich_spec
 
@@ -88,6 +91,122 @@ class ApplyRequestBodyPatchesTests(unittest.TestCase):
         applied = enrich_spec.apply_request_body_patches(spec)
         self.assertEqual(applied, 0)
         self.assertNotIn("requestBody", spec["paths"][path]["put"])
+
+
+class OperationIdLockTests(unittest.TestCase):
+    """The lockfile is what keeps CLI command and MCP tool names stable."""
+
+    def _spec(self) -> dict:
+        return {
+            "paths": {
+                "/workspaces": {"get": {"summary": "List workspaces for user"}},
+                "/user/workspaces": {
+                    "get": {"summary": "List workspaces for the current user"}
+                },
+            }
+        }
+
+    def test_locked_ids_win_over_derived_ones(self):
+        spec = self._spec()
+        lock = {"get /user/workspaces": "getUserWorkspaces"}
+        count, updated = enrich_spec.assign_operation_ids(spec, lock)
+
+        self.assertEqual(count, 2)
+        self.assertEqual(
+            spec["paths"]["/user/workspaces"]["get"]["operationId"],
+            "getUserWorkspaces",
+        )
+        self.assertEqual(updated["get /workspaces"], "listWorkspacesForUser")
+
+    def test_vanished_operation_keeps_its_id_reserved(self):
+        # Regression for the schema-sync failure: Atlassian dropped
+        # GET /user/permissions/workspaces, and GET /user/workspaces inherited
+        # its id, renaming a shipped CLI command. The reserved lock entry must
+        # prevent that even though the operation is gone from the spec.
+        spec = {
+            "paths": {
+                "/user/workspaces": {
+                    "get": {"summary": "List workspaces for the current user"}
+                }
+            }
+        }
+        lock = {
+            "get /user/permissions/workspaces": "listWorkspacesForTheCurrentUser",
+        }
+        _, updated = enrich_spec.assign_operation_ids(spec, lock)
+
+        oid = spec["paths"]["/user/workspaces"]["get"]["operationId"]
+        self.assertNotEqual(oid, "listWorkspacesForTheCurrentUser")
+        self.assertEqual(oid, "getUserWorkspaces")
+        self.assertEqual(
+            updated["get /user/permissions/workspaces"],
+            "listWorkspacesForTheCurrentUser",
+        )
+
+    def test_ids_are_independent_of_spec_ordering(self):
+        forward = self._spec()
+        reverse = {"paths": dict(reversed(list(self._spec()["paths"].items())))}
+
+        _, lock_forward = enrich_spec.assign_operation_ids(forward, {})
+        _, lock_reverse = enrich_spec.assign_operation_ids(reverse, {})
+
+        self.assertEqual(lock_forward, lock_reverse)
+
+    def test_colliding_summaries_fall_back_to_path_slug(self):
+        spec = {
+            "paths": {
+                "/a/activity": {"get": {"summary": "List activity"}},
+                "/b/activity": {"get": {"summary": "List activity"}},
+            }
+        }
+        _, updated = enrich_spec.assign_operation_ids(spec, {})
+
+        self.assertEqual(len(set(updated.values())), 2)
+        self.assertIn("getBActivity", updated.values())
+
+    def test_lock_roundtrip(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            lock_path = Path(temp_dir) / "operation-ids.json"
+            self.assertEqual(enrich_spec.load_lock(lock_path), {})
+
+            enrich_spec.write_lock({"b": "2", "a": "1"}, lock_path)
+            self.assertEqual(enrich_spec.load_lock(lock_path), {"a": "1", "b": "2"})
+            # Sorted on disk so the committed lockfile stays diff-stable.
+            self.assertLess(
+                lock_path.read_text().index('"a"'),
+                lock_path.read_text().index('"b"'),
+            )
+
+    def test_malformed_lock_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            lock_path = Path(temp_dir) / "operation-ids.json"
+            lock_path.write_text("[]")
+            with self.assertRaises(ValueError):
+                enrich_spec.load_lock(lock_path)
+
+    def test_invalid_lock_entries_are_rejected(self):
+        invalid = [
+            {"": "id"},
+            {"get /foo": None},
+            {"get /foo": 42},
+            {"get /foo": ""},
+            {"get /foo": "   "},
+        ]
+        with tempfile.TemporaryDirectory() as temp_dir:
+            for index, value in enumerate(invalid):
+                lock_path = Path(temp_dir) / f"operation-ids-{index}.json"
+                lock_path.write_text(json.dumps(value))
+                with self.subTest(value=value), self.assertRaises(ValueError):
+                    enrich_spec.load_lock(lock_path)
+
+    def test_duplicate_lock_ids_are_rejected(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            lock_path = Path(temp_dir) / "operation-ids.json"
+            lock_path.write_text(
+                '{"get /foo": "sameId", "get /bar": "sameId"}'
+            )
+            with self.assertRaises(ValueError):
+                enrich_spec.load_lock(lock_path)
 
 
 if __name__ == "__main__":

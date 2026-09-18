@@ -33,6 +33,9 @@ jobs:
       - name: Install Python dependencies
         run: pip install pyyaml
 
+      - name: Test schema pipeline scripts
+        run: python3 -m unittest discover -s scripts -p '*_test.py'
+
       - name: Install oapi-codegen
         run: go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.6.0
 
@@ -42,11 +45,14 @@ jobs:
             -o /tmp/bitbucket-raw.json
           echo "Fetched $(wc -c < /tmp/bitbucket-raw.json) bytes"
 
-      - name: Enrich spec (inject operationIds)
-        run: python3 scripts/enrich_spec.py /tmp/bitbucket-raw.json /tmp/bitbucket-enriched.json
+      - name: Enrich spec (inject operationIds from the lockfile)
+        run: |
+          python3 scripts/enrich_spec.py /tmp/bitbucket-raw.json /tmp/bitbucket-enriched.json \
+            --lock schema/operation-ids.json
 
-      - name: Partition spec (extract paths + resolve $refs)
+      - name: Partition spec (extract paths + resolve $refs + retain dropped operations)
         run: python3 scripts/partition_spec.py /tmp/bitbucket-enriched.json schema/ --all
+
 
       - name: Detect schema change
         id: diff

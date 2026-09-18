@@ -62,7 +62,7 @@ Available operations:
 			HasBody:        false,
 			Paginated:      false,
 			Scopes: []string{
-				`admin:workspace:bitbucket`,
+				`read:workspace:bitbucket`,
 			},
 			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-addon/#api-addon-addon-key-client-key-get`,
 		},
@@ -108,7 +108,7 @@ Available operations:
 			HasBody:        false,
 			Paginated:      false,
 			Scopes: []string{
-				`admin:workspace:bitbucket`,
+				`read:workspace:bitbucket`,
 			},
 			DocURL: `https://developer.atlassian.com/cloud/bitbucket/rest/api-group-addon/#api-addon-addon-key-client-key-get`,
 		},

@@ -443,6 +443,12 @@ components:
             description: Apply the restriction to branches that match this pattern.
               Active when `branch_match_kind` is `glob`. Will be empty when `branch_match_kind`
               is `branching_model`.
+          pipelines_source_branches:
+            type: array
+            description: List of source branch names allowed to push back to the restricted
+              branch. Used in conjunction with pipeline-based restrictions.
+            items:
+              type: string
           value:
             type: integer
             description: 'Value with kind-specific semantics:

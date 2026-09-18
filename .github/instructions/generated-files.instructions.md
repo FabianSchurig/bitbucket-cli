@@ -19,6 +19,7 @@ Instead, fix the issue at its source:
 - **Wrong model types** → fix `oapi-codegen.yaml` config or `scripts/partition_spec.py`
 - **Missing/wrong endpoints** → fix `scripts/enrich_spec.py` or `scripts/partition_spec.py`
 - **Missing operationIds** → fix `scripts/enrich_spec.py`
+- **operationId must stay stable** → it is pinned in `schema/operation-ids.json`; never hand-edit an existing entry, or CLI commands and MCP tools get renamed
 
 After fixing the source, regenerate:
 ```bash

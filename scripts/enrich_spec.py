@@ -3,10 +3,22 @@
 enrich_spec.py: Inject operationIds into the Bitbucket OpenAPI spec.
 
 Strategy: slugify(summary) if present, else "{method}_{path_slug}".
-This is deterministic and stable as long as Atlassian doesn't rename summaries
-(rare) — and the CI diff check will catch it if they do.
 
-Usage: python3 enrich_spec.py <input.json> <output.json>
+operationIds are the primary key of the whole pipeline: they become CLI command
+names, MCP tool names and the keys hand-written code (notably
+``internal/tfprovider/crud_config.go``) refers to. Deriving them purely from the
+live spec makes them unstable — the collision fallback is "first occurrence
+wins", so removing one operation silently *renames* an unrelated one (when
+Atlassian dropped ``GET /user/permissions/workspaces``, ``GET /user/workspaces``
+inherited its ``listWorkspacesForTheCurrentUser`` id).
+
+To make ids stable for good, assignments are persisted in a committed lockfile
+(``schema/operation-ids.json``) keyed by ``"<method> <path>"``. Locked
+operations always keep their id, ids of operations that disappear stay reserved
+so they are never handed to a different endpoint, and only genuinely new
+operations get a freshly derived id.
+
+Usage: python3 enrich_spec.py <input.json> <output.json> [--lock <lockfile.json>]
 """
 
 import copy
@@ -14,6 +26,11 @@ import json
 import re
 import sys
 from pathlib import Path
+
+# Default location of the committed operationId lockfile, relative to the
+# repository root (the parent directory of scripts/).
+DEFAULT_LOCK_PATH = Path(__file__).resolve().parent.parent / \
+    "schema" / "operation-ids.json"
 
 
 def safe_path(raw: str, allowed_extensions: set[str]) -> Path:
@@ -40,6 +57,11 @@ def path_slug(path: str, method: str) -> str:
     """/repositories/{workspace}/{repo_slug}/pullrequests' + 'get' -> 'getRepositoriesPullrequests'"""
     parts = [p for p in path.split("/") if p and not p.startswith("{")]
     return method.lower() + "".join(p.title() for p in parts)
+
+
+# HTTP methods considered operations, in a fixed order for deterministic id
+# assignment.
+HTTP_METHODS = ("get", "post", "put", "patch", "delete")
 
 
 # ─── Missing requestBody patches ──────────────────────────────────────────────
@@ -141,52 +163,163 @@ def apply_request_body_patches(spec: dict) -> int:
     return applied
 
 
+def lock_key(path: str, method: str) -> str:
+    """Key used in the operationId lockfile: ``"get /workspaces"``."""
+    return f"{method.lower()} {path}"
+
+
+def load_lock(lock_path: Path) -> dict[str, str]:
+    """Load the operationId lockfile, tolerating a missing or empty file.
+
+    A malformed lockfile is a hard error: silently falling back to derived ids
+    would rename CLI commands and MCP tools without anyone noticing.
+    """
+    if not lock_path.exists():
+        return {}
+    raw = lock_path.read_text().strip()
+    if not raw:
+        return {}
+    def reject_duplicate_keys(pairs):
+        data = {}
+        for key, value in pairs:
+            if key in data:
+                raise ValueError(
+                    f"Lockfile {lock_path} contains duplicate key {key!r}"
+                )
+            data[key] = value
+        return data
+
+    data = json.loads(raw, object_pairs_hook=reject_duplicate_keys)
+    if not isinstance(data, dict):
+        raise ValueError(f"Lockfile {lock_path} must contain a JSON object")
+    result: dict[str, str] = {}
+    ids: set[str] = set()
+    for key, value in data.items():
+        if not isinstance(key, str) or not key.strip():
+            raise ValueError(f"Lockfile {lock_path} contains an invalid key")
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(
+                f"Lockfile {lock_path} has a non-empty string id for {key!r}"
+            )
+        if value in ids:
+            raise ValueError(
+                f"Lockfile {lock_path} reuses operation id {value!r}"
+            )
+        ids.add(value)
+        result[key] = value
+    return result
+
+
+def _derive_id(op: dict, path: str, method: str) -> str:
+    """Derive a candidate operationId for an operation without a locked id."""
+    operation_id = op.get("operationId")
+    if isinstance(operation_id, str) and operation_id:
+        return operation_id
+    summary = op.get("summary", "")
+    return to_camel(summary) if isinstance(summary, str) and summary else path_slug(
+        path, method
+    )
+
+
+def _unique_id(candidate: str, path: str, method: str, taken: set[str]) -> str:
+    """Return ``candidate`` or a collision-free variant of it."""
+    if candidate and candidate not in taken:
+        return candidate
+    slug = path_slug(path, method)
+    if slug not in taken:
+        return slug
+    suffix = 2
+    while f"{slug}{suffix}" in taken:
+        suffix += 1
+    return f"{slug}{suffix}"
+
+
+def assign_operation_ids(spec: dict, lock: dict[str, str]) -> tuple[int, dict[str, str]]:
+    """Assign stable operationIds to every operation in ``spec``.
+
+    Locked operations keep their recorded id. Ids belonging to operations that
+    vanished from the published spec stay reserved, so a brand-new or renamed
+    endpoint can never inherit an id that already means something else — the
+    failure mode that renamed ``getUserWorkspaces`` when Atlassian dropped a
+    sibling path. New operations derive an id from their summary and fall back
+    to a path-based slug on collision.
+
+    Returns the number of operations processed and the updated lock mapping.
+    """
+    updated = dict(lock)
+    # Every id ever handed out stays reserved, including ids of operations that
+    # are no longer published.
+    taken = set(lock.values())
+    pending: list[tuple[str, str, dict]] = []
+
+    count = 0
+    # Iterate in a spec-order-independent order so ids do not depend on how
+    # Atlassian happens to serialize the document.
+    for path in sorted(spec.get("paths", {})):
+        path_item = spec["paths"][path]
+        if not isinstance(path_item, dict):
+            continue
+        for method in HTTP_METHODS:
+            op = path_item.get(method)
+            if not isinstance(op, dict):
+                continue
+            count += 1
+            locked = lock.get(lock_key(path, method))
+            if locked:
+                op["operationId"] = locked
+            else:
+                pending.append((path, method, op))
+
+    for path, method, op in pending:
+        oid = _unique_id(_derive_id(op, path, method), path, method, taken)
+        op["operationId"] = oid
+        taken.add(oid)
+        updated[lock_key(path, method)] = oid
+
+    return count, dict(sorted(updated.items()))
+
+
+def write_lock(lock: dict[str, str], lock_path: Path) -> None:
+    """Persist the lockfile with stable ordering and a trailing newline."""
+    lock_path.write_text(json.dumps(dict(sorted(lock.items())), indent=2) + "\n")
+
+
 def main():
-    if len(sys.argv) != 3:
+    args = sys.argv[1:]
+    lock_path = DEFAULT_LOCK_PATH
+    if "--lock" in args:
+        i = args.index("--lock")
+        if i + 1 >= len(args):
+            print("Error: --lock requires a path", file=sys.stderr)
+            sys.exit(1)
+        lock_path = safe_path(args[i + 1], {".json"})
+        del args[i:i + 2]
+
+    if len(args) != 2:
         print(
-            f"Usage: {sys.argv[0]} <input.json> <output.json>", file=sys.stderr)
+            f"Usage: {sys.argv[0]} <input.json> <output.json> [--lock <lockfile.json>]",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
-    input_path = safe_path(sys.argv[1], {".json"})
-    output_path = safe_path(sys.argv[2], {".json"})
+    input_path = safe_path(args[0], {".json"})
+    output_path = safe_path(args[1], {".json"})
 
     spec = json.loads(input_path.read_text())
 
-    http_methods = ["get", "post", "put", "patch", "delete"]
-    count = 0
-
-    for path, path_item in spec.get("paths", {}).items():
-        for method in http_methods:
-            op = path_item.get(method)
-            if not op:
-                continue
-            if "operationId" not in op:
-                summary = op.get("summary", "")
-                op["operationId"] = to_camel(
-                    summary) if summary else path_slug(path, method)
-            count += 1
-
-    # Deduplicate operationIds: when two different operations share the same
-    # operationId (e.g. two "List a pull request activity log" endpoints at
-    # different paths), regenerate the duplicate using path_slug which
-    # incorporates the full URL path and is therefore unique.
-    seen: dict[str, tuple[str, str]] = {}  # operationId → (path, method)
-    for path, path_item in spec.get("paths", {}).items():
-        for method in http_methods:
-            op = path_item.get(method)
-            if not op or "operationId" not in op:
-                continue
-            oid = op["operationId"]
-            if oid in seen:
-                # Collision — regenerate this one using path-based slug
-                op["operationId"] = path_slug(path, method)
-            else:
-                seen[oid] = (path, method)
+    lock = load_lock(lock_path)
+    count, updated_lock = assign_operation_ids(spec, lock)
+    new_ids = len(updated_lock) - len(lock)
 
     patched = apply_request_body_patches(spec)
 
     output_path.write_text(json.dumps(spec, indent=2))
+    write_lock(updated_lock, lock_path)
     print(f"Enriched {count} operations, wrote to {output_path}")
+    print(
+        f"operationId lock: {len(updated_lock)} entries "
+        f"({new_ids} new), wrote to {lock_path}"
+    )
     if patched:
         print(f"Injected {patched} missing requestBody object(s)")
 

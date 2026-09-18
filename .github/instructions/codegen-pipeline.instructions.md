@@ -6,8 +6,8 @@ applyTo: ["scripts/**", "oapi-codegen.yaml"]
 
 ## Pipeline stages
 
-1. **`scripts/enrich_spec.py`** — Injects `operationId` into raw Bitbucket OpenAPI spec (summary→camelCase with deduplication)
-2. **`scripts/partition_spec.py`** — Extracts PR-related paths, recursively resolves `$ref`s into a self-contained schema
+1. **`scripts/enrich_spec.py`** — Injects `operationId` into raw Bitbucket OpenAPI spec (summary→camelCase), persisting every assignment in the committed lockfile `schema/operation-ids.json` so ids never change between runs
+2. **`scripts/partition_spec.py`** — Extracts PR-related paths, recursively resolves `$ref`s into a self-contained schema, and retains operations the live spec has dropped
 3. **`oapi-codegen`** — Generates Go model types from `schema/pr-schema.yaml`
 4. **`scripts/gen_commands/main.go`** — Generates Cobra commands wired to `handlers.Dispatch()`
 
@@ -19,6 +19,8 @@ applyTo: ["scripts/**", "oapi-codegen.yaml"]
 - **Schema scripts are Python 3.12**: Only dependency is `pyyaml`; keep scripts simple and dependency-light
 - **Go generator uses `yaml.v3`**: Parses the OpenAPI schema directly without third-party OpenAPI libraries
 - **Hand-authored schemas are first-class**: any `schema/*-schema.yaml` is consumed by the generators, not just files produced by `partition_spec.py`. Use this for endpoints that are not in Bitbucket's public OpenAPI spec (for example the internal project branch-restrictions endpoints in `schema/internal-branch-restrictions-schema.yaml`). Path keys may be **absolute URLs** (e.g. `https://bitbucket.org/!api/internal/...`); the dispatcher passes absolute URLs straight to resty so a different host works without runtime changes.
+- **operationIds are locked, not derived**: `schema/operation-ids.json` maps `"<method> <path>"` → operationId and is committed. Locked ids win over anything the live spec says, and ids of operations that disappear stay reserved so they are never reused. Never hand-edit an existing entry — that renames CLI commands, MCP tools and `CRUDConfig` keys.
+- **Upstream removals are retained, not applied**: operations present in the committed schema but missing from the live spec are carried forward verbatim with `x-bb-cli-retained: true`. Retire one permanently by deleting it from `schema/*-schema.yaml`.
 
 ## Testing changes
 

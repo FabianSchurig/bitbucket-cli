@@ -189,12 +189,25 @@ flowchart TD
 ### Schema sync safety
 
 The live OpenAPI document is treated as an input, not as an authority to delete a
-working API group because of a transient omission. When a group extracts with no
-paths, `partition_spec.py` preserves its existing populated schema; a genuinely
-empty or new group is still written normally. If Bitbucket removes only some
-endpoints, that is treated as an intentional change: generated code and
-`CRUDConfig` are rebuilt, and the invariant tests fail if any hand-maintained
-mapping still references a removed operation.
+working API group because of a transient omission. Three mechanisms keep the
+daily sync from breaking published surface or itself:
+
+- **Group preservation**: when a group extracts with no paths, `partition_spec.py`
+  preserves its existing populated schema; a genuinely empty or new group is
+  still written normally.
+- **Stable operationIds**: ids are recorded in the committed lockfile
+  [`schema/operation-ids.json`](./schema/operation-ids.json), keyed by
+  `"<method> <path>"`. An operation keeps its id forever, and ids of removed
+  operations stay reserved — so a sibling endpoint can never inherit an id and
+  silently rename a shipped CLI command, MCP tool, or `CRUDConfig` reference.
+- **Operation retention**: Atlassian regularly removes *deprecated but still
+  functional* endpoints from the published spec. Rather than dropping commands
+  in an automatic patch release, `partition_spec.py` carries such operations
+  forward verbatim from the committed schema, annotated `x-bb-cli-retained: true`
+  so the schema diff shows exactly what upstream stopped publishing. Retiring one
+  for good is a deliberate act: delete it from `schema/*-schema.yaml`, and the
+  invariant tests then flag any hand-maintained mapping (for example in
+  `CRUDConfig`) that still references it.
 
 Acceptance tests in `internal/tfprovider/acceptance_test.go` are hand-written and
 are never deleted by schema generation. Generated Terraform fixtures are

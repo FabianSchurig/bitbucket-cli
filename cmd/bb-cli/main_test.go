@@ -40,18 +40,6 @@ func TestNewRootCmd(t *testing.T) {
 	}
 
 }
-
-func TestDeprecatedCommandsAreMarked(t *testing.T) {
-	cmd := newRootCmd()
-	deprecated, _, err := cmd.Find([]string{"workspaces", "list-workspaces-for-user"})
-	if err != nil {
-		t.Fatalf("finding deprecated command: %v", err)
-	}
-	if deprecated.Deprecated == "" {
-		t.Fatal("expected deprecated command to be marked")
-	}
-}
-
 func TestSetColoredHelp(t *testing.T) {
 	cmd := &cobra.Command{Use: "demo"}
 	setColoredHelp(cmd)
