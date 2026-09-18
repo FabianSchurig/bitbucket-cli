@@ -800,9 +800,16 @@ def main():
             if output_path.name == group["filename"]:
                 group_key = key
                 break
-        out = build_schema(spec, COMMAND_GROUPS[group_key])
+        built = {
+            key: build_schema(spec, group)
+            for key, group in COMMAND_GROUPS.items()
+        }
+        out = built[group_key]
         retained = merge_retained_operations(
-            out, load_existing_schema(output_path), published_operations([out]))
+            out,
+            load_existing_schema(output_path),
+            published_operations(list(built.values())),
+        )
         report_retained(retained, output_path)
         write_schema(out, output_path)
 

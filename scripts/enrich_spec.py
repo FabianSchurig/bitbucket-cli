@@ -179,18 +179,46 @@ def load_lock(lock_path: Path) -> dict[str, str]:
     raw = lock_path.read_text().strip()
     if not raw:
         return {}
-    data = json.loads(raw)
+    def reject_duplicate_keys(pairs):
+        data = {}
+        for key, value in pairs:
+            if key in data:
+                raise ValueError(
+                    f"Lockfile {lock_path} contains duplicate key {key!r}"
+                )
+            data[key] = value
+        return data
+
+    data = json.loads(raw, object_pairs_hook=reject_duplicate_keys)
     if not isinstance(data, dict):
         raise ValueError(f"Lockfile {lock_path} must contain a JSON object")
-    return {str(k): str(v) for k, v in data.items()}
+    result: dict[str, str] = {}
+    ids: set[str] = set()
+    for key, value in data.items():
+        if not isinstance(key, str) or not key.strip():
+            raise ValueError(f"Lockfile {lock_path} contains an invalid key")
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(
+                f"Lockfile {lock_path} has a non-empty string id for {key!r}"
+            )
+        if value in ids:
+            raise ValueError(
+                f"Lockfile {lock_path} reuses operation id {value!r}"
+            )
+        ids.add(value)
+        result[key] = value
+    return result
 
 
 def _derive_id(op: dict, path: str, method: str) -> str:
     """Derive a candidate operationId for an operation without a locked id."""
-    if op.get("operationId"):
-        return str(op["operationId"])
+    operation_id = op.get("operationId")
+    if isinstance(operation_id, str) and operation_id:
+        return operation_id
     summary = op.get("summary", "")
-    return to_camel(summary) if summary else path_slug(path, method)
+    return to_camel(summary) if isinstance(summary, str) and summary else path_slug(
+        path, method
+    )
 
 
 def _unique_id(candidate: str, path: str, method: str, taken: set[str]) -> str:

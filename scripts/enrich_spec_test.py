@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -180,6 +181,30 @@ class OperationIdLockTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             lock_path = Path(temp_dir) / "operation-ids.json"
             lock_path.write_text("[]")
+            with self.assertRaises(ValueError):
+                enrich_spec.load_lock(lock_path)
+
+    def test_invalid_lock_entries_are_rejected(self):
+        invalid = [
+            {"": "id"},
+            {"get /foo": None},
+            {"get /foo": 42},
+            {"get /foo": ""},
+            {"get /foo": "   "},
+        ]
+        with tempfile.TemporaryDirectory() as temp_dir:
+            for index, value in enumerate(invalid):
+                lock_path = Path(temp_dir) / f"operation-ids-{index}.json"
+                lock_path.write_text(json.dumps(value))
+                with self.subTest(value=value), self.assertRaises(ValueError):
+                    enrich_spec.load_lock(lock_path)
+
+    def test_duplicate_lock_ids_are_rejected(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            lock_path = Path(temp_dir) / "operation-ids.json"
+            lock_path.write_text(
+                '{"get /foo": "sameId", "get /bar": "sameId"}'
+            )
             with self.assertRaises(ValueError):
                 enrich_spec.load_lock(lock_path)
 
