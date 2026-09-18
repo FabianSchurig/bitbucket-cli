@@ -8,8 +8,8 @@ A low-maintenance CLI and MCP server for Bitbucket Cloud. Most code is **auto-ge
 
 ```
 Bitbucket OpenAPI spec (live)
-  → scripts/enrich_spec.py        # inject operationIds
-  → scripts/partition_spec.py     # extract paths by group, resolve $refs
+  → scripts/enrich_spec.py        # inject operationIds (locked in schema/operation-ids.json)
+  → scripts/partition_spec.py     # extract paths by group, resolve $refs, retain dropped ops
   → schema/*-schema.yaml          # self-contained OpenAPI specs (one per group)
   → oapi-codegen                  # internal/generated/models.gen.go
   → scripts/gen_commands/main.go  # internal/commands/*.gen.go (CLI)
@@ -53,7 +53,7 @@ go run ./cmd/bb-mcp       # run MCP server locally
 ## Code Generation (manual)
 
 ```bash
-python3 scripts/enrich_spec.py <raw-spec.json> <enriched.json>
+python3 scripts/enrich_spec.py <raw-spec.json> <enriched.json>   # updates schema/operation-ids.json
 python3 scripts/partition_spec.py <enriched.json> schema/ --all
 oapi-codegen --config oapi-codegen.yaml schema/pr-schema.yaml
 go run scripts/gen_commands/main.go schema/pr-schema.yaml internal/commands/commands.gen.go

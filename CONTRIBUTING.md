@@ -139,7 +139,7 @@ Generated code is automatically formatted using `go/format` during generation.
 The full pipeline, typically run by CI:
 
 ```bash
-python3 scripts/enrich_spec.py <raw-spec.json> <enriched.json>
+python3 scripts/enrich_spec.py <raw-spec.json> <enriched.json>   # updates schema/operation-ids.json
 python3 scripts/partition_spec.py <enriched.json> schema/ --all
 oapi-codegen --config oapi-codegen.yaml schema/pr-schema.yaml
 

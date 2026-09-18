@@ -41,14 +41,32 @@ func TestNewRootCmd(t *testing.T) {
 
 }
 
+// TestDeprecatedCommandsAreMarked verifies that deprecation survives code
+// generation, without pinning the assertion to one live endpoint. Naming a
+// specific deprecated endpoint made this test fail on every schema sync where
+// Atlassian retired that endpoint (see #130); the generator-level guarantee is
+// covered by scripts/internal/spec.TestDeprecatedOperation, so here we only
+// assert that the marking is applied consistently across the real command tree.
 func TestDeprecatedCommandsAreMarked(t *testing.T) {
 	cmd := newRootCmd()
-	deprecated, _, err := cmd.Find([]string{"workspaces", "list-workspaces-for-user"})
-	if err != nil {
-		t.Fatalf("finding deprecated command: %v", err)
+
+	var deprecated int
+	var walk func(c *cobra.Command)
+	walk = func(c *cobra.Command) {
+		for _, sub := range c.Commands() {
+			if sub.Deprecated != "" {
+				deprecated++
+			}
+			walk(sub)
+		}
 	}
-	if deprecated.Deprecated == "" {
-		t.Fatal("expected deprecated command to be marked")
+	walk(cmd)
+
+	// Bitbucket always publishes some deprecated endpoints, and operations the
+	// spec drops are retained as deprecated by partition_spec.py, so losing all
+	// of them signals a broken generator rather than upstream drift.
+	if deprecated == 0 {
+		t.Fatal("expected at least one command to be marked deprecated")
 	}
 }
 

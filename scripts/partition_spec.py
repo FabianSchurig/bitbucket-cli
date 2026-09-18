@@ -666,11 +666,13 @@ def merge_retained_operations(
     ``internal/tfprovider/crud_config.go``.
 
     Instead, an operation that exists in the previously committed schema but is
-    no longer published anywhere is copied forward, flagged ``deprecated: true``
-    and annotated with ``x-bb-cli-retained: true`` so the reason is visible in
-    the schema, the CLI, and the generated docs. ``published`` therefore has to
-    cover *all* groups, so an endpoint that merely moved between groups is not
-    duplicated.
+    no longer published anywhere is copied forward verbatim and annotated with
+    ``x-bb-cli-retained: true``. The operation is copied *as-is* — deprecation
+    is not forced on it, because a published deprecation flag is Atlassian's
+    call and Cobra hides deprecated commands from ``--help``; a transient spec
+    omission must not quietly hide a working command. ``published`` therefore
+    has to cover *all* groups, so an endpoint that merely moved between groups
+    is not duplicated.
 
     Retiring a retained endpoint for good is a deliberate, reviewable act:
     delete it from ``schema/*-schema.yaml`` and it is gone, because the
@@ -698,7 +700,6 @@ def merge_retained_operations(
                 target_item["parameters"] = copy.deepcopy(
                     path_item["parameters"])
             retained_op = copy.deepcopy(op)
-            retained_op["deprecated"] = True
             retained_op["x-bb-cli-retained"] = True
             target_item[method] = retained_op
             out["paths"][path] = order_path_item(target_item)
