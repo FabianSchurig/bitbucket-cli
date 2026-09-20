@@ -99,6 +99,7 @@ paths:
       x-atlassian-auth-types:
       - api-token
       operationId: listPublicRepositories
+      x-bb-cli-retained: true
     parameters: []
   /repositories/{workspace}:
     get:
