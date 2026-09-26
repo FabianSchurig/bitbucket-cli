@@ -10,13 +10,20 @@ info:
 paths:
   /repositories/{workspace}/{repo_slug}/commit/{commit}/properties/{app_key}/{property_name}:
     put:
+      deprecated: true
       responses:
         '204':
           description: An empty response.
       operationId: updateCommitHostedPropertyValue
       summary: Update a commit application property
-      description: Update an [application property](/cloud/bitbucket/application-properties/)
+      description: 'This API will be deprecated on January 31, 2027 as part of [end
+        of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+
+        Update an [application property](/cloud/bitbucket/application-properties/)
         value stored against a commit.
+
+        '
       parameters:
       - required: true
         in: path
@@ -63,13 +70,20 @@ paths:
       - basic: []
       - api_key: []
     delete:
+      deprecated: true
       responses:
         '204':
           description: An empty response.
       operationId: deleteCommitHostedPropertyValue
       summary: Delete a commit application property
-      description: Delete an [application property](/cloud/bitbucket/application-properties/)
+      description: 'This API will be deprecated on January 31, 2027 as part of [end
+        of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+
+        Delete an [application property](/cloud/bitbucket/application-properties/)
         value stored against a commit.
+
+        '
       parameters:
       - required: true
         in: path
@@ -109,6 +123,7 @@ paths:
       - basic: []
       - api_key: []
     get:
+      deprecated: true
       responses:
         '200':
           description: The value of the property.
@@ -118,8 +133,14 @@ paths:
                 $ref: '#/components/schemas/application_property'
       operationId: getCommitHostedPropertyValue
       summary: Get a commit application property
-      description: Retrieve an [application property](/cloud/bitbucket/application-properties/)
+      description: 'This API will be deprecated on January 31, 2027 as part of [end
+        of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+
+        Retrieve an [application property](/cloud/bitbucket/application-properties/)
         value stored against a commit.
+
+        '
       parameters:
       - required: true
         in: path
@@ -168,13 +189,20 @@ paths:
       - api-token
   /repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}:
     put:
+      deprecated: true
       responses:
         '204':
           description: An empty response.
       operationId: updateRepositoryHostedPropertyValue
       summary: Update a repository application property
-      description: Update an [application property](/cloud/bitbucket/application-properties/)
+      description: 'This API will be deprecated on January 31, 2027 as part of [end
+        of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+
+        Update an [application property](/cloud/bitbucket/application-properties/)
         value stored against a repository.
+
+        '
       parameters:
       - required: true
         in: path
@@ -215,13 +243,20 @@ paths:
       - basic: []
       - api_key: []
     delete:
+      deprecated: true
       responses:
         '204':
           description: An empty response.
       operationId: deleteRepositoryHostedPropertyValue
       summary: Delete a repository application property
-      description: Delete an [application property](/cloud/bitbucket/application-properties/)
+      description: 'This API will be deprecated on January 31, 2027 as part of [end
+        of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+
+        Delete an [application property](/cloud/bitbucket/application-properties/)
         value stored against a repository.
+
+        '
       parameters:
       - required: true
         in: path
@@ -255,6 +290,7 @@ paths:
       - basic: []
       - api_key: []
     get:
+      deprecated: true
       responses:
         '200':
           description: The value of the property.
@@ -264,8 +300,14 @@ paths:
                 $ref: '#/components/schemas/application_property'
       operationId: getRepositoryHostedPropertyValue
       summary: Get a repository application property
-      description: Retrieve an [application property](/cloud/bitbucket/application-properties/)
+      description: 'This API will be deprecated on January 31, 2027 as part of [end
+        of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+
+        Retrieve an [application property](/cloud/bitbucket/application-properties/)
         value stored against a repository.
+
+        '
       parameters:
       - required: true
         in: path
@@ -308,13 +350,16 @@ paths:
       - api-token
   /repositories/{workspace}/{repo_slug}/pullrequests/{pullrequest_id}/properties/{app_key}/{property_name}:
     put:
+      deprecated: true
       responses:
         '204':
           description: An empty response.
       operationId: updatePullRequestHostedPropertyValue
       summary: Update a pull request application property
-      description: Update an [application property](/cloud/bitbucket/application-properties/)
-        value stored against a pull request.
+      description: "This API will be deprecated on January 31, 2027 as part of [end\
+        \ of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).\n\
+        \nUpdate an [application property](/cloud/bitbucket/application-properties/)\
+        \ value stored against a pull \nrequest.\n"
       parameters:
       - required: true
         in: path
@@ -361,13 +406,22 @@ paths:
       - basic: []
       - api_key: []
     delete:
+      deprecated: true
       responses:
         '204':
           description: An empty response.
       operationId: deletePullRequestHostedPropertyValue
       summary: Delete a pull request application property
-      description: Delete an [application property](/cloud/bitbucket/application-properties/)
-        value stored against a pull request.
+      description: 'This API will be deprecated on January 31, 2027 as part of [end
+        of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+
+        Delete an [application property](/cloud/bitbucket/application-properties/)
+        value stored against a pull
+
+        request.
+
+        '
       parameters:
       - required: true
         in: path
@@ -407,6 +461,7 @@ paths:
       - basic: []
       - api_key: []
     get:
+      deprecated: true
       responses:
         '200':
           description: The value of the property.
@@ -416,8 +471,16 @@ paths:
                 $ref: '#/components/schemas/application_property'
       operationId: getPullRequestHostedPropertyValue
       summary: Get a pull request application property
-      description: Retrieve an [application property](/cloud/bitbucket/application-properties/)
-        value stored against a pull request.
+      description: 'This API will be deprecated on January 31, 2027 as part of [end
+        of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+
+        Retrieve an [application property](/cloud/bitbucket/application-properties/)
+        value stored against a pull
+
+        request.
+
+        '
       parameters:
       - required: true
         in: path
@@ -466,13 +529,20 @@ paths:
       - api-token
   /users/{selected_user}/properties/{app_key}/{property_name}:
     put:
+      deprecated: true
       responses:
         '204':
           description: An empty response.
       operationId: updateUserHostedPropertyValue
       summary: Update a user application property
-      description: Update an [application property](/cloud/bitbucket/application-properties/)
+      description: 'This API will be deprecated on January 31, 2027 as part of [end
+        of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+
+        Update an [application property](/cloud/bitbucket/application-properties/)
         value stored against a user.
+
+        '
       parameters:
       - required: true
         in: path
@@ -507,13 +577,20 @@ paths:
       - basic: []
       - api_key: []
     delete:
+      deprecated: true
       responses:
         '204':
           description: An empty response.
       operationId: deleteUserHostedPropertyValue
       summary: Delete a user application property
-      description: Delete an [application property](/cloud/bitbucket/application-properties/)
+      description: 'This API will be deprecated on January 31, 2027 as part of [end
+        of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+
+        Delete an [application property](/cloud/bitbucket/application-properties/)
         value stored against a user.
+
+        '
       parameters:
       - required: true
         in: path
@@ -541,6 +618,7 @@ paths:
       - basic: []
       - api_key: []
     get:
+      deprecated: true
       responses:
         '200':
           description: The value of the property.
@@ -550,8 +628,14 @@ paths:
                 $ref: '#/components/schemas/application_property'
       operationId: retrieveUserHostedPropertyValue
       summary: Get a user application property
-      description: Retrieve an [application property](/cloud/bitbucket/application-properties/)
+      description: 'This API will be deprecated on January 31, 2027 as part of [end
+        of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+
+        Retrieve an [application property](/cloud/bitbucket/application-properties/)
         value stored against a user.
+
+        '
       parameters:
       - required: true
         in: path

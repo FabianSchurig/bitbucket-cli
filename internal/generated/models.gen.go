@@ -1111,6 +1111,12 @@ type Pullrequest struct {
 			Name *string `json:"name,omitempty"`
 		} `json:"merge,omitempty"`
 
+		// MergeabilityChecks A link to a resource related to this object.
+		MergeabilityChecks *struct {
+			Href *string `json:"href,omitempty"`
+			Name *string `json:"name,omitempty"`
+		} `json:"mergeability_checks,omitempty"`
+
 		// Self A link to a resource related to this object.
 		Self *struct {
 			Href *string `json:"href,omitempty"`

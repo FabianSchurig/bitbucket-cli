@@ -70,7 +70,11 @@ func newPropertiesGetCommitHostedPropertyValueCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get-commit-hosted-property-value",
 		Short: `Get a commit application property`,
-		Long:  `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.`,
+		Long: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.
+`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"workspace":     workspace,
@@ -135,7 +139,11 @@ func newPropertiesUpdateCommitHostedPropertyValueCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-commit-hosted-property-value",
 		Short: `Update a commit application property`,
-		Long:  `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.`,
+		Long: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Update an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.
+`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"workspace":     workspace,
@@ -209,7 +217,11 @@ func newPropertiesDeleteCommitHostedPropertyValueCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-commit-hosted-property-value",
 		Short: `Delete a commit application property`,
-		Long:  `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.`,
+		Long: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.
+`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"workspace":     workspace,
@@ -271,7 +283,11 @@ func newPropertiesGetRepositoryHostedPropertyValueCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get-repository-hosted-property-value",
 		Short: `Get a repository application property`,
-		Long:  `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.`,
+		Long: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.
+`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"workspace":     workspace,
@@ -330,7 +346,11 @@ func newPropertiesUpdateRepositoryHostedPropertyValueCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-repository-hosted-property-value",
 		Short: `Update a repository application property`,
-		Long:  `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.`,
+		Long: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Update an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.
+`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"workspace":     workspace,
@@ -398,7 +418,11 @@ func newPropertiesDeleteRepositoryHostedPropertyValueCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-repository-hosted-property-value",
 		Short: `Delete a repository application property`,
-		Long:  `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.`,
+		Long: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.
+`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"workspace":     workspace,
@@ -456,7 +480,12 @@ func newPropertiesGetPullRequestHostedPropertyValueCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get-pull-request-hosted-property-value",
 		Short: `Get a pull request application property`,
-		Long:  `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a pull request.`,
+		Long: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a pull
+request.
+`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"workspace":      workspace,
@@ -521,7 +550,12 @@ func newPropertiesUpdatePullRequestHostedPropertyValueCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-pull-request-hosted-property-value",
 		Short: `Update a pull request application property`,
-		Long:  `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a pull request.`,
+		Long: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Update an [application property](/cloud/bitbucket/application-properties/) value stored against a pull 
+request.
+`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"workspace":      workspace,
@@ -595,7 +629,12 @@ func newPropertiesDeletePullRequestHostedPropertyValueCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-pull-request-hosted-property-value",
 		Short: `Delete a pull request application property`,
-		Long:  `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a pull request.`,
+		Long: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a pull
+request.
+`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"workspace":      workspace,
@@ -656,7 +695,11 @@ func newPropertiesRetrieveUserHostedPropertyValueCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "retrieve-user-hosted-property-value",
 		Short: `Get a user application property`,
-		Long:  `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a user.`,
+		Long: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a user.
+`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"selected_user": selectedUser,
@@ -709,7 +752,11 @@ func newPropertiesUpdateUserHostedPropertyValueCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-user-hosted-property-value",
 		Short: `Update a user application property`,
-		Long:  `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a user.`,
+		Long: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Update an [application property](/cloud/bitbucket/application-properties/) value stored against a user.
+`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"selected_user": selectedUser,
@@ -771,7 +818,11 @@ func newPropertiesDeleteUserHostedPropertyValueCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "delete-user-hosted-property-value",
 		Short: `Delete a user application property`,
-		Long:  `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a user.`,
+		Long: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a user.
+`,
+		Deprecated: "This API endpoint is deprecated.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"selected_user": selectedUser,

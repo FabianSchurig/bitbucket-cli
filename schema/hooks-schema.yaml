@@ -10,25 +10,18 @@ info:
 paths:
   /hook_events:
     get:
+      operationId: getAWebhookResource
+      summary: Get a webhook resource
+      description: 'Returns the webhook resource or subject types on which webhooks
+        can be registered.
+
+        Each resource/subject type contains an `events` link that returns the paginated
+        list of specific events each individual subject type can emit.
+
+        This endpoint is publicly accessible and does not require authentication or
+        scopes.'
       tags:
       - Webhooks
-      description: 'Returns the webhook resource or subject types on which webhooks
-        can
-
-        be registered.
-
-
-        Each resource/subject type contains an `events` link that returns the
-
-        paginated list of specific events each individual subject type can
-
-        emit.
-
-
-        This endpoint is publicly accessible and does not require
-
-        authentication or scopes.'
-      summary: Get a webhook resource
       responses:
         '200':
           description: A mapping of resource/subject types pointing to their individual
@@ -52,30 +45,33 @@ paths:
       - oauth2: []
       - basic: []
       - api_key: []
-      operationId: getAWebhookResource
-    parameters: []
   /hook_events/{subject_type}:
     get:
-      tags:
-      - Webhooks
-      description: 'Returns a paginated list of all valid webhook events for the
-
-        specified entity.
+      operationId: listSubscribableWebhookTypes
+      summary: List subscribable webhook types
+      description: 'Returns a paginated list of all valid webhook events for the specified
+        entity.
 
         **The team and user webhooks are deprecated, and you should use workspace
-        instead.
-
-        For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).**
-
+        instead. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).**
 
         This is public data that does not require any scopes or authentication.
 
-
         NOTE: The example response is a truncated response object for the `workspace`
-        `subject_type`.
-
-        We return the same structure for the other `subject_type` objects.'
-      summary: List subscribable webhook types
+        `subject_type`. We return the same structure for the other `subject_type`
+        objects.'
+      tags:
+      - Webhooks
+      parameters:
+      - name: subject_type
+        description: A resource or subject type.
+        required: true
+        in: path
+        schema:
+          type: string
+          enum:
+          - repository
+          - workspace
       responses:
         '200':
           description: A paginated list of webhook types available to subscribe on.
@@ -116,17 +112,6 @@ paths:
       - oauth2: []
       - basic: []
       - api_key: []
-      operationId: listSubscribableWebhookTypes
-    parameters:
-    - name: subject_type
-      in: path
-      description: A resource or subject type.
-      required: true
-      schema:
-        type: string
-        enum:
-        - repository
-        - workspace
   /repositories/{workspace}/{repo_slug}/hooks:
     get:
       tags:
@@ -753,6 +738,7 @@ components:
       type: object
       title: Hook Event
       description: An event, associated with a resource or subject type.
+      additionalProperties: false
       properties:
         event:
           type: string
@@ -796,7 +782,6 @@ components:
         description:
           type: string
           description: More detailed description of the webhook event type.
-      additionalProperties: false
     object:
       type: object
       description: Base type for most resource objects. It defines the common `type`
@@ -814,6 +799,7 @@ components:
       type: object
       title: Paginated Hook Events
       description: A paginated list of webhook types available to subscribe on.
+      additionalProperties: false
       properties:
         size:
           type: integer
@@ -840,7 +826,7 @@ components:
           format: uri
         previous:
           type: string
-          description: Link to previous page if it exists. A collections first page
+          description: Link to previous page if it exists. A collection's first page
             does not have this value. This is an optional element that is not provided
             in all responses. Some result sets strictly support forward navigation
             and never provide previous links. Clients must anticipate that backwards
@@ -853,7 +839,6 @@ components:
             $ref: '#/components/schemas/hook_event'
           minItems: 0
           uniqueItems: true
-      additionalProperties: false
     paginated_webhook_subscriptions:
       type: object
       title: Paginated Webhook Subscriptions
@@ -906,34 +891,42 @@ components:
       properties:
         repository:
           type: object
-          properties:
-            events:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
           additionalProperties: false
+          properties:
+            links:
+              type: object
+              additionalProperties: false
+              properties:
+                events:
+                  type: object
+                  title: Link
+                  description: A link to a resource related to this object.
+                  additionalProperties: false
+                  properties:
+                    href:
+                      type: string
+                      format: uri
+                    name:
+                      type: string
         workspace:
           type: object
-          properties:
-            events:
-              type: object
-              title: Link
-              description: A link to a resource related to this object.
-              properties:
-                href:
-                  type: string
-                  format: uri
-                name:
-                  type: string
-              additionalProperties: false
           additionalProperties: false
+          properties:
+            links:
+              type: object
+              additionalProperties: false
+              properties:
+                events:
+                  type: object
+                  title: Link
+                  description: A link to a resource related to this object.
+                  additionalProperties: false
+                  properties:
+                    href:
+                      type: string
+                      format: uri
+                    name:
+                      type: string
       additionalProperties: false
     webhook_subscription:
       allOf:

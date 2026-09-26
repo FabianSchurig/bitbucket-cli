@@ -45,15 +45,3 @@ resource "bitbucket_hook_types" "example" {
 
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
-- `repository` (Object) repository
-  Nested schema:
-  - `events` (Object) A link to a resource related to this object.
-    - `href` (String) href
-    - `name` (String) name
-
-- `workspace` (Object) workspace
-  Nested schema:
-  - `events` (Object) A link to a resource related to this object.
-    - `href` (String) href
-    - `name` (String) name
-

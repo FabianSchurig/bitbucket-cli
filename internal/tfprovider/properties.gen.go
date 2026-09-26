@@ -36,7 +36,10 @@ Available operations:
 			Method:      `GET`,
 			Path:        `/repositories/{workspace}/{repo_slug}/commit/{commit}/properties/{app_key}/{property_name}`,
 			Summary:     `Get a commit application property`,
-			Description: `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -60,7 +63,10 @@ Available operations:
 			Method:      `PUT`,
 			Path:        `/repositories/{workspace}/{repo_slug}/commit/{commit}/properties/{app_key}/{property_name}`,
 			Summary:     `Update a commit application property`,
-			Description: `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Update an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -81,7 +87,10 @@ Available operations:
 			Method:      `DELETE`,
 			Path:        `/repositories/{workspace}/{repo_slug}/commit/{commit}/properties/{app_key}/{property_name}`,
 			Summary:     `Delete a commit application property`,
-			Description: `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -100,7 +109,10 @@ Available operations:
 			Method:      `GET`,
 			Path:        `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}`,
 			Summary:     `Get a repository application property`,
-			Description: `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -123,7 +135,10 @@ Available operations:
 			Method:      `PUT`,
 			Path:        `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}`,
 			Summary:     `Update a repository application property`,
-			Description: `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Update an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -143,7 +158,10 @@ Available operations:
 			Method:      `DELETE`,
 			Path:        `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}`,
 			Summary:     `Delete a repository application property`,
-			Description: `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -161,7 +179,11 @@ Available operations:
 			Method:      `GET`,
 			Path:        `/repositories/{workspace}/{repo_slug}/pullrequests/{pullrequest_id}/properties/{app_key}/{property_name}`,
 			Summary:     `Get a pull request application property`,
-			Description: `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a pull request.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a pull
+request.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -185,7 +207,11 @@ Available operations:
 			Method:      `PUT`,
 			Path:        `/repositories/{workspace}/{repo_slug}/pullrequests/{pullrequest_id}/properties/{app_key}/{property_name}`,
 			Summary:     `Update a pull request application property`,
-			Description: `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a pull request.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Update an [application property](/cloud/bitbucket/application-properties/) value stored against a pull 
+request.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -206,7 +232,11 @@ Available operations:
 			Method:      `DELETE`,
 			Path:        `/repositories/{workspace}/{repo_slug}/pullrequests/{pullrequest_id}/properties/{app_key}/{property_name}`,
 			Summary:     `Delete a pull request application property`,
-			Description: `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a pull request.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a pull
+request.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -225,7 +255,10 @@ Available operations:
 			Method:      `GET`,
 			Path:        `/users/{selected_user}/properties/{app_key}/{property_name}`,
 			Summary:     `Get a user application property`,
-			Description: `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a user.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a user.
+`,
 			Params: []ParamDef{
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
@@ -247,7 +280,10 @@ Available operations:
 			Method:      `PUT`,
 			Path:        `/users/{selected_user}/properties/{app_key}/{property_name}`,
 			Summary:     `Update a user application property`,
-			Description: `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a user.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Update an [application property](/cloud/bitbucket/application-properties/) value stored against a user.
+`,
 			Params: []ParamDef{
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
@@ -266,7 +302,10 @@ Available operations:
 			Method:      `DELETE`,
 			Path:        `/users/{selected_user}/properties/{app_key}/{property_name}`,
 			Summary:     `Delete a user application property`,
-			Description: `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a user.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a user.
+`,
 			Params: []ParamDef{
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
@@ -285,7 +324,10 @@ Available operations:
 			Method:      `GET`,
 			Path:        `/repositories/{workspace}/{repo_slug}/commit/{commit}/properties/{app_key}/{property_name}`,
 			Summary:     `Get a commit application property`,
-			Description: `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -309,7 +351,10 @@ Available operations:
 			Method:      `PUT`,
 			Path:        `/repositories/{workspace}/{repo_slug}/commit/{commit}/properties/{app_key}/{property_name}`,
 			Summary:     `Update a commit application property`,
-			Description: `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Update an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -330,7 +375,10 @@ Available operations:
 			Method:      `DELETE`,
 			Path:        `/repositories/{workspace}/{repo_slug}/commit/{commit}/properties/{app_key}/{property_name}`,
 			Summary:     `Delete a commit application property`,
-			Description: `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a commit.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -349,7 +397,10 @@ Available operations:
 			Method:      `GET`,
 			Path:        `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}`,
 			Summary:     `Get a repository application property`,
-			Description: `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -372,7 +423,10 @@ Available operations:
 			Method:      `PUT`,
 			Path:        `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}`,
 			Summary:     `Update a repository application property`,
-			Description: `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Update an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -392,7 +446,10 @@ Available operations:
 			Method:      `DELETE`,
 			Path:        `/repositories/{workspace}/{repo_slug}/properties/{app_key}/{property_name}`,
 			Summary:     `Delete a repository application property`,
-			Description: `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a repository.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -410,7 +467,11 @@ Available operations:
 			Method:      `GET`,
 			Path:        `/repositories/{workspace}/{repo_slug}/pullrequests/{pullrequest_id}/properties/{app_key}/{property_name}`,
 			Summary:     `Get a pull request application property`,
-			Description: `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a pull request.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a pull
+request.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -434,7 +495,11 @@ Available operations:
 			Method:      `PUT`,
 			Path:        `/repositories/{workspace}/{repo_slug}/pullrequests/{pullrequest_id}/properties/{app_key}/{property_name}`,
 			Summary:     `Update a pull request application property`,
-			Description: `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a pull request.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Update an [application property](/cloud/bitbucket/application-properties/) value stored against a pull 
+request.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -455,7 +520,11 @@ Available operations:
 			Method:      `DELETE`,
 			Path:        `/repositories/{workspace}/{repo_slug}/pullrequests/{pullrequest_id}/properties/{app_key}/{property_name}`,
 			Summary:     `Delete a pull request application property`,
-			Description: `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a pull request.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a pull
+request.
+`,
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
@@ -474,7 +543,10 @@ Available operations:
 			Method:      `GET`,
 			Path:        `/users/{selected_user}/properties/{app_key}/{property_name}`,
 			Summary:     `Get a user application property`,
-			Description: `Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a user.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Retrieve an [application property](/cloud/bitbucket/application-properties/) value stored against a user.
+`,
 			Params: []ParamDef{
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
@@ -496,7 +568,10 @@ Available operations:
 			Method:      `PUT`,
 			Path:        `/users/{selected_user}/properties/{app_key}/{property_name}`,
 			Summary:     `Update a user application property`,
-			Description: `Update an [application property](/cloud/bitbucket/application-properties/) value stored against a user.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Update an [application property](/cloud/bitbucket/application-properties/) value stored against a user.
+`,
 			Params: []ParamDef{
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},
@@ -515,7 +590,10 @@ Available operations:
 			Method:      `DELETE`,
 			Path:        `/users/{selected_user}/properties/{app_key}/{property_name}`,
 			Summary:     `Delete a user application property`,
-			Description: `Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a user.`,
+			Description: `This API will be deprecated on January 31, 2027 as part of [end of support for Connect app](https://community.developer.atlassian.com/t/bitbucket-cloud-announcing-connect-end-of-support-timeline-and-next-steps/98760).
+
+Delete an [application property](/cloud/bitbucket/application-properties/) value stored against a user.
+`,
 			Params: []ParamDef{
 				{Name: `selected_user`, In: `path`, Type: `string`, Required: true},
 				{Name: `app_key`, In: `path`, Type: `string`, Required: true},

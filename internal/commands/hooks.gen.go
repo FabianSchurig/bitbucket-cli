@@ -63,7 +63,7 @@ func newHooksGetAWebhookResourceCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get-a-webhook-resource",
 		Short: `Get a webhook resource`,
-		Long:  "Returns the webhook resource or subject types on which webhooks can\nbe registered.\n\nEach resource/subject type contains an `events` link that returns the\npaginated list of specific events each individual subject type can\nemit.\n\nThis endpoint is publicly accessible and does not require\nauthentication or scopes.",
+		Long:  "Returns the webhook resource or subject types on which webhooks can be registered.\nEach resource/subject type contains an `events` link that returns the paginated list of specific events each individual subject type can emit.\nThis endpoint is publicly accessible and does not require authentication or scopes.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{}
 			handlers.InferRepoContext(pathParams)
@@ -99,7 +99,7 @@ func newHooksListSubscribableWebhookTypesCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-subscribable-webhook-types",
 		Short: `List subscribable webhook types`,
-		Long:  "Returns a paginated list of all valid webhook events for the\nspecified entity.\n**The team and user webhooks are deprecated, and you should use workspace instead.\nFor more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).**\n\nThis is public data that does not require any scopes or authentication.\n\nNOTE: The example response is a truncated response object for the `workspace` `subject_type`.\nWe return the same structure for the other `subject_type` objects.",
+		Long:  "Returns a paginated list of all valid webhook events for the specified entity.\n**The team and user webhooks are deprecated, and you should use workspace instead. For more information, see [the announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-teams-deprecation/).**\nThis is public data that does not require any scopes or authentication.\nNOTE: The example response is a truncated response object for the `workspace` `subject_type`. We return the same structure for the other `subject_type` objects.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"subject_type": subjectType,
