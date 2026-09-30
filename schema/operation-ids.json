@@ -132,6 +132,7 @@
   "get /repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/diff": "listChangesInAPullRequest",
   "get /repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/diffstat": "getTheDiffStatForAPullRequest",
   "get /repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/merge/task-status/{task_id}": "getTheMergeTaskStatusForAPullRequest",
+  "get /repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/mergeability/checks": "listPullRequestMergeabilityChecks",
   "get /repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/patch": "getThePatchForAPullRequest",
   "get /repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/statuses": "listCommitStatusesForAPullRequest",
   "get /repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/tasks": "listTasksOnAPullRequest",

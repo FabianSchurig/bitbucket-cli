@@ -44,6 +44,7 @@ Available operations:
 - getTheDiffStatForAPullRequest: Get the diff stat for a pull request [GET]
 - mergeAPullRequest: Merge a pull request [POST]
 - getTheMergeTaskStatusForAPullRequest: Get the merge task status for a pull request [GET]
+- listPullRequestMergeabilityChecks: List pull request mergeability checks [GET]
 - getThePatchForAPullRequest: Get the patch for a pull request [GET]
 - requestChangesForAPullRequest: Request changes for a pull request [POST]
 - removeChangeRequestForAPullRequest: Remove change request for a pull request [DELETE]
@@ -576,6 +577,22 @@ with the revspec that corresponds to the pull request.`,
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `task_id`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
+			},
+			BodyFields: []BodyFieldDef{},
+			HasBody:    false,
+			Paginated:  false,
+		},
+		{
+			OperationID: `listPullRequestMergeabilityChecks`,
+			Method:      `GET`,
+			Path:        `/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/mergeability/checks`,
+			Summary:     `List pull request mergeability checks`,
+			Description: "Returns the mergeability checks Bitbucket performs for this pull request, and whether each one\ncurrently allows the pull request to be merged - simulating what the merge endpoint checks before\nactually merging.\n\nChecks cover pull request state, the current user's merge permissions, Git conflicts, configured\nstandard and custom merge checks, and merge queue status when available. Each check's `blocking`\nattribute indicates whether it currently prevents merging. A failed check does not necessarily block a merge.\n\n`pullrequest_state_check`, `current_user_permission_check`, and `git_mergeability_check` cover state,\npermission, and Git eligibility. One `standard_merge_check` is included per configured branch/merge\nrestriction, and one `custom_pre_merge_check`/`custom_on_merge_check` per activated custom check - both\nomitted entirely, not reported as passing, when not configured. Not exhaustive: conditions Bitbucket can't\nevaluate without attempting the merge (e.g. dependency-merge requirements) aren't included. See\n`PullRequestMergeabilityCheckSchema` for per-check fields, and `q` below to exclude the checks that\nare expensive to evaluate.\n\nFor repositories with merge queues enabled, a `merge_queue_check` reports queue availability and\nwhether the pull request is already queued. It is included for open, non-draft pull requests when the\ndestination branch requires queueing, and for already-queued pull requests with a configured queue.\nThe check is omitted when no merge queue is configured for the destination branch. When the check is\npresent, `merge_queue` contains that configured queue's UUID, name and state. Already-queued pull requests\nreturn their blocking state check and any applicable queue check, without evaluating Git or other merge checks.\nA failed queue configuration read fails the whole request with `500`, as for custom merge check results.\n\nReturns `500` if custom merge checks are configured but their results aren't currently retrievable,\nsince the real merge action requires them too and would fail the same way.",
+			Params: []ParamDef{
+				{Name: `pull_request_id`, In: `path`, Type: `integer`, Required: true},
+				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
+				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
+				{Name: `q`, In: `query`, Type: `string`, Required: false},
 			},
 			BodyFields: []BodyFieldDef{},
 			HasBody:    false,

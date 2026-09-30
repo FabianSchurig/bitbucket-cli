@@ -110,22 +110,22 @@ func (e CommitSummaryMarkup) Valid() bool {
 
 // Defines values for CommitstatusState.
 const (
-	FAILED     CommitstatusState = "FAILED"
-	INPROGRESS CommitstatusState = "INPROGRESS"
-	STOPPED    CommitstatusState = "STOPPED"
-	SUCCESSFUL CommitstatusState = "SUCCESSFUL"
+	CommitstatusStateFAILED     CommitstatusState = "FAILED"
+	CommitstatusStateINPROGRESS CommitstatusState = "INPROGRESS"
+	CommitstatusStateSTOPPED    CommitstatusState = "STOPPED"
+	CommitstatusStateSUCCESSFUL CommitstatusState = "SUCCESSFUL"
 )
 
 // Valid indicates whether the value is a known member of the CommitstatusState enum.
 func (e CommitstatusState) Valid() bool {
 	switch e {
-	case FAILED:
+	case CommitstatusStateFAILED:
 		return true
-	case INPROGRESS:
+	case CommitstatusStateINPROGRESS:
 		return true
-	case STOPPED:
+	case CommitstatusStateSTOPPED:
 		return true
-	case SUCCESSFUL:
+	case CommitstatusStateSUCCESSFUL:
 		return true
 	default:
 		return false
@@ -393,6 +393,66 @@ func (e PullrequestMergeParametersMergeStrategy) Valid() bool {
 	case Squash:
 		return true
 	case SquashFastForward:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PullrequestMergeabilityCheckStatus.
+const (
+	PullrequestMergeabilityCheckStatusFAILED  PullrequestMergeabilityCheckStatus = "FAILED"
+	PullrequestMergeabilityCheckStatusPASSED  PullrequestMergeabilityCheckStatus = "PASSED"
+	PullrequestMergeabilityCheckStatusPENDING PullrequestMergeabilityCheckStatus = "PENDING"
+	PullrequestMergeabilityCheckStatusSKIPPED PullrequestMergeabilityCheckStatus = "SKIPPED"
+	PullrequestMergeabilityCheckStatusUNKNOWN PullrequestMergeabilityCheckStatus = "UNKNOWN"
+)
+
+// Valid indicates whether the value is a known member of the PullrequestMergeabilityCheckStatus enum.
+func (e PullrequestMergeabilityCheckStatus) Valid() bool {
+	switch e {
+	case PullrequestMergeabilityCheckStatusFAILED:
+		return true
+	case PullrequestMergeabilityCheckStatusPASSED:
+		return true
+	case PullrequestMergeabilityCheckStatusPENDING:
+		return true
+	case PullrequestMergeabilityCheckStatusSKIPPED:
+		return true
+	case PullrequestMergeabilityCheckStatusUNKNOWN:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PullrequestMergeabilityCheckType.
+const (
+	CurrentUserPermissionCheck PullrequestMergeabilityCheckType = "current_user_permission_check"
+	CustomOnMergeCheck         PullrequestMergeabilityCheckType = "custom_on_merge_check"
+	CustomPreMergeCheck        PullrequestMergeabilityCheckType = "custom_pre_merge_check"
+	GitMergeabilityCheck       PullrequestMergeabilityCheckType = "git_mergeability_check"
+	MergeQueueCheck            PullrequestMergeabilityCheckType = "merge_queue_check"
+	PullrequestStateCheck      PullrequestMergeabilityCheckType = "pullrequest_state_check"
+	StandardMergeCheck         PullrequestMergeabilityCheckType = "standard_merge_check"
+)
+
+// Valid indicates whether the value is a known member of the PullrequestMergeabilityCheckType enum.
+func (e PullrequestMergeabilityCheckType) Valid() bool {
+	switch e {
+	case CurrentUserPermissionCheck:
+		return true
+	case CustomOnMergeCheck:
+		return true
+	case CustomPreMergeCheck:
+		return true
+	case GitMergeabilityCheck:
+		return true
+	case MergeQueueCheck:
+		return true
+	case PullrequestStateCheck:
+		return true
+	case StandardMergeCheck:
 		return true
 	default:
 		return false
@@ -1374,6 +1434,32 @@ type PullrequestMergeParameters struct {
 // PullrequestMergeParametersMergeStrategy The merge strategy that will be used to merge the pull request.
 type PullrequestMergeParametersMergeStrategy string
 
+// PullrequestMergeabilityCheck A mergeability check. The `type` identifies the concrete check and its additional fields.
+type PullrequestMergeabilityCheck struct {
+	// Blocking Whether this check is currently preventing the pull request from being merged.
+	Blocking bool `json:"blocking"`
+
+	// Required Whether this check must pass for the pull request to be mergeable.
+	Required bool `json:"required"`
+
+	// Status Whether this check passed. `UNKNOWN` means the check could not be evaluated; it does not establish that the pull request is mergeable.
+	Status               PullrequestMergeabilityCheckStatus `json:"status"`
+	Type                 PullrequestMergeabilityCheckType   `json:"type"`
+	AdditionalProperties map[string]interface{}             `json:"-"`
+}
+
+// PullrequestMergeabilityCheckStatus Whether this check passed. `UNKNOWN` means the check could not be evaluated; it does not establish that the pull request is mergeable.
+type PullrequestMergeabilityCheckStatus string
+
+// PullrequestMergeabilityCheckType defines model for PullrequestMergeabilityCheck.Type.
+type PullrequestMergeabilityCheckType string
+
+// PullrequestMergeabilityChecks The collection of checks that determine whether the specified pull request can be merged. Every check has a `type` identifying its shape - see `pullrequest_state_check`, `current_user_permission_check`, `git_mergeability_check`, `standard_merge_check`, `custom_merge_check`, and `merge_queue_check` for what each type covers.
+type PullrequestMergeabilityChecks struct {
+	Size   *int                           `json:"size,omitempty"`
+	Values []PullrequestMergeabilityCheck `json:"values"`
+}
+
 // PullrequestTask defines model for pullrequest_task.
 type PullrequestTask struct {
 	Content struct {
@@ -1719,6 +1805,12 @@ type MergeAPullRequestParams struct {
 	// the API returns a 202 with polling link to the
 	// task-status API in the Location header.
 	Async *bool `form:"async,omitempty" json:"async,omitempty"`
+}
+
+// ListPullRequestMergeabilityChecksParams defines parameters for ListPullRequestMergeabilityChecks.
+type ListPullRequestMergeabilityChecksParams struct {
+	// Q Only a limited subset of BBQL is supported here. Checks that are expensive to calculate can be excluded: `type!="git_mergeability_check"` skips Git conflict evaluation, and `check.kind!="maximum_commits_behind"` skips the bounded Git ancestry check behind that standard merge check. Combine both with `AND` (either order). Anything else returns `400 Bad Request`.
+	Q *string `form:"q,omitempty" json:"q,omitempty"`
 }
 
 // ListCommitStatusesForAPullRequestParams defines parameters for ListCommitStatusesForAPullRequest.
@@ -4513,6 +4605,111 @@ func (a PullrequestMergeParameters) MarshalJSON() ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error marshaling 'message': %w", err)
 		}
+	}
+
+	object["type"], err = json.Marshal(a.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		object[fieldName], err = json.Marshal(field)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return json.Marshal(object)
+}
+
+// Getter for additional properties for PullrequestMergeabilityCheck. Returns the specified
+// element and whether it was found
+func (a PullrequestMergeabilityCheck) Get(fieldName string) (value interface{}, found bool) {
+	if a.AdditionalProperties != nil {
+		value, found = a.AdditionalProperties[fieldName]
+	}
+	return
+}
+
+// Setter for additional properties for PullrequestMergeabilityCheck
+func (a *PullrequestMergeabilityCheck) Set(fieldName string, value interface{}) {
+	if a.AdditionalProperties == nil {
+		a.AdditionalProperties = make(map[string]interface{})
+	}
+	a.AdditionalProperties[fieldName] = value
+}
+
+// Override default JSON handling for PullrequestMergeabilityCheck to handle AdditionalProperties
+func (a *PullrequestMergeabilityCheck) UnmarshalJSON(b []byte) error {
+	object := make(map[string]json.RawMessage)
+	err := json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["blocking"]; found {
+		err = json.Unmarshal(raw, &a.Blocking)
+		if err != nil {
+			return fmt.Errorf("error reading 'blocking': %w", err)
+		}
+		delete(object, "blocking")
+	}
+
+	if raw, found := object["required"]; found {
+		err = json.Unmarshal(raw, &a.Required)
+		if err != nil {
+			return fmt.Errorf("error reading 'required': %w", err)
+		}
+		delete(object, "required")
+	}
+
+	if raw, found := object["status"]; found {
+		err = json.Unmarshal(raw, &a.Status)
+		if err != nil {
+			return fmt.Errorf("error reading 'status': %w", err)
+		}
+		delete(object, "status")
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &a.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+		delete(object, "type")
+	}
+
+	if len(object) != 0 {
+		a.AdditionalProperties = make(map[string]interface{})
+		for fieldName, fieldBuf := range object {
+			var fieldVal interface{}
+			err := json.Unmarshal(fieldBuf, &fieldVal)
+			if err != nil {
+				return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+			}
+			a.AdditionalProperties[fieldName] = fieldVal
+		}
+	}
+	return nil
+}
+
+// Override default JSON handling for PullrequestMergeabilityCheck to handle AdditionalProperties
+func (a PullrequestMergeabilityCheck) MarshalJSON() ([]byte, error) {
+	var err error
+	object := make(map[string]json.RawMessage)
+
+	object["blocking"], err = json.Marshal(a.Blocking)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'blocking': %w", err)
+	}
+
+	object["required"], err = json.Marshal(a.Required)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'required': %w", err)
+	}
+
+	object["status"], err = json.Marshal(a.Status)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'status': %w", err)
 	}
 
 	object["type"], err = json.Marshal(a.Type)

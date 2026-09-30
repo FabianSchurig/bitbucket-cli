@@ -2116,6 +2116,171 @@ paths:
       required: true
       schema:
         type: string
+  /repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/mergeability/checks:
+    get:
+      tags:
+      - Pullrequests
+      description: 'Returns the mergeability checks Bitbucket performs for this pull
+        request, and whether each one
+
+        currently allows the pull request to be merged - simulating what the merge
+        endpoint checks before
+
+        actually merging.
+
+
+        Checks cover pull request state, the current user''s merge permissions, Git
+        conflicts, configured
+
+        standard and custom merge checks, and merge queue status when available. Each
+        check''s `blocking`
+
+        attribute indicates whether it currently prevents merging. A failed check
+        does not necessarily block a merge.
+
+
+        `pullrequest_state_check`, `current_user_permission_check`, and `git_mergeability_check`
+        cover state,
+
+        permission, and Git eligibility. One `standard_merge_check` is included per
+        configured branch/merge
+
+        restriction, and one `custom_pre_merge_check`/`custom_on_merge_check` per
+        activated custom check - both
+
+        omitted entirely, not reported as passing, when not configured. Not exhaustive:
+        conditions Bitbucket can''t
+
+        evaluate without attempting the merge (e.g. dependency-merge requirements)
+        aren''t included. See
+
+        `PullRequestMergeabilityCheckSchema` for per-check fields, and `q` below to
+        exclude the checks that
+
+        are expensive to evaluate.
+
+
+        For repositories with merge queues enabled, a `merge_queue_check` reports
+        queue availability and
+
+        whether the pull request is already queued. It is included for open, non-draft
+        pull requests when the
+
+        destination branch requires queueing, and for already-queued pull requests
+        with a configured queue.
+
+        The check is omitted when no merge queue is configured for the destination
+        branch. When the check is
+
+        present, `merge_queue` contains that configured queue''s UUID, name and state.
+        Already-queued pull requests
+
+        return their blocking state check and any applicable queue check, without
+        evaluating Git or other merge checks.
+
+        A failed queue configuration read fails the whole request with `500`, as for
+        custom merge check results.
+
+
+        Returns `500` if custom merge checks are configured but their results aren''t
+        currently retrievable,
+
+        since the real merge action requires them too and would fail the same way.'
+      summary: List pull request mergeability checks
+      responses:
+        '200':
+          description: The collection of checks that determine whether the specified
+            pull request can be merged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/pullrequest_mergeability_checks'
+        '400':
+          description: If `q` is an unsupported filter expression.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: If the request was not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '403':
+          description: If the authenticated user does not have access to the pull
+            request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the repository or pull request does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '429':
+          description: If the mergeability request rate limit has been exceeded.
+        '500':
+          description: If activated custom merge check results or enabled merge queue
+            configuration could not be retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      parameters:
+      - name: q
+        in: query
+        description: 'Only a limited subset of BBQL is supported here. Checks that
+          are expensive to calculate can be excluded: `type!="git_mergeability_check"`
+          skips Git conflict evaluation, and `check.kind!="maximum_commits_behind"`
+          skips the bounded Git ancestry check behind that standard merge check. Combine
+          both with `AND` (either order). Anything else returns `400 Bad Request`.'
+        required: false
+        schema:
+          type: string
+      security:
+      - oauth2:
+        - pullrequest
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:pullrequest:bitbucket
+      x-atlassian-auth-types:
+      - forge-oauth2
+      - api-token
+      operationId: listPullRequestMergeabilityChecks
+    parameters:
+    - name: pull_request_id
+      in: path
+      description: The id of the pull request.
+      required: true
+      schema:
+        type: integer
+    - name: repo_slug
+      in: path
+      description: 'This can either be the repository slug or the UUID of the repository,
+
+        surrounded by curly-braces, for example: `{repository UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
+    - name: workspace
+      in: path
+      description: 'This can either be the workspace ID (slug) or the workspace UUID
+
+        surrounded by curly-braces, for example: `{workspace UUID}`.
+
+        '
+      required: true
+      schema:
+        type: string
   /repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/patch:
     get:
       tags:
@@ -3964,6 +4129,67 @@ components:
       required:
       - type
       additionalProperties: true
+    pullrequest_mergeability_check:
+      type: object
+      title: Pull Request Mergeability Check
+      description: A mergeability check. The `type` identifies the concrete check
+        and its additional fields.
+      properties:
+        type:
+          type: string
+          enum:
+          - pullrequest_state_check
+          - current_user_permission_check
+          - git_mergeability_check
+          - standard_merge_check
+          - custom_pre_merge_check
+          - custom_on_merge_check
+          - merge_queue_check
+        status:
+          type: string
+          description: Whether this check passed. `UNKNOWN` means the check could
+            not be evaluated; it does not establish that the pull request is mergeable.
+          enum:
+          - PASSED
+          - FAILED
+          - PENDING
+          - SKIPPED
+          - UNKNOWN
+        required:
+          type: boolean
+          description: Whether this check must pass for the pull request to be mergeable.
+        blocking:
+          type: boolean
+          description: Whether this check is currently preventing the pull request
+            from being merged.
+      required:
+      - type
+      - status
+      - required
+      - blocking
+      additionalProperties: true
+      discriminator:
+        propertyName: type
+    pullrequest_mergeability_checks:
+      type: object
+      title: Pull Request Mergeability Checks
+      description: The collection of checks that determine whether the specified pull
+        request can be merged. Every check has a `type` identifying its shape - see
+        `pullrequest_state_check`, `current_user_permission_check`, `git_mergeability_check`,
+        `standard_merge_check`, `custom_merge_check`, and `merge_queue_check` for
+        what each type covers.
+      properties:
+        size:
+          type: integer
+          minimum: 0
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/pullrequest_mergeability_check'
+          minItems: 0
+      required:
+      - values
+      additionalProperties: false
     pullrequest_task:
       allOf:
       - $ref: '#/components/schemas/task'

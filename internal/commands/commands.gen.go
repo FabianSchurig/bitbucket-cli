@@ -67,6 +67,7 @@ func NewPRCommand() *cobra.Command {
 		newPRGetTheDiffStatForAPullRequestCmd(),
 		newPRMergeAPullRequestCmd(),
 		newPRGetTheMergeTaskStatusForAPullRequestCmd(),
+		newPRListPullRequestMergeabilityChecksCmd(),
 		newPRGetThePatchForAPullRequestCmd(),
 		newPRRequestChangesForAPullRequestCmd(),
 		newPRRemoveChangeRequestForAPullRequestCmd(),
@@ -1924,6 +1925,61 @@ func newPRGetTheMergeTaskStatusForAPullRequestCmd() *cobra.Command {
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&taskId, "task-id", "", "task_id (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	return cmd
+}
+
+// newPRListPullRequestMergeabilityChecksCmd returns the "pr list-pull-request-mergeability-checks" cobra command.
+// operationId: listPullRequestMergeabilityChecks
+func newPRListPullRequestMergeabilityChecksCmd() *cobra.Command {
+	var (
+		pullRequestId int
+		repoSlug      string
+		workspace     string
+		q             string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "list-pull-request-mergeability-checks",
+		Short: `List pull request mergeability checks`,
+		Long:  "Returns the mergeability checks Bitbucket performs for this pull request, and whether each one\ncurrently allows the pull request to be merged - simulating what the merge endpoint checks before\nactually merging.\n\nChecks cover pull request state, the current user's merge permissions, Git conflicts, configured\nstandard and custom merge checks, and merge queue status when available. Each check's `blocking`\nattribute indicates whether it currently prevents merging. A failed check does not necessarily block a merge.\n\n`pullrequest_state_check`, `current_user_permission_check`, and `git_mergeability_check` cover state,\npermission, and Git eligibility. One `standard_merge_check` is included per configured branch/merge\nrestriction, and one `custom_pre_merge_check`/`custom_on_merge_check` per activated custom check - both\nomitted entirely, not reported as passing, when not configured. Not exhaustive: conditions Bitbucket can't\nevaluate without attempting the merge (e.g. dependency-merge requirements) aren't included. See\n`PullRequestMergeabilityCheckSchema` for per-check fields, and `q` below to exclude the checks that\nare expensive to evaluate.\n\nFor repositories with merge queues enabled, a `merge_queue_check` reports queue availability and\nwhether the pull request is already queued. It is included for open, non-draft pull requests when the\ndestination branch requires queueing, and for already-queued pull requests with a configured queue.\nThe check is omitted when no merge queue is configured for the destination branch. When the check is\npresent, `merge_queue` contains that configured queue's UUID, name and state. Already-queued pull requests\nreturn their blocking state check and any applicable queue check, without evaluating Git or other merge checks.\nA failed queue configuration read fails the whole request with `500`, as for custom merge check results.\n\nReturns `500` if custom merge checks are configured but their results aren't currently retrievable,\nsince the real merge action requires them too and would fail the same way.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			pathParams := map[string]string{
+				"pull_request_id": strconv.Itoa(pullRequestId),
+				"repo_slug":       repoSlug,
+				"workspace":       workspace,
+			}
+			handlers.InferRepoContext(pathParams)
+			if pullRequestId == 0 {
+				return fmt.Errorf("--pull-request-id is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
+			}
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
+			c, err := client.NewClient()
+			if err != nil {
+				return err
+			}
+			queryParams := map[string]string{
+				"q": q,
+			}
+			body := ""
+			return handlers.Dispatch(context.Background(), c, handlers.Request{
+				Method:      "GET",
+				URLTemplate: "/repositories/{workspace}/{repo_slug}/pullrequests/{pull_request_id}/mergeability/checks",
+				PathParams:  pathParams,
+				QueryParams: queryParams,
+				Body:        body,
+				All:         false,
+			})
+		},
+	}
+	cmd.Flags().IntVar(&pullRequestId, "pull-request-id", 0, "pull_request_id (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&q, "q", "", "q (query parameter)")
 	return cmd
 }
 
