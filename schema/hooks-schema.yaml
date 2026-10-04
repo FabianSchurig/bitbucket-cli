@@ -114,11 +114,29 @@ paths:
       - api_key: []
   /repositories/{workspace}/{repo_slug}/hooks:
     get:
+      operationId: listWebhooksForARepository
+      summary: List webhooks for a repository
+      description: 'Returns a paginated list of webhooks installed on this repository.
+
+        '
       tags:
       - Repositories
       - Webhooks
-      description: Returns a paginated list of webhooks installed on this repository.
-      summary: List webhooks for a repository
+      parameters:
+      - name: workspace
+        description: This can either be the workspace ID (slug) or the workspace UUID
+          surrounded by curly-braces, for example `{workspace UUID}`.
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: repo_slug
+        description: 'This can either be the repository slug or the UUID of the repository,
+          surrounded by curly-braces, for example: `{repository UUID}`.'
+        required: true
+        in: path
+        schema:
+          type: string
       responses:
         '200':
           description: The paginated list of installed webhooks.
@@ -127,14 +145,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/paginated_webhook_subscriptions'
         '403':
-          description: If the authenticated user does not have permission to access
-            the webhooks.
+          description: If the authenticated user is not an owner on the specified
+            repository.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
         '404':
-          description: If the repository does not exist.
+          description: If the webhook or repository does not exist.
           content:
             application/json:
               schema:
@@ -151,28 +169,43 @@ paths:
         - read:webhook:bitbucket
       x-atlassian-auth-types:
       - api-token
-      operationId: listWebhooksForARepository
     post:
+      operationId: createAWebhookForARepository
+      summary: Create a webhook for a repository
+      description: "Creates a new webhook on the specified repository.\n\nWorkspace\
+        \ webhooks are fired for events from all repositories\ncontained by that workspace.\n\
+        \nExample:\n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n\
+        \  https://api.bitbucket.org/2.0/workspaces/my-workspace/hooks\n  -d '\n \
+        \   {\n      \"description\": \"Webhook Description\",\n      \"url\": \"\
+        https://example.com/\",\n      \"active\": true,\n      \"secret\": \"this\
+        \ is a really bad secret\",\n      \"events\": [\n        \"repo:push\",\n\
+        \        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n\
+        ```\n\nWhen the `secret` is provided it will be used as the key to\ngenerate\
+        \ a HMAC digest value sent in the `X-Hub-Signature` header\nat delivery time.\
+        \ Passing a `null` or empty `secret` or not\npassing a `secret` will leave\
+        \ the webhook's secret unset.\nBitbucket only generates the `X-Hub-Signature`\
+        \ when the webhook's\nsecret is set.\n\nThis call requires the webhook scope,\
+        \ as well as any scope\nthat applies to the events that the webhook subscribes\
+        \ to. In the\nexample above that means: `webhook`, `repository` and `issue`.\n\
+        \nThe `url` must properly resolve and cannot be an internal,\nnon-routed address.\n"
       tags:
       - Repositories
       - Webhooks
-      description: "Creates a new webhook on the specified repository.\n\nExample:\n\
-        \n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n\
-        \  https://api.bitbucket.org/2.0/repositories/my-workspace/my-repo-slug/hooks\n\
-        \  -d '\n    {\n      \"description\": \"Webhook Description\",\n      \"\
-        url\": \"https://example.com/\",\n      \"active\": true,\n      \"secret\"\
-        : \"this is a really bad secret\",\n      \"events\": [\n        \"repo:push\"\
-        ,\n        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n\
-        ```\n\nWhen the `secret` is provided it will be used as the key to generate\
-        \ a HMAC\ndigest value sent in the `X-Hub-Signature` header at delivery time.\
-        \ Passing\na `null` or empty `secret` or not passing a `secret` will leave\
-        \ the webhook's\nsecret unset. Bitbucket only generates the `X-Hub-Signature`\
-        \ when the webhook's\nsecret is set.\n\nNote that this call requires the webhook\
-        \ scope, as well as any scope\nthat applies to the events that the webhook\
-        \ subscribes to. In the\nexample above that means: `webhook`, `repository`\
-        \ and `issue`.\n\nAlso note that the `url` must properly resolve and cannot\
-        \ be an\ninternal, non-routed address."
-      summary: Create a webhook for a repository
+      parameters:
+      - name: workspace
+        description: This can either be the workspace ID (slug) or the workspace UUID
+          surrounded by curly-braces, for example `{workspace UUID}`.
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: repo_slug
+        description: 'This can either be the repository slug or the UUID of the repository,
+          surrounded by curly-braces, for example: `{repository UUID}`.'
+        required: true
+        in: path
+        schema:
+          type: string
       responses:
         '201':
           description: If the webhook was registered successfully.
@@ -193,7 +226,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
         '404':
-          description: If the repository does not exist.
+          description: If the webhook or repository does not exist.
           content:
             application/json:
               schema:
@@ -211,7 +244,6 @@ paths:
         - write:webhook:bitbucket
       x-atlassian-auth-types:
       - api-token
-      operationId: createAWebhookForARepository
       requestBody:
         content:
           application/json:
@@ -219,42 +251,208 @@ paths:
               $ref: '#/components/schemas/webhook_subscription'
         description: The webhook subscription to create or update.
         required: true
-    parameters:
-    - name: repo_slug
-      in: path
-      description: 'This can either be the repository slug or the UUID of the repository,
-
-        surrounded by curly-braces, for example: `{repository UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-    - name: workspace
-      in: path
-      description: 'This can either be the workspace ID (slug) or the workspace UUID
-
-        surrounded by curly-braces, for example: `{workspace UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
   /repositories/{workspace}/{repo_slug}/hooks/{uid}:
-    delete:
+    get:
+      operationId: getAWebhookForARepository
+      summary: Get a webhook for a repository
+      description: 'Returns the webhook with the specified id installed on the
+
+        specified repository.
+
+        '
       tags:
       - Repositories
       - Webhooks
+      parameters:
+      - name: workspace
+        description: This can either be the workspace ID (slug) or the workspace UUID
+          surrounded by curly-braces, for example `{workspace UUID}`.
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: repo_slug
+        description: 'This can either be the repository slug or the UUID of the repository,
+          surrounded by curly-braces, for example: `{repository UUID}`.'
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: uid
+        description: The webhook's id.
+        required: true
+        in: path
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The webhook subscription object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook_subscription'
+        '404':
+          description: If the webhook or repository does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - webhook
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:webhook:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+    put:
+      operationId: updateAWebhookForARepository
+      summary: Update a webhook for a repository
+      description: 'Updates the specified webhook subscription.
+
+
+        The following properties can be mutated:
+
+
+        * `description`
+
+        * `url`
+
+        * `secret`
+
+        * `active`
+
+        * `events`
+
+
+        The hook''s secret is used as a key to generate the HMAC hex digest
+
+        sent in the `X-Hub-Signature` header at delivery time. This
+
+        signature is only generated when the hook has a secret.
+
+
+        Set the hook''s secret by passing the new value in the `secret`
+
+        field. Passing a `null` value in the `secret` field will remove
+
+        the secret from the hook. The hook''s secret can be left unchanged
+
+        by not passing the `secret` field in the request.
+
+        '
+      tags:
+      - Repositories
+      - Webhooks
+      parameters:
+      - name: workspace
+        description: This can either be the workspace ID (slug) or the workspace UUID
+          surrounded by curly-braces, for example `{workspace UUID}`.
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: repo_slug
+        description: 'This can either be the repository slug or the UUID of the repository,
+          surrounded by curly-braces, for example: `{repository UUID}`.'
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: uid
+        description: The webhook's id.
+        required: true
+        in: path
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The webhook subscription object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook_subscription'
+        '403':
+          description: 'If the authenticated user does not have permission to update
+
+            the webhook.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the webhook or repository does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - webhook
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:webhook:bitbucket
+        - write:webhook:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/webhook_subscription'
+        description: The webhook subscription to create or update.
+        required: true
+    delete:
+      operationId: deleteAWebhookForARepository
+      summary: Delete a webhook for a repository
       description: 'Deletes the specified webhook subscription from the given
 
-        repository.'
-      summary: Delete a webhook for a repository
+        repository.
+
+        '
+      tags:
+      - Repositories
+      - Webhooks
+      parameters:
+      - name: workspace
+        description: This can either be the workspace ID (slug) or the workspace UUID
+          surrounded by curly-braces, for example `{workspace UUID}`.
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: repo_slug
+        description: 'This can either be the repository slug or the UUID of the repository,
+          surrounded by curly-braces, for example: `{repository UUID}`.'
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: uid
+        description: The webhook's id.
+        required: true
+        in: path
+        schema:
+          type: string
       responses:
         '204':
           description: When the webhook was deleted successfully
         '403':
-          description: If the authenticated user does not have permission to delete
+          description: 'If the authenticated user does not have permission to update
+
             the webhook.
+
+            '
           content:
             application/json:
               schema:
@@ -277,155 +475,22 @@ paths:
         - delete:webhook:bitbucket
       x-atlassian-auth-types:
       - api-token
-      operationId: deleteAWebhookForARepository
-    get:
-      tags:
-      - Repositories
-      - Webhooks
-      description: 'Returns the webhook with the specified id installed on the specified
-
-        repository.'
-      summary: Get a webhook for a repository
-      responses:
-        '200':
-          description: The webhook subscription object.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/webhook_subscription'
-        '404':
-          description: If the webhook or repository does not exist.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - webhook
-      - basic: []
-      - api_key: []
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:webhook:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: getAWebhookForARepository
-    put:
-      tags:
-      - Repositories
-      - Webhooks
-      description: 'Updates the specified webhook subscription.
-
-
-        The following properties can be mutated:
-
-
-        * `description`
-
-        * `url`
-
-        * `secret`
-
-        * `active`
-
-        * `events`
-
-
-        The hook''s secret is used as a key to generate the HMAC hex digest sent in
-        the
-
-        `X-Hub-Signature` header at delivery time. This signature is only generated
-
-        when the hook has a secret.
-
-
-        Set the hook''s secret by passing the new value in the `secret` field. Passing
-        a
-
-        `null` value in the `secret` field will remove the secret from the hook. The
-
-        hook''s secret can be left unchanged by not passing the `secret` field in
-        the
-
-        request.'
-      summary: Update a webhook for a repository
-      responses:
-        '200':
-          description: The webhook subscription object.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/webhook_subscription'
-        '403':
-          description: If the authenticated user does not have permission to update
-            the webhook.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '404':
-          description: If the webhook or repository does not exist.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - webhook
-      - basic: []
-      - api_key: []
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:webhook:bitbucket
-        - write:webhook:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: updateAWebhookForARepository
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/webhook_subscription'
-        description: The webhook subscription to create or update.
-        required: true
-    parameters:
-    - name: repo_slug
-      in: path
-      description: 'This can either be the repository slug or the UUID of the repository,
-
-        surrounded by curly-braces, for example: `{repository UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
-    - name: uid
-      in: path
-      description: Installed webhook's ID
-      required: true
-      schema:
-        type: string
-    - name: workspace
-      in: path
-      description: 'This can either be the workspace ID (slug) or the workspace UUID
-
-        surrounded by curly-braces, for example: `{workspace UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
   /workspaces/{workspace}/hooks:
     get:
+      operationId: listWebhooksForAWorkspace
+      summary: List webhooks for a workspace
+      description: Returns a paginated list of webhooks installed on this workspace.
       tags:
       - Workspaces
       - Webhooks
-      description: Returns a paginated list of webhooks installed on this workspace.
-      summary: List webhooks for a workspace
+      parameters:
+      - name: workspace
+        description: This can either be the workspace ID (slug) or the workspace UUID
+          surrounded by curly-braces, for example `{workspace UUID}`.
+        required: true
+        in: path
+        schema:
+          type: string
       responses:
         '200':
           description: The paginated list of installed webhooks.
@@ -441,7 +506,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
         '404':
-          description: If the specified workspace does not exist.
+          description: If the webhook or workspace does not exist.
           content:
             application/json:
               schema:
@@ -458,32 +523,40 @@ paths:
         - read:webhook:bitbucket
       x-atlassian-auth-types:
       - api-token
-      operationId: listWebhooksForAWorkspace
     post:
-      tags:
-      - Workspaces
-      - Webhooks
+      operationId: createAWebhookForAWorkspace
+      summary: Create a webhook for a workspace
       description: "Creates a new webhook on the specified workspace.\n\nWorkspace\
-        \ webhooks are fired for events from all repositories contained\nby that workspace.\n\
-        \nExample:\n\n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n\
+        \ webhooks are fired for events from all repositories\ncontained by that workspace.\n\
+        \nExample:\n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n\
         \  https://api.bitbucket.org/2.0/workspaces/my-workspace/hooks\n  -d '\n \
         \   {\n      \"description\": \"Webhook Description\",\n      \"url\": \"\
         https://example.com/\",\n      \"active\": true,\n      \"secret\": \"this\
         \ is a really bad secret\",\n      \"events\": [\n        \"repo:push\",\n\
         \        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n\
-        ```\n\nWhen the `secret` is provided it will be used as the key to generate\
-        \ a HMAC\ndigest value sent in the `X-Hub-Signature` header at delivery time.\
-        \ Passing\na `null` or empty `secret` or not passing a `secret` will leave\
-        \ the webhook's\nsecret unset. Bitbucket only generates the `X-Hub-Signature`\
+        ```\n\nWhen the `secret` is provided it will be used as the key to\ngenerate\
+        \ a HMAC digest value sent in the `X-Hub-Signature` header\nat delivery time.\
+        \ Passing a `null` or empty `secret` or not\npassing a `secret` will leave\
+        \ the webhook's secret unset.\nBitbucket only generates the `X-Hub-Signature`\
         \ when the webhook's\nsecret is set.\n\nThis call requires the webhook scope,\
         \ as well as any scope\nthat applies to the events that the webhook subscribes\
         \ to. In the\nexample above that means: `webhook`, `repository` and `issue`.\n\
-        \nThe `url` must properly resolve and cannot be an internal, non-routed address.\n\
-        \nOnly workspace owners can install webhooks on workspaces."
-      summary: Create a webhook for a workspace
+        \nThe `url` must properly resolve and cannot be an internal,\nnon-routed address.\n\
+        \nOnly workspace owners can install webhooks on workspaces.\n"
+      tags:
+      - Workspaces
+      - Webhooks
+      parameters:
+      - name: workspace
+        description: This can either be the workspace ID (slug) or the workspace UUID
+          surrounded by curly-braces, for example `{workspace UUID}`.
+        required: true
+        in: path
+        schema:
+          type: string
       responses:
         '201':
-          description: If the webhook was registered successfully.
+          description: The webhook subscription object.
           headers:
             Location:
               description: The URL of new newly created webhook.
@@ -494,14 +567,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/webhook_subscription'
         '403':
-          description: If the authenticated user does not have permission to install
+          description: 'If the authenticated user does not have permission to install
+
             webhooks on the specified workspace.
+
+            '
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
         '404':
-          description: If the specified workspace does not exist.
+          description: If the webhook or workspace does not exist.
           content:
             application/json:
               schema:
@@ -519,7 +595,6 @@ paths:
         - write:webhook:bitbucket
       x-atlassian-auth-types:
       - api-token
-      operationId: createAWebhookForAWorkspace
       requestBody:
         content:
           application/json:
@@ -527,30 +602,187 @@ paths:
               $ref: '#/components/schemas/webhook_subscription'
         description: The webhook subscription to create or update.
         required: true
-    parameters:
-    - name: workspace
-      in: path
-      description: 'This can either be the workspace ID (slug) or the workspace UUID
+  /workspaces/{workspace}/hooks/{uid}:
+    get:
+      operationId: getAWebhookForAWorkspace
+      summary: Get a webhook for a workspace
+      description: 'Returns the webhook with the specified id installed on the
 
-        surrounded by curly-braces, for example: `{workspace UUID}`.
+        specified workspace.
 
         '
-      required: true
-      schema:
-        type: string
-  /workspaces/{workspace}/hooks/{uid}:
-    delete:
       tags:
       - Workspaces
       - Webhooks
-      description: Deletes the specified webhook subscription from the given workspace.
+      parameters:
+      - name: workspace
+        description: This can either be the workspace ID (slug) or the workspace UUID
+          surrounded by curly-braces, for example `{workspace UUID}`.
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: uid
+        description: The webhook's id.
+        required: true
+        in: path
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The webhook subscription object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook_subscription'
+        '404':
+          description: If the webhook or workspace does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - webhook
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:webhook:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+    put:
+      operationId: updateAWebhookForAWorkspace
+      summary: Update a webhook for a workspace
+      description: 'Updates the specified webhook subscription.
+
+
+        The following properties can be mutated:
+
+
+        * `description`
+
+        * `url`
+
+        * `secret`
+
+        * `active`
+
+        * `events`
+
+
+        The hook''s secret is used as a key to generate the HMAC hex digest
+
+        sent in the X-Hub-Signature header at delivery time.
+
+        This signature is only generated when the hook has a secret.
+
+
+        Set the hook''s secret by passing the new value in the secret field
+
+        . Passing a null value in the secret field will remove the secret
+
+        from the hook. The hook''s secret can be left unchanged by not
+
+        passing the secret field in the request.
+
+        '
+      tags:
+      - Workspaces
+      - Webhooks
+      parameters:
+      - name: workspace
+        description: This can either be the workspace ID (slug) or the workspace UUID
+          surrounded by curly-braces, for example `{workspace UUID}`.
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: uid
+        description: The webhook's id.
+        required: true
+        in: path
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The webhook subscription object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/webhook_subscription'
+        '403':
+          description: 'If the authenticated user does not have permission to update
+
+            the webhook.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: If the webhook or workspace does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - oauth2:
+        - webhook
+      - basic: []
+      - api_key: []
+      x-atlassian-oauth2-scopes:
+      - state: Current
+        scheme: oauth2
+        scopes:
+        - read:webhook:bitbucket
+        - write:webhook:bitbucket
+      x-atlassian-auth-types:
+      - api-token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/webhook_subscription'
+        description: The webhook subscription to create or update.
+        required: true
+    delete:
+      operationId: deleteAWebhookForAWorkspace
       summary: Delete a webhook for a workspace
+      description: 'Deletes the specified webhook subscription from the given
+
+        workspace.
+
+        '
+      tags:
+      - Workspaces
+      - Webhooks
+      parameters:
+      - name: workspace
+        description: This can either be the workspace ID (slug) or the workspace UUID
+          surrounded by curly-braces, for example `{workspace UUID}`.
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: uid
+        description: The webhook's id.
+        required: true
+        in: path
+        schema:
+          type: string
       responses:
         '204':
           description: When the webhook was deleted successfully
         '403':
-          description: If the authenticated user does not have permission to delete
+          description: 'If the authenticated user does not have permission to update
+
             the webhook.
+
+            '
           content:
             application/json:
               schema:
@@ -573,138 +805,6 @@ paths:
         - delete:webhook:bitbucket
       x-atlassian-auth-types:
       - api-token
-      operationId: deleteAWebhookForAWorkspace
-    get:
-      tags:
-      - Workspaces
-      - Webhooks
-      description: 'Returns the webhook with the specified id installed on the given
-
-        workspace.'
-      summary: Get a webhook for a workspace
-      responses:
-        '200':
-          description: The webhook subscription object.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/webhook_subscription'
-        '404':
-          description: If the webhook or workspace does not exist.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - webhook
-      - basic: []
-      - api_key: []
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:webhook:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: getAWebhookForAWorkspace
-    put:
-      tags:
-      - Workspaces
-      - Webhooks
-      description: 'Updates the specified webhook subscription.
-
-
-        The following properties can be mutated:
-
-
-        * `description`
-
-        * `url`
-
-        * `secret`
-
-        * `active`
-
-        * `events`
-
-
-        The hook''s secret is used as a key to generate the HMAC hex digest sent in
-        the
-
-        `X-Hub-Signature` header at delivery time. This signature is only generated
-
-        when the hook has a secret.
-
-
-        Set the hook''s secret by passing the new value in the `secret` field. Passing
-        a
-
-        `null` value in the `secret` field will remove the secret from the hook. The
-
-        hook''s secret can be left unchanged by not passing the `secret` field in
-        the
-
-        request.'
-      summary: Update a webhook for a workspace
-      responses:
-        '200':
-          description: The webhook subscription object.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/webhook_subscription'
-        '403':
-          description: If the authenticated user does not have permission to update
-            the webhook.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-        '404':
-          description: If the webhook or workspace does not exist.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
-      security:
-      - oauth2:
-        - webhook
-      - basic: []
-      - api_key: []
-      x-atlassian-oauth2-scopes:
-      - state: Current
-        scheme: oauth2
-        scopes:
-        - read:webhook:bitbucket
-        - write:webhook:bitbucket
-      x-atlassian-auth-types:
-      - api-token
-      operationId: updateAWebhookForAWorkspace
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/webhook_subscription'
-        description: The webhook subscription to create or update.
-        required: true
-    parameters:
-    - name: uid
-      in: path
-      description: Installed webhook's ID
-      required: true
-      schema:
-        type: string
-    - name: workspace
-      in: path
-      description: 'This can either be the workspace ID (slug) or the workspace UUID
-
-        surrounded by curly-braces, for example: `{workspace UUID}`.
-
-        '
-      required: true
-      schema:
-        type: string
 components:
   schemas:
     error:
@@ -843,46 +943,27 @@ components:
       type: object
       title: Paginated Webhook Subscriptions
       description: A paginated list of webhook subscriptions
+      additionalProperties: false
       properties:
-        size:
-          type: integer
-          description: Total number of objects in the response. This is an optional
-            element that is not provided in all responses, as it can be expensive
-            to compute.
-          minimum: 0
-        page:
-          type: integer
-          description: Page number of the current results. This is an optional element
-            that is not provided in all responses.
-          minimum: 1
+        values:
+          type: array
+          minItems: 0
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/webhook_subscription'
         pagelen:
           type: integer
+          minimum: 1
+          maximum: 100
           description: Current number of objects on the existing page. The default
             value is 10 with 100 being the maximum allowed value. Individual APIs
             may enforce different values.
-          minimum: 1
         next:
           type: string
+          format: uri
           description: Link to the next page if it exists. The last page of a collection
             does not have this value. Use this link to navigate the result set and
             refrain from constructing your own URLs.
-          format: uri
-        previous:
-          type: string
-          description: Link to previous page if it exists. A collections first page
-            does not have this value. This is an optional element that is not provided
-            in all responses. Some result sets strictly support forward navigation
-            and never provide previous links. Clients must anticipate that backwards
-            navigation is not always available. Use this link to navigate the result
-            set and refrain from constructing your own URLs.
-          format: uri
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/webhook_subscription'
-          minItems: 0
-          uniqueItems: true
-      additionalProperties: false
     subject_types:
       type: object
       title: Subject Types
@@ -931,13 +1012,14 @@ components:
     webhook_subscription:
       allOf:
       - $ref: '#/components/schemas/object'
-      - type: object
+      - additionalProperties: true
+        type: object
         title: Webhook Subscription
         description: A Webhook subscription.
         properties:
           uuid:
             type: string
-            description: The webhook's id
+            description: The webhook's id.
             readOnly: true
           url:
             type: string
@@ -959,12 +1041,16 @@ components:
             readOnly: true
           active:
             type: boolean
+            description: Whether or not the webhook subscription is enabled.
           created_at:
             type: string
             format: date-time
+            description: The timestamp when the webhook subscription was created.
             readOnly: true
           events:
             type: array
+            minItems: 1
+            uniqueItems: true
             description: The events this webhook is subscribed to.
             items:
               type: string
@@ -998,8 +1084,6 @@ components:
               - repo:push
               - repo:transfer
               - repo:updated
-            minItems: 1
-            uniqueItems: true
           secret_set:
             type: boolean
             description: Indicates whether or not the hook has an associated secret.
@@ -1008,12 +1092,28 @@ components:
             readOnly: true
           secret:
             type: string
+            minLength: 0
+            maxLength: 128
             description: The secret to associate with the hook. The secret is never
               returned via the API. As such, this field is only used during updates.
-              The secret can be set to `null` or "" to remove the secret (or create
+              The secret can be set to `null`` or `""`` to remove the secret (or create
               a hook with no secret). Leaving out the secret field during updates
               will leave the secret unchanged. Leaving out the secret during creation
               will create a hook with no secret.
-            minLength: 0
-            maxLength: 128
-        additionalProperties: true
+          links:
+            $ref: '#/components/schemas/webhooks_subscription_links'
+    webhooks_subscription_link:
+      type: object
+      title: Link
+      properties:
+        href:
+          type: string
+          format: uri
+    webhooks_subscription_links:
+      type: object
+      title: Webhooks Links
+      description: A link to a resource related to this object.
+      additionalProperties: true
+      properties:
+        self:
+          $ref: '#/components/schemas/webhooks_subscription_link'

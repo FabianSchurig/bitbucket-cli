@@ -10,8 +10,8 @@ run "read_hooks" {
   command = apply
 
   variables {
-    repo_slug = "my-repo"
     workspace = "my-workspace"
+    repo_slug = "my-repo"
     uid = "webhook-uuid"
   }
 
@@ -26,8 +26,8 @@ run "create_hooks" {
   command = apply
 
   variables {
-    repo_slug = "my-repo"
     workspace = "my-workspace"
+    repo_slug = "my-repo"
   }
 
   # Resource create should succeed with mock provider

@@ -1,6 +1,6 @@
 data "bitbucket_hooks" "example" {
-  repo_slug = "my-repo"
   workspace = "my-workspace"
+  repo_slug = "my-repo"
 }
 
 output "hooks_response" {

@@ -138,8 +138,8 @@ func newHooksListSubscribableWebhookTypesCmd() *cobra.Command {
 // operationId: listWebhooksForARepository
 func newHooksListWebhooksForARepositoryCmd() *cobra.Command {
 	var (
-		repoSlug  string
 		workspace string
+		repoSlug  string
 		page      int
 		pagelen   int
 		all       bool
@@ -148,18 +148,19 @@ func newHooksListWebhooksForARepositoryCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list-webhooks-for-a-repository",
 		Short: `List webhooks for a repository`,
-		Long:  `Returns a paginated list of webhooks installed on this repository.`,
+		Long: `Returns a paginated list of webhooks installed on this repository.
+`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
-				"repo_slug": repoSlug,
 				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
 			handlers.InferRepoContext(pathParams)
-			if pathParams["repo_slug"] == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
 			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
@@ -180,8 +181,8 @@ func newHooksListWebhooksForARepositoryCmd() *cobra.Command {
 			})
 		},
 	}
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().IntVar(&page, "page", 0, "Page number (query parameter)")
 	cmd.Flags().IntVar(&pagelen, "pagelen", 0, "Number of items per page (query parameter)")
 	cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
@@ -192,8 +193,8 @@ func newHooksListWebhooksForARepositoryCmd() *cobra.Command {
 // operationId: createAWebhookForARepository
 func newHooksCreateAWebhookForARepositoryCmd() *cobra.Command {
 	var (
-		repoSlug        string
 		workspace       string
+		repoSlug        string
 		bodyActive      bool
 		bodyDescription string
 		bodyEvents      string
@@ -205,18 +206,18 @@ func newHooksCreateAWebhookForARepositoryCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-a-webhook-for-a-repository",
 		Short: `Create a webhook for a repository`,
-		Long:  "Creates a new webhook on the specified repository.\n\nExample:\n\n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n  https://api.bitbucket.org/2.0/repositories/my-workspace/my-repo-slug/hooks\n  -d '\n    {\n      \"description\": \"Webhook Description\",\n      \"url\": \"https://example.com/\",\n      \"active\": true,\n      \"secret\": \"this is a really bad secret\",\n      \"events\": [\n        \"repo:push\",\n        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n```\n\nWhen the `secret` is provided it will be used as the key to generate a HMAC\ndigest value sent in the `X-Hub-Signature` header at delivery time. Passing\na `null` or empty `secret` or not passing a `secret` will leave the webhook's\nsecret unset. Bitbucket only generates the `X-Hub-Signature` when the webhook's\nsecret is set.\n\nNote that this call requires the webhook scope, as well as any scope\nthat applies to the events that the webhook subscribes to. In the\nexample above that means: `webhook`, `repository` and `issue`.\n\nAlso note that the `url` must properly resolve and cannot be an\ninternal, non-routed address.",
+		Long:  "Creates a new webhook on the specified repository.\n\nWorkspace webhooks are fired for events from all repositories\ncontained by that workspace.\n\nExample:\n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n  https://api.bitbucket.org/2.0/workspaces/my-workspace/hooks\n  -d '\n    {\n      \"description\": \"Webhook Description\",\n      \"url\": \"https://example.com/\",\n      \"active\": true,\n      \"secret\": \"this is a really bad secret\",\n      \"events\": [\n        \"repo:push\",\n        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n```\n\nWhen the `secret` is provided it will be used as the key to\ngenerate a HMAC digest value sent in the `X-Hub-Signature` header\nat delivery time. Passing a `null` or empty `secret` or not\npassing a `secret` will leave the webhook's secret unset.\nBitbucket only generates the `X-Hub-Signature` when the webhook's\nsecret is set.\n\nThis call requires the webhook scope, as well as any scope\nthat applies to the events that the webhook subscribes to. In the\nexample above that means: `webhook`, `repository` and `issue`.\n\nThe `url` must properly resolve and cannot be an internal,\nnon-routed address.\n",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
-				"repo_slug": repoSlug,
 				"workspace": workspace,
+				"repo_slug": repoSlug,
 			}
 			handlers.InferRepoContext(pathParams)
-			if pathParams["repo_slug"] == "" {
-				return fmt.Errorf("--repo-slug is required")
-			}
 			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
+			}
+			if pathParams["repo_slug"] == "" {
+				return fmt.Errorf("--repo-slug is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
@@ -255,12 +256,12 @@ func newHooksCreateAWebhookForARepositoryCmd() *cobra.Command {
 			})
 		},
 	}
-	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().BoolVar(&bodyActive, "active", false, `active`)
+	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().BoolVar(&bodyActive, "active", false, `Whether or not the webhook subscription is enabled.`)
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `A user-defined description of the webhook.`)
 	cmd.Flags().StringVar(&bodyEvents, "events", "", `The events this webhook is subscribed to. [issue:comment_created, issue:created, issue:updated, pipeline:span_created, project:updated, pullrequest:approved, pullrequest:changes_request_created, pullrequest:changes_request_removed, pullrequest:comment_created, pullrequest:comment_deleted, pullrequest:comment_reopened, pullrequest:comment_resolved, pullrequest:comment_updated, pullrequest:created, pullrequest:fulfilled, pullrequest:push, pullrequest:rejected, pullrequest:unapproved, pullrequest:updated, repo:commit_comment_created, repo:commit_status_created, repo:commit_status_updated, repo:created, repo:deleted, repo:fork, repo:imported, repo:push, repo:transfer, repo:updated]`)
-	cmd.Flags().StringVar(&bodySecret, "secret", "", "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.")
+	cmd.Flags().StringVar(&bodySecret, "secret", "", "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null`` or `\"\"`` to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.")
 	cmd.Flags().StringVar(&bodyUrl, "url", "", `The URL events get delivered to.`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
@@ -270,31 +271,32 @@ func newHooksCreateAWebhookForARepositoryCmd() *cobra.Command {
 // operationId: getAWebhookForARepository
 func newHooksGetAWebhookForARepositoryCmd() *cobra.Command {
 	var (
+		workspace string
 		repoSlug  string
 		uid       string
-		workspace string
 	)
 
 	cmd := &cobra.Command{
 		Use:   "get-a-webhook-for-a-repository",
 		Short: `Get a webhook for a repository`,
-		Long: `Returns the webhook with the specified id installed on the specified
-repository.`,
+		Long: `Returns the webhook with the specified id installed on the
+specified repository.
+`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
+				"workspace": workspace,
 				"repo_slug": repoSlug,
 				"uid":       uid,
-				"workspace": workspace,
 			}
 			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
 			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			if pathParams["uid"] == "" {
 				return fmt.Errorf("--uid is required")
-			}
-			if pathParams["workspace"] == "" {
-				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
@@ -312,9 +314,9 @@ repository.`,
 			})
 		},
 	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&uid, "uid", "", "uid (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	return cmd
 }
 
@@ -322,9 +324,9 @@ repository.`,
 // operationId: updateAWebhookForARepository
 func newHooksUpdateAWebhookForARepositoryCmd() *cobra.Command {
 	var (
+		workspace       string
 		repoSlug        string
 		uid             string
-		workspace       string
 		bodyActive      bool
 		bodyDescription string
 		bodyEvents      string
@@ -336,22 +338,22 @@ func newHooksUpdateAWebhookForARepositoryCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-a-webhook-for-a-repository",
 		Short: `Update a webhook for a repository`,
-		Long:  "Updates the specified webhook subscription.\n\nThe following properties can be mutated:\n\n* `description`\n* `url`\n* `secret`\n* `active`\n* `events`\n\nThe hook's secret is used as a key to generate the HMAC hex digest sent in the\n`X-Hub-Signature` header at delivery time. This signature is only generated\nwhen the hook has a secret.\n\nSet the hook's secret by passing the new value in the `secret` field. Passing a\n`null` value in the `secret` field will remove the secret from the hook. The\nhook's secret can be left unchanged by not passing the `secret` field in the\nrequest.",
+		Long:  "Updates the specified webhook subscription.\n\nThe following properties can be mutated:\n\n* `description`\n* `url`\n* `secret`\n* `active`\n* `events`\n\nThe hook's secret is used as a key to generate the HMAC hex digest\nsent in the `X-Hub-Signature` header at delivery time. This\nsignature is only generated when the hook has a secret.\n\nSet the hook's secret by passing the new value in the `secret`\nfield. Passing a `null` value in the `secret` field will remove\nthe secret from the hook. The hook's secret can be left unchanged\nby not passing the `secret` field in the request.\n",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
+				"workspace": workspace,
 				"repo_slug": repoSlug,
 				"uid":       uid,
-				"workspace": workspace,
 			}
 			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
 			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			if pathParams["uid"] == "" {
 				return fmt.Errorf("--uid is required")
-			}
-			if pathParams["workspace"] == "" {
-				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
@@ -390,13 +392,13 @@ func newHooksUpdateAWebhookForARepositoryCmd() *cobra.Command {
 			})
 		},
 	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&uid, "uid", "", "uid (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().BoolVar(&bodyActive, "active", false, `active`)
+	cmd.Flags().BoolVar(&bodyActive, "active", false, `Whether or not the webhook subscription is enabled.`)
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `A user-defined description of the webhook.`)
 	cmd.Flags().StringVar(&bodyEvents, "events", "", `The events this webhook is subscribed to. [issue:comment_created, issue:created, issue:updated, pipeline:span_created, project:updated, pullrequest:approved, pullrequest:changes_request_created, pullrequest:changes_request_removed, pullrequest:comment_created, pullrequest:comment_deleted, pullrequest:comment_reopened, pullrequest:comment_resolved, pullrequest:comment_updated, pullrequest:created, pullrequest:fulfilled, pullrequest:push, pullrequest:rejected, pullrequest:unapproved, pullrequest:updated, repo:commit_comment_created, repo:commit_status_created, repo:commit_status_updated, repo:created, repo:deleted, repo:fork, repo:imported, repo:push, repo:transfer, repo:updated]`)
-	cmd.Flags().StringVar(&bodySecret, "secret", "", "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.")
+	cmd.Flags().StringVar(&bodySecret, "secret", "", "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null`` or `\"\"`` to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.")
 	cmd.Flags().StringVar(&bodyUrl, "url", "", `The URL events get delivered to.`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
@@ -406,31 +408,32 @@ func newHooksUpdateAWebhookForARepositoryCmd() *cobra.Command {
 // operationId: deleteAWebhookForARepository
 func newHooksDeleteAWebhookForARepositoryCmd() *cobra.Command {
 	var (
+		workspace string
 		repoSlug  string
 		uid       string
-		workspace string
 	)
 
 	cmd := &cobra.Command{
 		Use:   "delete-a-webhook-for-a-repository",
 		Short: `Delete a webhook for a repository`,
 		Long: `Deletes the specified webhook subscription from the given
-repository.`,
+repository.
+`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
+				"workspace": workspace,
 				"repo_slug": repoSlug,
 				"uid":       uid,
-				"workspace": workspace,
 			}
 			handlers.InferRepoContext(pathParams)
+			if pathParams["workspace"] == "" {
+				return fmt.Errorf("--workspace is required")
+			}
 			if pathParams["repo_slug"] == "" {
 				return fmt.Errorf("--repo-slug is required")
 			}
 			if pathParams["uid"] == "" {
 				return fmt.Errorf("--uid is required")
-			}
-			if pathParams["workspace"] == "" {
-				return fmt.Errorf("--workspace is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
@@ -448,9 +451,9 @@ repository.`,
 			})
 		},
 	}
+	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&uid, "uid", "", "uid (path parameter)")
-	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	return cmd
 }
 
@@ -518,7 +521,7 @@ func newHooksCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-a-webhook-for-a-workspace",
 		Short: `Create a webhook for a workspace`,
-		Long:  "Creates a new webhook on the specified workspace.\n\nWorkspace webhooks are fired for events from all repositories contained\nby that workspace.\n\nExample:\n\n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n  https://api.bitbucket.org/2.0/workspaces/my-workspace/hooks\n  -d '\n    {\n      \"description\": \"Webhook Description\",\n      \"url\": \"https://example.com/\",\n      \"active\": true,\n      \"secret\": \"this is a really bad secret\",\n      \"events\": [\n        \"repo:push\",\n        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n```\n\nWhen the `secret` is provided it will be used as the key to generate a HMAC\ndigest value sent in the `X-Hub-Signature` header at delivery time. Passing\na `null` or empty `secret` or not passing a `secret` will leave the webhook's\nsecret unset. Bitbucket only generates the `X-Hub-Signature` when the webhook's\nsecret is set.\n\nThis call requires the webhook scope, as well as any scope\nthat applies to the events that the webhook subscribes to. In the\nexample above that means: `webhook`, `repository` and `issue`.\n\nThe `url` must properly resolve and cannot be an internal, non-routed address.\n\nOnly workspace owners can install webhooks on workspaces.",
+		Long:  "Creates a new webhook on the specified workspace.\n\nWorkspace webhooks are fired for events from all repositories\ncontained by that workspace.\n\nExample:\n```\n$ curl -X POST -u credentials -H 'Content-Type: application/json'\n  https://api.bitbucket.org/2.0/workspaces/my-workspace/hooks\n  -d '\n    {\n      \"description\": \"Webhook Description\",\n      \"url\": \"https://example.com/\",\n      \"active\": true,\n      \"secret\": \"this is a really bad secret\",\n      \"events\": [\n        \"repo:push\",\n        \"issue:created\",\n        \"issue:updated\"\n      ]\n    }'\n```\n\nWhen the `secret` is provided it will be used as the key to\ngenerate a HMAC digest value sent in the `X-Hub-Signature` header\nat delivery time. Passing a `null` or empty `secret` or not\npassing a `secret` will leave the webhook's secret unset.\nBitbucket only generates the `X-Hub-Signature` when the webhook's\nsecret is set.\n\nThis call requires the webhook scope, as well as any scope\nthat applies to the events that the webhook subscribes to. In the\nexample above that means: `webhook`, `repository` and `issue`.\n\nThe `url` must properly resolve and cannot be an internal,\nnon-routed address.\n\nOnly workspace owners can install webhooks on workspaces.\n",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"workspace": workspace,
@@ -565,10 +568,10 @@ func newHooksCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().BoolVar(&bodyActive, "active", false, `active`)
+	cmd.Flags().BoolVar(&bodyActive, "active", false, `Whether or not the webhook subscription is enabled.`)
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `A user-defined description of the webhook.`)
 	cmd.Flags().StringVar(&bodyEvents, "events", "", `The events this webhook is subscribed to. [issue:comment_created, issue:created, issue:updated, pipeline:span_created, project:updated, pullrequest:approved, pullrequest:changes_request_created, pullrequest:changes_request_removed, pullrequest:comment_created, pullrequest:comment_deleted, pullrequest:comment_reopened, pullrequest:comment_resolved, pullrequest:comment_updated, pullrequest:created, pullrequest:fulfilled, pullrequest:push, pullrequest:rejected, pullrequest:unapproved, pullrequest:updated, repo:commit_comment_created, repo:commit_status_created, repo:commit_status_updated, repo:created, repo:deleted, repo:fork, repo:imported, repo:push, repo:transfer, repo:updated]`)
-	cmd.Flags().StringVar(&bodySecret, "secret", "", "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.")
+	cmd.Flags().StringVar(&bodySecret, "secret", "", "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null`` or `\"\"`` to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.")
 	cmd.Flags().StringVar(&bodyUrl, "url", "", `The URL events get delivered to.`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
@@ -578,26 +581,27 @@ func newHooksCreateAWebhookForAWorkspaceCmd() *cobra.Command {
 // operationId: getAWebhookForAWorkspace
 func newHooksGetAWebhookForAWorkspaceCmd() *cobra.Command {
 	var (
-		uid       string
 		workspace string
+		uid       string
 	)
 
 	cmd := &cobra.Command{
 		Use:   "get-a-webhook-for-a-workspace",
 		Short: `Get a webhook for a workspace`,
-		Long: `Returns the webhook with the specified id installed on the given
-workspace.`,
+		Long: `Returns the webhook with the specified id installed on the
+specified workspace.
+`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
-				"uid":       uid,
 				"workspace": workspace,
+				"uid":       uid,
 			}
 			handlers.InferRepoContext(pathParams)
-			if pathParams["uid"] == "" {
-				return fmt.Errorf("--uid is required")
-			}
 			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
+			}
+			if pathParams["uid"] == "" {
+				return fmt.Errorf("--uid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
@@ -615,8 +619,8 @@ workspace.`,
 			})
 		},
 	}
-	cmd.Flags().StringVar(&uid, "uid", "", "uid (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&uid, "uid", "", "uid (path parameter)")
 	return cmd
 }
 
@@ -624,8 +628,8 @@ workspace.`,
 // operationId: updateAWebhookForAWorkspace
 func newHooksUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 	var (
-		uid             string
 		workspace       string
+		uid             string
 		bodyActive      bool
 		bodyDescription string
 		bodyEvents      string
@@ -637,18 +641,18 @@ func newHooksUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-a-webhook-for-a-workspace",
 		Short: `Update a webhook for a workspace`,
-		Long:  "Updates the specified webhook subscription.\n\nThe following properties can be mutated:\n\n* `description`\n* `url`\n* `secret`\n* `active`\n* `events`\n\nThe hook's secret is used as a key to generate the HMAC hex digest sent in the\n`X-Hub-Signature` header at delivery time. This signature is only generated\nwhen the hook has a secret.\n\nSet the hook's secret by passing the new value in the `secret` field. Passing a\n`null` value in the `secret` field will remove the secret from the hook. The\nhook's secret can be left unchanged by not passing the `secret` field in the\nrequest.",
+		Long:  "Updates the specified webhook subscription.\n\nThe following properties can be mutated:\n\n* `description`\n* `url`\n* `secret`\n* `active`\n* `events`\n\nThe hook's secret is used as a key to generate the HMAC hex digest\nsent in the X-Hub-Signature header at delivery time.\nThis signature is only generated when the hook has a secret.\n\nSet the hook's secret by passing the new value in the secret field\n. Passing a null value in the secret field will remove the secret\nfrom the hook. The hook's secret can be left unchanged by not\npassing the secret field in the request.\n",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
-				"uid":       uid,
 				"workspace": workspace,
+				"uid":       uid,
 			}
 			handlers.InferRepoContext(pathParams)
-			if pathParams["uid"] == "" {
-				return fmt.Errorf("--uid is required")
-			}
 			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
+			}
+			if pathParams["uid"] == "" {
+				return fmt.Errorf("--uid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
@@ -687,12 +691,12 @@ func newHooksUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 			})
 		},
 	}
-	cmd.Flags().StringVar(&uid, "uid", "", "uid (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
-	cmd.Flags().BoolVar(&bodyActive, "active", false, `active`)
+	cmd.Flags().StringVar(&uid, "uid", "", "uid (path parameter)")
+	cmd.Flags().BoolVar(&bodyActive, "active", false, `Whether or not the webhook subscription is enabled.`)
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `A user-defined description of the webhook.`)
 	cmd.Flags().StringVar(&bodyEvents, "events", "", `The events this webhook is subscribed to. [issue:comment_created, issue:created, issue:updated, pipeline:span_created, project:updated, pullrequest:approved, pullrequest:changes_request_created, pullrequest:changes_request_removed, pullrequest:comment_created, pullrequest:comment_deleted, pullrequest:comment_reopened, pullrequest:comment_resolved, pullrequest:comment_updated, pullrequest:created, pullrequest:fulfilled, pullrequest:push, pullrequest:rejected, pullrequest:unapproved, pullrequest:updated, repo:commit_comment_created, repo:commit_status_created, repo:commit_status_updated, repo:created, repo:deleted, repo:fork, repo:imported, repo:push, repo:transfer, repo:updated]`)
-	cmd.Flags().StringVar(&bodySecret, "secret", "", "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null` or \"\" to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.")
+	cmd.Flags().StringVar(&bodySecret, "secret", "", "The secret to associate with the hook. The secret is never returned via the API. As such, this field is only used during updates. The secret can be set to `null`` or `\"\"`` to remove the secret (or create a hook with no secret). Leaving out the secret field during updates will leave the secret unchanged. Leaving out the secret during creation will create a hook with no secret.")
 	cmd.Flags().StringVar(&bodyUrl, "url", "", `The URL events get delivered to.`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
@@ -702,25 +706,27 @@ func newHooksUpdateAWebhookForAWorkspaceCmd() *cobra.Command {
 // operationId: deleteAWebhookForAWorkspace
 func newHooksDeleteAWebhookForAWorkspaceCmd() *cobra.Command {
 	var (
-		uid       string
 		workspace string
+		uid       string
 	)
 
 	cmd := &cobra.Command{
 		Use:   "delete-a-webhook-for-a-workspace",
 		Short: `Delete a webhook for a workspace`,
-		Long:  `Deletes the specified webhook subscription from the given workspace.`,
+		Long: `Deletes the specified webhook subscription from the given
+workspace.
+`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
-				"uid":       uid,
 				"workspace": workspace,
+				"uid":       uid,
 			}
 			handlers.InferRepoContext(pathParams)
-			if pathParams["uid"] == "" {
-				return fmt.Errorf("--uid is required")
-			}
 			if pathParams["workspace"] == "" {
 				return fmt.Errorf("--workspace is required")
+			}
+			if pathParams["uid"] == "" {
+				return fmt.Errorf("--uid is required")
 			}
 			c, err := client.NewClient()
 			if err != nil {
@@ -738,7 +744,7 @@ func newHooksDeleteAWebhookForAWorkspaceCmd() *cobra.Command {
 			})
 		},
 	}
-	cmd.Flags().StringVar(&uid, "uid", "", "uid (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
+	cmd.Flags().StringVar(&uid, "uid", "", "uid (path parameter)")
 	return cmd
 }
