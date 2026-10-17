@@ -1940,7 +1940,23 @@ paths:
     post:
       tags:
       - Pullrequests
-      description: Merges the pull request.
+      description: 'Merges the pull request.
+
+
+        If the destination branch has an active merge queue, the pull request
+
+        is added to the queue instead. The API returns a 202 with a polling
+
+        link to the task-status API in the Location header, even when `async`
+
+        is false. Calling it again on a queued pull request returns the same
+
+        link.
+
+
+        Merge queues support the `merge_commit`, `squash` and `rebase_merge`
+
+        strategies. If no strategy is given, the queue''s default is used.'
       summary: Merge a pull request
       responses:
         '200':
@@ -1952,9 +1968,23 @@ paths:
         '202':
           description: In the Location header, the URL to poll for the pull request
             merge status
+        '400':
+          description: If the pull request cannot be merged, or its merge queue is
+            not accepting pull requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
         '409':
           description: Unable to merge because one of the refs involved changed while
             attempting to merge
+        '503':
+          description: If the merge queue for the destination branch could not be
+            checked. Retry the request later
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
         '555':
           description: 'If the merge took too long and timed out.
 
@@ -2054,7 +2084,12 @@ paths:
         \n        }\n    },\n    \"merge_result\": <the merged pull request object>\n\
         }\n```\n\nIf the merge task failed, an error will be returned.\n\n```\n{\n\
         \    \"type\": \"error\",\n    \"error\": {\n        \"message\": \"<error\
-        \ message>\"\n    }\n}\n```"
+        \ message>\"\n    }\n}\n```\n\nIf the pull request was added to a merge queue,\
+        \ the task reports its\nlanding through the queue. A PENDING status is returned\
+        \ while it is in\nthe queue, with a `queued_pullrequest` object once the queue\
+        \ has it. A\nSUCCESS status is returned once it merges, and an error if it\
+        \ leaves\nthe queue without merging. The error message can contain Markdown.\n\
+        \nUnknown or expired task IDs return a PENDING status."
       summary: Get the merge task status for a pull request
       responses:
         '200':
@@ -2062,7 +2097,8 @@ paths:
             and if it is successful, a pull request
         '400':
           description: If the provided task ID does not relate to this pull request,
-            or if something went wrong during the merge operation
+            if something went wrong during the merge operation, or if the pull request
+            left the merge queue without merging
         '403':
           description: The user making the request does not have permission to the
             repo and is different from the user who queued the task
