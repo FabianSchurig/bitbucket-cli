@@ -255,6 +255,7 @@
   "post /users/{selected_user}/gpg-keys": "addANewGpgKey",
   "post /users/{selected_user}/pipelines_config/variables": "createPipelineVariableForUser",
   "post /users/{selected_user}/ssh-keys": "addANewSshKey",
+  "post /workspaces/{workspace}/codesearch": "searchCodeInAWorkspace",
   "post /workspaces/{workspace}/hooks": "createAWebhookForAWorkspace",
   "post /workspaces/{workspace}/pipelines-config/runners": "createWorkspaceRunner",
   "post /workspaces/{workspace}/pipelines-config/variables": "createPipelineVariableForWorkspace",
