@@ -489,30 +489,31 @@ for specific details.
 // operationId: createPipelineForRepository
 func newPipelinesCreatePipelineForRepositoryCmd() *cobra.Command {
 	var (
-		workspace                 string
-		repoSlug                  string
-		mergeDefaults             bool
-		targetBranchToCreate      string
-		bodyBuildNumber           int
-		bodyBuildSecondsUsed      int
-		bodyCompletedOn           string
-		bodyConfigurationSources  string
-		bodyCreatorDisplayName    string
-		bodyCreatorUuid           string
-		bodyRepositoryDescription string
-		bodyRepositoryForkPolicy  string
-		bodyRepositoryFullName    string
-		bodyRepositoryHasIssues   bool
-		bodyRepositoryHasWiki     bool
-		bodyRepositoryIsPrivate   bool
-		bodyRepositoryLanguage    string
-		bodyRepositoryName        string
-		bodyRepositoryScm         string
-		bodyRepositorySize        int
-		bodyRepositoryUuid        string
-		bodyUuid                  string
-		bodyVariables             string
-		body                      string
+		workspace                           string
+		repoSlug                            string
+		mergeDefaults                       bool
+		targetBranchToCreate                string
+		bodyBuildNumber                     int
+		bodyBuildSecondsUsed                int
+		bodyCompletedOn                     string
+		bodyConfigurationSources            string
+		bodyCreatorDisplayName              string
+		bodyCreatorUuid                     string
+		bodyRepositoryDescription           string
+		bodyRepositoryEnforcedSignedCommits bool
+		bodyRepositoryForkPolicy            string
+		bodyRepositoryFullName              string
+		bodyRepositoryHasIssues             bool
+		bodyRepositoryHasWiki               bool
+		bodyRepositoryIsPrivate             bool
+		bodyRepositoryLanguage              string
+		bodyRepositoryName                  string
+		bodyRepositoryScm                   string
+		bodyRepositorySize                  int
+		bodyRepositoryUuid                  string
+		bodyUuid                            string
+		bodyVariables                       string
+		body                                string
 	)
 
 	cmd := &cobra.Command{
@@ -561,6 +562,9 @@ func newPipelinesCreatePipelineForRepositoryCmd() *cobra.Command {
 				}
 				if bodyRepositoryDescription != "" {
 					handlers.SetNested(bodyObj, "repository.description", bodyRepositoryDescription)
+				}
+				if cmd.Flags().Changed("repository-enforced-signed-commits") {
+					handlers.SetNested(bodyObj, "repository.enforced_signed_commits", bodyRepositoryEnforcedSignedCommits)
 				}
 				if bodyRepositoryForkPolicy != "" {
 					handlers.SetNested(bodyObj, "repository.fork_policy", bodyRepositoryForkPolicy)
@@ -624,6 +628,7 @@ func newPipelinesCreatePipelineForRepositoryCmd() *cobra.Command {
 	cmd.Flags().StringVar(&bodyCreatorDisplayName, "creator-display-name", "", `display_name`)
 	cmd.Flags().StringVar(&bodyCreatorUuid, "creator-uuid", "", `uuid`)
 	cmd.Flags().StringVar(&bodyRepositoryDescription, "repository-description", "", `description`)
+	cmd.Flags().BoolVar(&bodyRepositoryEnforcedSignedCommits, "repository-enforced-signed-commits", false, `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`)
 	cmd.Flags().StringVar(&bodyRepositoryForkPolicy, "repository-fork-policy", "", `
 Controls the rules for forking this repository.
 
@@ -1681,21 +1686,22 @@ func newPipelinesGetRepositoryPipelineConfigCmd() *cobra.Command {
 // operationId: updateRepositoryPipelineConfig
 func newPipelinesUpdateRepositoryPipelineConfigCmd() *cobra.Command {
 	var (
-		workspace                 string
-		repoSlug                  string
-		bodyEnabled               bool
-		bodyRepositoryDescription string
-		bodyRepositoryForkPolicy  string
-		bodyRepositoryFullName    string
-		bodyRepositoryHasIssues   bool
-		bodyRepositoryHasWiki     bool
-		bodyRepositoryIsPrivate   bool
-		bodyRepositoryLanguage    string
-		bodyRepositoryName        string
-		bodyRepositoryScm         string
-		bodyRepositorySize        int
-		bodyRepositoryUuid        string
-		body                      string
+		workspace                           string
+		repoSlug                            string
+		bodyEnabled                         bool
+		bodyRepositoryDescription           string
+		bodyRepositoryEnforcedSignedCommits bool
+		bodyRepositoryForkPolicy            string
+		bodyRepositoryFullName              string
+		bodyRepositoryHasIssues             bool
+		bodyRepositoryHasWiki               bool
+		bodyRepositoryIsPrivate             bool
+		bodyRepositoryLanguage              string
+		bodyRepositoryName                  string
+		bodyRepositoryScm                   string
+		bodyRepositorySize                  int
+		bodyRepositoryUuid                  string
+		body                                string
 	)
 
 	cmd := &cobra.Command{
@@ -1726,6 +1732,9 @@ func newPipelinesUpdateRepositoryPipelineConfigCmd() *cobra.Command {
 				}
 				if bodyRepositoryDescription != "" {
 					handlers.SetNested(bodyObj, "repository.description", bodyRepositoryDescription)
+				}
+				if cmd.Flags().Changed("repository-enforced-signed-commits") {
+					handlers.SetNested(bodyObj, "repository.enforced_signed_commits", bodyRepositoryEnforcedSignedCommits)
 				}
 				if bodyRepositoryForkPolicy != "" {
 					handlers.SetNested(bodyObj, "repository.fork_policy", bodyRepositoryForkPolicy)
@@ -1776,6 +1785,7 @@ func newPipelinesUpdateRepositoryPipelineConfigCmd() *cobra.Command {
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().BoolVar(&bodyEnabled, "enabled", false, `Whether Pipelines is enabled for the repository.`)
 	cmd.Flags().StringVar(&bodyRepositoryDescription, "repository-description", "", `description`)
+	cmd.Flags().BoolVar(&bodyRepositoryEnforcedSignedCommits, "repository-enforced-signed-commits", false, `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`)
 	cmd.Flags().StringVar(&bodyRepositoryForkPolicy, "repository-fork-policy", "", `
 Controls the rules for forking this repository.
 

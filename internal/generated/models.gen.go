@@ -1562,6 +1562,9 @@ type Repository struct {
 	CreatedOn   *time.Time `json:"created_on,omitempty"`
 	Description *string    `json:"description,omitempty"`
 
+	// EnforcedSignedCommits Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.
+	EnforcedSignedCommits *bool `json:"enforced_signed_commits,omitempty"`
+
 	// ForkPolicy
 	// Controls the rules for forking this repository.
 	//
@@ -4878,6 +4881,14 @@ func (a *Repository) UnmarshalJSON(b []byte) error {
 		delete(object, "description")
 	}
 
+	if raw, found := object["enforced_signed_commits"]; found {
+		err = json.Unmarshal(raw, &a.EnforcedSignedCommits)
+		if err != nil {
+			return fmt.Errorf("error reading 'enforced_signed_commits': %w", err)
+		}
+		delete(object, "enforced_signed_commits")
+	}
+
 	if raw, found := object["fork_policy"]; found {
 		err = json.Unmarshal(raw, &a.ForkPolicy)
 		if err != nil {
@@ -5044,6 +5055,13 @@ func (a Repository) MarshalJSON() ([]byte, error) {
 		object["description"], err = json.Marshal(a.Description)
 		if err != nil {
 			return nil, fmt.Errorf("error marshaling 'description': %w", err)
+		}
+	}
+
+	if a.EnforcedSignedCommits != nil {
+		object["enforced_signed_commits"], err = json.Marshal(a.EnforcedSignedCommits)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'enforced_signed_commits': %w", err)
 		}
 	}
 

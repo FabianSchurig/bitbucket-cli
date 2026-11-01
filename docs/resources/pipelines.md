@@ -63,6 +63,7 @@ resource "bitbucket_pipelines" "example" {
 - `repository` (Object) repository (also computed from API response)
   Nested schema:
   - `description` (String) description
+  - `enforced_signed_commits` (String) Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.
   - `fork_policy` (String) 
   - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
   - `has_issues` (String) 

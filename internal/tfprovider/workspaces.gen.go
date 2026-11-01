@@ -63,6 +63,7 @@ Available operations:
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
@@ -131,6 +132,7 @@ private to the members and consequently only visible to members.`},
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
@@ -169,6 +171,7 @@ private to the members and consequently only visible to members.`},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `enforced_signed_commits`, Type: `bool`, Desc: `The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.`},
 				{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
@@ -203,6 +206,7 @@ private to the members and consequently only visible to members.`},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `enforced_signed_commits`, Type: `bool`, Desc: `The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.`},
 				{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
@@ -400,6 +404,7 @@ workspace.
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
@@ -441,6 +446,7 @@ private to the members and consequently only visible to members.`},
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
@@ -484,6 +490,7 @@ private to the members and consequently only visible to members.`},
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
@@ -525,6 +532,7 @@ private to the members and consequently only visible to members.`},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -591,6 +599,7 @@ administered through admin.atlassian.com.
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -967,6 +976,7 @@ During a key rotation period, two keys may be returned.`,
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
@@ -1035,6 +1045,7 @@ private to the members and consequently only visible to members.`},
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
@@ -1073,6 +1084,7 @@ private to the members and consequently only visible to members.`},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `enforced_signed_commits`, Type: `bool`, Desc: `The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.`},
 				{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
@@ -1107,6 +1119,7 @@ private to the members and consequently only visible to members.`},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `created_on`, Type: `string`, Desc: `created_on`},
+				{Path: `enforced_signed_commits`, Type: `bool`, Desc: `The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.`},
 				{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
@@ -1304,6 +1317,7 @@ workspace.
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
@@ -1345,6 +1359,7 @@ private to the members and consequently only visible to members.`},
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
@@ -1388,6 +1403,7 @@ private to the members and consequently only visible to members.`},
 				}},
 				{Path: `workspace`, Type: `string`, Desc: `workspace`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.`},
 					{Path: `forking_mode`, Type: `string`, Desc: `Controls the rules for forking repositories within this workspace.
 
 * **allow_forks**: unrestricted forking
@@ -1429,6 +1445,7 @@ private to the members and consequently only visible to members.`},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -1495,6 +1512,7 @@ administered through admin.atlassian.com.
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 

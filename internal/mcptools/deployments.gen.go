@@ -69,6 +69,7 @@ Available operations:
 				{Path: `owner.display_name`, Type: `string`, Desc: `display_name`},
 				{Path: `owner.uuid`, Type: `string`, Desc: `uuid`},
 				{Path: `repository.description`, Type: `string`, Desc: `description`},
+				{Path: `repository.enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 				{Path: `repository.fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 

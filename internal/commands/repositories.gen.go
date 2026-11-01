@@ -243,6 +243,7 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 		repoSlug                           string
 		workspace                          string
 		bodyDescription                    string
+		bodyEnforcedSignedCommits          bool
 		bodyForkPolicy                     string
 		bodyFullName                       string
 		bodyHasIssues                      bool
@@ -293,6 +294,9 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 				bodyObj := map[string]any{}
 				if bodyDescription != "" {
 					handlers.SetNested(bodyObj, "description", bodyDescription)
+				}
+				if cmd.Flags().Changed("enforced-signed-commits") {
+					handlers.SetNested(bodyObj, "enforced_signed_commits", bodyEnforcedSignedCommits)
 				}
 				if bodyForkPolicy != "" {
 					handlers.SetNested(bodyObj, "fork_policy", bodyForkPolicy)
@@ -378,6 +382,7 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `description`)
+	cmd.Flags().BoolVar(&bodyEnforcedSignedCommits, "enforced-signed-commits", false, `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`)
 	cmd.Flags().StringVar(&bodyForkPolicy, "fork-policy", "", `
 Controls the rules for forking this repository.
 
@@ -431,6 +436,7 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 		repoSlug                           string
 		workspace                          string
 		bodyDescription                    string
+		bodyEnforcedSignedCommits          bool
 		bodyForkPolicy                     string
 		bodyFullName                       string
 		bodyHasIssues                      bool
@@ -481,6 +487,9 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 				bodyObj := map[string]any{}
 				if bodyDescription != "" {
 					handlers.SetNested(bodyObj, "description", bodyDescription)
+				}
+				if cmd.Flags().Changed("enforced-signed-commits") {
+					handlers.SetNested(bodyObj, "enforced_signed_commits", bodyEnforcedSignedCommits)
 				}
 				if bodyForkPolicy != "" {
 					handlers.SetNested(bodyObj, "fork_policy", bodyForkPolicy)
@@ -566,6 +575,7 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `description`)
+	cmd.Flags().BoolVar(&bodyEnforcedSignedCommits, "enforced-signed-commits", false, `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`)
 	cmd.Flags().StringVar(&bodyForkPolicy, "fork-policy", "", `
 Controls the rules for forking this repository.
 
@@ -809,6 +819,7 @@ func newReposForkARepositoryCmd() *cobra.Command {
 		repoSlug                           string
 		workspace                          string
 		bodyDescription                    string
+		bodyEnforcedSignedCommits          bool
 		bodyForkPolicy                     string
 		bodyFullName                       string
 		bodyHasIssues                      bool
@@ -859,6 +870,9 @@ func newReposForkARepositoryCmd() *cobra.Command {
 				bodyObj := map[string]any{}
 				if bodyDescription != "" {
 					handlers.SetNested(bodyObj, "description", bodyDescription)
+				}
+				if cmd.Flags().Changed("enforced-signed-commits") {
+					handlers.SetNested(bodyObj, "enforced_signed_commits", bodyEnforcedSignedCommits)
 				}
 				if bodyForkPolicy != "" {
 					handlers.SetNested(bodyObj, "fork_policy", bodyForkPolicy)
@@ -944,6 +958,7 @@ func newReposForkARepositoryCmd() *cobra.Command {
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `description`)
+	cmd.Flags().BoolVar(&bodyEnforcedSignedCommits, "enforced-signed-commits", false, `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`)
 	cmd.Flags().StringVar(&bodyForkPolicy, "fork-policy", "", `
 Controls the rules for forking this repository.
 

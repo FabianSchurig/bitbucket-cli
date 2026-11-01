@@ -44,6 +44,7 @@ resource "bitbucket_forked_repository" "example" {
 
 ### Optional
 - `description` (String) description (also computed from API response)
+- `enforced_signed_commits` (String) Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false. (also computed from API response)
 - `fork_policy` (String)  (also computed from API response)
 - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs. (also computed from API response)
 - `has_issues` (String)  (also computed from API response)

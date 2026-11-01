@@ -62,6 +62,7 @@ Available operations:
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -119,6 +120,7 @@ administered through admin.atlassian.com.
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -160,6 +162,7 @@ administered through admin.atlassian.com.
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -222,6 +225,7 @@ administered through admin.atlassian.com.
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -283,6 +287,7 @@ administered through admin.atlassian.com.
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -706,6 +711,7 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -763,6 +769,7 @@ administered through admin.atlassian.com.
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -804,6 +811,7 @@ administered through admin.atlassian.com.
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -866,6 +874,7 @@ administered through admin.atlassian.com.
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -927,6 +936,7 @@ administered through admin.atlassian.com.
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 

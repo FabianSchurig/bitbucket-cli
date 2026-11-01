@@ -2179,6 +2179,11 @@ components:
             - allow_forks
             - no_public_forks
             - no_forks
+          enforced_signed_commits:
+            type: boolean
+            description: 'Whether signed commits are required for this repository:
+              true when the workspace has Premium and the repository, its project,
+              or its workspace enforces them; otherwise false.'
           project:
             $ref: '#/components/schemas/project'
           mainbranch:

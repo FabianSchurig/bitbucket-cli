@@ -118,27 +118,28 @@ func newDeploymentsListRepositoryDeployKeysCmd() *cobra.Command {
 // operationId: addARepositoryDeployKey
 func newDeploymentsAddARepositoryDeployKeyCmd() *cobra.Command {
 	var (
-		repoSlug                  string
-		workspace                 string
-		bodyAddedOn               string
-		bodyComment               string
-		bodyKey                   string
-		bodyLabel                 string
-		bodyLastUsed              string
-		bodyOwnerDisplayName      string
-		bodyOwnerUuid             string
-		bodyRepositoryDescription string
-		bodyRepositoryForkPolicy  string
-		bodyRepositoryFullName    string
-		bodyRepositoryHasIssues   bool
-		bodyRepositoryHasWiki     bool
-		bodyRepositoryIsPrivate   bool
-		bodyRepositoryLanguage    string
-		bodyRepositoryName        string
-		bodyRepositoryScm         string
-		bodyRepositorySize        int
-		bodyRepositoryUuid        string
-		body                      string
+		repoSlug                            string
+		workspace                           string
+		bodyAddedOn                         string
+		bodyComment                         string
+		bodyKey                             string
+		bodyLabel                           string
+		bodyLastUsed                        string
+		bodyOwnerDisplayName                string
+		bodyOwnerUuid                       string
+		bodyRepositoryDescription           string
+		bodyRepositoryEnforcedSignedCommits bool
+		bodyRepositoryForkPolicy            string
+		bodyRepositoryFullName              string
+		bodyRepositoryHasIssues             bool
+		bodyRepositoryHasWiki               bool
+		bodyRepositoryIsPrivate             bool
+		bodyRepositoryLanguage              string
+		bodyRepositoryName                  string
+		bodyRepositoryScm                   string
+		bodyRepositorySize                  int
+		bodyRepositoryUuid                  string
+		body                                string
 	)
 
 	cmd := &cobra.Command{
@@ -187,6 +188,9 @@ func newDeploymentsAddARepositoryDeployKeyCmd() *cobra.Command {
 				}
 				if bodyRepositoryDescription != "" {
 					handlers.SetNested(bodyObj, "repository.description", bodyRepositoryDescription)
+				}
+				if cmd.Flags().Changed("repository-enforced-signed-commits") {
+					handlers.SetNested(bodyObj, "repository.enforced_signed_commits", bodyRepositoryEnforcedSignedCommits)
 				}
 				if bodyRepositoryForkPolicy != "" {
 					handlers.SetNested(bodyObj, "repository.fork_policy", bodyRepositoryForkPolicy)
@@ -243,6 +247,7 @@ func newDeploymentsAddARepositoryDeployKeyCmd() *cobra.Command {
 	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `display_name`)
 	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `uuid`)
 	cmd.Flags().StringVar(&bodyRepositoryDescription, "repository-description", "", `description`)
+	cmd.Flags().BoolVar(&bodyRepositoryEnforcedSignedCommits, "repository-enforced-signed-commits", false, `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`)
 	cmd.Flags().StringVar(&bodyRepositoryForkPolicy, "repository-fork-policy", "", `
 Controls the rules for forking this repository.
 

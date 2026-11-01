@@ -117,6 +117,7 @@ This endpoint also supports filtering and sorting of the results. See
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 				{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -175,6 +176,7 @@ Note that private projects cannot contain public repositories.`},
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 				{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -291,6 +293,7 @@ repository.`,
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
 				{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 

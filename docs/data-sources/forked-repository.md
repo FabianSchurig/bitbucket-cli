@@ -47,6 +47,7 @@ output "forked_repository_response" {
 - `created_on` (String) created_on
 - `updated_on` (String) updated_on
 - `description` (String) description
+- `enforced_signed_commits` (String) Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.
 - `fork_policy` (String) 
 - `full_name` (String) The concatenation of the repository owner's username and the slugified name, e.g. "evzijst/interruptingcow". This is the same string used in Bitbucket URLs.
 - `has_issues` (String) 
