@@ -824,6 +824,7 @@ paths:
         scopes:
         - read:webhook:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
     post:
       operationId: createAWebhookForARepository
@@ -899,6 +900,7 @@ paths:
         - read:webhook:bitbucket
         - write:webhook:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
       requestBody:
         content:
@@ -964,6 +966,7 @@ paths:
         scopes:
         - read:webhook:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
     put:
       operationId: updateAWebhookForARepository
@@ -1060,6 +1063,7 @@ paths:
         - read:webhook:bitbucket
         - write:webhook:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
       requestBody:
         content:
@@ -1130,6 +1134,7 @@ paths:
         scopes:
         - delete:webhook:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
   /repositories/{workspace}/{repo_slug}/override-settings:
     get:

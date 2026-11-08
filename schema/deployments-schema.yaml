@@ -64,6 +64,7 @@ paths:
         scopes:
         - admin:repository:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
       operationId: listRepositoryDeployKeys
     post:
@@ -240,6 +241,7 @@ paths:
         scopes:
         - admin:repository:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
       operationId: getARepositoryDeployKey
     put:
@@ -749,6 +751,7 @@ paths:
         scopes:
         - admin:project:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
       operationId: listProjectDeployKeys
     post:
@@ -941,6 +944,7 @@ paths:
         scopes:
         - admin:project:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
       operationId: getAProjectDeployKey
     parameters:

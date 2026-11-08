@@ -577,7 +577,8 @@ paths:
         \ Bitbucket error envelope:\n`{\"type\": \"error\", \"error\": {\"message\"\
         : ..., \"code\": ...}}`.\nA backend error keeps its status code, except that\
         \ a backend 5xx is\nreturned as `502 Bad Gateway`. The backend's own error\
-        \ code, when there\nis one, is in `error.detail.upstream_code`."
+        \ code, when there\nis one, is in `error.detail.upstream_code`. A `429` includes\
+        \ the\nbackend's `Retry-After` header when the backend sends one."
       summary: Search code in a workspace
       responses:
         '200':
@@ -715,6 +716,7 @@ paths:
         scopes:
         - read:webhook:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
     post:
       operationId: createAWebhookForAWorkspace
@@ -787,6 +789,7 @@ paths:
         - read:webhook:bitbucket
         - write:webhook:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
       requestBody:
         content:
@@ -845,6 +848,7 @@ paths:
         scopes:
         - read:webhook:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
     put:
       operationId: updateAWebhookForAWorkspace
@@ -934,6 +938,7 @@ paths:
         - read:webhook:bitbucket
         - write:webhook:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
       requestBody:
         content:
@@ -997,6 +1002,7 @@ paths:
         scopes:
         - delete:webhook:bitbucket
       x-atlassian-auth-types:
+      - forge-oauth2
       - api-token
   /workspaces/{workspace}/members:
     get:

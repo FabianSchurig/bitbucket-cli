@@ -630,7 +630,7 @@ paths:
                 $ref: '#/components/schemas/error'
       security:
       - oauth2:
-        - pipeline
+        - pipeline:write
       - basic: []
       - api_key: []
       x-atlassian-oauth2-scopes:
@@ -4322,6 +4322,8 @@ components:
             format: date-time
         additionalProperties: true
     pipeline:
+      x-bb-default-fields:
+      - uuid
       allOf:
       - $ref: '#/components/schemas/object'
       - additionalProperties: true
