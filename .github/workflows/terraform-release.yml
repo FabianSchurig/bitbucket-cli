@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - 'v*'
+  # Dispatched by schema-sync.yml with --ref <tag>: its GITHUB_TOKEN tag push
+  # does not trigger the push event.
+  workflow_dispatch:
 
 # Only checkout is needed in this repo; the release is created in the
 # terraform-provider-bitbucket repo via TERRAFORM_REPO_TOKEN.
@@ -14,6 +17,7 @@ jobs:
   mirror:
     name: Mirror to terraform-provider-bitbucket
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -57,7 +61,7 @@ jobs:
 
       - name: Run govulncheck
         run: |
-          go install golang.org/x/vuln/cmd/govulncheck@v1.1.4
+          go install golang.org/x/vuln/cmd/govulncheck@v1.10.0
           govulncheck ./...
 
       - name: Run GoReleaser

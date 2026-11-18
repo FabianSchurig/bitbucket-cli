@@ -41,28 +41,6 @@ jobs:
   terraform-tests:
     name: Terraform Tests (mock)
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        test-group:
-          - repos
-          - pr
-          - projects
-          - workspaces
-          - hooks
-          - snippets
-          - refs
-          - commits
-          - pipelines
-          - deployments
-          - branch-restrictions
-          - branching-model
-          - commit-statuses
-          - downloads
-          - users
-          - reports
-          - search
-          - properties
-          - addon
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -93,9 +71,23 @@ jobs:
           }
           EOF
 
-      - name: Run terraform test (${{ matrix.test-group }})
-        working-directory: tests/${{ matrix.test-group }}
-        run: terraform test
+      # Runs every generated tests/<group>/ suite so new groups are covered
+      # without editing this workflow.
+      - name: Run terraform test for every resource group
+        run: |
+          failed=()
+          for dir in tests/*/; do
+            group=$(basename "$dir")
+            echo "::group::$group"
+            if ! (cd "$dir" && terraform test); then
+              failed+=("$group")
+            fi
+            echo "::endgroup::"
+          done
+          if [ ${#failed[@]} -gt 0 ]; then
+            echo "::error::terraform test failed for: ${failed[*]}"
+            exit 1
+          fi
 
   # Real API tests: only run on push to main, manual dispatch, or same-repo PRs.
   # Fork PRs never receive secrets so this job is skipped entirely to avoid

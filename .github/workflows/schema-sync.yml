@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write # dispatch the release workflows for the new tag
     env:
       PYTHONHASHSEED: "0" # Deterministic hash ordering for stable schema output
     steps:
@@ -63,82 +64,23 @@ jobs:
         if: steps.diff.outputs.changed == 'true'
         run: oapi-codegen --config oapi-codegen.yaml schema/pr-schema.yaml
 
-      - name: Regenerate Cobra commands
+      # Every schema/*-schema.yaml group is regenerated, so new groups need no
+      # workflow change.
+      - name: Regenerate CLI commands, MCP tools and Terraform resources
+        if: steps.diff.outputs.changed == 'true'
+        run: make generate
+
+      - name: Regenerate docs (Terraform, MCP tool reference, E2E coverage)
+        if: steps.diff.outputs.changed == 'true'
+        run: make generate-docs
+
+      - name: Format, build, vet & test
         if: steps.diff.outputs.changed == 'true'
         run: |
-          go run scripts/gen_commands/main.go schema/pr-schema.yaml internal/commands/commands.gen.go
-          go run scripts/gen_commands/main.go schema/hooks-schema.yaml internal/commands/hooks.gen.go
-          go run scripts/gen_commands/main.go schema/search-schema.yaml internal/commands/search.gen.go
-          go run scripts/gen_commands/main.go schema/refs-schema.yaml internal/commands/refs.gen.go
-          go run scripts/gen_commands/main.go schema/commits-schema.yaml internal/commands/commits.gen.go
-          go run scripts/gen_commands/main.go schema/reports-schema.yaml internal/commands/reports.gen.go
-          go run scripts/gen_commands/main.go schema/repositories-schema.yaml internal/commands/repositories.gen.go
-          go run scripts/gen_commands/main.go schema/workspaces-schema.yaml internal/commands/workspaces.gen.go
-          go run scripts/gen_commands/main.go schema/projects-schema.yaml internal/commands/projects.gen.go
-          go run scripts/gen_commands/main.go schema/pipelines-schema.yaml internal/commands/pipelines.gen.go
-          go run scripts/gen_commands/main.go schema/snippets-schema.yaml internal/commands/snippets.gen.go
-          go run scripts/gen_commands/main.go schema/deployments-schema.yaml internal/commands/deployments.gen.go
-          go run scripts/gen_commands/main.go schema/branch-restrictions-schema.yaml internal/commands/branch-restrictions.gen.go
-          go run scripts/gen_commands/main.go schema/branching-model-schema.yaml internal/commands/branching-model.gen.go
-          go run scripts/gen_commands/main.go schema/commit-statuses-schema.yaml internal/commands/commit-statuses.gen.go
-          go run scripts/gen_commands/main.go schema/downloads-schema.yaml internal/commands/downloads.gen.go
-          go run scripts/gen_commands/main.go schema/users-schema.yaml internal/commands/users.gen.go
-          go run scripts/gen_commands/main.go schema/properties-schema.yaml internal/commands/properties.gen.go
-          go run scripts/gen_commands/main.go schema/addon-schema.yaml internal/commands/addon.gen.go
-
-      - name: Regenerate MCP tools
-        if: steps.diff.outputs.changed == 'true'
-        run: |
-          go run scripts/gen_mcptools/main.go schema/pr-schema.yaml internal/mcptools/pr.gen.go
-          go run scripts/gen_mcptools/main.go schema/hooks-schema.yaml internal/mcptools/hooks.gen.go
-          go run scripts/gen_mcptools/main.go schema/search-schema.yaml internal/mcptools/search.gen.go
-          go run scripts/gen_mcptools/main.go schema/refs-schema.yaml internal/mcptools/refs.gen.go
-          go run scripts/gen_mcptools/main.go schema/commits-schema.yaml internal/mcptools/commits.gen.go
-          go run scripts/gen_mcptools/main.go schema/reports-schema.yaml internal/mcptools/reports.gen.go
-          go run scripts/gen_mcptools/main.go schema/repositories-schema.yaml internal/mcptools/repositories.gen.go
-          go run scripts/gen_mcptools/main.go schema/workspaces-schema.yaml internal/mcptools/workspaces.gen.go
-          go run scripts/gen_mcptools/main.go schema/projects-schema.yaml internal/mcptools/projects.gen.go
-          go run scripts/gen_mcptools/main.go schema/pipelines-schema.yaml internal/mcptools/pipelines.gen.go
-          go run scripts/gen_mcptools/main.go schema/snippets-schema.yaml internal/mcptools/snippets.gen.go
-          go run scripts/gen_mcptools/main.go schema/deployments-schema.yaml internal/mcptools/deployments.gen.go
-          go run scripts/gen_mcptools/main.go schema/branch-restrictions-schema.yaml internal/mcptools/branch-restrictions.gen.go
-          go run scripts/gen_mcptools/main.go schema/branching-model-schema.yaml internal/mcptools/branching-model.gen.go
-          go run scripts/gen_mcptools/main.go schema/commit-statuses-schema.yaml internal/mcptools/commit-statuses.gen.go
-          go run scripts/gen_mcptools/main.go schema/downloads-schema.yaml internal/mcptools/downloads.gen.go
-          go run scripts/gen_mcptools/main.go schema/users-schema.yaml internal/mcptools/users.gen.go
-          go run scripts/gen_mcptools/main.go schema/properties-schema.yaml internal/mcptools/properties.gen.go
-          go run scripts/gen_mcptools/main.go schema/addon-schema.yaml internal/mcptools/addon.gen.go
-
-      - name: Regenerate Terraform resources
-        if: steps.diff.outputs.changed == 'true'
-        run: |
-          go run scripts/gen_terraform/main.go schema/pr-schema.yaml internal/tfprovider/pr.gen.go
-          go run scripts/gen_terraform/main.go schema/hooks-schema.yaml internal/tfprovider/hooks.gen.go
-          go run scripts/gen_terraform/main.go schema/search-schema.yaml internal/tfprovider/search.gen.go
-          go run scripts/gen_terraform/main.go schema/refs-schema.yaml internal/tfprovider/refs.gen.go
-          go run scripts/gen_terraform/main.go schema/commits-schema.yaml internal/tfprovider/commits.gen.go
-          go run scripts/gen_terraform/main.go schema/reports-schema.yaml internal/tfprovider/reports.gen.go
-          go run scripts/gen_terraform/main.go schema/repositories-schema.yaml internal/tfprovider/repositories.gen.go
-          go run scripts/gen_terraform/main.go schema/workspaces-schema.yaml internal/tfprovider/workspaces.gen.go
-          go run scripts/gen_terraform/main.go schema/projects-schema.yaml internal/tfprovider/projects.gen.go
-          go run scripts/gen_terraform/main.go schema/pipelines-schema.yaml internal/tfprovider/pipelines.gen.go
-          go run scripts/gen_terraform/main.go schema/snippets-schema.yaml internal/tfprovider/snippets.gen.go
-          go run scripts/gen_terraform/main.go schema/deployments-schema.yaml internal/tfprovider/deployments.gen.go
-          go run scripts/gen_terraform/main.go schema/branch-restrictions-schema.yaml internal/tfprovider/branch-restrictions.gen.go
-          go run scripts/gen_terraform/main.go schema/branching-model-schema.yaml internal/tfprovider/branching-model.gen.go
-          go run scripts/gen_terraform/main.go schema/commit-statuses-schema.yaml internal/tfprovider/commit-statuses.gen.go
-          go run scripts/gen_terraform/main.go schema/downloads-schema.yaml internal/tfprovider/downloads.gen.go
-          go run scripts/gen_terraform/main.go schema/users-schema.yaml internal/tfprovider/users.gen.go
-          go run scripts/gen_terraform/main.go schema/properties-schema.yaml internal/tfprovider/properties.gen.go
-          go run scripts/gen_terraform/main.go schema/addon-schema.yaml internal/tfprovider/addon.gen.go
-
-      - name: Regenerate Terraform docs & tests
-        if: steps.diff.outputs.changed == 'true'
-        run: go run scripts/gen_tfdocs/main.go
-
-      - name: Build & test
-        if: steps.diff.outputs.changed == 'true'
-        run: go build ./... && go test ./...
+          gofmt -w .
+          go build ./...
+          go vet ./...
+          go test ./...
 
       - name: Commit + tag release
         if: steps.diff.outputs.changed == 'true'
@@ -163,4 +105,11 @@ jobs:
           git commit -m "chore: schema sync ${VERSION}"
           git tag -a "$VERSION" -m "chore: schema sync ${VERSION}"
           git push --follow-tags
-          # The tag push triggers the Release workflow (release.yml)
+
+          # Pushes made with GITHUB_TOKEN do not trigger other workflows, so the
+          # tag push alone never starts a release. workflow_dispatch is exempt.
+          for workflow in release.yml docker.yml terraform-release.yml; do
+            gh workflow run "$workflow" --ref "$VERSION"
+          done
+        env:
+          GH_TOKEN: ${{ github.token }}
