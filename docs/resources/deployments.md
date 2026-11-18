@@ -12,6 +12,7 @@ Manages Bitbucket deployments via the Bitbucket Cloud API.
 ## CRUD Operations
 - **Create**: Supported
 - **Read**: Supported
+- **Update**: Supported
 - **Delete**: Supported
 - **List**: Supported (via data source)
 
@@ -21,6 +22,7 @@ Manages Bitbucket deployments via the Bitbucket Cloud API.
 |-----------|--------|------|----------|
 | Create | `POST` | `/repositories/{workspace}/{repo_slug}/environments` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-post) |
 | Read | `GET` | `/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-environment-uuid-get) |
+| Update | `POST` | `/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}/changes` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-environment-uuid-changes-post) |
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-environment-uuid-delete) |
 | List | `GET` | `/repositories/{workspace}/{repo_slug}/environments` | [View](https://developer.atlassian.com/cloud/bitbucket/rest/api-group-deployments/#api-repositories-workspace-repo-slug-environments-get) |
 
@@ -30,6 +32,7 @@ Manages Bitbucket deployments via the Bitbucket Cloud API.
 |-----------|----------------|
 | Create | `admin:pipeline:bitbucket` |
 | Read | `read:pipeline:bitbucket` |
+| Update | `admin:pipeline:bitbucket` |
 | Delete | `admin:pipeline:bitbucket` |
 | List | `read:pipeline:bitbucket` |
 
@@ -50,7 +53,15 @@ resource "bitbucket_deployments" "example" {
 
 ### Optional
 - `environment_uuid` (String) Path parameter (auto-populated from API response).
+- `environment_type` (Object) The environment type. Required on create; cannot be changed afterwards. (also computed from API response)
+  Nested schema:
+  - `name` (String) The name of the environment type. [Test, Staging, Production]
+
 - `name` (String) The name of the environment. (also computed from API response)
+- `restrictions` (Object) Deployment restrictions for the environment. (also computed from API response)
+  Nested schema:
+  - `admin_only` (String) Only workspace and repository admins can deploy to this environment.
+
 - `uuid` (String) The UUID identifying the environment. (also computed from API response)
 - `request_body` (String) Raw JSON request body for create/update operations. Use `jsonencode({...})` to pass fields not exposed as individual attributes.
 

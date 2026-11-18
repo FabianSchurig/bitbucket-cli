@@ -142,3 +142,44 @@ func TestIsConfigurableAttr(t *testing.T) {
 		}
 	}
 }
+
+func TestRequiresReplace(t *testing.T) {
+	withoutUpdate := &GenericResource{group: ResourceGroup{Ops: CRUDOps{
+		Create: &OperationDef{OperationID: "create"},
+		Read:   &OperationDef{OperationID: "read"},
+	}}}
+	if !withoutUpdate.requiresReplace("name") {
+		t.Error("a resource without an Update operation must replace on any change")
+	}
+
+	withUpdate := &GenericResource{group: ResourceGroup{Ops: CRUDOps{
+		Read:      &OperationDef{OperationID: "read"},
+		Update:    &OperationDef{OperationID: "update"},
+		ReplaceOn: []string{"environment_type"},
+	}}}
+	if withUpdate.requiresReplace("name") {
+		t.Error("name is updatable in place")
+	}
+	if !withUpdate.requiresReplace("environment_type") {
+		t.Error("ReplaceOn attributes must force replacement")
+	}
+}
+
+func TestUpdateOpOmitsReplaceOnBodyFields(t *testing.T) {
+	update := &OperationDef{
+		OperationID: "update",
+		BodyFields: []BodyFieldDef{
+			{Path: "name", Type: "string"},
+			{Path: "environment_type", Type: "string", IsObject: true, ItemFields: []BodyFieldDef{{Path: "name", Type: "string"}}},
+		},
+	}
+	r := &GenericResource{group: ResourceGroup{Ops: CRUDOps{Update: update, ReplaceOn: []string{"environment_type"}}}}
+
+	got := r.updateOp()
+	if len(got.BodyFields) != 1 || got.BodyFields[0].Path != "name" {
+		t.Fatalf("updateOp body fields = %+v, want only name", got.BodyFields)
+	}
+	if len(update.BodyFields) != 2 {
+		t.Fatal("updateOp must not mutate the shared operation definition")
+	}
+}

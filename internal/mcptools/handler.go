@@ -44,15 +44,16 @@ type BodyFieldDef struct {
 
 // OperationDef holds metadata for a single Bitbucket API operation.
 type OperationDef struct {
-	OperationID string
-	Method      string
-	Path        string
-	Summary     string
-	Description string
-	Params      []ParamDef
-	BodyFields  []BodyFieldDef
-	HasBody     bool
-	Paginated   bool
+	OperationID  string
+	Method       string
+	Path         string
+	Summary      string
+	Description  string
+	Params       []ParamDef
+	BodyFields   []BodyFieldDef
+	HasBody      bool
+	BodyEnvelope string
+	Paginated    bool
 }
 
 // ToolGroup holds a set of related operations registered as a single MCP tool.
@@ -186,12 +187,13 @@ func newToolHandler(opMap map[string]OperationDef) mcp.ToolHandler {
 		}
 
 		result, err := handlers.DispatchRaw(ctx, c, handlers.Request{
-			Method:      op.Method,
-			URLTemplate: op.Path,
-			PathParams:  pathParams,
-			QueryParams: queryParams,
-			Body:        body,
-			All:         op.Paginated,
+			Method:       op.Method,
+			URLTemplate:  op.Path,
+			PathParams:   pathParams,
+			QueryParams:  queryParams,
+			Body:         body,
+			BodyEnvelope: op.BodyEnvelope,
+			All:          op.Paginated,
 		})
 		if err != nil {
 			return errResult(fmt.Sprintf("API error: %v", err)), nil

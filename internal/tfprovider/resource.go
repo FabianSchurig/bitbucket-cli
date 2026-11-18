@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -76,6 +77,7 @@ type OperationDef struct {
 	BodyFields     []BodyFieldDef
 	ResponseFields []BodyFieldDef // Flattened fields from the response schema (computed)
 	HasBody        bool
+	BodyEnvelope   string // wire-level wrapper key for the request body (see handlers.Request)
 	Paginated      bool
 	Scopes         []string // OAuth2 scopes from x-atlassian-oauth2-scopes
 	DocURL         string   // Atlassian REST API documentation URL
@@ -108,6 +110,8 @@ type CRUDOps struct {
 	Update *OperationDef
 	Delete *OperationDef
 	List   *OperationDef
+
+	ReplaceOn []string // see CRUDMapping.ReplaceOn
 }
 
 // ResourceGroup holds metadata for a Terraform resource generated from a
@@ -431,16 +435,105 @@ func restorePriorID(ctx context.Context, state stateAccessor, priorID string, di
 // Computed attributes mis-mapped, producing "Provider produced inconsistent
 // result after apply" errors on every modify.
 func (r *GenericResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	op := r.group.Ops.Update
+	op := r.updateOp()
 	if op == nil {
 		resp.Diagnostics.AddError("Update not supported", fmt.Sprintf("Resource %s does not support update", r.group.TypeName))
+		return
+	}
+	// The id is fixed at Create time. An Update that answers without a body
+	// (202/204) would otherwise store the operation-id fallback as the id.
+	priorID := readPriorID(ctx, &req.State, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 	r.dispatchWithParamFallback(ctx, op, &req.Plan, &req.State, &resp.State, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
+	restorePriorID(ctx, &resp.State, priorID, &resp.Diagnostics)
 	r.refreshAfterWrite(ctx, op, &resp.State, &req.State, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	r.awaitPlannedValues(ctx, op, &req.Plan, &resp.State, &req.State, &resp.Diagnostics)
+}
+
+// updateOp returns the Update operation with ReplaceOn attributes removed from
+// its typed body fields. Those attributes are unchanged whenever Update runs
+// (changing them plans a replacement), and APIs that reject them in an update
+// body (e.g. a deployment environment's type) would otherwise fail.
+func (r *GenericResource) updateOp() *OperationDef {
+	op := r.group.Ops.Update
+	if op == nil || len(r.group.Ops.ReplaceOn) == 0 {
+		return op
+	}
+	filtered := *op
+	filtered.BodyFields = nil
+	for _, bf := range op.BodyFields {
+		if !slices.Contains(r.group.Ops.ReplaceOn, toSnakeCase(bf.Path)) {
+			filtered.BodyFields = append(filtered.BodyFields, bf)
+		}
+	}
+	return &filtered
+}
+
+// awaitPlannedValues re-reads the resource until every configured top-level
+// scalar body attribute matches the plan. Some update endpoints apply changes
+// asynchronously (the deployment environment /changes POST answers
+// 202 Accepted), so the first post-write Read can still return old values and
+// Terraform would report "Provider produced inconsistent result after apply".
+// Gives up after readAfterWriteMaxAttempts reads and leaves the last state.
+func (r *GenericResource) awaitPlannedValues(ctx context.Context, writeOp *OperationDef, plan, state, paramFallback stateAccessor, diags *diag.Diagnostics) {
+	readOp := r.group.Ops.Read
+	if readOp == nil || readOp.OperationID == writeOp.OperationID {
+		return
+	}
+	wait := readAfterWriteInitialWait
+	for attempt := 1; attempt < readAfterWriteMaxAttempts; attempt++ {
+		if plannedScalarsApplied(ctx, writeOp.BodyFields, plan, state) {
+			return
+		}
+		if err := sleepWithContext(ctx, wait); err != nil {
+			return
+		}
+		wait = min(wait*2, readAfterWriteMaxWait)
+		r.refreshState(ctx, readOp, state, paramFallback, diags)
+		if diags.HasError() {
+			return
+		}
+	}
+}
+
+// plannedScalarsApplied reports whether each top-level string/int body
+// attribute with a known, non-null planned value has that value in state.
+func plannedScalarsApplied(ctx context.Context, fields []BodyFieldDef, plan, state stateAccessor) bool {
+	for _, bf := range fields {
+		if bf.IsObject || bf.IsArray {
+			continue
+		}
+		p := attrPath(toSnakeCase(strings.ReplaceAll(bf.Path, ".", "_")))
+		var planned, current attr.Value
+		if bf.Type == "int" {
+			var pv, cv types.Int64
+			if plan.GetAttribute(ctx, p, &pv).HasError() || state.GetAttribute(ctx, p, &cv).HasError() {
+				continue
+			}
+			planned, current = pv, cv
+		} else {
+			var pv, cv types.String
+			if plan.GetAttribute(ctx, p, &pv).HasError() || state.GetAttribute(ctx, p, &cv).HasError() {
+				continue
+			}
+			planned, current = pv, cv
+		}
+		if planned.IsNull() || planned.IsUnknown() {
+			continue
+		}
+		if !planned.Equal(current) {
+			return false
+		}
+	}
+	return true
 }
 
 // ImportState implements resource import. The import ID must be the slash-separated
@@ -557,12 +650,13 @@ func (r *GenericResource) dispatchWithParamFallback(ctx context.Context, op *Ope
 	}
 
 	result, err := handlers.DispatchRaw(ctx, r.client, handlers.Request{
-		Method:      op.Method,
-		URLTemplate: op.Path,
-		PathParams:  pathParams,
-		QueryParams: queryParams,
-		Body:        body,
-		All:         op.Paginated,
+		Method:       op.Method,
+		URLTemplate:  op.Path,
+		PathParams:   pathParams,
+		QueryParams:  queryParams,
+		Body:         body,
+		BodyEnvelope: op.BodyEnvelope,
+		All:          op.Paginated,
 	})
 	if err != nil {
 		diags.AddError("API Error", fmt.Sprintf("Operation %s failed: %v", op.OperationID, err))

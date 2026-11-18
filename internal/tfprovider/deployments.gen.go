@@ -360,7 +360,13 @@ administered through admin.atlassian.com.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `environment`, Type: `string`, Desc: `environment`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `environment_type`, Type: `string`, Desc: `The environment type. Required on create; cannot be changed afterwards.`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+					}},
 					{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+					{Path: `restrictions`, Type: `string`, Desc: `Deployment restrictions for the environment.`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+					}},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 				}},
 				{Path: `release`, Type: `string`, Desc: `release`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -392,7 +398,13 @@ administered through admin.atlassian.com.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `environment`, Type: `string`, Desc: `environment`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `environment_type`, Type: `string`, Desc: `The environment type. Required on create; cannot be changed afterwards.`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+					}},
 					{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+					{Path: `restrictions`, Type: `string`, Desc: `Deployment restrictions for the environment.`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+					}},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 				}},
 				{Path: `release`, Type: `string`, Desc: `release`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -424,7 +436,13 @@ administered through admin.atlassian.com.
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `environment_type`, Type: `string`, Desc: `The environment type. Required on create; cannot be changed afterwards.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+				}},
 				{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+				{Path: `restrictions`, Type: `string`, Desc: `Deployment restrictions for the environment.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 			},
 			HasBody:   false,
@@ -445,11 +463,23 @@ administered through admin.atlassian.com.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
+				{Path: `environment_type`, Type: `string`, Desc: `The environment type. Required on create; cannot be changed afterwards.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+				}},
 				{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+				{Path: `restrictions`, Type: `string`, Desc: `Deployment restrictions for the environment.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 			},
 			ResponseFields: []BodyFieldDef{
+				{Path: `environment_type`, Type: `string`, Desc: `The environment type. Required on create; cannot be changed afterwards.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+				}},
 				{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+				{Path: `restrictions`, Type: `string`, Desc: `Deployment restrictions for the environment.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 			},
 			HasBody:   true,
@@ -472,7 +502,13 @@ administered through admin.atlassian.com.
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `environment_type`, Type: `string`, Desc: `The environment type. Required on create; cannot be changed afterwards.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+				}},
 				{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+				{Path: `restrictions`, Type: `string`, Desc: `Deployment restrictions for the environment.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 			},
 			HasBody:   false,
@@ -513,9 +549,19 @@ administered through admin.atlassian.com.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `environment_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields:     []BodyFieldDef{},
+			BodyFields: []BodyFieldDef{
+				{Path: `environment_type`, Type: `string`, Desc: `The environment type. Required on create; cannot be changed afterwards.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+				}},
+				{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+				{Path: `restrictions`, Type: `string`, Desc: `Deployment restrictions for the environment.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+				}},
+				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
+			},
 			ResponseFields: []BodyFieldDef{},
-			HasBody:        false,
+			HasBody:        true,
+			BodyEnvelope:   `change`,
 			Paginated:      false,
 			Scopes: []string{
 				`admin:pipeline:bitbucket`,
@@ -1009,7 +1055,13 @@ administered through admin.atlassian.com.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `environment`, Type: `string`, Desc: `environment`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `environment_type`, Type: `string`, Desc: `The environment type. Required on create; cannot be changed afterwards.`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+					}},
 					{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+					{Path: `restrictions`, Type: `string`, Desc: `Deployment restrictions for the environment.`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+					}},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 				}},
 				{Path: `release`, Type: `string`, Desc: `release`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1041,7 +1093,13 @@ administered through admin.atlassian.com.
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
 				{Path: `environment`, Type: `string`, Desc: `environment`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `environment_type`, Type: `string`, Desc: `The environment type. Required on create; cannot be changed afterwards.`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+					}},
 					{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+					{Path: `restrictions`, Type: `string`, Desc: `Deployment restrictions for the environment.`, IsObject: true, ItemFields: []BodyFieldDef{
+						{Path: `admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+					}},
 					{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 				}},
 				{Path: `release`, Type: `string`, Desc: `release`, IsObject: true, ItemFields: []BodyFieldDef{
@@ -1073,7 +1131,13 @@ administered through admin.atlassian.com.
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `environment_type`, Type: `string`, Desc: `The environment type. Required on create; cannot be changed afterwards.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+				}},
 				{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+				{Path: `restrictions`, Type: `string`, Desc: `Deployment restrictions for the environment.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 			},
 			HasBody:   false,
@@ -1094,11 +1158,23 @@ administered through admin.atlassian.com.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
+				{Path: `environment_type`, Type: `string`, Desc: `The environment type. Required on create; cannot be changed afterwards.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+				}},
 				{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+				{Path: `restrictions`, Type: `string`, Desc: `Deployment restrictions for the environment.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 			},
 			ResponseFields: []BodyFieldDef{
+				{Path: `environment_type`, Type: `string`, Desc: `The environment type. Required on create; cannot be changed afterwards.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+				}},
 				{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+				{Path: `restrictions`, Type: `string`, Desc: `Deployment restrictions for the environment.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 			},
 			HasBody:   true,
@@ -1121,7 +1197,13 @@ administered through admin.atlassian.com.
 			},
 			BodyFields: []BodyFieldDef{},
 			ResponseFields: []BodyFieldDef{
+				{Path: `environment_type`, Type: `string`, Desc: `The environment type. Required on create; cannot be changed afterwards.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+				}},
 				{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+				{Path: `restrictions`, Type: `string`, Desc: `Deployment restrictions for the environment.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+				}},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 			},
 			HasBody:   false,
@@ -1162,9 +1244,19 @@ administered through admin.atlassian.com.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `environment_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields:     []BodyFieldDef{},
+			BodyFields: []BodyFieldDef{
+				{Path: `environment_type`, Type: `string`, Desc: `The environment type. Required on create; cannot be changed afterwards.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+				}},
+				{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+				{Path: `restrictions`, Type: `string`, Desc: `Deployment restrictions for the environment.`, IsObject: true, ItemFields: []BodyFieldDef{
+					{Path: `admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+				}},
+				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
+			},
 			ResponseFields: []BodyFieldDef{},
-			HasBody:        false,
+			HasBody:        true,
+			BodyEnvelope:   `change`,
 			Paginated:      false,
 			Scopes: []string{
 				`admin:pipeline:bitbucket`,

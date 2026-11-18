@@ -131,18 +131,18 @@ Manage Bitbucket webhooks
 
 | Operation | Method | Description |
 |-----------|--------|-------------|
-| `getAWebhookResource` | `GET` | Returns the webhook resource or subject types on which webhooks can |
-| `listSubscribableWebhookTypes` | `GET` | Returns a paginated list of all valid webhook events for the |
+| `getAWebhookResource` | `GET` | Returns the webhook resource or subject types on which webhooks can be registered. |
+| `listSubscribableWebhookTypes` | `GET` | Returns a paginated list of all valid webhook events for the specified entity. |
 | `listWebhooksForARepository` | `GET` | Returns a paginated list of webhooks installed on this repository. |
 | `createAWebhookForARepository` | `POST` | Creates a new webhook on the specified repository. |
-| `getAWebhookForARepository` | `GET` | Returns the webhook with the specified id installed on the specified |
+| `getAWebhookForARepository` | `GET` | Returns the webhook with the specified id installed on the |
 | `updateAWebhookForARepository` | `PUT` | Updates the specified webhook subscription. |
 | `deleteAWebhookForARepository` | `DELETE` | Deletes the specified webhook subscription from the given |
 | `listWebhooksForAWorkspace` | `GET` | Returns a paginated list of webhooks installed on this workspace. |
 | `createAWebhookForAWorkspace` | `POST` | Creates a new webhook on the specified workspace. |
-| `getAWebhookForAWorkspace` | `GET` | Returns the webhook with the specified id installed on the given |
+| `getAWebhookForAWorkspace` | `GET` | Returns the webhook with the specified id installed on the |
 | `updateAWebhookForAWorkspace` | `PUT` | Updates the specified webhook subscription. |
-| `deleteAWebhookForAWorkspace` | `DELETE` | Deletes the specified webhook subscription from the given workspace. |
+| `deleteAWebhookForAWorkspace` | `DELETE` | Deletes the specified webhook subscription from the given |
 
 ---
 
@@ -282,6 +282,7 @@ Typical workflow:
 | `getTheDiffStatForAPullRequest` | `GET` | Redirects to the [repository diffstat](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-diffstat-spec-get) |
 | `mergeAPullRequest` | `POST` | Merges the pull request. Common merge strategies: merge_commit, squash, fast_forward. Requires all required approvals and passing builds. Confirm with listCommitStatusesForAPullRequest first. ✏️ |
 | `getTheMergeTaskStatusForAPullRequest` | `GET` | When merging a pull request takes too long, the client receives a |
+| `listPullRequestMergeabilityChecks` | `GET` | Returns the mergeability checks Bitbucket performs for this pull request, and whether each one |
 | `getThePatchForAPullRequest` | `GET` | Redirects to the [repository patch](/cloud/bitbucket/rest/api-group-commits/#api-repositories-workspace-repo-slug-patch-spec-get) |
 | `requestChangesForAPullRequest` | `POST` | Marks the pull request as needing changes from the author. This blocks merge until the change request is resolved or removed. ✏️ |
 | `removeChangeRequestForAPullRequest` | `DELETE` | Remove change request for a pull request |
@@ -385,7 +386,7 @@ Common operations:
 | `forkARepository` | `POST` | Creates a new fork of the specified repository. |
 | `listWebhooksForARepository` | `GET` | Returns a paginated list of webhooks installed on this repository. |
 | `createAWebhookForARepository` | `POST` | Creates a new webhook on the specified repository. |
-| `getAWebhookForARepository` | `GET` | Returns the webhook with the specified id installed on the specified |
+| `getAWebhookForARepository` | `GET` | Returns the webhook with the specified id installed on the |
 | `updateAWebhookForARepository` | `PUT` | Updates the specified webhook subscription. |
 | `deleteAWebhookForARepository` | `DELETE` | Deletes the specified webhook subscription from the given |
 | `retrieveTheInheritanceStateForRepositorySettings` | `GET` | Retrieve the inheritance state for repository settings |
@@ -486,11 +487,12 @@ Manage Bitbucket workspaces
 | `getUserPermissionOnAWorkspace` | `GET` | Returns the caller's effective role; as in, the highest level of privilege |
 | `listWorkspacesForUser` | `GET` | **This endpoint is deprecated. Please use the |
 | `getAWorkspace` | `GET` | Returns the requested workspace. |
+| `searchCodeInAWorkspace` | `POST` | Search code across repositories in a workspace. |
 | `listWebhooksForAWorkspace` | `GET` | Returns a paginated list of webhooks installed on this workspace. |
 | `createAWebhookForAWorkspace` | `POST` | Creates a new webhook on the specified workspace. |
-| `getAWebhookForAWorkspace` | `GET` | Returns the webhook with the specified id installed on the given |
+| `getAWebhookForAWorkspace` | `GET` | Returns the webhook with the specified id installed on the |
 | `updateAWebhookForAWorkspace` | `PUT` | Updates the specified webhook subscription. |
-| `deleteAWebhookForAWorkspace` | `DELETE` | Deletes the specified webhook subscription from the given workspace. |
+| `deleteAWebhookForAWorkspace` | `DELETE` | Deletes the specified webhook subscription from the given |
 | `listUsersInAWorkspace` | `GET` | Returns all members of the requested workspace. |
 | `getUserMembershipForAWorkspace` | `GET` | Returns the workspace membership, which includes |
 | `listUserPermissionsInAWorkspace` | `GET` | Returns the list of members in a workspace |

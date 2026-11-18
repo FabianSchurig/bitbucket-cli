@@ -174,7 +174,7 @@ operation groups. Each resource group maps to a set of CRUD operations.
 
 | Resource | Data Source | CRUD |
 |----------|-------------|------|
-| `bitbucket_deployments` | `bitbucket_deployments` | CRDL |
+| `bitbucket_deployments` | `bitbucket_deployments` | CRUDL |
 | `bitbucket_project_deploy_keys` | `bitbucket_project_deploy_keys` | CRDL |
 | `bitbucket_repo_deploy_keys` | `bitbucket_repo_deploy_keys` | CRUDL |
 

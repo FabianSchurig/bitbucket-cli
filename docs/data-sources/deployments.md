@@ -49,5 +49,13 @@ output "deployments_response" {
 
 - `id` (String) Resource identifier.
 - `api_response` (String) The raw JSON response from the Bitbucket API.
+- `environment_type` (Object) The environment type. Required on create; cannot be changed afterwards.
+  Nested schema:
+  - `name` (String) The name of the environment type. [Test, Staging, Production]
+
 - `name` (String) The name of the environment.
+- `restrictions` (Object) Deployment restrictions for the environment.
+  Nested schema:
+  - `admin_only` (String) Only workspace and repository admins can deploy to this environment.
+
 - `uuid` (String) The UUID identifying the environment.

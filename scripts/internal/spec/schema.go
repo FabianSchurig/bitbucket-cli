@@ -47,6 +47,9 @@ type Op struct {
 	RequestBody  *RequestBody       `yaml:"requestBody"`
 	Responses    Responses          `yaml:"responses"`
 	OAuth2Scopes []OAuth2ScopeEntry `yaml:"x-atlassian-oauth2-scopes"`
+	// BodyEnvelope names the top-level key the request body must be wrapped
+	// in on the wire (x-bb-body-envelope, injected by enrich_spec.py).
+	BodyEnvelope string `yaml:"x-bb-body-envelope"`
 }
 
 // OAuth2ScopeEntry represents an x-atlassian-oauth2-scopes entry.

@@ -196,6 +196,7 @@ type OperationDef struct {
 	BodyFields     []BodyField
 	ResponseFields []BodyField // Flattened fields from the response schema
 	HasBody        bool
+	BodyEnvelope   string // wire-level wrapper key for the request body (x-bb-body-envelope)
 	Paginated      bool
 	Scopes         []string // OAuth2 scopes from x-atlassian-oauth2-scopes (Current state)
 	DocURL         string   // Atlassian REST API documentation URL
@@ -246,6 +247,7 @@ func BuildOperation(pe PathEntry, entry MethodOp, schema *Schema) OperationDef {
 		BodyFields:     bodyFields,
 		ResponseFields: responseFields,
 		HasBody:        op.RequestBody != nil,
+		BodyEnvelope:   op.BodyEnvelope,
 		Paginated:      paginated,
 		Scopes:         ExtractScopes(op),
 		DocURL:         BuildDocURL(op.Tags, pe.Path, entry.Method),

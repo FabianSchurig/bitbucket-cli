@@ -419,6 +419,7 @@ Manage Bitbucket deployments
 | --- | --- | --- |
 | Create | `POST` | `/repositories/{workspace}/{repo_slug}/environments` |
 | Read | `GET` | `/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}` |
+| Update | `POST` | `/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}/changes` |
 | Delete | `DELETE` | `/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}` |
 | List | `GET` | `/repositories/{workspace}/{repo_slug}/environments` |
 

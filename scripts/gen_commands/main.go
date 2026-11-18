@@ -28,17 +28,18 @@ import (
 
 // CommandData holds the data for a single generated Cobra command.
 type CommandData struct {
-	OperationID string
-	Use         string
-	Short       string
-	Long        string
-	Deprecated  bool
-	Method      string
-	Path        string
-	Flags       []FlagData
-	BodyFields  []spec.BodyField
-	HasBody     bool
-	Paginated   bool
+	OperationID  string
+	Use          string
+	Short        string
+	Long         string
+	Deprecated   bool
+	Method       string
+	Path         string
+	Flags        []FlagData
+	BodyFields   []spec.BodyField
+	HasBody      bool
+	BodyEnvelope string
+	Paginated    bool
 }
 
 // FlagData holds the data for a single CLI flag.
@@ -102,17 +103,18 @@ func operationToCommand(op spec.OperationDef) CommandData {
 	}
 
 	return CommandData{
-		OperationID: op.OperationID,
-		Use:         spec.ToKebab(op.OperationID),
-		Short:       op.Summary,
-		Long:        op.Description,
-		Deprecated:  op.Deprecated,
-		Method:      op.Method,
-		Path:        op.Path,
-		Flags:       flags,
-		BodyFields:  bodyFields,
-		HasBody:     op.HasBody,
-		Paginated:   op.Paginated,
+		OperationID:  op.OperationID,
+		Use:          spec.ToKebab(op.OperationID),
+		Short:        op.Summary,
+		Long:         op.Description,
+		Deprecated:   op.Deprecated,
+		Method:       op.Method,
+		Path:         op.Path,
+		Flags:        flags,
+		BodyFields:   bodyFields,
+		HasBody:      op.HasBody,
+		BodyEnvelope: op.BodyEnvelope,
+		Paginated:    op.Paginated,
 	}
 }
 
@@ -274,6 +276,9 @@ return handlers.Dispatch(context.Background(), c, handlers.Request{
 					PathParams:  pathParams,
 					QueryParams: queryParams,
 					Body:        body,
+{{- if .BodyEnvelope}}
+					BodyEnvelope: {{goStringLit .BodyEnvelope}},
+{{- end}}
 					All:         {{if .Paginated}}all{{else}}false{{end}},
 				})
 },

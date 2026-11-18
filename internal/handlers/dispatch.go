@@ -33,7 +33,11 @@ type Request struct {
 	PathParams  map[string]string
 	QueryParams map[string]string
 	Body        string
-	All         bool
+	// BodyEnvelope, when set, wraps the JSON body as {"<BodyEnvelope>": body}
+	// before sending (e.g. Bitbucket's environment update expects
+	// {"change": {...}}). A body that is already enveloped is sent unchanged.
+	BodyEnvelope string
+	All          bool
 }
 
 // pageResult holds extracted pagination data from a response.
@@ -64,6 +68,7 @@ func Dispatch(ctx context.Context, c *client.BBClient, r Request) error {
 // responses). Returns nil for empty/non-JSON responses. This is used by both
 // the CLI (via Dispatch) and the MCP server.
 func DispatchRaw(ctx context.Context, c *client.BBClient, r Request) (any, error) {
+	r.Body = applyBodyEnvelope(r.Body, r.BodyEnvelope)
 	baseURL := buildURL(r.URLTemplate, r.PathParams)
 	var allValues []any
 	fetchURL := baseURL
@@ -107,6 +112,29 @@ func fetchResult(ctx context.Context, c *client.BBClient, r Request, fetchURL, b
 	}
 
 	return result, extractPage(result), nil
+}
+
+// applyBodyEnvelope wraps a JSON body under the envelope key. Bodies that are
+// empty, not valid JSON, or already a single-key object using the envelope key
+// are returned unchanged, so callers may pass either shape.
+func applyBodyEnvelope(body, envelope string) string {
+	if envelope == "" || strings.TrimSpace(body) == "" {
+		return body
+	}
+	var parsed any
+	if err := json.Unmarshal([]byte(body), &parsed); err != nil {
+		return body
+	}
+	if m, ok := parsed.(map[string]any); ok && len(m) == 1 {
+		if _, wrapped := m[envelope]; wrapped {
+			return body
+		}
+	}
+	wrapped, err := json.Marshal(map[string]any{envelope: parsed})
+	if err != nil {
+		return body
+	}
+	return string(wrapped)
 }
 
 func shouldFetchNextPage(all bool, page *pageResult) bool {
@@ -287,9 +315,12 @@ func parseNestedValue(value any) any {
 	return parsed
 }
 
+// ensureNestedMap returns the map stored under key, creating it when absent.
+// A non-map value already stored under key (e.g. a scalar flag "target" set
+// alongside "target.hash") is replaced rather than causing a panic.
 func ensureNestedMap(current map[string]any, key string) map[string]any {
-	if sub, ok := current[key]; ok {
-		return sub.(map[string]any)
+	if sub, ok := current[key].(map[string]any); ok {
+		return sub
 	}
 
 	sub := map[string]any{}

@@ -119,6 +119,63 @@ REQUEST_BODY_PATCHES: dict[tuple[str, str], dict] = {
         "description": "The deploy key to add",
         "required": False,
     },
+    # updateEnvironmentForRepository — the live spec declares no body, yet the
+    # endpoint takes the environment fields wrapped as {"change": {...}}
+    # (BCLOUD-22876). The body is declared flat here and the wrapper key is
+    # carried by OPERATION_EXTENSION_PATCHES, so CLI flags, MCP body fields and
+    # Terraform attributes match createEnvironment.
+    ("post", "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}/changes"): {
+        "content": {
+            "application/json": {
+                "schema": {"$ref": "#/components/schemas/deployment_environment"}
+            }
+        },
+        "description": "The environment fields to change",
+        "required": True,
+    },
+}
+
+
+# ─── Operation extension patches ──────────────────────────────────────────────
+# Vendor extensions the generators understand but Atlassian does not publish.
+# x-bb-body-envelope: wrap the JSON body under this key on the wire.
+OPERATION_EXTENSION_PATCHES: dict[tuple[str, str], dict] = {
+    ("post", "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}/changes"): {
+        "x-bb-body-envelope": "change",
+    },
+}
+
+
+# ─── Missing schema property patches ──────────────────────────────────────────
+# Properties the API accepts and returns but the published component schema
+# omits. Without them the only way to create a deployment environment is the
+# raw request_body, because Bitbucket rejects a create without
+# environment_type.name ("Unknown environment type"). Patched properties are
+# added only when absent, so a property Atlassian starts publishing wins.
+SCHEMA_PROPERTY_PATCHES: dict[str, dict[str, dict]] = {
+    "deployment_environment": {
+        "environment_type": {
+            "type": "object",
+            "description": "The environment type. Required on create; cannot be changed afterwards.",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the environment type.",
+                    "enum": ["Test", "Staging", "Production"],
+                },
+            },
+        },
+        "restrictions": {
+            "type": "object",
+            "description": "Deployment restrictions for the environment.",
+            "properties": {
+                "admin_only": {
+                    "type": "boolean",
+                    "description": "Only workspace and repository admins can deploy to this environment.",
+                },
+            },
+        },
+    },
 }
 
 
@@ -160,6 +217,52 @@ def apply_request_body_patches(spec: dict) -> int:
             continue
         op["requestBody"] = copy.deepcopy(body)
         applied += 1
+    return applied
+
+
+def apply_operation_extension_patches(spec: dict) -> int:
+    """Set vendor extensions on existing operations without overriding any."""
+    applied = 0
+    for (method, path), extensions in OPERATION_EXTENSION_PATCHES.items():
+        op = spec.get("paths", {}).get(path, {}).get(method)
+        if not isinstance(op, dict):
+            continue
+        for key, value in extensions.items():
+            if key not in op:
+                op[key] = copy.deepcopy(value)
+                applied += 1
+    return applied
+
+
+def _properties_container(schema: dict) -> dict | None:
+    """Return the ``properties`` dict that describes ``schema`` itself.
+
+    Bitbucket components are usually ``allOf: [{$ref: object}, {properties}]``;
+    the inline allOf member carries the entity's own properties.
+    """
+    if isinstance(schema.get("properties"), dict):
+        return schema["properties"]
+    for member in schema.get("allOf", []):
+        if isinstance(member, dict) and "$ref" not in member and isinstance(member.get("properties"), dict):
+            return member["properties"]
+    return None
+
+
+def apply_schema_property_patches(spec: dict) -> int:
+    """Add missing properties to component schemas; never overwrite existing ones."""
+    schemas = spec.get("components", {}).get("schemas", {})
+    applied = 0
+    for name, props in SCHEMA_PROPERTY_PATCHES.items():
+        schema = schemas.get(name)
+        if not isinstance(schema, dict):
+            continue
+        container = _properties_container(schema)
+        if container is None:
+            continue
+        for prop_name, prop in props.items():
+            if prop_name not in container:
+                container[prop_name] = copy.deepcopy(prop)
+                applied += 1
     return applied
 
 
@@ -312,6 +415,8 @@ def main():
     new_ids = len(updated_lock) - len(lock)
 
     patched = apply_request_body_patches(spec)
+    extended = apply_operation_extension_patches(spec)
+    properties = apply_schema_property_patches(spec)
 
     output_path.write_text(json.dumps(spec, indent=2))
     write_lock(updated_lock, lock_path)
@@ -322,6 +427,10 @@ def main():
     )
     if patched:
         print(f"Injected {patched} missing requestBody object(s)")
+    if extended:
+        print(f"Injected {extended} operation extension(s)")
+    if properties:
+        print(f"Injected {properties} missing schema propert(y/ies)")
 
 
 if __name__ == "__main__":

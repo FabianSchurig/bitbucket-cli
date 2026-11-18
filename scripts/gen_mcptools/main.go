@@ -32,15 +32,16 @@ type MCPToolData struct {
 }
 
 type MCPOpData struct {
-	OperationID string
-	Method      string
-	Path        string
-	Summary     string
-	Description string
-	Params      []MCPParamData
-	BodyFields  []MCPBodyFieldData
-	HasBody     bool
-	Paginated   bool
+	OperationID  string
+	Method       string
+	Path         string
+	Summary      string
+	Description  string
+	Params       []MCPParamData
+	BodyFields   []MCPBodyFieldData
+	HasBody      bool
+	BodyEnvelope string
+	Paginated    bool
 }
 
 type MCPParamData struct {
@@ -93,6 +94,9 @@ var {{.ToolVarName}} = ToolGroup{
 {{- end}}
 			},
 			HasBody:   {{.HasBody}},
+{{- if .BodyEnvelope}}
+			BodyEnvelope: {{goStringLit .BodyEnvelope}},
+{{- end}}
 			Paginated: {{.Paginated}},
 		},
 {{- end}}
@@ -130,15 +134,16 @@ func operationToMCPOp(op spec.OperationDef) MCPOpData {
 	}
 
 	return MCPOpData{
-		OperationID: op.OperationID,
-		Method:      op.Method,
-		Path:        op.Path,
-		Summary:     op.Summary,
-		Description: op.Description,
-		Params:      params,
-		BodyFields:  bodyFields,
-		HasBody:     op.HasBody,
-		Paginated:   op.Paginated,
+		OperationID:  op.OperationID,
+		Method:       op.Method,
+		Path:         op.Path,
+		Summary:      op.Summary,
+		Description:  op.Description,
+		Params:       params,
+		BodyFields:   bodyFields,
+		HasBody:      op.HasBody,
+		BodyEnvelope: op.BodyEnvelope,
+		Paginated:    op.Paginated,
 	}
 }
 

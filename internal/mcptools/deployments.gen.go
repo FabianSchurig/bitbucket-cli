@@ -202,7 +202,9 @@ administered through admin.atlassian.com.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
+				{Path: `environment_type.name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
 				{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+				{Path: `restrictions.admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
 				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
 			},
 			HasBody:   true,
@@ -249,9 +251,15 @@ administered through admin.atlassian.com.
 				{Name: `repo_slug`, In: `path`, Type: `string`, Required: true},
 				{Name: `environment_uuid`, In: `path`, Type: `string`, Required: true},
 			},
-			BodyFields: []BodyFieldDef{},
-			HasBody:    false,
-			Paginated:  false,
+			BodyFields: []BodyFieldDef{
+				{Path: `environment_type.name`, Type: `string`, Desc: `The name of the environment type. [Test, Staging, Production]`},
+				{Path: `name`, Type: `string`, Desc: `The name of the environment.`},
+				{Path: `restrictions.admin_only`, Type: `bool`, Desc: `Only workspace and repository admins can deploy to this environment.`},
+				{Path: `uuid`, Type: `string`, Desc: `The UUID identifying the environment.`},
+			},
+			HasBody:      true,
+			BodyEnvelope: `change`,
+			Paginated:    false,
 		},
 		{
 			OperationID: `listProjectDeployKeys`,

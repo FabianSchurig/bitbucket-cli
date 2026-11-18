@@ -173,15 +173,15 @@ flowchart TD
     F --> G[Regenerate code and docs]
     G --> H[Build and test]
     H --> I[Tag new version]
-    I --> J[release.yml]
-    J --> K[docker.yml]
-    I --> L[terraform-release.yml]
+    I -->|workflow_dispatch| J[release.yml]
+    I -->|workflow_dispatch| K[docker.yml]
+    I -->|workflow_dispatch| L[terraform-release.yml]
     K --> M[Publish to MCP Registry]
 ```
 
 - **`ci.yml`**: builds, lints, vets, runs Go tests, and sends analysis to SonarQube Cloud.
 - **`terraform-tests.yml`**: runs mock-based Terraform acceptance and `terraform test` suites, plus real API tests when credentials exist. See [docs/e2e-coverage.md](./docs/e2e-coverage.md) for the current list of endpoints exercised by the real-API tests.
-- **`schema-sync.yml`**: daily/manual sync that fetches the live Bitbucket spec, regenerates generated artifacts, rebuilds docs, tests everything, and tags a release when the schema changed.
+- **`schema-sync.yml`**: daily/manual sync that fetches the live Bitbucket spec, regenerates generated artifacts, rebuilds docs, tests everything, and tags a release when the schema changed. Because pushes made with `GITHUB_TOKEN` do not trigger other workflows, it dispatches `release.yml`, `docker.yml` and `terraform-release.yml` for the new tag explicitly.
 - **`release.yml`**: publishes tagged binary releases via GoReleaser.
 - **`docker.yml`**: builds multi-arch container images for `bb-cli` and `bb-mcp`, pushes them to GHCR, publishes their SBOM and CVE reports (see [Supply chain: SBOM and CVE reports](#supply-chain-sbom-and-cve-reports)), and publishes the `bb-mcp` server to the [MCP Registry](https://registry.modelcontextprotocol.io).
 - **`terraform-release.yml`**: mirrors the tagged source into `terraform-provider-bitbucket` and publishes the Terraform provider release.
@@ -258,9 +258,10 @@ Use the short guides on this first page to get started, then switch to the detai
 - **CLI**: [docs/cli.md](./docs/cli.md)
 - **MCP**: [docs/mcp.md](./docs/mcp.md)
 - **Terraform provider docs**: [docs/index.md](./docs/index.md) and the [Terraform Registry docs](https://registry.terraform.io/providers/FabianSchurig/bitbucket/latest)
+- **Terraform guides** (hand-written, under `docs/guides/`): [managing deployment environments across repositories](./docs/guides/deployment-environments.md)
 - **Real-API E2E test coverage**: [docs/e2e-coverage.md](./docs/e2e-coverage.md) — auto-generated list of which resource groups are exercised by `TestAccRealAPI_*` tests, and which are still missing coverage.
 
-The Terraform documentation under `docs/` is generated. The root README stays focused on orientation, links, architecture, maintenance, and contribution entry points.
+The Terraform documentation under `docs/` is generated, except for `docs/guides/`. The root README stays focused on orientation, links, architecture, maintenance, and contribution entry points.
 
 ## Maintenance and contributions
 

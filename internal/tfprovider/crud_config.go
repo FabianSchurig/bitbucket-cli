@@ -64,10 +64,16 @@ var CRUDConfig = map[string]CRUDMapping{
 		List:   "getPipelinesForRepository",
 	},
 	"deployments": {
-		Create: "createEnvironment",
-		Read:   "getEnvironmentForRepository",
-		Delete: "deleteEnvironmentForRepository",
-		List:   "getEnvironmentsForRepository",
+		// One resource instance per deployment environment. Updates go through
+		// POST .../environments/{uuid}/changes ({"change": {...}} envelope);
+		// Bitbucket rejects changing the environment type, so that forces
+		// replacement instead.
+		Create:    "createEnvironment",
+		Read:      "getEnvironmentForRepository",
+		Update:    "updateEnvironmentForRepository",
+		Delete:    "deleteEnvironmentForRepository",
+		List:      "getEnvironmentsForRepository",
+		ReplaceOn: []string{"environment_type"},
 	},
 	"branch-restrictions": {
 		Create: "createABranchRestrictionRule",
@@ -389,4 +395,8 @@ type CRUDMapping struct {
 	Update string
 	Delete string
 	List   string
+	// ReplaceOn lists top-level attributes the API cannot change in place.
+	// Changing one plans a replacement, and they are omitted from Update
+	// bodies built from typed attributes.
+	ReplaceOn []string
 }

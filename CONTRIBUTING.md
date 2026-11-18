@@ -120,6 +120,7 @@ Changes will be overwritten by the next CI run. Instead, fix the source:
 | Wrong Terraform resource definitions | `scripts/gen_terraform/main.go` |
 | Wrong model types | `oapi-codegen.yaml` or `scripts/partition_spec.py` |
 | Missing/wrong endpoints | `scripts/enrich_spec.py` or `scripts/partition_spec.py` |
+| Missing request bodies, schema properties or wire quirks (e.g. a `{"change": ...}` body envelope) | `REQUEST_BODY_PATCHES`, `SCHEMA_PROPERTY_PATCHES`, `OPERATION_EXTENSION_PATCHES` in `scripts/enrich_spec.py` |
 | Shared schema logic | `scripts/internal/spec/` |
 
 Generated code is automatically formatted using `go/format` during generation.
@@ -152,8 +153,9 @@ go run scripts/gen_mcptools/main.go schema/pr-schema.yaml internal/mcptools/pr.g
 # Terraform resources
 go run scripts/gen_terraform/main.go schema/pr-schema.yaml internal/tfprovider/pr.gen.go
 
-# Or regenerate everything:
+# Or regenerate everything (all schema/*-schema.yaml groups), then the docs:
 make generate
+make generate-docs
 ```
 
 ## Security

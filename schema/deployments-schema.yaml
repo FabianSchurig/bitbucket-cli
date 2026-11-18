@@ -688,6 +688,14 @@ paths:
       x-atlassian-auth-types:
       - forge-oauth2
       - api-token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deployment_environment'
+        description: The environment fields to change
+        required: true
+      x-bb-body-envelope: change
   /workspaces/{workspace}/projects/{project_key}/deploy-keys:
     get:
       tags:
@@ -1185,6 +1193,26 @@ components:
           name:
             type: string
             description: The name of the environment.
+          environment_type:
+            type: object
+            description: The environment type. Required on create; cannot be changed
+              afterwards.
+            properties:
+              name:
+                type: string
+                description: The name of the environment type.
+                enum:
+                - Test
+                - Staging
+                - Production
+          restrictions:
+            type: object
+            description: Deployment restrictions for the environment.
+            properties:
+              admin_only:
+                type: boolean
+                description: Only workspace and repository admins can deploy to this
+                  environment.
       x-bb-default-fields:
       - uuid
       x-bb-url: /rest/2.0/accounts/{workspace.uuid}/repositories/{repository.uuid}/environments/{uuid}

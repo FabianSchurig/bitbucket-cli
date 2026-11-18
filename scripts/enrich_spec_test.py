@@ -209,5 +209,58 @@ class OperationIdLockTests(unittest.TestCase):
                 enrich_spec.load_lock(lock_path)
 
 
+ENV_CHANGES_PATH = "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}/changes"
+
+
+class DeploymentEnvironmentPatchTests(unittest.TestCase):
+    def _spec(self, env_props: dict, changes_op: dict) -> dict:
+        return {
+            "paths": {ENV_CHANGES_PATH: {"post": changes_op}},
+            "components": {
+                "schemas": {
+                    "object": {"type": "object"},
+                    "deployment_environment": {
+                        "allOf": [
+                            {"$ref": "#/components/schemas/object"},
+                            {"type": "object", "properties": env_props},
+                        ]
+                    },
+                }
+            },
+        }
+
+    def test_update_gets_flat_body_and_change_envelope(self):
+        spec = self._spec({"name": {"type": "string"}}, {"operationId": "updateEnvironmentForRepository"})
+        enrich_spec.apply_request_body_patches(spec)
+        enrich_spec.apply_operation_extension_patches(spec)
+        op = spec["paths"][ENV_CHANGES_PATH]["post"]
+        self.assertEqual(
+            op["requestBody"]["content"]["application/json"]["schema"],
+            {"$ref": "#/components/schemas/deployment_environment"},
+        )
+        self.assertEqual(op["x-bb-body-envelope"], "change")
+
+    def test_existing_extension_is_not_overridden(self):
+        spec = self._spec({}, {"operationId": "u", "x-bb-body-envelope": "custom"})
+        self.assertEqual(enrich_spec.apply_operation_extension_patches(spec), 0)
+        self.assertEqual(spec["paths"][ENV_CHANGES_PATH]["post"]["x-bb-body-envelope"], "custom")
+
+    def test_missing_properties_are_added_to_inline_allof_member(self):
+        spec = self._spec({"name": {"type": "string"}}, {"operationId": "u"})
+        applied = enrich_spec.apply_schema_property_patches(spec)
+        props = spec["components"]["schemas"]["deployment_environment"]["allOf"][1]["properties"]
+        self.assertEqual(applied, len(enrich_spec.SCHEMA_PROPERTY_PATCHES["deployment_environment"]))
+        self.assertEqual(props["environment_type"]["properties"]["name"]["type"], "string")
+        self.assertIn("admin_only", props["restrictions"]["properties"])
+        self.assertEqual(props["name"], {"type": "string"})
+
+    def test_published_properties_win(self):
+        published = {"type": "object", "description": "published by Atlassian"}
+        spec = self._spec({"environment_type": published}, {"operationId": "u"})
+        enrich_spec.apply_schema_property_patches(spec)
+        props = spec["components"]["schemas"]["deployment_environment"]["allOf"][1]["properties"]
+        self.assertEqual(props["environment_type"], published)
+
+
 if __name__ == "__main__":
     unittest.main()

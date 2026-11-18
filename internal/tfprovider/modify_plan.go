@@ -2,7 +2,10 @@ package tfprovider
 
 import (
 	"context"
+	"slices"
+	"sort"
 
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
@@ -79,6 +82,7 @@ func (r *GenericResource) ModifyPlan(ctx context.Context, req resource.ModifyPla
 		return
 	}
 
+	var changed []string
 	for name, attr := range schemaAttrs {
 		if !isConfigurableAttr(attr) {
 			continue
@@ -107,14 +111,32 @@ func (r *GenericResource) ModifyPlan(ctx context.Context, req resource.ModifyPla
 			return
 		}
 		if !equal {
-			return
+			changed = append(changed, name)
 		}
 	}
 
-	// Every configurable attribute is semantically unchanged. Preserve the
-	// prior state as the plan so Computed attributes stay concrete and we
-	// produce an empty diff.
-	resp.Plan.Raw = req.State.Raw
+	if len(changed) == 0 {
+		// Every configurable attribute is semantically unchanged. Preserve
+		// the prior state as the plan so Computed attributes stay concrete
+		// and we produce an empty diff.
+		resp.Plan.Raw = req.State.Raw
+		return
+	}
+
+	sort.Strings(changed)
+	for _, name := range changed {
+		if r.requiresReplace(name) {
+			resp.RequiresReplace = append(resp.RequiresReplace, path.Root(name))
+		}
+	}
+}
+
+// requiresReplace reports whether a change to the named attribute can only
+// be applied by destroying and re-creating the resource: either the resource
+// has no Update operation at all (an in-place plan would fail at apply with
+// "Update not supported"), or the attribute is listed in ReplaceOn.
+func (r *GenericResource) requiresReplace(name string) bool {
+	return r.group.Ops.Update == nil || slices.Contains(r.group.Ops.ReplaceOn, name)
 }
 
 // modifyPlanSchemaAttrs returns the resource's schema attribute map for use

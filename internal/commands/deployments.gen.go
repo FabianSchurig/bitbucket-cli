@@ -593,11 +593,13 @@ func newDeploymentsGetEnvironmentsForRepositoryCmd() *cobra.Command {
 // operationId: createEnvironment
 func newDeploymentsCreateEnvironmentCmd() *cobra.Command {
 	var (
-		workspace string
-		repoSlug  string
-		bodyName  string
-		bodyUuid  string
-		body      string
+		workspace                 string
+		repoSlug                  string
+		bodyEnvironmentTypeName   string
+		bodyName                  string
+		bodyRestrictionsAdminOnly bool
+		bodyUuid                  string
+		body                      string
 	)
 
 	cmd := &cobra.Command{
@@ -623,8 +625,14 @@ func newDeploymentsCreateEnvironmentCmd() *cobra.Command {
 			queryParams := map[string]string{}
 			if body == "" {
 				bodyObj := map[string]any{}
+				if bodyEnvironmentTypeName != "" {
+					handlers.SetNested(bodyObj, "environment_type.name", bodyEnvironmentTypeName)
+				}
 				if bodyName != "" {
 					handlers.SetNested(bodyObj, "name", bodyName)
+				}
+				if cmd.Flags().Changed("restrictions-admin-only") {
+					handlers.SetNested(bodyObj, "restrictions.admin_only", bodyRestrictionsAdminOnly)
 				}
 				if bodyUuid != "" {
 					handlers.SetNested(bodyObj, "uuid", bodyUuid)
@@ -646,7 +654,9 @@ func newDeploymentsCreateEnvironmentCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
+	cmd.Flags().StringVar(&bodyEnvironmentTypeName, "environment-type-name", "", `The name of the environment type. [Test, Staging, Production]`)
 	cmd.Flags().StringVar(&bodyName, "name", "", `The name of the environment.`)
+	cmd.Flags().BoolVar(&bodyRestrictionsAdminOnly, "restrictions-admin-only", false, `Only workspace and repository admins can deploy to this environment.`)
 	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID identifying the environment.`)
 	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
@@ -758,9 +768,14 @@ func newDeploymentsDeleteEnvironmentForRepositoryCmd() *cobra.Command {
 // operationId: updateEnvironmentForRepository
 func newDeploymentsUpdateEnvironmentForRepositoryCmd() *cobra.Command {
 	var (
-		workspace       string
-		repoSlug        string
-		environmentUuid string
+		workspace                 string
+		repoSlug                  string
+		environmentUuid           string
+		bodyEnvironmentTypeName   string
+		bodyName                  string
+		bodyRestrictionsAdminOnly bool
+		bodyUuid                  string
+		body                      string
 	)
 
 	cmd := &cobra.Command{
@@ -788,20 +803,44 @@ func newDeploymentsUpdateEnvironmentForRepositoryCmd() *cobra.Command {
 				return err
 			}
 			queryParams := map[string]string{}
-			body := ""
+			if body == "" {
+				bodyObj := map[string]any{}
+				if bodyEnvironmentTypeName != "" {
+					handlers.SetNested(bodyObj, "environment_type.name", bodyEnvironmentTypeName)
+				}
+				if bodyName != "" {
+					handlers.SetNested(bodyObj, "name", bodyName)
+				}
+				if cmd.Flags().Changed("restrictions-admin-only") {
+					handlers.SetNested(bodyObj, "restrictions.admin_only", bodyRestrictionsAdminOnly)
+				}
+				if bodyUuid != "" {
+					handlers.SetNested(bodyObj, "uuid", bodyUuid)
+				}
+				if len(bodyObj) > 0 {
+					b, _ := json.Marshal(bodyObj)
+					body = string(b)
+				}
+			}
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
-				Method:      "POST",
-				URLTemplate: "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}/changes",
-				PathParams:  pathParams,
-				QueryParams: queryParams,
-				Body:        body,
-				All:         false,
+				Method:       "POST",
+				URLTemplate:  "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}/changes",
+				PathParams:   pathParams,
+				QueryParams:  queryParams,
+				Body:         body,
+				BodyEnvelope: `change`,
+				All:          false,
 			})
 		},
 	}
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&environmentUuid, "environment-uuid", "", "environment_uuid (path parameter)")
+	cmd.Flags().StringVar(&bodyEnvironmentTypeName, "environment-type-name", "", `The name of the environment type. [Test, Staging, Production]`)
+	cmd.Flags().StringVar(&bodyName, "name", "", `The name of the environment.`)
+	cmd.Flags().BoolVar(&bodyRestrictionsAdminOnly, "restrictions-admin-only", false, `Only workspace and repository admins can deploy to this environment.`)
+	cmd.Flags().StringVar(&bodyUuid, "uuid", "", `The UUID identifying the environment.`)
+	cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 	return cmd
 }
 

@@ -75,6 +75,8 @@ func MapCRUDOps(typeName string, ops []OperationDef) CRUDOps {
 		Update: index[cfg.Update],
 		Delete: index[cfg.Delete],
 		List:   index[cfg.List],
+
+		ReplaceOn: cfg.ReplaceOn,
 	}
 }
 
