@@ -19,6 +19,11 @@ variable "project_key" {
   default = "PROJ"
 }
 
+variable "pattern" {
+  type    = string
+  default = "example-value"
+}
+
 provider "bitbucket" {}
 
 data "bitbucket_project_branch_restrictions_by_pattern" "test" {

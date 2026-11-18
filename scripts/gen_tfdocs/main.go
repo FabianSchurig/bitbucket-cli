@@ -46,6 +46,7 @@ type GroupData struct {
 	ComputedParams     []string // params from non-primary ops (Optional+Computed)
 	DSRequiredParams   []string // data source Required params (from List or Read base path)
 	DSOptionalParams   []string // data source Optional params (Read-only, not in List)
+	TestVariables      []string // params referenced as var.<name> in the generated tests/<group>/main.tf
 	ParamValues        map[string]string
 	RequiredBodyFields []FieldDoc   // writable body fields that are Required per API schema
 	BodyFields         []FieldDoc   // writable body fields (Optional)
@@ -256,6 +257,7 @@ func buildGroups() []GroupData {
 			ComputedParams:     computedParams,
 			DSRequiredParams:   dsRequiredParams,
 			DSOptionalParams:   dsOptionalParams,
+			TestVariables:      testVariables(crud.Create != "", requiredParams, dsRequiredParams, dsOptionalParams),
 			ParamValues:        pv,
 			RequiredBodyFields: requiredBodyFields,
 			BodyFields:         bodyFields,
@@ -269,6 +271,29 @@ func buildGroups() []GroupData {
 	}
 	sort.Slice(groups, func(i, j int) bool { return groups[i].Name < groups[j].Name })
 	return groups
+}
+
+// testVariables returns, in first-use order, every param the generated test
+// configuration references: the data source params and, when the resource
+// block is rendered, the resource's required params (e.g. a project branch
+// restriction's "pattern", which the data source does not take).
+func testVariables(hasCreate bool, resourceParams, dsRequired, dsOptional []string) []string {
+	seen := map[string]bool{}
+	var vars []string
+	add := func(params []string) {
+		for _, p := range params {
+			if !seen[p] {
+				seen[p] = true
+				vars = append(vars, p)
+			}
+		}
+	}
+	add(dsRequired)
+	add(dsOptional)
+	if hasCreate {
+		add(resourceParams)
+	}
+	return vars
 }
 
 // groupByCategory organises a flat slice of groups into CategoryGroup entries
@@ -1204,16 +1229,7 @@ variable "workspace" {
   default = "test-workspace"
 }
 
-{{- range .DSRequiredParams}}
-{{- if ne . "workspace"}}
-
-variable "{{.}}" {
-  type    = string
-  default = "{{index $.ParamValues .}}"
-}
-{{- end}}
-{{- end}}
-{{- range .DSOptionalParams}}
+{{- range .TestVariables}}
 {{- if ne . "workspace"}}
 
 variable "{{.}}" {
@@ -1304,6 +1320,8 @@ func main() {
 		writeTemplate(filepath.Join(testDir, g.Name+".tftest.hcl"), tfTestTemplate, g)
 	}
 
+	pruneStaleGroupOutputs(groups)
+
 	fmt.Printf("Generated documentation for %d resource groups\n", len(groups))
 	fmt.Println("  docs/index.md")
 	fmt.Printf("  docs/resources/*.md (%d files)\n", len(groups))
@@ -1336,4 +1354,58 @@ func writeFile(path, content string) {
 		fmt.Fprintf(os.Stderr, "writing %s: %v\n", path, err)
 		os.Exit(1)
 	}
+}
+
+// pruneStaleGroupOutputs removes docs, examples and Terraform tests generated
+// for resource groups that no longer exist (e.g. after a group is dropped from
+// CRUDConfig). Only files with the generator's own names are deleted, and a
+// directory only once it is empty, so hand-written files are never touched.
+func pruneStaleGroupOutputs(groups []GroupData) {
+	current := make(map[string]bool, len(groups))
+	for _, g := range groups {
+		current[g.Name] = true
+	}
+
+	for _, dir := range []string{"docs/resources", "docs/data-sources"} {
+		entries, _ := os.ReadDir(dir)
+		for _, e := range entries {
+			name := strings.TrimSuffix(e.Name(), ".md")
+			if !e.IsDir() && name != e.Name() && !current[name] {
+				removeGenerated(filepath.Join(dir, e.Name()))
+			}
+		}
+	}
+
+	generatedFiles := map[string]func(group string) []string{
+		"examples/resources":    func(string) []string { return []string{"resource.tf"} },
+		"examples/data-sources": func(string) []string { return []string{"data-source.tf"} },
+		"tests":                 func(g string) []string { return []string{"main.tf", g + ".tftest.hcl"} },
+	}
+	for dir, files := range generatedFiles {
+		entries, _ := os.ReadDir(dir)
+		for _, e := range entries {
+			if !e.IsDir() || current[e.Name()] {
+				continue
+			}
+			groupDir := filepath.Join(dir, e.Name())
+			for _, f := range files(e.Name()) {
+				removeGenerated(filepath.Join(groupDir, f))
+			}
+			if rest, err := os.ReadDir(groupDir); err == nil && len(rest) == 0 {
+				removeGenerated(groupDir)
+			}
+		}
+	}
+}
+
+func removeGenerated(path string) {
+	err := os.Remove(path)
+	if os.IsNotExist(err) {
+		return
+	}
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "removing %s: %v\n", path, err)
+		os.Exit(1)
+	}
+	fmt.Printf("  removed stale %s\n", path)
 }

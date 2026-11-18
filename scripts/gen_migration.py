@@ -28,6 +28,7 @@ CURRENT_ALIAS = {
     ("resource", "bitbucket_deploy_key"): ["bitbucket_repo_deploy_keys"],
     ("resource", "bitbucket_deployment"): ["bitbucket_deployments"],
     ("resource", "bitbucket_deployment_variable"): ["bitbucket_deployment_variables"],
+    ("resource", "bitbucket_gpg_key"): ["bitbucket_gpg_keys"],
     ("resource", "bitbucket_forked_repository"): ["bitbucket_forked_repository"],
     ("resource", "bitbucket_group"): [],
     ("resource", "bitbucket_group_membership"): [],
@@ -99,6 +100,14 @@ OBJECT_NOTES = {
         "The legacy data source also fetched `/user/emails`. The generated provider "
         "splits that into `bitbucket_current_user` plus `bitbucket_user_emails` when "
         "you need email addresses."
+    ),
+    ("resource", "bitbucket_deployment"): (
+        "Each `bitbucket_deployments` instance manages one environment: `name`, "
+        "`environment_type = { name = ... }` (legacy `stage`) and "
+        "`restrictions = { admin_only = ... }`. Renames apply in place; changing "
+        "the type replaces the environment. See the "
+        "[deployment environments guide](./docs/guides/deployment-environments.md) "
+        "for importing existing environments."
     ),
     ("data-source", "bitbucket_deployment"): (
         "Use `bitbucket_deployments` with the identifying path parameters for a "
@@ -329,10 +338,19 @@ def legacy_names() -> dict[str, list[str]]:
     }
 
 
+def current_targets(kind: str, name: str) -> list[str]:
+    """Current equivalents of a legacy object; [] (legacy-only) when unmapped.
+
+    The legacy provider's object list is fetched live, so a resource added
+    upstream must not crash the generator before someone maps it.
+    """
+    return CURRENT_ALIAS.get((kind, name), [])
+
+
 def mapped_current_objects(
     kind: str, name: str, current: dict[tuple[str, str], DocObject]
 ) -> list[DocObject]:
-    mapped_names = CURRENT_ALIAS[(kind, name)]
+    mapped_names = current_targets(kind, name)
     return [
         current[(kind, mapped_name)]
         for mapped_name in mapped_names
@@ -353,7 +371,7 @@ def make_overview(
     legacy_only = []
     mapped_current = set()
     for name in legacy:
-        targets = CURRENT_ALIAS[(kind, name)]
+        targets = current_targets(kind, name)
         if targets:
             matched.append(name)
             mapped_current.update(targets)
@@ -505,7 +523,7 @@ def render(repo_root: Path) -> str:
     lines.append("| Legacy resource | New resource(s) |")
     lines.append("|---|---|")
     for name in res_matched:
-        targets = ", ".join(f"`{target}`" for target in CURRENT_ALIAS[("resource", name)])
+        targets = ", ".join(f"`{target}`" for target in current_targets("resource", name))
         lines.append(f"| `{name}` | {targets} |")
     lines.append("")
     lines.append("## Quick rename table for matched data sources")
@@ -514,7 +532,7 @@ def render(repo_root: Path) -> str:
     lines.append("|---|---|")
     for name in ds_matched:
         targets = ", ".join(
-            f"`{target}`" for target in CURRENT_ALIAS[("data-source", name)]
+            f"`{target}`" for target in current_targets("data-source", name)
         )
         lines.append(f"| `{name}` | {targets} |")
     lines.append("")
@@ -599,7 +617,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    text = render(args.repo_root)
+    text = render(args.repo_root).rstrip("\n") + "\n"
     if args.output:
         args.output.write_text(text)
     else:

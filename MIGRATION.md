@@ -81,12 +81,12 @@ provider "bitbucket" {
 
 ## Coverage summary
 
-- Matched legacy resources: **24 / 26**
+- Matched legacy resources: **25 / 27**
 - Legacy-only resources: **2**
-- New-only resources: **33**
+- New-only resources: **30**
 - Matched legacy data sources: **12 / 16**
 - Legacy-only data sources: **4**
-- New-only data sources: **48**
+- New-only data sources: **46**
 
 ## Quick rename table for matched resources
 
@@ -100,6 +100,7 @@ provider "bitbucket" {
 | `bitbucket_deployment` | `bitbucket_deployments` |
 | `bitbucket_deployment_variable` | `bitbucket_deployment_variables` |
 | `bitbucket_forked_repository` | `bitbucket_forked_repository` |
+| `bitbucket_gpg_key` | `bitbucket_gpg_keys` |
 | `bitbucket_hook` | `bitbucket_hooks` |
 | `bitbucket_pipeline_schedule` | `bitbucket_pipeline_schedules` |
 | `bitbucket_pipeline_ssh_key` | `bitbucket_pipeline_ssh_keys` |
@@ -172,6 +173,7 @@ provider "bitbucket" {
 - New equivalent(s): `bitbucket_deployments`
 - Legacy docs: [`bitbucket_deployment`](https://github.com/DrFaust92/terraform-provider-bitbucket/blob/master/docs/resources/deployment.md)
 - New docs: [`bitbucket_deployments`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/deployments.md)
+- Notes: Each `bitbucket_deployments` instance manages one environment: `name`, `environment_type = { name = ... }` (legacy `stage`) and `restrictions = { admin_only = ... }`. Renames apply in place; changing the type replaces the environment. See the [deployment environments guide](./docs/guides/deployment-environments.md) for importing existing environments.
 
 ### `bitbucket_deployment_variable`
 
@@ -184,6 +186,12 @@ provider "bitbucket" {
 - New equivalent(s): `bitbucket_forked_repository`
 - Legacy docs: [`bitbucket_forked_repository`](https://github.com/DrFaust92/terraform-provider-bitbucket/blob/master/docs/resources/forked_repository.md)
 - New docs: [`bitbucket_forked_repository`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/forked-repository.md)
+
+### `bitbucket_gpg_key`
+
+- New equivalent(s): `bitbucket_gpg_keys`
+- Legacy docs: [`bitbucket_gpg_key`](https://github.com/DrFaust92/terraform-provider-bitbucket/blob/master/docs/resources/gpg_key.md)
+- New docs: [`bitbucket_gpg_keys`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/gpg-keys.md)
 
 ### `bitbucket_hook`
 
@@ -409,7 +417,6 @@ provider "bitbucket" {
 - [`bitbucket_commits`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/commits.md)
 - [`bitbucket_current_user`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/current-user.md)
 - [`bitbucket_downloads`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/downloads.md)
-- [`bitbucket_gpg_keys`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/gpg-keys.md)
 - [`bitbucket_hook_types`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/hook-types.md)
 - [`bitbucket_pipeline_caches`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/pipeline-caches.md)
 - [`bitbucket_pipeline_oidc`](https://github.com/FabianSchurig/bitbucket-cli/blob/main/docs/resources/pipeline-oidc.md)
