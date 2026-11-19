@@ -45,7 +45,7 @@ resource "bitbucket_workspaces" "example" {
 - `id` (String) Resource identifier (extracted from API response).
 - `api_response` (String) The raw JSON response from the Bitbucket API.
 - `created_on` (String) created_on
-- `enforced_signed_commits` (String) The workspace's stored signed-commit enforcement setting. Unset values are returned as false. Enforcement requires a Premium plan.
+- `enforced_signed_commits` (String) Whether signed commits are required for this workspace:
 - `forking_mode` (String) Controls the rules for forking repositories within this workspace.
 - `is_personal` (String) Indicates whether the workspace belongs to an individual user.
 - `is_privacy_enforced` (String) Indicates whether the workspace enforces private content, or whether it allows public content.

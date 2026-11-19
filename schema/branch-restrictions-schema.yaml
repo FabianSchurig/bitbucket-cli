@@ -753,8 +753,10 @@ components:
               user.
           enforced_signed_commits:
             type: boolean
-            description: The workspace's stored signed-commit enforcement setting.
-              Unset values are returned as false. Enforcement requires a Premium plan.
+            description: "Whether signed commits are required for this workspace:\n\
+              \n- true when enforcement is enabled at the workspace level, even if\
+              \ the workspace is no longer on a\n  Premium plan. Signed commits are\
+              \ only enforced on a Premium plan;\n- otherwise false."
           is_privacy_enforced:
             type: boolean
             description: Indicates whether the workspace enforces private content,

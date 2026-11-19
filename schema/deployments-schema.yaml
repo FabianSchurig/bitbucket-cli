@@ -1570,6 +1570,11 @@ components:
               Indicates whether the project contains publicly visible repositories.
 
               Note that private projects cannot contain public repositories.'
+          enforced_signed_commits:
+            type: boolean
+            description: "Whether signed commits are required for this project:\n\n\
+              - true when the workspace is on a Premium plan and enforcement is enabled\
+              \ at the project or the\n  workspace level;\n- otherwise false."
         additionalProperties: true
     project_deploy_key:
       allOf:
@@ -1857,9 +1862,10 @@ components:
             - no_forks
           enforced_signed_commits:
             type: boolean
-            description: 'Whether signed commits are required for this repository:
-              true when the workspace has Premium and the repository, its project,
-              or its workspace enforces them; otherwise false.'
+            description: "Whether signed commits are required for this repository:\n\
+              \n- true when the workspace is on a Premium plan and enforcement is\
+              \ enabled at the repository, project,\n  or workspace level;\n- otherwise\
+              \ false."
           project:
             $ref: '#/components/schemas/project'
           mainbranch:

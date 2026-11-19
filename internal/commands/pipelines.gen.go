@@ -628,7 +628,11 @@ func newPipelinesCreatePipelineForRepositoryCmd() *cobra.Command {
 	cmd.Flags().StringVar(&bodyCreatorDisplayName, "creator-display-name", "", `display_name`)
 	cmd.Flags().StringVar(&bodyCreatorUuid, "creator-uuid", "", `uuid`)
 	cmd.Flags().StringVar(&bodyRepositoryDescription, "repository-description", "", `description`)
-	cmd.Flags().BoolVar(&bodyRepositoryEnforcedSignedCommits, "repository-enforced-signed-commits", false, `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`)
+	cmd.Flags().BoolVar(&bodyRepositoryEnforcedSignedCommits, "repository-enforced-signed-commits", false, `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`)
 	cmd.Flags().StringVar(&bodyRepositoryForkPolicy, "repository-fork-policy", "", `
 Controls the rules for forking this repository.
 
@@ -1785,7 +1789,11 @@ func newPipelinesUpdateRepositoryPipelineConfigCmd() *cobra.Command {
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().BoolVar(&bodyEnabled, "enabled", false, `Whether Pipelines is enabled for the repository.`)
 	cmd.Flags().StringVar(&bodyRepositoryDescription, "repository-description", "", `description`)
-	cmd.Flags().BoolVar(&bodyRepositoryEnforcedSignedCommits, "repository-enforced-signed-commits", false, `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`)
+	cmd.Flags().BoolVar(&bodyRepositoryEnforcedSignedCommits, "repository-enforced-signed-commits", false, `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`)
 	cmd.Flags().StringVar(&bodyRepositoryForkPolicy, "repository-fork-policy", "", `
 Controls the rules for forking this repository.
 

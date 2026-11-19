@@ -1055,6 +1055,13 @@ type Project struct {
 	CreatedOn   *time.Time `json:"created_on,omitempty"`
 	Description *string    `json:"description,omitempty"`
 
+	// EnforcedSignedCommits Whether signed commits are required for this project:
+	//
+	// - true when the workspace is on a Premium plan and enforcement is enabled at the project or the
+	//   workspace level;
+	// - otherwise false.
+	EnforcedSignedCommits *bool `json:"enforced_signed_commits,omitempty"`
+
 	// HasPubliclyVisibleRepos
 	// Indicates whether the project contains publicly visible repositories.
 	// Note that private projects cannot contain public repositories.
@@ -1562,7 +1569,11 @@ type Repository struct {
 	CreatedOn   *time.Time `json:"created_on,omitempty"`
 	Description *string    `json:"description,omitempty"`
 
-	// EnforcedSignedCommits Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.
+	// EnforcedSignedCommits Whether signed commits are required for this repository:
+	//
+	// - true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+	//   or workspace level;
+	// - otherwise false.
 	EnforcedSignedCommits *bool `json:"enforced_signed_commits,omitempty"`
 
 	// ForkPolicy
@@ -3696,6 +3707,14 @@ func (a *Project) UnmarshalJSON(b []byte) error {
 		delete(object, "description")
 	}
 
+	if raw, found := object["enforced_signed_commits"]; found {
+		err = json.Unmarshal(raw, &a.EnforcedSignedCommits)
+		if err != nil {
+			return fmt.Errorf("error reading 'enforced_signed_commits': %w", err)
+		}
+		delete(object, "enforced_signed_commits")
+	}
+
 	if raw, found := object["has_publicly_visible_repos"]; found {
 		err = json.Unmarshal(raw, &a.HasPubliclyVisibleRepos)
 		if err != nil {
@@ -3798,6 +3817,13 @@ func (a Project) MarshalJSON() ([]byte, error) {
 		object["description"], err = json.Marshal(a.Description)
 		if err != nil {
 			return nil, fmt.Errorf("error marshaling 'description': %w", err)
+		}
+	}
+
+	if a.EnforcedSignedCommits != nil {
+		object["enforced_signed_commits"], err = json.Marshal(a.EnforcedSignedCommits)
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling 'enforced_signed_commits': %w", err)
 		}
 	}
 

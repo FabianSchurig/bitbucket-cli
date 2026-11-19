@@ -258,6 +258,7 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 		bodyOwnerDisplayName               string
 		bodyOwnerUuid                      string
 		bodyProjectDescription             string
+		bodyProjectEnforcedSignedCommits   bool
 		bodyProjectHasPubliclyVisibleRepos bool
 		bodyProjectIsPrivate               bool
 		bodyProjectKey                     string
@@ -272,7 +273,7 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-a-repository",
 		Short: `Create a repository`,
-		Long:  "Creates a new repository.\n\nNote: In order to set the project for the newly created repository,\npass in either the project key or the project UUID as part of the\nrequest body as shown in the examples below:\n\n```\n$ curl -X POST -H \"Content-Type: application/json\" -d '{\n    \"scm\": \"git\",\n    \"project\": {\n        \"key\": \"MARS\"\n    }\n}' https://api.bitbucket.org/2.0/repositories/teamsinspace/hablanding\n```\n\nor\n\n```\n$ curl -X POST -H \"Content-Type: application/json\" -d '{\n    \"scm\": \"git\",\n    \"project\": {\n        \"key\": \"{ba516952-992a-4c2d-acbd-17d502922f96}\"\n    }\n}' https://api.bitbucket.org/2.0/repositories/teamsinspace/hablanding\n```\n\nThe project must be assigned for all repositories. If the project is not provided,\nthe repository is automatically assigned to the oldest project in the workspace.\n\nNote: In the examples above, the workspace ID `teamsinspace`,\nand/or the repository name `hablanding` can be replaced by UUIDs.",
+		Long:  "Creates a new repository.\n\nNote: In order to set the project for the newly created repository,\npass in either the project key or the project UUID as part of the\nrequest body as shown in the examples below:\n\n```\n$ curl -X POST -H \"Content-Type: application/json\" -d '{\n    \"scm\": \"git\",\n    \"project\": {\n        \"key\": \"MARS\"\n    }\n}' https://api.bitbucket.org/2.0/repositories/teamsinspace/hablanding\n```\n\nor\n\n```\n$ curl -X POST -H \"Content-Type: application/json\" -d '{\n    \"scm\": \"git\",\n    \"project\": {\n        \"key\": \"{ba516952-992a-4c2d-acbd-17d502922f96}\"\n    }\n}' https://api.bitbucket.org/2.0/repositories/teamsinspace/hablanding\n```\n\nThe project must be assigned for all repositories. If the project is not provided,\nthe repository is automatically assigned to the oldest project in the workspace.\n\nNote: In order to require signed commits for the newly created repository,\npass in `enforced_signed_commits` as part of the request body as shown in\nthe example below. This requires the workspace to be on a Premium plan.\nCannot be disabled while the setting is enforced at the project or\nworkspace level.\n\n```\n$ curl -X POST -H \"Content-Type: application/json\" -d '{\n    \"enforced_signed_commits\": true\n}' https://api.bitbucket.org/2.0/repositories/teamsinspace/hablanding\n```\n\nNote: In the examples above, the workspace ID `teamsinspace`,\nand/or the repository name `hablanding` can be replaced by UUIDs.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"repo_slug": repoSlug,
@@ -339,6 +340,9 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 				}
 				if bodyProjectDescription != "" {
 					handlers.SetNested(bodyObj, "project.description", bodyProjectDescription)
+				}
+				if cmd.Flags().Changed("project-enforced-signed-commits") {
+					handlers.SetNested(bodyObj, "project.enforced_signed_commits", bodyProjectEnforcedSignedCommits)
 				}
 				if cmd.Flags().Changed("project-has-publicly-visible-repos") {
 					handlers.SetNested(bodyObj, "project.has_publicly_visible_repos", bodyProjectHasPubliclyVisibleRepos)
@@ -382,7 +386,11 @@ func newReposCreateARepositoryCmd() *cobra.Command {
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `description`)
-	cmd.Flags().BoolVar(&bodyEnforcedSignedCommits, "enforced-signed-commits", false, `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`)
+	cmd.Flags().BoolVar(&bodyEnforcedSignedCommits, "enforced-signed-commits", false, `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`)
 	cmd.Flags().StringVar(&bodyForkPolicy, "fork-policy", "", `
 Controls the rules for forking this repository.
 
@@ -412,6 +420,11 @@ administered through admin.atlassian.com.
 	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `display_name`)
 	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `uuid`)
 	cmd.Flags().StringVar(&bodyProjectDescription, "project-description", "", `description`)
+	cmd.Flags().BoolVar(&bodyProjectEnforcedSignedCommits, "project-enforced-signed-commits", false, `Whether signed commits are required for this project:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the project or the
+  workspace level;
+- otherwise false.`)
 	cmd.Flags().BoolVar(&bodyProjectHasPubliclyVisibleRepos, "project-has-publicly-visible-repos", false, `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`)
@@ -451,6 +464,7 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 		bodyOwnerDisplayName               string
 		bodyOwnerUuid                      string
 		bodyProjectDescription             string
+		bodyProjectEnforcedSignedCommits   bool
 		bodyProjectHasPubliclyVisibleRepos bool
 		bodyProjectIsPrivate               bool
 		bodyProjectKey                     string
@@ -465,7 +479,7 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-a-repository",
 		Short: `Update a repository`,
-		Long:  "Since this endpoint can be used to both update and to create a\nrepository, the request body depends on the intent.\n\n#### Creation\n\nSee the POST documentation for the repository endpoint for an example\nof the request body.\n\n#### Update\n\nNote: Changing the `name` of the repository will cause the location to\nbe changed. This is because the URL of the repo is derived from the\nname (a process called slugification). In such a scenario, it is\npossible for the request to fail if the newly created slug conflicts\nwith an existing repository's slug. But if there is no conflict,\nthe new location will be returned in the `Location` header of the\nresponse.",
+		Long:  "Since this endpoint can be used to both update and to create a\nrepository, the request body depends on the intent.\n\n#### Creation\n\nSee the POST documentation for the repository endpoint for an example\nof the request body.\n\n#### Update\n\nNote: Changing the `name` of the repository will cause the location to\nbe changed. This is because the URL of the repo is derived from the\nname (a process called slugification). In such a scenario, it is\npossible for the request to fail if the newly created slug conflicts\nwith an existing repository's slug. But if there is no conflict,\nthe new location will be returned in the `Location` header of the\nresponse.\n\nNote: Changing the `enforced_signed_commits` setting requires the workspace\nto be on a Premium plan. Cannot be disabled while the setting is enforced\nat the project or workspace level.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"repo_slug": repoSlug,
@@ -533,6 +547,9 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 				if bodyProjectDescription != "" {
 					handlers.SetNested(bodyObj, "project.description", bodyProjectDescription)
 				}
+				if cmd.Flags().Changed("project-enforced-signed-commits") {
+					handlers.SetNested(bodyObj, "project.enforced_signed_commits", bodyProjectEnforcedSignedCommits)
+				}
 				if cmd.Flags().Changed("project-has-publicly-visible-repos") {
 					handlers.SetNested(bodyObj, "project.has_publicly_visible_repos", bodyProjectHasPubliclyVisibleRepos)
 				}
@@ -575,7 +592,11 @@ func newReposUpdateARepositoryCmd() *cobra.Command {
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `description`)
-	cmd.Flags().BoolVar(&bodyEnforcedSignedCommits, "enforced-signed-commits", false, `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`)
+	cmd.Flags().BoolVar(&bodyEnforcedSignedCommits, "enforced-signed-commits", false, `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`)
 	cmd.Flags().StringVar(&bodyForkPolicy, "fork-policy", "", `
 Controls the rules for forking this repository.
 
@@ -605,6 +626,11 @@ administered through admin.atlassian.com.
 	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `display_name`)
 	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `uuid`)
 	cmd.Flags().StringVar(&bodyProjectDescription, "project-description", "", `description`)
+	cmd.Flags().BoolVar(&bodyProjectEnforcedSignedCommits, "project-enforced-signed-commits", false, `Whether signed commits are required for this project:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the project or the
+  workspace level;
+- otherwise false.`)
 	cmd.Flags().BoolVar(&bodyProjectHasPubliclyVisibleRepos, "project-has-publicly-visible-repos", false, `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`)
@@ -834,6 +860,7 @@ func newReposForkARepositoryCmd() *cobra.Command {
 		bodyOwnerDisplayName               string
 		bodyOwnerUuid                      string
 		bodyProjectDescription             string
+		bodyProjectEnforcedSignedCommits   bool
 		bodyProjectHasPubliclyVisibleRepos bool
 		bodyProjectIsPrivate               bool
 		bodyProjectKey                     string
@@ -916,6 +943,9 @@ func newReposForkARepositoryCmd() *cobra.Command {
 				if bodyProjectDescription != "" {
 					handlers.SetNested(bodyObj, "project.description", bodyProjectDescription)
 				}
+				if cmd.Flags().Changed("project-enforced-signed-commits") {
+					handlers.SetNested(bodyObj, "project.enforced_signed_commits", bodyProjectEnforcedSignedCommits)
+				}
 				if cmd.Flags().Changed("project-has-publicly-visible-repos") {
 					handlers.SetNested(bodyObj, "project.has_publicly_visible_repos", bodyProjectHasPubliclyVisibleRepos)
 				}
@@ -958,7 +988,11 @@ func newReposForkARepositoryCmd() *cobra.Command {
 	cmd.Flags().StringVar(&repoSlug, "repo-slug", "", "repo_slug (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `description`)
-	cmd.Flags().BoolVar(&bodyEnforcedSignedCommits, "enforced-signed-commits", false, `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`)
+	cmd.Flags().BoolVar(&bodyEnforcedSignedCommits, "enforced-signed-commits", false, `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`)
 	cmd.Flags().StringVar(&bodyForkPolicy, "fork-policy", "", `
 Controls the rules for forking this repository.
 
@@ -988,6 +1022,11 @@ administered through admin.atlassian.com.
 	cmd.Flags().StringVar(&bodyOwnerDisplayName, "owner-display-name", "", `display_name`)
 	cmd.Flags().StringVar(&bodyOwnerUuid, "owner-uuid", "", `uuid`)
 	cmd.Flags().StringVar(&bodyProjectDescription, "project-description", "", `description`)
+	cmd.Flags().BoolVar(&bodyProjectEnforcedSignedCommits, "project-enforced-signed-commits", false, `Whether signed commits are required for this project:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the project or the
+  workspace level;
+- otherwise false.`)
 	cmd.Flags().BoolVar(&bodyProjectHasPubliclyVisibleRepos, "project-has-publicly-visible-repos", false, `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`)

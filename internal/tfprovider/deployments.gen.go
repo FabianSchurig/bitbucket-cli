@@ -62,7 +62,11 @@ Available operations:
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -120,7 +124,11 @@ administered through admin.atlassian.com.
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -162,7 +170,11 @@ administered through admin.atlassian.com.
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -225,7 +237,11 @@ administered through admin.atlassian.com.
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -287,7 +303,11 @@ administered through admin.atlassian.com.
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -595,6 +615,11 @@ administered through admin.atlassian.com.
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this project:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the project or the
+  workspace level;
+- otherwise false.`},
 					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
@@ -640,6 +665,11 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this project:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the project or the
+  workspace level;
+- otherwise false.`},
 					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
@@ -687,6 +717,11 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this project:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the project or the
+  workspace level;
+- otherwise false.`},
 					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
@@ -757,7 +792,11 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -815,7 +854,11 @@ administered through admin.atlassian.com.
 				}},
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -857,7 +900,11 @@ administered through admin.atlassian.com.
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -920,7 +967,11 @@ administered through admin.atlassian.com.
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -982,7 +1033,11 @@ administered through admin.atlassian.com.
 				{Path: `repository`, Type: `string`, Desc: `repository`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
-					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository: true when the workspace has Premium and the repository, its project, or its workspace enforces them; otherwise false.`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this repository:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the repository, project,
+  or workspace level;
+- otherwise false.`},
 					{Path: `fork_policy`, Type: `string`, Desc: `
 Controls the rules for forking this repository.
 
@@ -1290,6 +1345,11 @@ administered through admin.atlassian.com.
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this project:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the project or the
+  workspace level;
+- otherwise false.`},
 					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
@@ -1335,6 +1395,11 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this project:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the project or the
+  workspace level;
+- otherwise false.`},
 					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
@@ -1382,6 +1447,11 @@ Note that private projects cannot contain public repositories.`},
 				{Path: `project`, Type: `string`, Desc: `project`, IsObject: true, ItemFields: []BodyFieldDef{
 					{Path: `created_on`, Type: `string`, Desc: `created_on`},
 					{Path: `description`, Type: `string`, Desc: `description`},
+					{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this project:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the project or the
+  workspace level;
+- otherwise false.`},
 					{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},

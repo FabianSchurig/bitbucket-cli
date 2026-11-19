@@ -44,11 +44,14 @@ paths:
     post:
       tags:
       - Projects
-      description: "Creates a new project.\n\nNote that the avatar has to be embedded\
-        \ as either a data-url\nor a URL to an external image as shown in the examples\
-        \ below:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\": \"Mars Project\",\n\
-        \    \"key\": \"MARS\",\n    \"description\": \"Software for colonizing mars.\"\
-        ,\n    \"links\": {\n        \"avatar\": {\n            \"href\": \"data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/...\"\
+      description: "Creates a new project.\n\nNote: Setting `enforced_signed_commits`\
+        \ requires the workspace to be on a\nPremium plan. Cannot be disabled while\
+        \ the setting is enforced at the\nworkspace level.\n\nNote that the avatar\
+        \ has to be embedded as either a data-url\nor a URL to an external image as\
+        \ shown in the examples below:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\"\
+        : \"Mars Project\",\n    \"key\": \"MARS\",\n    \"description\": \"Software\
+        \ for colonizing mars.\",\n    \"links\": {\n        \"avatar\": {\n     \
+        \       \"href\": \"data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/...\"\
         \n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type:\
         \ application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n     \
         \  https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq\
@@ -73,6 +76,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/project'
+        '400':
+          description: The request body is invalid, or `enforced_signed_commits` can't
+            be set.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
         '403':
           description: The user requesting to create a project does not have the necessary
             permissions.
@@ -253,7 +263,14 @@ paths:
 
         project is changed and is returned in the `Location` header of the
 
-        response.'
+        response.
+
+
+        Note: Changing the `enforced_signed_commits` setting requires the workspace
+
+        to be on a Premium plan. Cannot be disabled while the setting is enforced
+
+        at the workspace level.'
       summary: Update a project for a workspace
       responses:
         '200':
@@ -280,6 +297,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/project'
+        '400':
+          description: The request body is invalid, or `enforced_signed_commits` can't
+            be changed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
         '403':
           description: The requesting user isn't authorized to update or create the
             project.
@@ -1723,6 +1747,11 @@ components:
               Indicates whether the project contains publicly visible repositories.
 
               Note that private projects cannot contain public repositories.'
+          enforced_signed_commits:
+            type: boolean
+            description: "Whether signed commits are required for this project:\n\n\
+              - true when the workspace is on a Premium plan and enforcement is enabled\
+              \ at the project or the\n  workspace level;\n- otherwise false."
         additionalProperties: true
     project_group_permission:
       type: object
@@ -1988,8 +2017,10 @@ components:
               user.
           enforced_signed_commits:
             type: boolean
-            description: The workspace's stored signed-commit enforcement setting.
-              Unset values are returned as false. Enforcement requires a Premium plan.
+            description: "Whether signed commits are required for this workspace:\n\
+              \n- true when enforcement is enabled at the workspace level, even if\
+              \ the workspace is no longer on a\n  Premium plan. Signed commits are\
+              \ only enforced on a Premium plan;\n- otherwise false."
           is_privacy_enforced:
             type: boolean
             description: Indicates whether the workspace enforces private content,

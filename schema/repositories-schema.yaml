@@ -320,8 +320,14 @@ paths:
         \n    }\n}' https://api.bitbucket.org/2.0/repositories/teamsinspace/hablanding\n\
         ```\n\nThe project must be assigned for all repositories. If the project is\
         \ not provided,\nthe repository is automatically assigned to the oldest project\
-        \ in the workspace.\n\nNote: In the examples above, the workspace ID `teamsinspace`,\n\
-        and/or the repository name `hablanding` can be replaced by UUIDs."
+        \ in the workspace.\n\nNote: In order to require signed commits for the newly\
+        \ created repository,\npass in `enforced_signed_commits` as part of the request\
+        \ body as shown in\nthe example below. This requires the workspace to be on\
+        \ a Premium plan.\nCannot be disabled while the setting is enforced at the\
+        \ project or\nworkspace level.\n\n```\n$ curl -X POST -H \"Content-Type: application/json\"\
+        \ -d '{\n    \"enforced_signed_commits\": true\n}' https://api.bitbucket.org/2.0/repositories/teamsinspace/hablanding\n\
+        ```\n\nNote: In the examples above, the workspace ID `teamsinspace`,\nand/or\
+        \ the repository name `hablanding` can be replaced by UUIDs."
       summary: Create a repository
       responses:
         '200':
@@ -331,8 +337,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/repository'
         '400':
-          description: If the input document was invalid, or if the caller lacks the
-            privilege to create repositories under the targeted account.
+          description: If the input document was invalid, if the caller lacks the
+            privilege to create repositories under the targeted account, or if `enforced_signed_commits`
+            cannot be changed.
           content:
             application/json:
               schema:
@@ -396,7 +403,14 @@ paths:
 
         the new location will be returned in the `Location` header of the
 
-        response.'
+        response.
+
+
+        Note: Changing the `enforced_signed_commits` setting requires the workspace
+
+        to be on a Premium plan. Cannot be disabled while the setting is enforced
+
+        at the project or workspace level.'
       summary: Update a repository
       responses:
         '200':
@@ -424,8 +438,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/repository'
         '400':
-          description: If the input document was invalid, or if the caller lacks the
-            privilege to create repositories under the targeted account.
+          description: If the input document was invalid, if the caller lacks the
+            privilege to create repositories under the targeted account, or if `enforced_signed_commits`
+            cannot be changed.
           content:
             application/json:
               schema:
@@ -3514,6 +3529,11 @@ components:
               Indicates whether the project contains publicly visible repositories.
 
               Note that private projects cannot contain public repositories.'
+          enforced_signed_commits:
+            type: boolean
+            description: "Whether signed commits are required for this project:\n\n\
+              - true when the workspace is on a Premium plan and enforcement is enabled\
+              \ at the project or the\n  workspace level;\n- otherwise false."
         additionalProperties: true
     ref:
       type: object
@@ -3759,9 +3779,10 @@ components:
             - no_forks
           enforced_signed_commits:
             type: boolean
-            description: 'Whether signed commits are required for this repository:
-              true when the workspace has Premium and the repository, its project,
-              or its workspace enforces them; otherwise false.'
+            description: "Whether signed commits are required for this repository:\n\
+              \n- true when the workspace is on a Premium plan and enforcement is\
+              \ enabled at the repository, project,\n  or workspace level;\n- otherwise\
+              \ false."
           project:
             $ref: '#/components/schemas/project'
           mainbranch:
@@ -4187,8 +4208,10 @@ components:
               user.
           enforced_signed_commits:
             type: boolean
-            description: The workspace's stored signed-commit enforcement setting.
-              Unset values are returned as false. Enforcement requires a Premium plan.
+            description: "Whether signed commits are required for this workspace:\n\
+              \n- true when enforcement is enabled at the workspace level, even if\
+              \ the workspace is no longer on a\n  Premium plan. Signed commits are\
+              \ only enforced on a Premium plan;\n- otherwise false."
           is_privacy_enforced:
             type: boolean
             description: Indicates whether the workspace enforces private content,

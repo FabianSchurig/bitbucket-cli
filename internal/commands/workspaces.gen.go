@@ -934,6 +934,7 @@ func newWorkspacesCreateAProjectInAWorkspaceCmd() *cobra.Command {
 	var (
 		workspace                   string
 		bodyDescription             string
+		bodyEnforcedSignedCommits   bool
 		bodyHasPubliclyVisibleRepos bool
 		bodyIsPrivate               bool
 		bodyKey                     string
@@ -947,7 +948,7 @@ func newWorkspacesCreateAProjectInAWorkspaceCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-a-project-in-a-workspace",
 		Short: `Create a project in a workspace`,
-		Long:  "Creates a new project.\n\nNote that the avatar has to be embedded as either a data-url\nor a URL to an external image as shown in the examples below:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\": \"Mars Project\",\n    \"key\": \"MARS\",\n    \"description\": \"Software for colonizing mars.\",\n    \"links\": {\n        \"avatar\": {\n            \"href\": \"data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/...\"\n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type: application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n       https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq .\n{\n  // Serialized project document\n}\n```\n\nor even:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\": \"Mars Project\",\n    \"key\": \"MARS\",\n    \"description\": \"Software for colonizing mars.\",\n    \"links\": {\n        \"avatar\": {\n            \"href\": \"http://i.imgur.com/72tRx4w.gif\"\n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type: application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n       https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq .\n{\n  // Serialized project document\n}\n```",
+		Long:  "Creates a new project.\n\nNote: Setting `enforced_signed_commits` requires the workspace to be on a\nPremium plan. Cannot be disabled while the setting is enforced at the\nworkspace level.\n\nNote that the avatar has to be embedded as either a data-url\nor a URL to an external image as shown in the examples below:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\": \"Mars Project\",\n    \"key\": \"MARS\",\n    \"description\": \"Software for colonizing mars.\",\n    \"links\": {\n        \"avatar\": {\n            \"href\": \"data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/...\"\n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type: application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n       https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq .\n{\n  // Serialized project document\n}\n```\n\nor even:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\": \"Mars Project\",\n    \"key\": \"MARS\",\n    \"description\": \"Software for colonizing mars.\",\n    \"links\": {\n        \"avatar\": {\n            \"href\": \"http://i.imgur.com/72tRx4w.gif\"\n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type: application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n       https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq .\n{\n  // Serialized project document\n}\n```",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"workspace": workspace,
@@ -965,6 +966,9 @@ func newWorkspacesCreateAProjectInAWorkspaceCmd() *cobra.Command {
 				bodyObj := map[string]any{}
 				if bodyDescription != "" {
 					handlers.SetNested(bodyObj, "description", bodyDescription)
+				}
+				if cmd.Flags().Changed("enforced-signed-commits") {
+					handlers.SetNested(bodyObj, "enforced_signed_commits", bodyEnforcedSignedCommits)
 				}
 				if cmd.Flags().Changed("has-publicly-visible-repos") {
 					handlers.SetNested(bodyObj, "has_publicly_visible_repos", bodyHasPubliclyVisibleRepos)
@@ -1004,6 +1008,11 @@ func newWorkspacesCreateAProjectInAWorkspaceCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `description`)
+	cmd.Flags().BoolVar(&bodyEnforcedSignedCommits, "enforced-signed-commits", false, `Whether signed commits are required for this project:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the project or the
+  workspace level;
+- otherwise false.`)
 	cmd.Flags().BoolVar(&bodyHasPubliclyVisibleRepos, "has-publicly-visible-repos", false, `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`)
@@ -1072,6 +1081,7 @@ func newWorkspacesUpdateAProjectForAWorkspaceCmd() *cobra.Command {
 		projectKey                  string
 		workspace                   string
 		bodyDescription             string
+		bodyEnforcedSignedCommits   bool
 		bodyHasPubliclyVisibleRepos bool
 		bodyIsPrivate               bool
 		bodyKey                     string
@@ -1085,7 +1095,7 @@ func newWorkspacesUpdateAProjectForAWorkspaceCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-a-project-for-a-workspace",
 		Short: `Update a project for a workspace`,
-		Long:  "Since this endpoint can be used to both update and to create a\nproject, the request body depends on the intent.\n\n#### Creation\n\nSee the POST documentation for the project collection for an\nexample of the request body.\n\nNote: The `key` should not be specified in the body of request\n(since it is already present in the URL). The `name` is required,\neverything else is optional.\n\n#### Update\n\nSee the POST documentation for the project collection for an\nexample of the request body.\n\nNote: The key is not required in the body (since it is already in\nthe URL). The key may be specified in the body, if the intent is\nto change the key itself. In such a scenario, the location of the\nproject is changed and is returned in the `Location` header of the\nresponse.",
+		Long:  "Since this endpoint can be used to both update and to create a\nproject, the request body depends on the intent.\n\n#### Creation\n\nSee the POST documentation for the project collection for an\nexample of the request body.\n\nNote: The `key` should not be specified in the body of request\n(since it is already present in the URL). The `name` is required,\neverything else is optional.\n\n#### Update\n\nSee the POST documentation for the project collection for an\nexample of the request body.\n\nNote: The key is not required in the body (since it is already in\nthe URL). The key may be specified in the body, if the intent is\nto change the key itself. In such a scenario, the location of the\nproject is changed and is returned in the `Location` header of the\nresponse.\n\nNote: Changing the `enforced_signed_commits` setting requires the workspace\nto be on a Premium plan. Cannot be disabled while the setting is enforced\nat the workspace level.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			pathParams := map[string]string{
 				"project_key": projectKey,
@@ -1107,6 +1117,9 @@ func newWorkspacesUpdateAProjectForAWorkspaceCmd() *cobra.Command {
 				bodyObj := map[string]any{}
 				if bodyDescription != "" {
 					handlers.SetNested(bodyObj, "description", bodyDescription)
+				}
+				if cmd.Flags().Changed("enforced-signed-commits") {
+					handlers.SetNested(bodyObj, "enforced_signed_commits", bodyEnforcedSignedCommits)
 				}
 				if cmd.Flags().Changed("has-publicly-visible-repos") {
 					handlers.SetNested(bodyObj, "has_publicly_visible_repos", bodyHasPubliclyVisibleRepos)
@@ -1147,6 +1160,11 @@ func newWorkspacesUpdateAProjectForAWorkspaceCmd() *cobra.Command {
 	cmd.Flags().StringVar(&projectKey, "project-key", "", "project_key (path parameter)")
 	cmd.Flags().StringVar(&workspace, "workspace", "", "workspace (path parameter)")
 	cmd.Flags().StringVar(&bodyDescription, "description", "", `description`)
+	cmd.Flags().BoolVar(&bodyEnforcedSignedCommits, "enforced-signed-commits", false, `Whether signed commits are required for this project:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the project or the
+  workspace level;
+- otherwise false.`)
 	cmd.Flags().BoolVar(&bodyHasPubliclyVisibleRepos, "has-publicly-visible-repos", false, `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`)

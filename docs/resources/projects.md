@@ -52,6 +52,7 @@ resource "bitbucket_projects" "example" {
 ### Optional
 - `project_key` (String) Path parameter (auto-populated from API response).
 - `description` (String) description (also computed from API response)
+- `enforced_signed_commits` (String) Whether signed commits are required for this project: (also computed from API response)
 - `has_publicly_visible_repos` (String)  (also computed from API response)
 - `is_private` (String)  (also computed from API response)
 - `key` (String) The project's key. (also computed from API response)

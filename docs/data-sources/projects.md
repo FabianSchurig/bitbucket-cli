@@ -50,6 +50,7 @@ output "projects_response" {
 - `created_on` (String) created_on
 - `updated_on` (String) updated_on
 - `description` (String) description
+- `enforced_signed_commits` (String) Whether signed commits are required for this project:
 - `has_publicly_visible_repos` (String) 
 - `is_private` (String) 
 - `key` (String) The project's key.

@@ -55,12 +55,17 @@ Available operations:
 			Method:      `POST`,
 			Path:        `/workspaces/{workspace}/projects`,
 			Summary:     `Create a project in a workspace`,
-			Description: "Creates a new project.\n\nNote that the avatar has to be embedded as either a data-url\nor a URL to an external image as shown in the examples below:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\": \"Mars Project\",\n    \"key\": \"MARS\",\n    \"description\": \"Software for colonizing mars.\",\n    \"links\": {\n        \"avatar\": {\n            \"href\": \"data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/...\"\n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type: application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n       https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq .\n{\n  // Serialized project document\n}\n```\n\nor even:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\": \"Mars Project\",\n    \"key\": \"MARS\",\n    \"description\": \"Software for colonizing mars.\",\n    \"links\": {\n        \"avatar\": {\n            \"href\": \"http://i.imgur.com/72tRx4w.gif\"\n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type: application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n       https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq .\n{\n  // Serialized project document\n}\n```",
+			Description: "Creates a new project.\n\nNote: Setting `enforced_signed_commits` requires the workspace to be on a\nPremium plan. Cannot be disabled while the setting is enforced at the\nworkspace level.\n\nNote that the avatar has to be embedded as either a data-url\nor a URL to an external image as shown in the examples below:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\": \"Mars Project\",\n    \"key\": \"MARS\",\n    \"description\": \"Software for colonizing mars.\",\n    \"links\": {\n        \"avatar\": {\n            \"href\": \"data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/...\"\n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type: application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n       https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq .\n{\n  // Serialized project document\n}\n```\n\nor even:\n\n```\n$ body=$(cat << EOF\n{\n    \"name\": \"Mars Project\",\n    \"key\": \"MARS\",\n    \"description\": \"Software for colonizing mars.\",\n    \"links\": {\n        \"avatar\": {\n            \"href\": \"http://i.imgur.com/72tRx4w.gif\"\n        }\n    },\n    \"is_private\": false\n}\nEOF\n)\n$ curl -H \"Content-Type: application/json\" \\\n       -X POST \\\n       -d \"$body\" \\\n       https://api.bitbucket.org/2.0/workspaces/teams-in-space/projects/ | jq .\n{\n  // Serialized project document\n}\n```",
 			Params: []ParamDef{
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this project:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the project or the
+  workspace level;
+- otherwise false.`},
 				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
@@ -96,13 +101,18 @@ Note that private projects cannot contain public repositories.`},
 			Method:      `PUT`,
 			Path:        `/workspaces/{workspace}/projects/{project_key}`,
 			Summary:     `Update a project for a workspace`,
-			Description: "Since this endpoint can be used to both update and to create a\nproject, the request body depends on the intent.\n\n#### Creation\n\nSee the POST documentation for the project collection for an\nexample of the request body.\n\nNote: The `key` should not be specified in the body of request\n(since it is already present in the URL). The `name` is required,\neverything else is optional.\n\n#### Update\n\nSee the POST documentation for the project collection for an\nexample of the request body.\n\nNote: The key is not required in the body (since it is already in\nthe URL). The key may be specified in the body, if the intent is\nto change the key itself. In such a scenario, the location of the\nproject is changed and is returned in the `Location` header of the\nresponse.",
+			Description: "Since this endpoint can be used to both update and to create a\nproject, the request body depends on the intent.\n\n#### Creation\n\nSee the POST documentation for the project collection for an\nexample of the request body.\n\nNote: The `key` should not be specified in the body of request\n(since it is already present in the URL). The `name` is required,\neverything else is optional.\n\n#### Update\n\nSee the POST documentation for the project collection for an\nexample of the request body.\n\nNote: The key is not required in the body (since it is already in\nthe URL). The key may be specified in the body, if the intent is\nto change the key itself. In such a scenario, the location of the\nproject is changed and is returned in the `Location` header of the\nresponse.\n\nNote: Changing the `enforced_signed_commits` setting requires the workspace\nto be on a Premium plan. Cannot be disabled while the setting is enforced\nat the workspace level.",
 			Params: []ParamDef{
 				{Name: `project_key`, In: `path`, Type: `string`, Required: true},
 				{Name: `workspace`, In: `path`, Type: `string`, Required: true},
 			},
 			BodyFields: []BodyFieldDef{
 				{Path: `description`, Type: `string`, Desc: `description`},
+				{Path: `enforced_signed_commits`, Type: `bool`, Desc: `Whether signed commits are required for this project:
+
+- true when the workspace is on a Premium plan and enforcement is enabled at the project or the
+  workspace level;
+- otherwise false.`},
 				{Path: `has_publicly_visible_repos`, Type: `bool`, Desc: `
 Indicates whether the project contains publicly visible repositories.
 Note that private projects cannot contain public repositories.`},
