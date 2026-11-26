@@ -157,6 +157,16 @@ Merge a pull request:
 bb-cli pr merge-apull-request --workspace myteam --repo-slug myrepo --pull-request-id 42
 ```
 
+Commit files without a git checkout. Each `--file` takes `<repository path>=<local file>` and can be repeated. Binary files are sent unchanged, and `--files` names a path to delete in the same commit. A new `--branch` starts from `--parents`, or from the main branch when `--parents` is omitted:
+
+```bash
+bb-cli repos create-a-commit-by-uploading-a-file --workspace myteam --repo-slug myrepo \
+  --branch docs/update --parents "$(bb-cli refs get-a-branch --name main --output json | jq -r .target.hash)" \
+  --message "Update the user guide" \
+  --file docs/guide.pdf=build/guide.pdf \
+  --file "docs/release notes.md=notes.md"
+```
+
 ## Discover commands quickly
 
 ```bash

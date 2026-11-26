@@ -210,6 +210,7 @@ class OperationIdLockTests(unittest.TestCase):
 
 
 ENV_CHANGES_PATH = "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}/changes"
+SRC_PATH = "/repositories/{workspace}/{repo_slug}/src"
 
 
 class DeploymentEnvironmentPatchTests(unittest.TestCase):
@@ -244,6 +245,11 @@ class DeploymentEnvironmentPatchTests(unittest.TestCase):
         spec = self._spec({}, {"operationId": "u", "x-bb-body-envelope": "custom"})
         self.assertEqual(enrich_spec.apply_operation_extension_patches(spec), 0)
         self.assertEqual(spec["paths"][ENV_CHANGES_PATH]["post"]["x-bb-body-envelope"], "custom")
+
+    def test_src_upload_is_marked_multipart(self):
+        spec = {"paths": {SRC_PATH: {"post": {"operationId": "createACommitByUploadingAFile"}}}}
+        enrich_spec.apply_operation_extension_patches(spec)
+        self.assertIs(spec["paths"][SRC_PATH]["post"]["x-bb-multipart-files"], True)
 
     def test_missing_properties_are_added_to_inline_allof_member(self):
         spec = self._spec({"name": {"type": "string"}}, {"operationId": "u"})

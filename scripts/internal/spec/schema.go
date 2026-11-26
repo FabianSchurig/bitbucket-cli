@@ -50,6 +50,10 @@ type Op struct {
 	// BodyEnvelope names the top-level key the request body must be wrapped
 	// in on the wire (x-bb-body-envelope, injected by enrich_spec.py).
 	BodyEnvelope string `yaml:"x-bb-body-envelope"`
+	// MultipartFiles marks an operation that uploads files as
+	// multipart/form-data fields named after their repository path
+	// (x-bb-multipart-files, injected by enrich_spec.py).
+	MultipartFiles bool `yaml:"x-bb-multipart-files"`
 }
 
 // OAuth2ScopeEntry represents an x-atlassian-oauth2-scopes entry.

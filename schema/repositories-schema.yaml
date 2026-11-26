@@ -2277,6 +2277,7 @@ paths:
       - forge-oauth2
       - api-token
       operationId: createACommitByUploadingAFile
+      x-bb-multipart-files: true
     parameters:
     - name: repo_slug
       in: path

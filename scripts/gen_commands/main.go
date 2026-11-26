@@ -9,6 +9,8 @@
 //   - Reads query parameters as optional --flags (typed from schema)
 //   - For POST/PUT/PATCH operations, generates typed --flags from the request body schema
 //   - Falls back to --body for raw JSON input (advanced)
+//   - For x-bb-multipart-files operations, adds a repeatable --file flag and
+//     sends the request as multipart/form-data
 //   - Calls handlers.Dispatch with method, URL template, params, etc.
 //
 // This script is run in CI whenever the schema changes.
@@ -39,7 +41,10 @@ type CommandData struct {
 	BodyFields   []spec.BodyField
 	HasBody      bool
 	BodyEnvelope string
-	Paginated    bool
+	// MultipartFiles adds a repeatable --file flag and sends the request as
+	// multipart/form-data (x-bb-multipart-files).
+	MultipartFiles bool
+	Paginated      bool
 }
 
 // FlagData holds the data for a single CLI flag.
@@ -103,18 +108,19 @@ func operationToCommand(op spec.OperationDef) CommandData {
 	}
 
 	return CommandData{
-		OperationID:  op.OperationID,
-		Use:          spec.ToKebab(op.OperationID),
-		Short:        op.Summary,
-		Long:         op.Description,
-		Deprecated:   op.Deprecated,
-		Method:       op.Method,
-		Path:         op.Path,
-		Flags:        flags,
-		BodyFields:   bodyFields,
-		HasBody:      op.HasBody,
-		BodyEnvelope: op.BodyEnvelope,
-		Paginated:    op.Paginated,
+		OperationID:    op.OperationID,
+		Use:            spec.ToKebab(op.OperationID),
+		Short:          op.Summary,
+		Long:           op.Description,
+		Deprecated:     op.Deprecated,
+		Method:         op.Method,
+		Path:           op.Path,
+		Flags:          flags,
+		BodyFields:     bodyFields,
+		HasBody:        op.HasBody,
+		BodyEnvelope:   op.BodyEnvelope,
+		MultipartFiles: op.MultipartFiles,
+		Paginated:      op.Paginated,
 	}
 }
 
@@ -172,7 +178,7 @@ return cmd
 // new{{$.CommandName}}{{toCamel .OperationID}}Cmd returns the "{{$.CommandUse}} {{.Use}}" cobra command.
 // operationId: {{.OperationID}}
 func new{{$.CommandName}}{{toCamel .OperationID}}Cmd() *cobra.Command {
-{{- if or .Flags .BodyFields .HasBody .Paginated}}
+{{- if or .Flags .BodyFields .HasBody .Paginated .MultipartFiles}}
 var (
 {{- range .Flags}}
 {{.GoName}} {{.GoType}}
@@ -185,6 +191,9 @@ body string
 {{- end}}
 {{- if .Paginated}}
 all bool
+{{- end}}
+{{- if .MultipartFiles}}
+uploadFiles []string
 {{- end}}
 )
 {{- end}}
@@ -270,6 +279,12 @@ body = string(b)
 {{- if not .HasBody}}
 body := ""
 {{- end}}
+{{- if .MultipartFiles}}
+uploads, err := handlers.ParseUploadFiles(uploadFiles)
+if err != nil {
+return err
+}
+{{- end}}
 return handlers.Dispatch(context.Background(), c, handlers.Request{
 					Method:      "{{.Method}}",
 					URLTemplate: "{{.Path}}",
@@ -278,6 +293,10 @@ return handlers.Dispatch(context.Background(), c, handlers.Request{
 					Body:        body,
 {{- if .BodyEnvelope}}
 					BodyEnvelope: {{goStringLit .BodyEnvelope}},
+{{- end}}
+{{- if .MultipartFiles}}
+					Multipart: true,
+					Files:     uploads,
 {{- end}}
 					All:         {{if .Paginated}}all{{else}}false{{end}},
 				})
@@ -295,6 +314,9 @@ cmd.Flags().StringVar(&body, "body", "", "Raw JSON request body (advanced)")
 {{- end}}
 {{- if .Paginated}}
 cmd.Flags().BoolVar(&all, "all", true, "Traverse all pages (follows 'next' cursor)")
+{{- end}}
+{{- if .MultipartFiles}}
+cmd.Flags().StringArrayVar(&uploadFiles, "file", nil, "File to upload, as <repository path>=<local file>; repeat for more files")
 {{- end}}
 return cmd
 }
