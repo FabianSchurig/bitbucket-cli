@@ -6,12 +6,12 @@
 
 ### Homebrew (macOS and Linux)
 
-To install via our custom tap, tap the repository and trust the formula to reduce supply chain risks:
+To install via our custom tap, tap the repository and trust the formula to reduce supply chain risks. Install it by its full name: Homebrew's core repository has an unrelated `bitbucket-cli` formula, which a plain `brew install bitbucket-cli` would pick instead:
 
 ```bash
 brew tap FabianSchurig/tap
 brew trust --formula FabianSchurig/tap/bitbucket-cli
-brew install bitbucket-cli
+brew install FabianSchurig/tap/bitbucket-cli
 ```
 
 > [!NOTE]
