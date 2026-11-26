@@ -1976,13 +1976,14 @@ To create new commits, [POST to this endpoint](#post)`,
 // operationId: createACommitByUploadingAFile
 func newReposCreateACommitByUploadingAFileCmd() *cobra.Command {
 	var (
-		repoSlug  string
-		workspace string
-		message   string
-		author    string
-		parents   string
-		files     string
-		branch    string
+		repoSlug    string
+		workspace   string
+		message     string
+		author      string
+		parents     string
+		files       string
+		branch      string
+		uploadFiles []string
 	)
 
 	cmd := &cobra.Command{
@@ -2013,12 +2014,18 @@ func newReposCreateACommitByUploadingAFileCmd() *cobra.Command {
 				"branch":  branch,
 			}
 			body := ""
+			uploads, err := handlers.ParseUploadFiles(uploadFiles)
+			if err != nil {
+				return err
+			}
 			return handlers.Dispatch(context.Background(), c, handlers.Request{
 				Method:      "POST",
 				URLTemplate: "/repositories/{workspace}/{repo_slug}/src",
 				PathParams:  pathParams,
 				QueryParams: queryParams,
 				Body:        body,
+				Multipart:   true,
+				Files:       uploads,
 				All:         false,
 			})
 		},
@@ -2030,6 +2037,7 @@ func newReposCreateACommitByUploadingAFileCmd() *cobra.Command {
 	cmd.Flags().StringVar(&parents, "parents", "", "parents (query parameter)")
 	cmd.Flags().StringVar(&files, "files", "", "files (query parameter)")
 	cmd.Flags().StringVar(&branch, "branch", "", "branch (query parameter)")
+	cmd.Flags().StringArrayVar(&uploadFiles, "file", nil, "File to upload, as <repository path>=<local file>; repeat for more files")
 	return cmd
 }
 

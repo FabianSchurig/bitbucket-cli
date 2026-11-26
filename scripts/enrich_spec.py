@@ -139,9 +139,16 @@ REQUEST_BODY_PATCHES: dict[tuple[str, str], dict] = {
 # ─── Operation extension patches ──────────────────────────────────────────────
 # Vendor extensions the generators understand but Atlassian does not publish.
 # x-bb-body-envelope: wrap the JSON body under this key on the wire.
+# x-bb-multipart-files: send a multipart/form-data request whose file fields
+#   are named after their repository path; the query parameters become form
+#   fields. The live spec declares no request body for these endpoints.
 OPERATION_EXTENSION_PATCHES: dict[tuple[str, str], dict] = {
     ("post", "/repositories/{workspace}/{repo_slug}/environments/{environment_uuid}/changes"): {
         "x-bb-body-envelope": "change",
+    },
+    # createACommitByUploadingAFile
+    ("post", "/repositories/{workspace}/{repo_slug}/src"): {
+        "x-bb-multipart-files": True,
     },
 }
 

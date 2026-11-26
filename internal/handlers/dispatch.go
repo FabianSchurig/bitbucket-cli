@@ -37,7 +37,12 @@ type Request struct {
 	// before sending (e.g. Bitbucket's environment update expects
 	// {"change": {...}}). A body that is already enveloped is sent unchanged.
 	BodyEnvelope string
-	All          bool
+	// Multipart sends the request as multipart/form-data (x-bb-multipart-files):
+	// the query parameters become form fields and each of Files becomes a file
+	// field named after its repository path, as Bitbucket's /src endpoint expects.
+	Multipart bool
+	Files     []UploadFile
+	All       bool
 }
 
 // pageResult holds extracted pagination data from a response.
@@ -178,6 +183,11 @@ func executeRequest(ctx context.Context, c *client.BBClient, r Request, fetchURL
 			applyBasicAuth(req, c)
 		}
 
+		if r.Multipart {
+			setMultipartForm(req, r)
+			return req, nil
+		}
+
 		if fetchURL == baseURL {
 			for k, v := range r.QueryParams {
 				if v != "" && v != "0" && v != "false" {
@@ -207,6 +217,21 @@ func executeRequest(ctx context.Context, c *client.BBClient, r Request, fetchURL
 	}
 
 	return resp, err
+}
+
+// setMultipartForm moves the request's parameters into a multipart/form-data
+// body. Empty parameters are skipped, as they are for query strings.
+func setMultipartForm(req *resty.Request, r Request) {
+	form := map[string]string{}
+	for k, v := range r.QueryParams {
+		if v != "" && v != "0" && v != "false" {
+			form[k] = v
+		}
+	}
+	req.SetMultipartFormData(form)
+	for _, f := range r.Files {
+		req.SetFile(f.RepoPath, f.LocalPath)
+	}
 }
 
 func shouldRetryWithoutAuth(method, url string, resp *resty.Response) bool {
