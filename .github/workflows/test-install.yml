@@ -5,6 +5,8 @@ on:
     workflows: ["Release"]
     types:
       - completed
+  # Re-test the latest release without cutting a new one.
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -12,7 +14,7 @@ permissions:
 jobs:
   test-homebrew:
     name: Test Homebrew install
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Set up Homebrew
@@ -22,7 +24,7 @@ jobs:
         run: |
           brew tap FabianSchurig/tap
           brew trust --formula FabianSchurig/tap/bitbucket-cli
-          brew install bitbucket-cli
+          brew install FabianSchurig/tap/bitbucket-cli
 
       - name: Verify bb-cli
         run: bb-cli --help
@@ -30,14 +32,14 @@ jobs:
       - name: Install bb-mcp from tap
         run: |
           brew trust --formula FabianSchurig/tap/bitbucket-mcp
-          brew install bitbucket-mcp
+          brew install FabianSchurig/tap/bitbucket-mcp
 
       - name: Verify bb-mcp
         run: bb-mcp --help
 
   test-deb:
     name: Test .deb install
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Get latest release tag
@@ -68,7 +70,7 @@ jobs:
 
   test-scoop:
     name: Test Scoop install
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: windows-latest
     steps:
       - name: Install Scoop
@@ -98,7 +100,7 @@ jobs:
 
   test-install-script:
     name: Test install script (${{ matrix.os }})
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
